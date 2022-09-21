@@ -21,6 +21,10 @@ public class MessageDetails implements Serializable {
 	 * The parameter name for vibration flag.
 	 */
 	private static final String NAME_VIBRATE = "vibrate";
+	/**
+	 * The parameter name for the lock message flag.
+	 */
+	private static final String LOCK_MESSAGE = "lockMessage";
 
 
 	/**
@@ -35,6 +39,10 @@ public class MessageDetails implements Serializable {
 	 * Flag indicating if there should be vibration on display.
 	 */
 	private boolean vibrate;
+	/**
+	 * Flag indicating if the message should be locked.
+	 */
+	private boolean lockMessage;
 
 	/**
 	 * Generate message details.
@@ -42,11 +50,13 @@ public class MessageDetails implements Serializable {
 	 * @param messageText         The message text.
 	 * @param displayOnLockScreen The display on lock screen flag.
 	 * @param vibrate             The vibration flag.
+	 * @param lockMessage         The lock message flag.
 	 */
-	public MessageDetails(String messageText, boolean displayOnLockScreen, boolean vibrate) {
+	public MessageDetails(String messageText, boolean displayOnLockScreen, boolean vibrate, boolean lockMessage) {
 		this.messageText = messageText;
 		this.displayOnLockScreen = displayOnLockScreen;
 		this.vibrate = vibrate;
+		this.lockMessage = lockMessage;
 	}
 
 	public String getMessageText() {
@@ -73,6 +83,14 @@ public class MessageDetails implements Serializable {
 		this.vibrate = vibrate;
 	}
 
+	public boolean isLockMessage() {
+		return lockMessage;
+	}
+
+	public void setLockMessage(boolean lockMessage) {
+		this.lockMessage = lockMessage;
+	}
+
 	/**
 	 * Extract messageDetails from remote message.
 	 *
@@ -85,7 +103,8 @@ public class MessageDetails implements Serializable {
 		String messageText = data.get(NAME_MESSAGE_TEXT);
 		boolean displayOnLockScreen = Boolean.parseBoolean(data.get(NAME_DISPLAY_ON_LOCK_SCREEN));
 		boolean vibrate = Boolean.parseBoolean(data.get(NAME_VIBRATE));
-		return new MessageDetails(messageText, displayOnLockScreen, vibrate);
+		boolean lockMessage = Boolean.parseBoolean(data.get(LOCK_MESSAGE));
+		return new MessageDetails(messageText, displayOnLockScreen, vibrate, lockMessage);
 	}
 
 }

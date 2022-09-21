@@ -107,6 +107,9 @@ public class MessageActivity extends AppCompatActivity {
 		if (messageDetails.isDisplayOnLockScreen()) {
 			displayOnLockScreen();
 		}
+		if (messageDetails.isLockMessage()) {
+			startLockTask();
+		}
 	}
 
 	/**
