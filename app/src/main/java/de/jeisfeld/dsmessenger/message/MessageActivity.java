@@ -13,9 +13,9 @@ import android.os.Vibrator;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
-import de.jeisfeld.dsmessenger.util.Logger;
 
 public class MessageActivity extends AppCompatActivity {
 	/**
@@ -23,9 +23,22 @@ public class MessageActivity extends AppCompatActivity {
 	 */
 	private static final String STRING_EXTRA_MESSAGE_DETAILS = "de.jeisfeld.dsmessenger.MESSAGE_DETAILS";
 	/**
+	 * String for storing message in instance state.
+	 */
+	private static final String STRING_MESSAGE="MESSAGE";
+	/**
 	 * The vibration pattern.
 	 */
 	private static final long[] VIBRATION_PATTERN = {0, 800, 400, 100, 200, 100, 200, 250, 300, 1000};
+
+	/**
+	 * The binding of the activity.
+	 */
+	ActivityMessageBinding binding;
+	/**
+	 * The message text.
+	 */
+	CharSequence messageText;
 
 	/**
 	 * Static helper method to create an intent for this activity.
@@ -37,22 +50,57 @@ public class MessageActivity extends AppCompatActivity {
 	public static Intent createIntent(final Context context, final MessageDetails messageDetails) {
 		Intent intent = new Intent(context, MessageActivity.class);
 		intent.putExtra(STRING_EXTRA_MESSAGE_DETAILS, messageDetails);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-		Logger.log("Created MessageActivity intent");
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
 		return intent;
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Logger.log("MessageActivity.onCreate()");
 
-		ActivityMessageBinding binding = ActivityMessageBinding.inflate(getLayoutInflater());
+		binding = ActivityMessageBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
 
-		MessageDetails messageDetails = (MessageDetails) getIntent().getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
-		binding.textviewFirst.setText(messageDetails.getMessageText());
+		if(savedInstanceState != null && savedInstanceState.getCharSequence(STRING_MESSAGE) != null) {
+			messageText = savedInstanceState.getCharSequence(STRING_MESSAGE);
+		}
+		else {
+			messageText = extractMessageText(getIntent());
+		}
 
+		handleIntentData(getIntent());
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		messageText += "\n" + extractMessageText(intent);
+		handleIntentData(intent);
+	}
+
+	@Override
+	protected void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putCharSequence(STRING_MESSAGE, messageText);
+	}
+
+	/**
+	 * Extract the message text form an intent.
+	 * @param intent The intent.
+	 * @return The message text.
+	 */
+	private String extractMessageText(final Intent intent) {
+		return ((MessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS)).getMessageText();
+	}
+
+	/**
+	 * Handle the data of a new intent.
+	 * @param intent The intent.
+	 */
+	private void handleIntentData(Intent intent) {
+		binding.textviewMessage.setText(messageText);
+
+		MessageDetails messageDetails = (MessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 		if (messageDetails.isVibrate()) {
 			vibrate(true);
 		}

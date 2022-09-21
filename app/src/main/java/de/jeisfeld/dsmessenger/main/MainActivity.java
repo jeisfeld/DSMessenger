@@ -4,20 +4,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.AppCompatActivity;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMainBinding;
-import de.jeisfeld.dsmessenger.util.Logger;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -80,10 +79,10 @@ public class MainActivity extends AppCompatActivity {
 
 					String oldToken = PreferenceUtil.getSharedPreferenceString(R.string.key_pref_messaging_token);
 					if (token.equals(oldToken)) {
-						Logger.log("Unchanged messaging token: " + token);
+						Log.d(Application.TAG,"Unchanged messaging token: " + token);
 					}
 					else {
-						Logger.log("Got new messaging token: " + token);
+						Log.i(Application.TAG,"Got new messaging token: " + token);
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_messaging_token, token);
 					}
 
