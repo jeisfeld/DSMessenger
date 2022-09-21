@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="preference_file_key" translatable="false">default</string>
+
+    <!-- Keys for app settings -->
+    <string name="key_pref_language" translatable="false">pref_language</string>
+    <string name="key_pref_night_mode" translatable="false">pref_night_mode</string>
+    <string name="key_pref_dummy_setting_battery_optimizations" translatable="false">pref_dummy_setting_battery_optimizations</string>
+
+    <!-- Keys for messaging -->
+    <string name="key_pref_messaging_token" translatable="false">pref_messaging_token</string>
+
+
+    <!-- Titles and defaults of preferences -->
+    <string name="pref_title_language">Language</string>
+    <string name="pref_default_language" translatable="false">0</string>
+    <string name="pref_title_night_mode">Dark Mode</string>
+    <string name="pref_default_night_mode" translatable="false">-1</string>
+    <string name="pref_title_dummy_setting_battery_optimizations">Configure battery optimizations</string>
+
+    <!-- Arrays for list preferences -->
+    <string-array name="pref_list_titles_language">
+        <item>System language</item>
+        <item>English</item>
+    </string-array>
+    <string-array name="pref_list_values_language" translatable="false">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <string-array name="pref_list_titles_night_mode">
+        <item>Follow System</item>
+        <item>Bright</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="pref_list_values_night_mode" translatable="false">
+        <item>-1</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+</resources>

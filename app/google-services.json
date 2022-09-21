@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "961673817720",
+    "project_id": "ds-messenger-f7c23",
+    "storage_bucket": "ds-messenger-f7c23.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:961673817720:android:267fd31b5ddf6d466fc78d",
+        "android_client_info": {
+          "package_name": "de.jeisfeld.dsmessenger"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "961673817720-ifbubi8ghg4g1cif53ij09lfjfcmpb47.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy47sl0CjyceaypBfz3LNG6POM-qJ0kdw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "961673817720-ifbubi8ghg4g1cif53ij09lfjfcmpb47.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
