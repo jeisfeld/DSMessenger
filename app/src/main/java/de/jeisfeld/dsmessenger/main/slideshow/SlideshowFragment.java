@@ -1,4 +1,4 @@
-package de.jeisfeld.dsmessenger.ui.slideshow;
+package de.jeisfeld.dsmessenger.main.slideshow;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

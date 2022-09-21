@@ -1,4 +1,4 @@
-package de.jeisfeld.dsmessenger.ui.home;
+package de.jeisfeld.dsmessenger.main.home;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

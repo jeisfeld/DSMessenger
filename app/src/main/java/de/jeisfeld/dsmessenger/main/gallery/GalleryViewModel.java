@@ -1,4 +1,4 @@
-package de.jeisfeld.dsmessenger.ui.gallery;
+package de.jeisfeld.dsmessenger.main.gallery;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
