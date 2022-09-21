@@ -15,6 +15,7 @@ import android.view.WindowManager.LayoutParams;
 
 import androidx.appcompat.app.AppCompatActivity;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
+import de.jeisfeld.dsmessenger.util.Logger;
 
 public class MessageActivity extends AppCompatActivity {
 	/**
@@ -24,7 +25,7 @@ public class MessageActivity extends AppCompatActivity {
 	/**
 	 * The vibration pattern.
 	 */
-	private static final long[] VIBRATION_PATTERN = {0, 1000, 500, 100, 200, 100, 200, 1000};
+	private static final long[] VIBRATION_PATTERN = {0, 800, 400, 100, 200, 100, 200, 250, 300, 1000};
 
 	/**
 	 * Static helper method to create an intent for this activity.
@@ -37,12 +38,14 @@ public class MessageActivity extends AppCompatActivity {
 		Intent intent = new Intent(context, MessageActivity.class);
 		intent.putExtra(STRING_EXTRA_MESSAGE_DETAILS, messageDetails);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+		Logger.log("Created MessageActivity intent");
 		return intent;
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Logger.log("MessageActivity.onCreate()");
 
 		ActivityMessageBinding binding = ActivityMessageBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());

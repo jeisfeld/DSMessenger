@@ -13,14 +13,18 @@ public class FirebaseDSMessagingService extends FirebaseMessagingService {
 	public void onMessageReceived(@NonNull RemoteMessage message) {
 		super.onMessageReceived(message);
 
-		Logger.log("Received message from: " + message.getFrom());
+		Logger.log("Received message from " + message.getFrom() + " with priority " + message.getPriority());
 
 		if (message.getData().size() > 0) {
 			Logger.log("Message data: " + message.getData());
-
 		}
 
 		startActivity(MessageActivity.createIntent(this, MessageDetails.fromRemoteMessage(message)));
+	}
+
+	@Override
+	public void onDeletedMessages() {
+		super.onDeletedMessages();
 	}
 
 	@Override

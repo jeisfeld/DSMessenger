@@ -6,6 +6,7 @@
     <!-- Keys for app settings -->
     <string name="key_pref_language" translatable="false">pref_language</string>
     <string name="key_pref_night_mode" translatable="false">pref_night_mode</string>
+    <string name="key_pref_screen_control" translatable="false">pref_screen_control</string>
     <string name="key_pref_dummy_setting_battery_optimizations" translatable="false">pref_dummy_setting_battery_optimizations</string>
 
     <!-- Keys for messaging -->
@@ -17,6 +18,7 @@
     <string name="pref_default_language" translatable="false">0</string>
     <string name="pref_title_night_mode">Dark Mode</string>
     <string name="pref_default_night_mode" translatable="false">-1</string>
+    <string name="pref_title_screen_control">Enable screen control</string>
     <string name="pref_title_dummy_setting_battery_optimizations">Configure battery optimizations</string>
 
     <!-- Arrays for list preferences -->
