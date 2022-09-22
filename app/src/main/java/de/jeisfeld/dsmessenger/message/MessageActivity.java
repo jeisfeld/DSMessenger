@@ -2,16 +2,9 @@ package de.jeisfeld.dsmessenger.message;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
 import android.os.Build;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
@@ -47,12 +40,12 @@ public class MessageActivity extends AppCompatActivity {
 	 * Static helper method to create an intent for this activity.
 	 *
 	 * @param context        The context in which this activity is started.
-	 * @param messageDetails The details of the message to be displayed
+	 * @param textMessageDetails The details of the message to be displayed
 	 * @return the intent.
 	 */
-	public static Intent createIntent(final Context context, final MessageDetails messageDetails) {
+	public static Intent createIntent(final Context context, final TextMessageDetails textMessageDetails) {
 		Intent intent = new Intent(context, MessageActivity.class);
-		intent.putExtra(STRING_EXTRA_MESSAGE_DETAILS, messageDetails);
+		intent.putExtra(STRING_EXTRA_MESSAGE_DETAILS, textMessageDetails);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
 		return intent;
 	}
@@ -104,7 +97,7 @@ public class MessageActivity extends AppCompatActivity {
 	 * @return The message text.
 	 */
 	private String extractMessageText(final Intent intent) {
-		return ((MessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS)).getMessageText();
+		return ((TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS)).getMessageText();
 	}
 
 	/**
@@ -114,18 +107,18 @@ public class MessageActivity extends AppCompatActivity {
 	private void handleIntentData(Intent intent) {
 		binding.textviewMessage.setText(messageText);
 
-		MessageDetails messageDetails = (MessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
-		if (messageDetails.isVibrate()) {
+		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
+		if (textMessageDetails.isVibrate()) {
 			messageVibration = new MessageVibration(this);
-			messageVibration.vibrate(messageDetails);
+			messageVibration.vibrate(textMessageDetails);
 		}
-		if (messageDetails.isDisplayOnLockScreen()) {
+		if (textMessageDetails.isDisplayOnLockScreen()) {
 			displayOnLockScreen();
 		}
-		if (messageDetails.isLockMessage()) {
+		if (textMessageDetails.isLockMessage()) {
 			startLockTask();
 		}
-		if (messageDetails.isKeepScreenOn()) {
+		if (textMessageDetails.isKeepScreenOn()) {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
 	}

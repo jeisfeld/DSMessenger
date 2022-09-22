@@ -11,141 +11,25 @@ import java.util.Objects;
  */
 public class MessageDetails implements Serializable {
 	/**
-	 * The parameter name for message text.
+	 * The parameter name for message type.
 	 */
-	private static final String NAME_MESSAGE_TEXT = "messageText";
-	/**
-	 * The parameter name for display on lock screen flag.
-	 */
-	private static final String NAME_DISPLAY_ON_LOCK_SCREEN = "displayOnLockScreen";
-	/**
-	 * The parameter name for vibration flag.
-	 */
-	private static final String NAME_VIBRATE = "vibrate";
-	/**
-	 * The parameter name for vibration repetition flag.
-	 */
-	private static final String NAME_VIBRATION_REPEATED = "vibrationRepeated";
-	/**
-	 * The parameter name for vibration pattern flag.
-	 */
-	private static final String NAME_VIBRATION_PATTERN = "vibrationPattern";
-	/**
-	 * The parameter name for the lock message flag.
-	 */
-	private static final String LOCK_MESSAGE = "lockMessage";
-	/**
-	 * The parameter name for the keep screen on flag.
-	 */
-	private static final String KEEP_SCREEN_ON = "keepScreenOn";
-
+	private static final String NAME_MESSAGE_TYPE = "messageType";
 
 	/**
-	 * The message text.
+	 * The message type.
 	 */
-	private String messageText;
-	/**
-	 * Flag indicating if the message should be displayed on top of lock screen.
-	 */
-	private boolean displayOnLockScreen;
-	/**
-	 * Flag indicating if there should be vibration on display.
-	 */
-	private boolean vibrate;
-	/**
-	 * Flag indicating if the vibration should be repeated.
-	 */
-	private boolean vibrationRepeated;
-	/**
-	 * The vibration pattern.
-	 */
-	private int vibrationPattern;
+	private MessageType type;
 
-	/**
-	 * Flag indicating if the message should be locked.
-	 */
-	private boolean lockMessage;
-	/**
-	 * Flag indicating if screen should be kept on.
-	 */
-	private boolean keepScreenOn;
-
-	/**
-	 * Generate message details.
-	 *
-	 * @param messageText         The message text.
-	 * @param displayOnLockScreen The display on lock screen flag.
-	 * @param vibrate             The vibration flag.
-	 * @param vibrationRepeated   The vibration repetition flag.
-	 * @param vibrationPattern    The vibration pattern.
-	 * @param lockMessage         The lock message flag.
-	 * @param keepScreenOn        The Keep screen on flag.
-	 */
-	public MessageDetails(String messageText, boolean displayOnLockScreen, boolean vibrate, boolean vibrationRepeated, int vibrationPattern,
-						  boolean lockMessage, boolean keepScreenOn) {
-		this.messageText = messageText;
-		this.displayOnLockScreen = displayOnLockScreen;
-		this.vibrate = vibrate;
-		this.vibrationRepeated = vibrationRepeated;
-		this.vibrationPattern = vibrationPattern;
-		this.lockMessage = lockMessage;
-		this.keepScreenOn = keepScreenOn;
+	public MessageType getType() {
+		return type;
 	}
 
-	public String getMessageText() {
-		return messageText;
+	public void setType(MessageType type) {
+		this.type = type;
 	}
 
-	public void setMessageText(String messageText) {
-		this.messageText = messageText;
-	}
-
-	public boolean isDisplayOnLockScreen() {
-		return displayOnLockScreen;
-	}
-
-	public void setDisplayOnLockScreen(boolean displayOnLockScreen) {
-		this.displayOnLockScreen = displayOnLockScreen;
-	}
-
-	public boolean isVibrate() {
-		return vibrate;
-	}
-
-	public void setVibrate(boolean vibrate) {
-		this.vibrate = vibrate;
-	}
-
-	public boolean isVibrationRepeated() {
-		return vibrationRepeated;
-	}
-
-	public void setVibrationRepeated(boolean vibrationRepeated) {
-		this.vibrationRepeated = vibrationRepeated;
-	}
-
-	public int getVibrationPattern() {
-		return vibrationPattern;
-	}
-
-	public void setVibrationPattern(int vibrationPattern) {
-		this.vibrationPattern = vibrationPattern;
-	}
-
-	public boolean isLockMessage() {
-		return lockMessage;
-	}
-
-	public void setLockMessage(boolean lockMessage) {
-		this.lockMessage = lockMessage;
-	}
-
-	public boolean isKeepScreenOn() {
-		return keepScreenOn;
-	}
-
-	public void setKeepScreenOn(boolean keepScreenOn) {
-		this.keepScreenOn = keepScreenOn;
+	public MessageDetails(MessageType type) {
+		this.type = type;
 	}
 
 	/**
@@ -156,21 +40,37 @@ public class MessageDetails implements Serializable {
 	 */
 	public static MessageDetails fromRemoteMessage(final RemoteMessage message) {
 		Map<String, String> data = message.getData();
+		MessageType messageType = MessageType.fromName(data.get(NAME_MESSAGE_TYPE));
 
-		String messageText = data.get(NAME_MESSAGE_TEXT);
-		boolean displayOnLockScreen = Boolean.parseBoolean(data.get(NAME_DISPLAY_ON_LOCK_SCREEN));
-		boolean vibrate = Boolean.parseBoolean(data.get(NAME_VIBRATE));
-		boolean vibrationRepated = Boolean.parseBoolean(data.get(NAME_VIBRATION_REPEATED));
-		int vibrationPattern;
-		try {
-			vibrationPattern = Integer.parseInt(Objects.requireNonNull(data.get(NAME_VIBRATION_PATTERN)));
+		switch(messageType) {
+		case TEXT:
+			return TextMessageDetails.fromRemoteMessage(message);
+		case UNKNOWN:
+		default:
+			return new MessageDetails(MessageType.UNKNOWN);
 		}
-		catch(NumberFormatException | NullPointerException e) {
-			vibrationPattern = 0;
-		}
-		boolean lockMessage = Boolean.parseBoolean(data.get(LOCK_MESSAGE));
-		boolean keepScreenOn = Boolean.parseBoolean(data.get(KEEP_SCREEN_ON));
-		return new MessageDetails(messageText, displayOnLockScreen, vibrate, vibrationRepated, vibrationPattern, lockMessage, keepScreenOn);
 	}
 
+	/**
+	 * The type of messages.
+	 */
+	public enum MessageType {
+		/**
+		 * Unknown message.
+		 */
+		UNKNOWN,
+		/**
+		 * Text message.
+		 */
+		TEXT;
+
+		private static MessageType fromName(String name) {
+			try {
+				return MessageType.valueOf(name);
+			}
+			catch (IllegalArgumentException | NullPointerException e) {
+				return UNKNOWN;
+			}
+		}
+	}
 }
