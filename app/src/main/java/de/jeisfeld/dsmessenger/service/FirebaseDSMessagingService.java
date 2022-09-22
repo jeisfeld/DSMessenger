@@ -25,11 +25,6 @@ public class FirebaseDSMessagingService extends FirebaseMessagingService {
 	}
 
 	@Override
-	public void onDeletedMessages() {
-		super.onDeletedMessages();
-	}
-
-	@Override
 	public void onNewToken(@NonNull String token) {
 		Log.i(Application.TAG,"Received new messaging token: " + token);
 	}

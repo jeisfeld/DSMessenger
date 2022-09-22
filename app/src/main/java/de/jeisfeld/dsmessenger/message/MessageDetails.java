@@ -25,6 +25,10 @@ public class MessageDetails implements Serializable {
 	 * The parameter name for the lock message flag.
 	 */
 	private static final String LOCK_MESSAGE = "lockMessage";
+	/**
+	 * The parameter name for the keep screen on flag.
+	 */
+	private static final String KEEP_SCREEN_ON = "keepScreenOn";
 
 
 	/**
@@ -43,6 +47,10 @@ public class MessageDetails implements Serializable {
 	 * Flag indicating if the message should be locked.
 	 */
 	private boolean lockMessage;
+	/**
+	 * Flag indicating if screen should be kept on.
+	 */
+	private boolean keepScreenOn;
 
 	/**
 	 * Generate message details.
@@ -51,12 +59,14 @@ public class MessageDetails implements Serializable {
 	 * @param displayOnLockScreen The display on lock screen flag.
 	 * @param vibrate             The vibration flag.
 	 * @param lockMessage         The lock message flag.
+	 * @param keepScreenOn        The Keep screen on flag.
 	 */
-	public MessageDetails(String messageText, boolean displayOnLockScreen, boolean vibrate, boolean lockMessage) {
+	public MessageDetails(String messageText, boolean displayOnLockScreen, boolean vibrate, boolean lockMessage, boolean keepScreenOn) {
 		this.messageText = messageText;
 		this.displayOnLockScreen = displayOnLockScreen;
 		this.vibrate = vibrate;
 		this.lockMessage = lockMessage;
+		this.keepScreenOn = keepScreenOn;
 	}
 
 	public String getMessageText() {
@@ -91,6 +101,14 @@ public class MessageDetails implements Serializable {
 		this.lockMessage = lockMessage;
 	}
 
+	public boolean isKeepScreenOn() {
+		return keepScreenOn;
+	}
+
+	public void setKeepScreenOn(boolean keepScreenOn) {
+		this.keepScreenOn = keepScreenOn;
+	}
+
 	/**
 	 * Extract messageDetails from remote message.
 	 *
@@ -104,7 +122,8 @@ public class MessageDetails implements Serializable {
 		boolean displayOnLockScreen = Boolean.parseBoolean(data.get(NAME_DISPLAY_ON_LOCK_SCREEN));
 		boolean vibrate = Boolean.parseBoolean(data.get(NAME_VIBRATE));
 		boolean lockMessage = Boolean.parseBoolean(data.get(LOCK_MESSAGE));
-		return new MessageDetails(messageText, displayOnLockScreen, vibrate, lockMessage);
+		boolean keepScreenOn = Boolean.parseBoolean(data.get(KEEP_SCREEN_ON));
+		return new MessageDetails(messageText, displayOnLockScreen, vibrate, lockMessage, keepScreenOn);
 	}
 
 }

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 
 import androidx.annotation.NonNull;
@@ -109,6 +110,9 @@ public class MessageActivity extends AppCompatActivity {
 		}
 		if (messageDetails.isLockMessage()) {
 			startLockTask();
+		}
+		if (messageDetails.isKeepScreenOn()) {
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
 	}
 
