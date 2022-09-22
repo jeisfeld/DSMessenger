@@ -4,6 +4,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The details of a message.
@@ -21,6 +22,14 @@ public class MessageDetails implements Serializable {
 	 * The parameter name for vibration flag.
 	 */
 	private static final String NAME_VIBRATE = "vibrate";
+	/**
+	 * The parameter name for vibration repetition flag.
+	 */
+	private static final String NAME_VIBRATION_REPEATED = "vibrationRepeated";
+	/**
+	 * The parameter name for vibration pattern flag.
+	 */
+	private static final String NAME_VIBRATION_PATTERN = "vibrationPattern";
 	/**
 	 * The parameter name for the lock message flag.
 	 */
@@ -44,6 +53,15 @@ public class MessageDetails implements Serializable {
 	 */
 	private boolean vibrate;
 	/**
+	 * Flag indicating if the vibration should be repeated.
+	 */
+	private boolean vibrationRepeated;
+	/**
+	 * The vibration pattern.
+	 */
+	private int vibrationPattern;
+
+	/**
 	 * Flag indicating if the message should be locked.
 	 */
 	private boolean lockMessage;
@@ -58,13 +76,18 @@ public class MessageDetails implements Serializable {
 	 * @param messageText         The message text.
 	 * @param displayOnLockScreen The display on lock screen flag.
 	 * @param vibrate             The vibration flag.
+	 * @param vibrationRepeated   The vibration repetition flag.
+	 * @param vibrationPattern    The vibration pattern.
 	 * @param lockMessage         The lock message flag.
 	 * @param keepScreenOn        The Keep screen on flag.
 	 */
-	public MessageDetails(String messageText, boolean displayOnLockScreen, boolean vibrate, boolean lockMessage, boolean keepScreenOn) {
+	public MessageDetails(String messageText, boolean displayOnLockScreen, boolean vibrate, boolean vibrationRepeated, int vibrationPattern,
+						  boolean lockMessage, boolean keepScreenOn) {
 		this.messageText = messageText;
 		this.displayOnLockScreen = displayOnLockScreen;
 		this.vibrate = vibrate;
+		this.vibrationRepeated = vibrationRepeated;
+		this.vibrationPattern = vibrationPattern;
 		this.lockMessage = lockMessage;
 		this.keepScreenOn = keepScreenOn;
 	}
@@ -91,6 +114,22 @@ public class MessageDetails implements Serializable {
 
 	public void setVibrate(boolean vibrate) {
 		this.vibrate = vibrate;
+	}
+
+	public boolean isVibrationRepeated() {
+		return vibrationRepeated;
+	}
+
+	public void setVibrationRepeated(boolean vibrationRepeated) {
+		this.vibrationRepeated = vibrationRepeated;
+	}
+
+	public int getVibrationPattern() {
+		return vibrationPattern;
+	}
+
+	public void setVibrationPattern(int vibrationPattern) {
+		this.vibrationPattern = vibrationPattern;
 	}
 
 	public boolean isLockMessage() {
@@ -121,9 +160,17 @@ public class MessageDetails implements Serializable {
 		String messageText = data.get(NAME_MESSAGE_TEXT);
 		boolean displayOnLockScreen = Boolean.parseBoolean(data.get(NAME_DISPLAY_ON_LOCK_SCREEN));
 		boolean vibrate = Boolean.parseBoolean(data.get(NAME_VIBRATE));
+		boolean vibrationRepated = Boolean.parseBoolean(data.get(NAME_VIBRATION_REPEATED));
+		int vibrationPattern;
+		try {
+			vibrationPattern = Integer.parseInt(Objects.requireNonNull(data.get(NAME_VIBRATION_PATTERN)));
+		}
+		catch(NumberFormatException | NullPointerException e) {
+			vibrationPattern = 0;
+		}
 		boolean lockMessage = Boolean.parseBoolean(data.get(LOCK_MESSAGE));
 		boolean keepScreenOn = Boolean.parseBoolean(data.get(KEEP_SCREEN_ON));
-		return new MessageDetails(messageText, displayOnLockScreen, vibrate, lockMessage, keepScreenOn);
+		return new MessageDetails(messageText, displayOnLockScreen, vibrate, vibrationRepated, vibrationPattern, lockMessage, keepScreenOn);
 	}
 
 }

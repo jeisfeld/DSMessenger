@@ -10,6 +10,8 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
@@ -27,10 +29,6 @@ public class MessageActivity extends AppCompatActivity {
 	 * String for storing message in instance state.
 	 */
 	private static final String STRING_MESSAGE="MESSAGE";
-	/**
-	 * The vibration pattern.
-	 */
-	private static final long[] VIBRATION_PATTERN = {0, 800, 400, 100, 200, 100, 200, 250, 300, 1000};
 
 	/**
 	 * The binding of the activity.
@@ -40,6 +38,10 @@ public class MessageActivity extends AppCompatActivity {
 	 * The message text.
 	 */
 	CharSequence messageText;
+	/**
+	 * The message vibration.
+	 */
+	MessageVibration messageVibration = null;
 
 	/**
 	 * Static helper method to create an intent for this activity.
@@ -70,13 +72,24 @@ public class MessageActivity extends AppCompatActivity {
 		}
 
 		handleIntentData(getIntent());
+
+		binding.buttonAcknowledge.setOnClickListener(v -> {
+			if (messageVibration != null) {
+				messageVibration.cancelVibration();
+			}
+			binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
+		});
 	}
 
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
-		messageText += "\n" + extractMessageText(intent);
+		if (messageText.length() > 0 && messageText.charAt(messageText.length() - 1) != '\n') {
+			messageText += "\n";
+		}
+		messageText += extractMessageText(intent);
 		handleIntentData(intent);
+		binding.buttonAcknowledge.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -103,7 +116,8 @@ public class MessageActivity extends AppCompatActivity {
 
 		MessageDetails messageDetails = (MessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 		if (messageDetails.isVibrate()) {
-			vibrate(true);
+			messageVibration = new MessageVibration(this);
+			messageVibration.vibrate(messageDetails);
 		}
 		if (messageDetails.isDisplayOnLockScreen()) {
 			displayOnLockScreen();
@@ -131,24 +145,6 @@ public class MessageActivity extends AppCompatActivity {
 		}
 	}
 
-	/**
-	 * Vibrate when displaying the message.
-	 *
-	 * @param forced Flag indicating if vibration should happen even if in silent mode
-	 */
-	private void vibrate(final boolean forced) {
-		AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-		if (forced || am.getRingerMode() != AudioManager.RINGER_MODE_SILENT) {
-			Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-			if (VERSION.SDK_INT >= VERSION_CODES.O) {
-				vibrator.vibrate(VibrationEffect.createWaveform(VIBRATION_PATTERN, -1),
-						new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_COMMUNICATION_INSTANT).build());
-			}
-			else {
-				vibrator.vibrate(VIBRATION_PATTERN, -1);
-			}
-		}
-	}
 
 }
