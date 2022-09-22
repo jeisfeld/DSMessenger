@@ -7,11 +7,11 @@
         <deviceKey>
           <Key>
             <type value="SERIAL_NUMBER" />
-            <value value="Handy-Galaxy-S10e:5555" />
+            <value value="Tablet-Galaxy-Tab-S6:5555" />
           </Key>
         </deviceKey>
       </Target>
     </runningDeviceTargetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2022-09-22T18:04:29.976902100Z" />
+    <timeTargetWasSelectedWithDropDown value="2022-09-23T13:53:12.570262Z" />
   </component>
 </project>

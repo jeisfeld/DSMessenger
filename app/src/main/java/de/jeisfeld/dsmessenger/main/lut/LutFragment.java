@@ -17,15 +17,9 @@ public class LutFragment extends Fragment {
 
 	public View onCreateView(@NonNull LayoutInflater inflater,
 							 ViewGroup container, Bundle savedInstanceState) {
-		LutViewModel lutViewModel =
-				new ViewModelProvider(this).get(LutViewModel.class);
 
 		binding = FragmentLutBinding.inflate(inflater, container, false);
-		View root = binding.getRoot();
-
-		final TextView textView = binding.textSlideshow;
-		lutViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-		return root;
+		return binding.getRoot();
 	}
 
 	@Override

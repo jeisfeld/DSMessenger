@@ -1,10 +1,5 @@
 <resources>
-    <dimen name="page_padding">20dp</dimen>
     <dimen name="margin_small">10dp</dimen>
     <dimen name="margin_medium">20dp</dimen>
-
-    <integer name="selector_label_width">30</integer>
-    <integer name="selector_input_width">70</integer>
     <integer name="messge_text_min_lines">10</integer>
-
 </resources>

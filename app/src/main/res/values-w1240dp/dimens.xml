@@ -1,3 +1,6 @@
 <resources>
-    <dimen name="fab_margin">200dp</dimen>
+    <dimen name="page_padding">40dp</dimen>
+    <dimen name="margin_small">20dp</dimen>
+    <dimen name="margin_medium">40dp</dimen>
+    <integer name="messge_text_min_lines">15</integer>
 </resources>
