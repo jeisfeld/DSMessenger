@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.service;
 
+import android.content.Intent;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -9,6 +10,7 @@ import androidx.annotation.NonNull;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.message.MessageActivity;
 import de.jeisfeld.dsmessenger.message.MessageDetails;
+import de.jeisfeld.dsmessenger.message.RandomimageMessageDetails;
 import de.jeisfeld.dsmessenger.message.TextMessageDetails;
 
 public class FirebaseDSMessagingService extends FirebaseMessagingService {
@@ -29,6 +31,23 @@ public class FirebaseDSMessagingService extends FirebaseMessagingService {
 		switch (messageDetails.getType()) {
 		case TEXT:
 			startActivity(MessageActivity.createIntent(this, (TextMessageDetails) messageDetails));
+			break;
+		case RANDOMIMAGE:
+			RandomimageMessageDetails randomimageMessageDetails = (RandomimageMessageDetails) messageDetails;
+			Intent intent = new Intent("de.jeisfeld.randomimage.DISPLAY_RANDOM_IMAGE_FROM_EXTERNAL");
+			switch(randomimageMessageDetails.getRandomImageOrigin()) {
+			case NOTIFICATION:
+				intent.putExtra("de.eisfeldj.randomimage.NOTIFICATION_NAME", ((RandomimageMessageDetails) messageDetails).getNotificationName());
+				sendBroadcast(intent);
+				break;
+			case WIDGET:
+				intent.putExtra("de.eisfeldj.randomimage.WIDGET_NAME", ((RandomimageMessageDetails) messageDetails).getWidgetName());
+				sendBroadcast(intent);
+				break;
+			case UNKNOWN:
+			default:
+				break;
+			}
 			break;
 		case UNKNOWN:
 		default:

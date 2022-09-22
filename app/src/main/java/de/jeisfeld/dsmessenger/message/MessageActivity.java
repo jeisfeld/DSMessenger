@@ -13,6 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
 
+/**
+ * Activity to display messages.
+ */
 public class MessageActivity extends AppCompatActivity {
 	/**
 	 * The resource key for the message.
@@ -21,25 +24,25 @@ public class MessageActivity extends AppCompatActivity {
 	/**
 	 * String for storing message in instance state.
 	 */
-	private static final String STRING_MESSAGE="MESSAGE";
+	private static final String STRING_MESSAGE = "MESSAGE";
 
 	/**
 	 * The binding of the activity.
 	 */
-	ActivityMessageBinding binding;
+	private ActivityMessageBinding binding;
 	/**
 	 * The message text.
 	 */
-	CharSequence messageText;
+	private String messageText;
 	/**
 	 * The message vibration.
 	 */
-	MessageVibration messageVibration = null;
+	private MessageVibration messageVibration = null;
 
 	/**
 	 * Static helper method to create an intent for this activity.
 	 *
-	 * @param context        The context in which this activity is started.
+	 * @param context            The context in which this activity is started.
 	 * @param textMessageDetails The details of the message to be displayed
 	 * @return the intent.
 	 */
@@ -51,14 +54,14 @@ public class MessageActivity extends AppCompatActivity {
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		binding = ActivityMessageBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
 
-		if(savedInstanceState != null && savedInstanceState.getCharSequence(STRING_MESSAGE) != null) {
-			messageText = savedInstanceState.getCharSequence(STRING_MESSAGE);
+		if (savedInstanceState != null && savedInstanceState.getCharSequence(STRING_MESSAGE) != null) {
+			messageText = savedInstanceState.getString(STRING_MESSAGE);
 		}
 		else {
 			messageText = extractMessageText(getIntent());
@@ -75,7 +78,7 @@ public class MessageActivity extends AppCompatActivity {
 	}
 
 	@Override
-	protected void onNewIntent(Intent intent) {
+	protected final void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
 		if (messageText.length() > 0 && messageText.charAt(messageText.length() - 1) != '\n') {
 			messageText += "\n";
@@ -86,13 +89,14 @@ public class MessageActivity extends AppCompatActivity {
 	}
 
 	@Override
-	protected void onSaveInstanceState(@NonNull Bundle outState) {
+	protected final void onSaveInstanceState(@NonNull final Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putCharSequence(STRING_MESSAGE, messageText);
+		outState.putString(STRING_MESSAGE, messageText);
 	}
 
 	/**
 	 * Extract the message text form an intent.
+	 *
 	 * @param intent The intent.
 	 * @return The message text.
 	 */
@@ -102,9 +106,10 @@ public class MessageActivity extends AppCompatActivity {
 
 	/**
 	 * Handle the data of a new intent.
+	 *
 	 * @param intent The intent.
 	 */
-	private void handleIntentData(Intent intent) {
+	private void handleIntentData(final Intent intent) {
 		binding.textviewMessage.setText(messageText);
 
 		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
@@ -137,7 +142,5 @@ public class MessageActivity extends AppCompatActivity {
 			window.addFlags(LayoutParams.FLAG_TURN_SCREEN_ON);
 		}
 	}
-
-
 
 }

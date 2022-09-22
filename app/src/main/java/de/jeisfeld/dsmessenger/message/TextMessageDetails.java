@@ -2,7 +2,6 @@ package de.jeisfeld.dsmessenger.message;
 
 import com.google.firebase.messaging.RemoteMessage;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 
@@ -43,32 +42,32 @@ public class TextMessageDetails extends MessageDetails {
 	/**
 	 * The message text.
 	 */
-	private String messageText;
+	private final String messageText;
 	/**
 	 * Flag indicating if the message should be displayed on top of lock screen.
 	 */
-	private boolean displayOnLockScreen;
+	private final boolean displayOnLockScreen;
 	/**
 	 * Flag indicating if there should be vibration on display.
 	 */
-	private boolean vibrate;
+	private final boolean vibrate;
 	/**
 	 * Flag indicating if the vibration should be repeated.
 	 */
-	private boolean vibrationRepeated;
+	private final boolean vibrationRepeated;
 	/**
 	 * The vibration pattern.
 	 */
-	private int vibrationPattern;
+	private final int vibrationPattern;
 
 	/**
 	 * Flag indicating if the message should be locked.
 	 */
-	private boolean lockMessage;
+	private final boolean lockMessage;
 	/**
 	 * Flag indicating if screen should be kept on.
 	 */
-	private boolean keepScreenOn;
+	private final boolean keepScreenOn;
 
 	/**
 	 * Generate message details.
@@ -97,56 +96,28 @@ public class TextMessageDetails extends MessageDetails {
 		return messageText;
 	}
 
-	public void setMessageText(String messageText) {
-		this.messageText = messageText;
-	}
-
 	public boolean isDisplayOnLockScreen() {
 		return displayOnLockScreen;
-	}
-
-	public void setDisplayOnLockScreen(boolean displayOnLockScreen) {
-		this.displayOnLockScreen = displayOnLockScreen;
 	}
 
 	public boolean isVibrate() {
 		return vibrate;
 	}
 
-	public void setVibrate(boolean vibrate) {
-		this.vibrate = vibrate;
-	}
-
 	public boolean isVibrationRepeated() {
 		return vibrationRepeated;
-	}
-
-	public void setVibrationRepeated(boolean vibrationRepeated) {
-		this.vibrationRepeated = vibrationRepeated;
 	}
 
 	public int getVibrationPattern() {
 		return vibrationPattern;
 	}
 
-	public void setVibrationPattern(int vibrationPattern) {
-		this.vibrationPattern = vibrationPattern;
-	}
-
 	public boolean isLockMessage() {
 		return lockMessage;
 	}
 
-	public void setLockMessage(boolean lockMessage) {
-		this.lockMessage = lockMessage;
-	}
-
 	public boolean isKeepScreenOn() {
 		return keepScreenOn;
-	}
-
-	public void setKeepScreenOn(boolean keepScreenOn) {
-		this.keepScreenOn = keepScreenOn;
 	}
 
 	/**

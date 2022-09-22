@@ -18,14 +18,10 @@ public class MessageDetails implements Serializable {
 	/**
 	 * The message type.
 	 */
-	private MessageType type;
+	private final MessageType type;
 
 	public MessageType getType() {
 		return type;
-	}
-
-	public void setType(MessageType type) {
-		this.type = type;
 	}
 
 	public MessageDetails(MessageType type) {
@@ -45,6 +41,9 @@ public class MessageDetails implements Serializable {
 		switch(messageType) {
 		case TEXT:
 			return TextMessageDetails.fromRemoteMessage(message);
+		case RANDOMIMAGE:
+			return RandomimageMessageDetails.fromRemoteMessage(message);
+		case LUT:
 		case UNKNOWN:
 		default:
 			return new MessageDetails(MessageType.UNKNOWN);
@@ -62,7 +61,15 @@ public class MessageDetails implements Serializable {
 		/**
 		 * Text message.
 		 */
-		TEXT;
+		TEXT,
+		/**
+		 * Randomimage notification.
+		 */
+		RANDOMIMAGE,
+		/**
+		 * Lob und Tadel notification.
+		 */
+		LUT;
 
 		private static MessageType fromName(String name) {
 			try {
