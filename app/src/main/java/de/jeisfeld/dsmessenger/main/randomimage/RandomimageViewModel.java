@@ -1,16 +1,16 @@
-package de.jeisfeld.dsmessenger.main.slideshow;
+package de.jeisfeld.dsmessenger.main.randomimage;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class SlideshowViewModel extends ViewModel {
+public class RandomimageViewModel extends ViewModel {
 
 	private final MutableLiveData<String> mText;
 
-	public SlideshowViewModel() {
+	public RandomimageViewModel() {
 		mText = new MutableLiveData<>();
-		mText.setValue("This is slideshow fragment");
+		mText.setValue("This is gallery fragment");
 	}
 
 	public LiveData<String> getText() {

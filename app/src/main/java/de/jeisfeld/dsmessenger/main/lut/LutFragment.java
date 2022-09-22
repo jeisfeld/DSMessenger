@@ -1,4 +1,4 @@
-package de.jeisfeld.dsmessenger.main.slideshow;
+package de.jeisfeld.dsmessenger.main.lut;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,22 +9,22 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import de.jeisfeld.dsmessenger.databinding.FragmentSlideshowBinding;
+import de.jeisfeld.dsmessenger.databinding.FragmentLutBinding;
 
-public class SlideshowFragment extends Fragment {
+public class LutFragment extends Fragment {
 
-	private FragmentSlideshowBinding binding;
+	private FragmentLutBinding binding;
 
 	public View onCreateView(@NonNull LayoutInflater inflater,
 							 ViewGroup container, Bundle savedInstanceState) {
-		SlideshowViewModel slideshowViewModel =
-				new ViewModelProvider(this).get(SlideshowViewModel.class);
+		LutViewModel lutViewModel =
+				new ViewModelProvider(this).get(LutViewModel.class);
 
-		binding = FragmentSlideshowBinding.inflate(inflater, container, false);
+		binding = FragmentLutBinding.inflate(inflater, container, false);
 		View root = binding.getRoot();
 
 		final TextView textView = binding.textSlideshow;
-		slideshowViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+		lutViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 		return root;
 	}
 

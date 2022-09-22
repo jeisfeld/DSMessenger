@@ -2,21 +2,21 @@
     <string name="app_name">DS Messenger</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">DS Messenger</string>
+    <string name="nav_header_subtitle">dsmessenger@jeisfeld.de</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="action_settings">Settings</string>
     <string name="title_activity_message">MessageActivity</string>
+    <string name="title_dialog_confirmation">Confirmation</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_message">Message</string>
+    <string name="menu_randomimage">Randomimage</string>
+    <string name="menu_lut">LUT</string>
     <string name="menu_settings">Settings</string>
 
     <string name="button_ok">OK</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_acknowledge">Acknowledge</string>
 
-    <string name="title_dialog_confirmation">Confirmation</string>
+    <string name="text_message_text">Message Text</string>
 
 </resources>

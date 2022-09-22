@@ -1,4 +1,4 @@
-package de.jeisfeld.dsmessenger.main.gallery;
+package de.jeisfeld.dsmessenger.main.randomimage;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,23 +8,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import de.jeisfeld.dsmessenger.databinding.FragmentGalleryBinding;
+import de.jeisfeld.dsmessenger.databinding.FragmentRandomimageBinding;
 
-public class GalleryFragment extends Fragment {
+public class RandomimageFragment extends Fragment {
 
-	private FragmentGalleryBinding binding;
+	private FragmentRandomimageBinding binding;
 
 	@Override
 	public View onCreateView(@NonNull final LayoutInflater inflater,
 			final ViewGroup container, final Bundle savedInstanceState) {
-		GalleryViewModel galleryViewModel =
-				new ViewModelProvider(this).get(GalleryViewModel.class);
+		RandomimageViewModel randomimageViewModel =
+				new ViewModelProvider(this).get(RandomimageViewModel.class);
 
-		binding = FragmentGalleryBinding.inflate(inflater, container, false);
+		binding = FragmentRandomimageBinding.inflate(inflater, container, false);
 		View root = binding.getRoot();
 
 		final TextView textView = binding.textGallery;
-		galleryViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+		randomimageViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 		return root;
 	}
 
