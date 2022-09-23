@@ -17,45 +17,25 @@ import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.util.DialogUtil;
 
 /**
  * Fragment for settings.
  */
 public class SettingsFragment extends PreferenceFragmentCompat {
-	ActivityResultLauncher<Intent> permissionResultLauncher;
-
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		permissionResultLauncher = registerForActivityResult(
-				new ActivityResultContracts.StartActivityForResult(),
-				result -> {
-					if (Settings.canDrawOverlays(getActivity())) {
-						((CheckBoxPreference) Objects.requireNonNull(findPreference(getString(R.string.key_pref_screen_control)))).setChecked(true);
-					}
-				});
 	}
 
 	@Override
 	public final void onCreatePreferences(final Bundle savedInstanceState, final String rootKey) {
 		setPreferencesFromResource(R.xml.preferences, rootKey);
 		configureBatteryOptimizationButton();
+		configureScreenControlButton();
 
 		findPreference(getString(R.string.key_pref_night_mode)).setOnPreferenceChangeListener((preference, newValue) -> {
 			AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
-			return true;
-		});
-
-		findPreference(getString(R.string.key_pref_screen_control)).setOnPreferenceChangeListener((preference, newValue) -> {
-			if (Boolean.TRUE.equals(newValue)) {
-				if (!Settings.canDrawOverlays(getActivity())) {
-					Intent permissionIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-							Uri.parse("package:" + getActivity().getPackageName()));
-					permissionResultLauncher.launch(permissionIntent);
-					return false;
-				}
-			}
 			return true;
 		});
 	}
@@ -64,7 +44,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 	 * Configure the button for battery optimization.
 	 */
 	private void configureBatteryOptimizationButton() {
-		Preference batteryOptimizationPreference = findPreference(getString(R.string.key_pref_dummy_setting_battery_optimizations));
+		Preference batteryOptimizationPreference = findPreference(getString(R.string.key_pref_dummy_battery_optimizations));
 		assert batteryOptimizationPreference != null;
 		batteryOptimizationPreference.setOnPreferenceClickListener(preference -> {
 			PowerManager pm = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
@@ -78,6 +58,26 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 			}
 			startActivity(intent);
 			return true;
+		});
+	}
+
+	/**
+	 * Configure the button for screen control.
+	 */
+	private void configureScreenControlButton() {
+		Preference screenControlPreference = findPreference(getString(R.string.key_pref_dummy_screen_control));
+		assert screenControlPreference != null;
+		screenControlPreference.setOnPreferenceClickListener(preference -> {
+			final Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getActivity().getPackageName()));
+			if (Settings.canDrawOverlays(getActivity())) {
+				startActivity(intent);
+				return true;
+			}
+			else {
+				DialogUtil.displayConfirmationMessage(getActivity(), dialog -> startActivity(intent), R.string.title_dialog_info,
+						null, R.string.button_ok, R.string.dialog_screen_control_permission, getString(R.string.app_name));
+				return true;
+			}
 		});
 	}
 }

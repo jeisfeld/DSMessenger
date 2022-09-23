@@ -7,6 +7,7 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="title_activity_message">MessageActivity</string>
     <string name="title_dialog_confirmation">Confirmation</string>
+    <string name="title_dialog_info">Info</string>
 
     <string name="menu_message">Message</string>
     <string name="menu_randomimage">Randomimage</string>
@@ -36,6 +37,8 @@
     <string name="text_origin_notification">Notification</string>
     <string name="text_notification_name">Notification Name</string>
     <string name="text_widget_name">Widget Name</string>
+
+    <string name="dialog_screen_control_permission">In the following screen, please give the app %1$s permission to make displays on top of other apps.</string>
 
     <string-array name="array_vibrate_pattern_names">
         <item>Default</item>

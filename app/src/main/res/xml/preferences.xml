@@ -18,13 +18,12 @@
         android:title="@string/pref_title_night_mode"
         app:iconSpaceReserved="false"
         app:useSimpleSummaryProvider="true" />
-    <CheckBoxPreference
-        android:defaultValue="false"
-        android:key="@string/key_pref_screen_control"
-        android:title="@string/pref_title_screen_control"
+    <Preference
+        android:key="@string/key_pref_dummy_screen_control"
+        android:title="@string/pref_title_dummy_screen_control"
         app:iconSpaceReserved="false" />
     <Preference
-        android:key="@string/key_pref_dummy_setting_battery_optimizations"
-        android:title="@string/pref_title_dummy_setting_battery_optimizations"
+        android:key="@string/key_pref_dummy_battery_optimizations"
+        android:title="@string/pref_title_dummy_battery_optimizations"
         app:iconSpaceReserved="false" />
 </PreferenceScreen>

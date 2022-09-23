@@ -91,6 +91,32 @@ public final class DialogUtil {
 	 * Display a confirmation message asking for cancel or ok.
 	 *
 	 * @param activity              the current activity
+	 * @param titleResource         the title of the confirmation dialog
+	 * @param confirmButtonResource the display on the positive button
+	 * @param messageResource       the confirmation message
+	 * @param args                  arguments for the confirmation message
+	 */
+	public static void displayInfoMessage(final FragmentActivity activity, final Integer titleResource, final Integer confirmButtonResource,
+												  final int messageResource, final Object... args) {
+		String message = capitalizeFirst(activity.getString(messageResource, args));
+		Bundle bundle = new Bundle();
+		bundle.putCharSequence(PARAM_MESSAGE, message);
+		bundle.putInt(PARAM_CONFIRM_BUTTON_RESOURCE, confirmButtonResource == null ? R.string.button_ok : confirmButtonResource);
+		bundle.putInt(PARAM_TITLE_RESOURCE, titleResource == null ? R.string.title_dialog_info : titleResource);
+		DisplayInfoDialogFragment fragment = new DisplayInfoDialogFragment();
+		fragment.setArguments(bundle);
+		try {
+			fragment.show(activity.getSupportFragmentManager(), fragment.getClass().toString());
+		}
+		catch (IllegalStateException e) {
+			// May appear if activity is not active any more - ignore.
+		}
+	}
+
+	/**
+	 * Display a confirmation message asking for cancel or ok.
+	 *
+	 * @param activity              the current activity
 	 * @param listener              The listener waiting for the response
 	 * @param titleResource         the title of the confirmation dialog
 	 * @param cancelButtonResource  the display on the negative button
@@ -121,20 +147,7 @@ public final class DialogUtil {
 	}
 
 	/**
-	 * Display a confirmation message asking for cancel or ok.
-	 *
-	 * @param activity        the current activity
-	 * @param titleResource   the title of the confirmation dialog
-	 * @param messageResource the confirmation message
-	 * @param args            arguments for the confirmation message
-	 */
-	public static void displayConfirmationMessage(final FragmentActivity activity, final Integer titleResource,
-												  final int messageResource, final Object... args) {
-		displayConfirmationMessage(activity, null, titleResource, null, R.string.button_ok, messageResource, args);
-	}
-
-	/**
-	 * Display a confirmation message asking for cancel or ok.
+	 * Display an input dialog.
 	 *
 	 * @param activity        the current activity
 	 * @param listener        The listener waiting for the response
@@ -182,6 +195,33 @@ public final class DialogUtil {
 	}
 
 	/**
+	 * Fragment to display a info message.
+	 */
+	public static class DisplayInfoDialogFragment extends DialogFragment {
+		@Override
+		@NonNull
+		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
+			assert getArguments() != null;
+			final CharSequence message = getArguments().getCharSequence(PARAM_MESSAGE);
+			final int confirmButtonResource = getArguments().getInt(PARAM_CONFIRM_BUTTON_RESOURCE);
+			final int titleResource = getArguments().getInt(PARAM_TITLE_RESOURCE);
+
+			View view = getLayoutInflater().inflate(R.layout.dialog_info, null);
+			((TextView) view.findViewById(R.id.textViewInfoMessage)).setText(message);
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setTitle(titleResource) //
+					.setIcon(R.drawable.ic_info) //
+					.setView(view) //
+					.setPositiveButton(confirmButtonResource, (dialog, id) -> {
+						// do nothing
+					});
+
+			return builder.create();
+		}
+	}
+
+	/**
 	 * Fragment to display a confirmation message.
 	 */
 	public static class ConfirmDialogFragment extends DialogFragment {
@@ -208,7 +248,7 @@ public final class DialogUtil {
 			final int confirmButtonResource = getArguments().getInt(PARAM_CONFIRM_BUTTON_RESOURCE);
 			final int titleResource = getArguments().getInt(PARAM_TITLE_RESOURCE);
 
-			View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_confirmation, null);
+			View view = getLayoutInflater().inflate(R.layout.dialog_confirmation, null);
 			((TextView) view.findViewById(R.id.textViewConfirmationMessage)).setText(message);
 
 			// Listeners cannot retain functionality when automatically recreated.
@@ -307,7 +347,7 @@ public final class DialogUtil {
 		@Override
 		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
 			assert getArguments() != null;
-			View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_input, null);
+			View view = getLayoutInflater().inflate(R.layout.dialog_input, null);
 			final EditText input = view.findViewById(R.id.editTextDialog);
 			input.setText(getArguments().getString(PARAM_TEXT_VALUE));
 			input.setInputType(getArguments().getInt(PARAM_INPUT_TYPE));
