@@ -1,4 +1,5 @@
 <?php
+namespace dsmessenger;
 require 'vendor/autoload.php';
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
