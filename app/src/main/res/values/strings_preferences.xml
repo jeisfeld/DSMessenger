@@ -8,6 +8,7 @@
     <string name="key_pref_night_mode" translatable="false">pref_night_mode</string>
     <string name="key_pref_dummy_screen_control" translatable="false">pref_dummy_screen_control</string>
     <string name="key_pref_dummy_battery_optimizations" translatable="false">pref_dummy_setting_battery_optimizations</string>
+    <string name="key_pref_use_test_server" translatable="false">pref_use_test_server</string>
 
     <!-- Keys for messaging -->
     <string name="key_pref_messaging_token" translatable="false">pref_messaging_token</string>
@@ -20,6 +21,7 @@
     <string name="pref_default_night_mode" translatable="false">-1</string>
     <string name="pref_title_dummy_screen_control">Configure screen control</string>
     <string name="pref_title_dummy_battery_optimizations">Configure battery optimizations</string>
+    <string name="pref_title_use_test_server">Use test server</string>
 
     <!-- Arrays for list preferences -->
     <string-array name="pref_list_titles_language">

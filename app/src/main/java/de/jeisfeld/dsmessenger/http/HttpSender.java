@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.Authenticator;
-import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 import javax.net.ssl.HttpsURLConnection;
 
 import de.jeisfeld.dsmessenger.Application;
+import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 public class HttpSender {
 	/**
@@ -32,19 +33,26 @@ public class HttpSender {
 				return new PasswordAuthentication(HttpCredentials.USERNAME, HttpCredentials.PASSWORD.toCharArray());
 			}
 		});
+		String urlBase;
+		if (PreferenceUtil.getSharedPreferenceBoolean(R.string.key_pref_use_test_server)) {
+			urlBase = "https://pc-joerg:8101/dsmessenger/";
+		}
+		else {
+			urlBase = "https://jeisfeld.de/dsmessenger/";
+		}
 
 		new Thread() {
 			@Override
 			public void run() {
 				Reader in = null;
 				try {
-					URL url = new URL("https://jeisfeld.de/index.php");
-					HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-					byte[] postDataBytes = getPostData(parameters).getBytes(StandardCharsets.UTF_8);
-					urlConnection.setRequestMethod("POST");
-					urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-					urlConnection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+					URL url = new URL(urlBase + "index.php");
+					URLConnection urlConnection = url.openConnection();
 					urlConnection.setDoOutput(true);
+					((HttpsURLConnection) urlConnection).setRequestMethod("POST");
+					urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+					byte[] postDataBytes = getPostData(parameters).getBytes(StandardCharsets.UTF_8);
+					urlConnection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
 					urlConnection.getOutputStream().write(postDataBytes);
 
 					in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8));
@@ -52,7 +60,7 @@ public class HttpSender {
 					for (int c; (c = in.read()) >= 0; ) {
 						result.append((char) c);
 					}
-					Log.v(Application.TAG, "HTTPS result: " + result);
+					//Log.v(Application.TAG, "HTTPS result: " + result);
 				}
 				catch (IOException e) {
 					Log.e(Application.TAG, "Invalid URL", e);

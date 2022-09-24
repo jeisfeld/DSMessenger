@@ -26,4 +26,9 @@
         android:key="@string/key_pref_dummy_battery_optimizations"
         android:title="@string/pref_title_dummy_battery_optimizations"
         app:iconSpaceReserved="false" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/key_pref_use_test_server"
+        android:title="@string/pref_title_use_test_server"
+        app:iconSpaceReserved="false" />
 </PreferenceScreen>

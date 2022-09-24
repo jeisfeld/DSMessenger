@@ -28,7 +28,7 @@ function sendTextMessage($device, $messageText, $vibrate, $vibrationRepeated, $v
 }
 
 if (isset($_POST['messageText'])) {
-    sendTextMessage($_POST['device'], $_POST['messageText'], $_POST['vibrate'], $_POST['vibrationRepeated'], $_POST['vibrationPattern'], $_POST['displayOnLockScreen'], $_POST['lockMessage'], $_POST['keepScreenOn']);
+    sendTextMessage($_POST['device'], $_POST['messageText'], @$_POST['vibrate'], @$_POST['vibrationRepeated'], @$_POST['vibrationPattern'], @$_POST['displayOnLockScreen'], @$_POST['lockMessage'], @$_POST['keepScreenOn']);
 }
 
 function sendRandomImageMessage($device, $randomImageOrigin, $notificationName, $widgetName)
