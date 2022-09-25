@@ -55,7 +55,8 @@ public class MessageFragment extends Fragment {
 		boolean lockMessage = binding.checkboxLockMessage.isChecked();
 		boolean keepScreenOn = binding.checkboxKeepScreenOn.isChecked();
 
-		new HttpSender().sendMessage("device", device, "messageType", "TEXT", "messageText", messageText, "vibrate", Boolean.toString(vibrate),
+		new HttpSender().sendMessage(null,
+				"device", device, "messageType", "TEXT", "messageText", messageText, "vibrate", Boolean.toString(vibrate),
 				"vibrationRepeated", Boolean.toString(repeatVibration), "vibrationPattern", Integer.toString(vibrationPattern),
 				"displayOnLockScreen", Boolean.toString(displayOnLockScreen), "lockMessage", Boolean.toString(lockMessage),
 				"keepScreenOn", Boolean.toString(keepScreenOn));

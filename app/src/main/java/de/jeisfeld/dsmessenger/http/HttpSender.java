@@ -24,9 +24,10 @@ public class HttpSender {
 	/**
 	 * Send a POST message to Server.
 	 *
+	 * @param listener   The response listener.
 	 * @param parameters The POST parameters.
 	 */
-	public void sendMessage(String... parameters) {
+	public void sendMessage(OnHttpResponseListener listener, String... parameters) {
 		Authenticator.setDefault(new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -60,7 +61,9 @@ public class HttpSender {
 					for (int c; (c = in.read()) >= 0; ) {
 						result.append((char) c);
 					}
-					//Log.v(Application.TAG, "HTTPS result: " + result);
+					if (listener != null) {
+						listener.onHttpResponse(result.toString());
+					}
 				}
 				catch (IOException e) {
 					Log.e(Application.TAG, "Invalid URL", e);
@@ -96,6 +99,18 @@ public class HttpSender {
 			postData.append(URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
 		}
 		return postData.toString();
+	}
+
+	/**
+	 * Handler for HTTP/HTTPS response.
+	 */
+	public interface OnHttpResponseListener {
+		/**
+		 * Handle HTTP/HTTPS response.
+		 *
+		 * @param response The response.
+		 */
+		void onHttpResponse(String response);
 	}
 
 }
