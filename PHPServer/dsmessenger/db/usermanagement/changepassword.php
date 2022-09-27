@@ -20,7 +20,7 @@ if (! $newpassword || strlen($newpassword) < 8) {
 }
 $hashedpassword = password_hash($newpassword, PASSWORD_BCRYPT);
 
-$stmt = $conn->prepare("UPDATE dsm_user_slave SET password = ? WHERE username = ?");
+$stmt = $conn->prepare("UPDATE dsm_user SET password = ? WHERE username = ?");
 $stmt->bind_param("ss", $hashedpassword, $username);
 
 if ($stmt->execute()) {

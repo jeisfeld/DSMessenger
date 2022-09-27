@@ -24,7 +24,7 @@ $hashedpassword = password_hash($password, PASSWORD_BCRYPT);
 $email = @$_POST['email'];
 $token = @$_POST['token'];
 
-$stmt = $conn->prepare("SELECT id FROM dsm_user_slave WHERE username = ?");
+$stmt = $conn->prepare("SELECT id FROM dsm_user WHERE username = ?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
 
@@ -33,7 +33,7 @@ if ($stmt->get_result()->num_rows) {
 }
 $stmt->close();
 
-$stmt = $conn->prepare("INSERT INTO dsm_user_slave (username, password, email, token) VALUES (?, ?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO dsm_user (username, password, email, token) VALUES (?, ?, ?, ?)");
 $stmt->bind_param("ssss", $username, $hashedpassword, $email, $token);
 if ($stmt->execute()) {
     printSuccess("User " . $username . " successfully created.");

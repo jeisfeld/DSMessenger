@@ -25,7 +25,7 @@ function verifyCredentials($conn, $username, $password)
     }
 
     $hashedpassword = null;
-    $stmt = $conn->prepare("SELECT password FROM dsm_user_slave WHERE username = ?");
+    $stmt = $conn->prepare("SELECT password FROM dsm_user WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->bind_result($hashedpassword);
@@ -40,7 +40,7 @@ function verifyCredentials($conn, $username, $password)
     }
 }
 
-function getUserSlaveId($conn, $username, $password) {
+function getUserId($conn, $username, $password) {
     if (! $username) {
         die("Error: Missing username");
     }
@@ -49,7 +49,7 @@ function getUserSlaveId($conn, $username, $password) {
     }
     
     $id = null;
-    $stmt = $conn->prepare("SELECT id FROM dsm_user_slave WHERE username = ?");
+    $stmt = $conn->prepare("SELECT id FROM dsm_user WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->bind_result($id);

@@ -14,17 +14,15 @@ $username = @$_POST['username'];
 $password = @$_POST['password'];
 verifyCredentials($conn, $username, $password);
 
-$verificationcode = uniqid('id', true);
-$slaveid = getUserSlaveId($conn, $username, $password);
+$stmt = $conn->prepare("DELETE FROM dsm_user WHERE username = ?");
+$stmt->bind_param("s", $username);
 
-$stmt = $conn->prepare("INSERT INTO dsm_user_master (slave_id, verificationcode) VALUES (?, ?)");
-$stmt->bind_param("is", $slaveid, $verificationcode);
 if ($stmt->execute()) {
-    printSuccess("Invitation for user " . $username . " successfully created.", array("verificationcode" => $verificationcode));
+    printSuccess("User " . $username . " successfully deleted.");
 }
 else {
     $stmt->close();
-    printError(102, "Failed to create invitation");
+    printError(102, "Failed to delete user.");
 }
 
 $conn->close();
