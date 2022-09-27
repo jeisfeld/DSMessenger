@@ -58,4 +58,3 @@ function getUserId($conn, $username, $password) {
     return $id;
 }
 
-$_POST = $_GET;

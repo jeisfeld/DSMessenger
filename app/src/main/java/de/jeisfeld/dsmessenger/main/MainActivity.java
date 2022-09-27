@@ -2,10 +2,8 @@ package de.jeisfeld.dsmessenger.main;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +15,7 @@ import androidx.navigation.ui.NavigationUI;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMainBinding;
+import de.jeisfeld.dsmessenger.service.FirebaseDSMessagingService;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 		// Passing each menu ID as a set of Ids because each
 		// menu should be considered as top level destinations.
 		mAppBarConfiguration = new AppBarConfiguration.Builder(
-				R.id.nav_message, R.id.nav_randomimage, R.id.nav_lut, R.id.nav_settings)
+				R.id.nav_account, R.id.nav_message, R.id.nav_randomimage, R.id.nav_lut, R.id.nav_settings)
 				.setOpenableLayout(drawer)
 				.build();
 		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -53,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
 				|| super.onSupportNavigateUp();
 	}
 
+	/**
+	 * Log the messaging token.
+	 */
 	private void logMessagingToken() {
 		FirebaseMessaging.getInstance().getToken()
 				.addOnCompleteListener(task -> {
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 					}
 					else {
 						Log.i(Application.TAG,"Got new messaging token: " + token);
-						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_messaging_token, token);
+						FirebaseDSMessagingService.updateToken(token);
 					}
 
 				});

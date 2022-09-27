@@ -10,7 +10,10 @@
     <string name="key_pref_dummy_battery_optimizations" translatable="false">pref_dummy_setting_battery_optimizations</string>
     <string name="key_pref_use_test_server" translatable="false">pref_use_test_server</string>
 
-    <!-- Keys for messaging -->
+    <!-- Keys for my account -->
+    <string name="key_pref_username" translatable="false">pref_username</string>
+    <string name="key_pref_password" translatable="false">pref_password</string>
+    <string name="key_pref_email" translatable="false">pref_email</string>
     <string name="key_pref_messaging_token" translatable="false">pref_messaging_token</string>
 
 

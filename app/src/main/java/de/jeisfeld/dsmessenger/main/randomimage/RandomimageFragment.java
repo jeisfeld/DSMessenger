@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -19,7 +20,7 @@ public class RandomimageFragment extends Fragment {
 
 	@Override
 	public View onCreateView(@NonNull final LayoutInflater inflater,
-			final ViewGroup container, final Bundle savedInstanceState) {
+							 final ViewGroup container, final Bundle savedInstanceState) {
 		binding = FragmentRandomimageBinding.inflate(inflater, container, false);
 
 		binding.radioGroupOrigin.setOnCheckedChangeListener((group, checkedId) -> {
@@ -54,7 +55,7 @@ public class RandomimageFragment extends Fragment {
 		String notificationName = binding.spinnerNotificationName.getSelectedItem().toString();
 		String widgetName = binding.spinnerWidgetName.getSelectedItem().toString();
 
-		new HttpSender().sendMessage(null,
+		new HttpSender().sendMessage("index.php", false, null,
 				"device", device, "messageType", "RANDOMIMAGE", "randomImageOrigin", randomImageOrigin,
 				"notificationName", notificationName, "widgetName", widgetName);
 	}

@@ -55,7 +55,7 @@ public class MessageFragment extends Fragment {
 		boolean lockMessage = binding.checkboxLockMessage.isChecked();
 		boolean keepScreenOn = binding.checkboxKeepScreenOn.isChecked();
 
-		new HttpSender().sendMessage(null,
+		new HttpSender().sendMessage("index.php", false, null,
 				"device", device, "messageType", "TEXT", "messageText", messageText, "vibrate", Boolean.toString(vibrate),
 				"vibrationRepeated", Boolean.toString(repeatVibration), "vibrationPattern", Integer.toString(vibrationPattern),
 				"displayOnLockScreen", Boolean.toString(displayOnLockScreen), "lockMessage", Boolean.toString(lockMessage),

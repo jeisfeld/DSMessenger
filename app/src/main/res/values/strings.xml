@@ -9,6 +9,7 @@
     <string name="title_dialog_confirmation">Confirmation</string>
     <string name="title_dialog_info">Info</string>
 
+    <string name="menu_account">Account</string>
     <string name="menu_message">Message</string>
     <string name="menu_randomimage">Randomimage</string>
     <string name="menu_lut">LUT</string>
@@ -18,6 +19,13 @@
     <string name="button_cancel">Cancel</string>
     <string name="button_acknowledge">Acknowledge</string>
     <string name="button_send">Send</string>
+    <string name="button_create_account">Create account</string>
+    <string name="button_login">Login</string>
+    <string name="button_create_invitation">Create Invitation</string>
+    <string name="button_accept_invitation">Accept Invitation</string>
+    <string name="button_withdraw_invitation">Withdraw Invitation</string>
+    <string name="button_logout">Logout</string>
+    <string name="button_change_password">Change Password</string>
 
     <string name="text_send_message">Send Message</string>
     <string name="text_display_random_image">Display RandomImage</string>
@@ -37,6 +45,25 @@
     <string name="text_origin_notification">Notification</string>
     <string name="text_notification_name">Notification Name</string>
     <string name="text_widget_name">Widget Name</string>
+
+    <string name="text_my_account">My Account</string>
+    <string name="text_username">Username</string>
+    <string name="text_password">Password</string>
+    <string name="text_repeat_password">Repeat Password</string>
+    <string name="text_old_password">Old Password</string>
+    <string name="text_new_password">New Password</string>
+    <string name="text_email">Email</string>
+    <string name="text_connected_accounts">Connected Accounts</string>
+    <string name="text_my_role">My Role</string>
+    <string name="text_sub">Sub</string>
+    <string name="text_dom">Dom</string>
+    <string name="text_connection_code">Connection Code</string>
+
+    <string name="error_missing_username">Missing username</string>
+    <string name="error_passwords_do_not_match">Passwords do not match</string>
+    <string name="error_password_too_short">Password must have min 8 characters</string>
+    <string name="error_technical_error">Technical error</string>
+    <string name="error_wrong_old_password">Wrong old password</string>
 
     <string name="dialog_screen_control_permission">In the following screen, please give the app %1$s permission to make displays on top of other apps.</string>
 
