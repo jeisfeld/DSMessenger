@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_medium"
             android:text="@string/text_my_account"
-            android:textSize="@dimen/text_large" />
+            android:textSize="@dimen/text_xlarge" />
 
         <TableLayout
             android:id="@+id/table_my_account"
@@ -126,10 +126,26 @@
             android:layout_marginTop="@dimen/margin_medium"
             android:layout_marginBottom="@dimen/margin_medium"
             android:text="@string/text_connected_accounts"
-            android:textSize="@dimen/text_large"
+            android:textSize="@dimen/text_xlarge"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/table_my_account" />
+
+        <LinearLayout
+            android:id="@+id/layoutMyDoms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_my_doms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_medium"
+                android:text="@string/text_my_doms"
+                android:textSize="@dimen/text_large" />
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/button_create_invitation"

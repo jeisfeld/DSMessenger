@@ -15,20 +15,22 @@ $password = @$_POST['password'];
 verifyCredentials($conn, $username, $password);
 
 $slaveid = getUserId($conn, $username, $password);
-$isSlave = @$_POST['isSlave'];
+$isSlave = @$_POST['is_slave'];
+$myName = @$_POST['myname'];
+$contactName = @$_POST['contactname'];
 
 if ($isSlave) {
     $connectioncode = uniqid('m', true);
-    $stmt = $conn->prepare("INSERT INTO dsm_relation (slave_id, connection_code, wait_verification_by) VALUES (?, ?, false)");
+    $stmt = $conn->prepare("INSERT INTO dsm_relation (slave_id, connection_code, slave_name, master_name) VALUES (?, ?, ?, ?)");
 }
 else {
     $connectioncode = uniqid('s', true);
-    $stmt = $conn->prepare("INSERT INTO dsm_relation (master_id, connection_code, wait_verification_by) VALUES (?, ?, true)");
+    $stmt = $conn->prepare("INSERT INTO dsm_relation (master_id, connection_code, master_name, slave_name) VALUES (?, ?, ?, ?)");
 }
 
-$stmt->bind_param("is", $slaveid, $connectioncode);
+$stmt->bind_param("isss", $slaveid, $connectioncode, $myName, $contactName);
 if ($stmt->execute()) {
-    printSuccess("Invitation for user " . $username . " successfully created.", array("connection_code" => $connectioncode));
+    printSuccess("Invitation for user " . $username . " successfully created.", array("connectioncode" => $connectioncode));
 }
 else {
     $stmt->close();

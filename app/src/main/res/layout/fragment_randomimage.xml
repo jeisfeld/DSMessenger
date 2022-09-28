@@ -37,7 +37,7 @@
                 android:layout_marginBottom="@dimen/margin_medium"
                 android:text="@string/text_display_random_image"
                 android:textAlignment="center"
-                android:textSize="@dimen/text_large"
+                android:textSize="@dimen/text_xlarge"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

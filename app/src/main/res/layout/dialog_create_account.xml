@@ -28,7 +28,7 @@
                     android:id="@+id/editTextUsername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/text_username"
+                    android:hint="@string/text_username_m"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 

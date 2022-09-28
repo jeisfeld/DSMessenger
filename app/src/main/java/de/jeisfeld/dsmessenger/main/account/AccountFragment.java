@@ -14,6 +14,7 @@ import de.jeisfeld.dsmessenger.databinding.FragmentAccountBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.ChangePasswordDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateAccountDialogFragment;
+import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateInvitationDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.LoginDialogFragment;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
@@ -85,9 +86,7 @@ public class AccountFragment extends Fragment {
 	 * Configure the buttons for invitations.
 	 */
 	private void configureInvitationButtons() {
-		binding.buttonCreateInvitation.setOnClickListener(v -> {
-
-		});
+		binding.buttonCreateInvitation.setOnClickListener(v -> AccountDialogUtil.displayCreateInvitationDialog(this));
 	}
 
 	/**
@@ -173,5 +172,30 @@ public class AccountFragment extends Fragment {
 				requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
 			}
 		}, "newpassword", newPassword);
+	}
+
+	/**
+	 * Handle the response of create invitation dialog.
+	 *
+	 * @param dialog      The dialog.
+	 * @param isSlave     Flag indicating if my role is slave.
+	 * @param myName      My name.
+	 * @param contactName The contact name.
+	 */
+	protected void handleCreateInvitationDialogResponse(final CreateInvitationDialogFragment dialog, final boolean isSlave,
+														final String myName, final String contactName) {
+		new HttpSender().sendMessage("db/usermanagement/createinvitation.php", (response, responseData) -> {
+			if (responseData == null) {
+				Log.e(Application.TAG, "Error in server communication: " + response);
+				requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+			}
+			else if (responseData.isSuccess()) {
+				// TODO - display invitation
+				dialog.dismiss();
+			}
+			else {
+				requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
+			}
+		}, "is_slave", isSlave ? "1" : "", "myname", myName, "contactname", contactName);
 	}
 }

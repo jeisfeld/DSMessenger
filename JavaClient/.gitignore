@@ -1,3 +1,5 @@
 /bin
 /libs
+/libs-firebase/
+/libs-zxing/
 /src/de/jeisfeld/dsmessenger/client/TestKeys.java

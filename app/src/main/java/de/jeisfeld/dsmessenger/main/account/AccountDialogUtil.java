@@ -10,6 +10,7 @@ import androidx.fragment.app.DialogFragment;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.DialogChangePasswordBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogCreateAccountBinding;
+import de.jeisfeld.dsmessenger.databinding.DialogCreateInvitationBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogLoginBinding;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
@@ -68,6 +69,22 @@ public final class AccountDialogUtil {
 	 */
 	public static void displayChangePasswordDialog(final AccountFragment accountFragment) {
 		ChangePasswordDialogFragment fragment = new ChangePasswordDialogFragment();
+
+		try {
+			fragment.show(accountFragment.getChildFragmentManager(), fragment.getClass().toString());
+		}
+		catch (IllegalStateException e) {
+			// May appear if activity is not active any more - ignore.
+		}
+	}
+
+	/**
+	 * Display dialog for create invitation.
+	 *
+	 * @param accountFragment The triggering fragment.
+	 */
+	public static void displayCreateInvitationDialog(final AccountFragment accountFragment) {
+		CreateInvitationDialogFragment fragment = new CreateInvitationDialogFragment();
 
 		try {
 			fragment.show(accountFragment.getChildFragmentManager(), fragment.getClass().toString());
@@ -253,6 +270,60 @@ public final class AccountDialogUtil {
 				}
 				((AccountFragment) requireParentFragment()).handleChangePasswordDialogResponse(this,
 						binding.editTextOldPassword.getText().toString().trim(), binding.editTextNewPassword.getText().toString());
+			});
+
+			return builder.create();
+		}
+	}
+
+	/**
+	 * Fragment to create an invitation dialog.
+	 */
+	public static class CreateInvitationDialogFragment extends DialogFragment {
+		/**
+		 * The binding of the view.
+		 */
+		private DialogCreateInvitationBinding binding;
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param resource The text resource.
+		 */
+		public void displayError(final int resource) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(resource);
+		}
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param message The error message.
+		 */
+		public void displayError(final String message) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(message);
+		}
+
+		@NonNull
+		@Override
+		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
+			binding = DialogCreateInvitationBinding.inflate(getLayoutInflater());
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+			builder.setTitle(R.string.button_create_invitation).setView(binding.getRoot());
+
+			binding.buttonCancel.setOnClickListener(v -> dismiss());
+
+			binding.buttonCreateInvitation.setOnClickListener(v -> {
+				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
+				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0) {
+					displayError(R.string.error_missing_contactname);
+					return;
+				}
+				String myName = binding.editTextMyName.getText() == null ? null : binding.editTextMyName.getText().toString();
+				((AccountFragment) requireParentFragment()).handleCreateInvitationDialogResponse(this, binding.radioButtonSub.isChecked(),
+						myName, binding.editTextContactName.getText().toString().trim());
 			});
 
 			return builder.create();

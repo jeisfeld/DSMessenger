@@ -22,8 +22,9 @@ $sql = "CREATE TABLE dsm_relation (
 id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 slave_id INT(6) UNSIGNED,
 master_id INT(6) UNSIGNED,
+slave_name VARCHAR(30),
+master_name VARCHAR(30),
 connection_code VARCHAR(24),
-wait_verification_by BOOLEAN,
 FOREIGN KEY (slave_id) REFERENCES dsm_user(id),
 FOREIGN KEY (master_id) REFERENCES dsm_user(id)
 )";

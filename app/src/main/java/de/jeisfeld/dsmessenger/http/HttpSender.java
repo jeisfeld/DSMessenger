@@ -118,12 +118,14 @@ public class HttpSender {
 		while (i < parameters.length - 1) {
 			final String name = parameters[i++];
 			final String value = parameters[i++];
-			if (postData.length() > 0) {
-				postData.append('&');
+			if (value != null) {
+				if (postData.length() > 0) {
+					postData.append('&');
+				}
+				postData.append(URLEncoder.encode(name, StandardCharsets.UTF_8.name()));
+				postData.append('=');
+				postData.append(URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
 			}
-			postData.append(URLEncoder.encode(name, StandardCharsets.UTF_8.name()));
-			postData.append('=');
-			postData.append(URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
 		}
 		if (addCredentials) {
 			if (postData.length() > 0) {
