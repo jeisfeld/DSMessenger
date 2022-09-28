@@ -25,6 +25,9 @@ import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
+/**
+ * Helper class for sending http(s) messages to server.
+ */
 public class HttpSender {
 	/**
 	 * Send a POST message to Server.
@@ -34,7 +37,8 @@ public class HttpSender {
 	 * @param listener       The response listener.
 	 * @param parameters     The POST parameters.
 	 */
-	public void sendMessage(String urlPostfix, boolean addCredentials, OnHttpResponseListener listener, String... parameters) {
+	public void sendMessage(final String urlPostfix, final boolean addCredentials, final OnHttpResponseListener listener,
+							final String... parameters) {
 		Authenticator.setDefault(new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -97,7 +101,7 @@ public class HttpSender {
 	 * @param listener   The response listener.
 	 * @param parameters The POST parameters.
 	 */
-	public void sendMessage(String urlPostfix, OnHttpResponseListener listener, String... parameters) {
+	public void sendMessage(final String urlPostfix, final OnHttpResponseListener listener, final String... parameters) {
 		sendMessage(urlPostfix, true, listener, parameters);
 	}
 
@@ -106,13 +110,14 @@ public class HttpSender {
 	 *
 	 * @param addCredentials Flag indicating if username, password should be added.
 	 * @param parameters     the name value entries.
+	 * @return The data to be posted.
 	 */
-	private String getPostData(boolean addCredentials, String... parameters) throws UnsupportedEncodingException {
+	private String getPostData(final boolean addCredentials, final String... parameters) throws UnsupportedEncodingException {
 		int i = 0;
 		StringBuilder postData = new StringBuilder();
 		while (i < parameters.length - 1) {
-			String name = parameters[i++];
-			String value = parameters[i++];
+			final String name = parameters[i++];
+			final String value = parameters[i++];
 			if (postData.length() > 0) {
 				postData.append('&');
 			}
@@ -139,7 +144,7 @@ public class HttpSender {
 		/**
 		 * Handle HTTP/HTTPS response.
 		 *
-		 * @param response     The response as String.
+		 * @param response The response as String.
 		 * @param responseData The response as data.
 		 */
 		void onHttpResponse(String response, ResponseData responseData);
@@ -148,11 +153,30 @@ public class HttpSender {
 	/**
 	 * Response data from server.
 	 */
-	public static class ResponseData {
+	public static final class ResponseData {
+		/**
+		 * Success status of the call.
+		 */
 		private final boolean success;
+		/**
+		 * Error code (if not success).
+		 */
 		private final int errorCode;
+		/**
+		 * Error message (if not success).
+		 */
 		private final String errorMessage;
+		/**
+		 * Response data (if success).
+		 */
 		private final Map<String, String> data;
+
+		private ResponseData(final boolean success, final int errorCode, final String errorMessage, final Map<String, String> data) {
+			this.success = success;
+			this.errorCode = errorCode;
+			this.errorMessage = errorMessage;
+			this.data = data;
+		}
 
 		/**
 		 * Extract response data from server response.
@@ -183,13 +207,6 @@ public class HttpSender {
 			catch (Exception e) {
 				return null;
 			}
-		}
-
-		private ResponseData(boolean success, int errorCode, String errorMessage, Map<String, String> data) {
-			this.success = success;
-			this.errorCode = errorCode;
-			this.errorMessage = errorMessage;
-			this.data = data;
 		}
 
 		public boolean isSuccess() {

@@ -7,13 +7,8 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 
-import java.util.Objects;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.preference.CheckBoxPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import de.jeisfeld.dsmessenger.R;
@@ -24,7 +19,7 @@ import de.jeisfeld.dsmessenger.util.DialogUtil;
  */
 public class SettingsFragment extends PreferenceFragmentCompat {
 	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
+	public final void onCreate(@Nullable final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
 

@@ -16,9 +16,30 @@ import de.jeisfeld.dsmessenger.message.RandomimageMessageDetails;
 import de.jeisfeld.dsmessenger.message.TextMessageDetails;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
-public class FirebaseDSMessagingService extends FirebaseMessagingService {
+/**
+ * The service receiving firebase messages.
+ */
+public class FirebaseDsMessagingService extends FirebaseMessagingService {
+	/**
+	 * Update the token locally and on the server.
+	 *
+	 * @param token The new token.
+	 */
+	public static void updateToken(final String token) {
+		if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) != null) {
+			new HttpSender().sendMessage("db/usermanagement/changeuserdata.php", (response, responseData) -> {
+				if (responseData != null && responseData.isSuccess()) {
+					PreferenceUtil.setSharedPreferenceString(R.string.key_pref_messaging_token, token);
+				}
+			}, "token", token);
+		}
+		else {
+			PreferenceUtil.setSharedPreferenceString(R.string.key_pref_messaging_token, token);
+		}
+	}
+
 	@Override
-	public void onMessageReceived(@NonNull RemoteMessage message) {
+	public final void onMessageReceived(@NonNull final RemoteMessage message) {
 		super.onMessageReceived(message);
 
 		Log.d(Application.TAG, "Received message from " + message.getFrom() + " with priority " + message.getPriority());
@@ -59,26 +80,8 @@ public class FirebaseDSMessagingService extends FirebaseMessagingService {
 	}
 
 	@Override
-	public void onNewToken(@NonNull String token) {
+	public final void onNewToken(@NonNull final String token) {
 		Log.i(Application.TAG, "Received new messaging token: " + token);
 		updateToken(token);
-	}
-
-	/**
-	 * Update the token locally and on the server.
-	 *
-	 * @param token The new token.
-	 */
-	public static void updateToken(String token) {
-		if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) != null) {
-			new HttpSender().sendMessage("db/usermanagement/changeuserdata.php", (response, responseData) -> {
-				if (responseData != null && responseData.isSuccess()) {
-					PreferenceUtil.setSharedPreferenceString(R.string.key_pref_messaging_token, token);
-				}
-			}, "token", token);
-		}
-		else {
-			PreferenceUtil.setSharedPreferenceString(R.string.key_pref_messaging_token, token);
-		}
 	}
 }

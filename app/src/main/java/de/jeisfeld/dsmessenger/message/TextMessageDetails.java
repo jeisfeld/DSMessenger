@@ -3,7 +3,6 @@ package de.jeisfeld.dsmessenger.message;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * The details of a text message.
@@ -37,7 +36,6 @@ public class TextMessageDetails extends MessageDetails {
 	 * The parameter name for the keep screen on flag.
 	 */
 	private static final String KEEP_SCREEN_ON = "keepScreenOn";
-
 
 	/**
 	 * The message text.
@@ -80,8 +78,8 @@ public class TextMessageDetails extends MessageDetails {
 	 * @param lockMessage         The lock message flag.
 	 * @param keepScreenOn        The Keep screen on flag.
 	 */
-	public TextMessageDetails(String messageText, boolean displayOnLockScreen, boolean vibrate, boolean vibrationRepeated, int vibrationPattern,
-							  boolean lockMessage, boolean keepScreenOn) {
+	public TextMessageDetails(final String messageText, final boolean displayOnLockScreen, final boolean vibrate, final boolean vibrationRepeated,
+							  final int vibrationPattern, final boolean lockMessage, final boolean keepScreenOn) {
 		super(MessageType.TEXT);
 		this.messageText = messageText;
 		this.displayOnLockScreen = displayOnLockScreen;
@@ -90,34 +88,6 @@ public class TextMessageDetails extends MessageDetails {
 		this.vibrationPattern = vibrationPattern;
 		this.lockMessage = lockMessage;
 		this.keepScreenOn = keepScreenOn;
-	}
-
-	public String getMessageText() {
-		return messageText;
-	}
-
-	public boolean isDisplayOnLockScreen() {
-		return displayOnLockScreen;
-	}
-
-	public boolean isVibrate() {
-		return vibrate;
-	}
-
-	public boolean isVibrationRepeated() {
-		return vibrationRepeated;
-	}
-
-	public int getVibrationPattern() {
-		return vibrationPattern;
-	}
-
-	public boolean isLockMessage() {
-		return lockMessage;
-	}
-
-	public boolean isKeepScreenOn() {
-		return keepScreenOn;
 	}
 
 	/**
@@ -133,16 +103,46 @@ public class TextMessageDetails extends MessageDetails {
 		boolean displayOnLockScreen = Boolean.parseBoolean(data.get(NAME_DISPLAY_ON_LOCK_SCREEN));
 		boolean vibrate = Boolean.parseBoolean(data.get(NAME_VIBRATE));
 		boolean vibrationRepated = Boolean.parseBoolean(data.get(NAME_VIBRATION_REPEATED));
-		int vibrationPattern;
+		int vibrationPattern = 0;
 		try {
-			vibrationPattern = Integer.parseInt(Objects.requireNonNull(data.get(NAME_VIBRATION_PATTERN)));
+			if (data.get(NAME_VIBRATION_PATTERN) != null) {
+				vibrationPattern = Integer.parseInt(data.get(NAME_VIBRATION_PATTERN));
+			}
 		}
-		catch(NumberFormatException | NullPointerException e) {
-			vibrationPattern = 0;
+		catch (NumberFormatException e) {
+			// ignore
 		}
 		boolean lockMessage = Boolean.parseBoolean(data.get(LOCK_MESSAGE));
 		boolean keepScreenOn = Boolean.parseBoolean(data.get(KEEP_SCREEN_ON));
 		return new TextMessageDetails(messageText, displayOnLockScreen, vibrate, vibrationRepated, vibrationPattern, lockMessage, keepScreenOn);
+	}
+
+	public final String getMessageText() {
+		return messageText;
+	}
+
+	public final boolean isDisplayOnLockScreen() {
+		return displayOnLockScreen;
+	}
+
+	public final boolean isVibrate() {
+		return vibrate;
+	}
+
+	public final boolean isVibrationRepeated() {
+		return vibrationRepeated;
+	}
+
+	public final int getVibrationPattern() {
+		return vibrationPattern;
+	}
+
+	public final boolean isLockMessage() {
+		return lockMessage;
+	}
+
+	public final boolean isKeepScreenOn() {
+		return keepScreenOn;
 	}
 
 }

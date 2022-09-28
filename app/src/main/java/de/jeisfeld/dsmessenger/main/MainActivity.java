@@ -15,15 +15,20 @@ import androidx.navigation.ui.NavigationUI;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMainBinding;
-import de.jeisfeld.dsmessenger.service.FirebaseDSMessagingService;
+import de.jeisfeld.dsmessenger.service.FirebaseDsMessagingService;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
+/**
+ * The main activity of the app.
+ */
 public class MainActivity extends AppCompatActivity {
-
+	/**
+	 * The configuration of the app bar.
+	 */
 	private AppBarConfiguration mAppBarConfiguration;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		de.jeisfeld.dsmessenger.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -46,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	@Override
-	public boolean onSupportNavigateUp() {
+	public final boolean onSupportNavigateUp() {
 		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
 		return NavigationUI.navigateUp(navController, mAppBarConfiguration)
 				|| super.onSupportNavigateUp();
@@ -72,11 +77,11 @@ public class MainActivity extends AppCompatActivity {
 
 					String oldToken = PreferenceUtil.getSharedPreferenceString(R.string.key_pref_messaging_token);
 					if (token.equals(oldToken)) {
-						Log.d(Application.TAG,"Unchanged messaging token: " + token);
+						Log.d(Application.TAG, "Unchanged messaging token: " + token);
 					}
 					else {
-						Log.i(Application.TAG,"Got new messaging token: " + token);
-						FirebaseDSMessagingService.updateToken(token);
+						Log.i(Application.TAG, "Got new messaging token: " + token);
+						FirebaseDsMessagingService.updateToken(token);
 					}
 
 				});

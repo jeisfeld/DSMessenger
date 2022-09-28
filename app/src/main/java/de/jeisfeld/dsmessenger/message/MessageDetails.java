@@ -4,7 +4,6 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * The details of a message.
@@ -20,11 +19,7 @@ public class MessageDetails implements Serializable {
 	 */
 	private final MessageType type;
 
-	public MessageType getType() {
-		return type;
-	}
-
-	public MessageDetails(MessageType type) {
+	public MessageDetails(final MessageType type) {
 		this.type = type;
 	}
 
@@ -38,7 +33,7 @@ public class MessageDetails implements Serializable {
 		Map<String, String> data = message.getData();
 		MessageType messageType = MessageType.fromName(data.get(NAME_MESSAGE_TYPE));
 
-		switch(messageType) {
+		switch (messageType) {
 		case TEXT:
 			return TextMessageDetails.fromRemoteMessage(message);
 		case RANDOMIMAGE:
@@ -48,6 +43,10 @@ public class MessageDetails implements Serializable {
 		default:
 			return new MessageDetails(MessageType.UNKNOWN);
 		}
+	}
+
+	public final MessageType getType() {
+		return type;
 	}
 
 	/**
@@ -71,11 +70,14 @@ public class MessageDetails implements Serializable {
 		 */
 		LUT;
 
-		private static MessageType fromName(String name) {
+		private static MessageType fromName(final String name) {
+			if (name == null) {
+				return UNKNOWN;
+			}
 			try {
 				return MessageType.valueOf(name);
 			}
-			catch (IllegalArgumentException | NullPointerException e) {
+			catch (IllegalArgumentException e) {
 				return UNKNOWN;
 			}
 		}

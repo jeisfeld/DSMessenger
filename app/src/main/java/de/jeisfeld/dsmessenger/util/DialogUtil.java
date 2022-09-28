@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -97,7 +96,7 @@ public final class DialogUtil {
 	 * @param args                  arguments for the confirmation message
 	 */
 	public static void displayInfoMessage(final FragmentActivity activity, final Integer titleResource, final Integer confirmButtonResource,
-												  final int messageResource, final Object... args) {
+										  final int messageResource, final Object... args) {
 		String message = capitalizeFirst(activity.getString(messageResource, args));
 		Bundle bundle = new Bundle();
 		bundle.putCharSequence(PARAM_MESSAGE, message);

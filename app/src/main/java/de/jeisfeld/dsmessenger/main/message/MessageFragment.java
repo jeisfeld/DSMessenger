@@ -3,27 +3,25 @@ package de.jeisfeld.dsmessenger.main.message;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
-
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import de.jeisfeld.dsmessenger.databinding.FragmentMessageBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 
+/**
+ * Fragment for sending messages.
+ */
 public class MessageFragment extends Fragment {
-
+	/**
+	 * The view binding.
+	 */
 	private FragmentMessageBinding binding;
 
-	public View onCreateView(@NonNull LayoutInflater inflater,
-							 ViewGroup container, Bundle savedInstanceState) {
+	@Override
+	public final View onCreateView(@NonNull final LayoutInflater inflater,
+								   final ViewGroup container, final Bundle savedInstanceState) {
 		binding = FragmentMessageBinding.inflate(inflater, container, false);
 
 		binding.checkboxVibrate.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -37,7 +35,7 @@ public class MessageFragment extends Fragment {
 	}
 
 	@Override
-	public void onDestroyView() {
+	public final void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
 	}

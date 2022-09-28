@@ -4,23 +4,24 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import de.jeisfeld.dsmessenger.databinding.FragmentRandomimageBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 
+/**
+ * Fragment for triggering Randomimage notificactions.
+ */
 public class RandomimageFragment extends Fragment {
-
+	/**
+	 * The view binding.
+	 */
 	private FragmentRandomimageBinding binding;
 
 	@Override
-	public View onCreateView(@NonNull final LayoutInflater inflater,
-							 final ViewGroup container, final Bundle savedInstanceState) {
+	public final View onCreateView(@NonNull final LayoutInflater inflater,
+								   final ViewGroup container, final Bundle savedInstanceState) {
 		binding = FragmentRandomimageBinding.inflate(inflater, container, false);
 
 		binding.radioGroupOrigin.setOnCheckedChangeListener((group, checkedId) -> {
@@ -40,7 +41,7 @@ public class RandomimageFragment extends Fragment {
 	}
 
 	@Override
-	public void onDestroyView() {
+	public final void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
 	}
@@ -50,8 +51,8 @@ public class RandomimageFragment extends Fragment {
 	 */
 	private void sendMessage() {
 		String device = binding.radioDeviceTablet.isChecked() ? "tablet" : "handy";
-		String randomImageOrigin = binding.radioGroupOrigin.getCheckedRadioButtonId() ==
-				binding.radioOriginWidget.getId() ? "WIDGET" : "NOTIFICATION";
+		String randomImageOrigin =
+				binding.radioGroupOrigin.getCheckedRadioButtonId() == binding.radioOriginWidget.getId() ? "WIDGET" : "NOTIFICATION";
 		String notificationName = binding.spinnerNotificationName.getSelectedItem().toString();
 		String widgetName = binding.spinnerWidgetName.getSelectedItem().toString();
 

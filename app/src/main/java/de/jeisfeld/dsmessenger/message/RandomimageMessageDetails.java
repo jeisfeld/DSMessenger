@@ -38,25 +38,25 @@ public class RandomimageMessageDetails extends MessageDetails {
 	 * Generate message details.
 	 *
 	 * @param randomImageOrigin the random image origin.
-	 * @param notificationName The notification name.
-	 * @param widgetName  The widget name.
+	 * @param notificationName  The notification name.
+	 * @param widgetName        The widget name.
 	 */
-	public RandomimageMessageDetails(RandomImageOrigin randomImageOrigin, String notificationName, String widgetName) {
+	public RandomimageMessageDetails(final RandomImageOrigin randomImageOrigin, final String notificationName, final String widgetName) {
 		super(MessageType.RANDOMIMAGE);
 		this.randomImageOrigin = randomImageOrigin;
 		this.notificationName = notificationName;
 		this.widgetName = widgetName;
 	}
 
-	public RandomImageOrigin getRandomImageOrigin() {
+	public final RandomImageOrigin getRandomImageOrigin() {
 		return randomImageOrigin;
 	}
 
-	public String getNotificationName() {
+	public final String getNotificationName() {
 		return notificationName;
 	}
 
-	public String getWidgetName() {
+	public final String getWidgetName() {
 		return widgetName;
 	}
 
@@ -92,11 +92,14 @@ public class RandomimageMessageDetails extends MessageDetails {
 		 */
 		WIDGET;
 
-		private static RandomImageOrigin fromName(String name) {
+		private static RandomImageOrigin fromName(final String name) {
+			if (name == null) {
+				return UNKNOWN;
+			}
 			try {
 				return RandomImageOrigin.valueOf(name);
 			}
-			catch (IllegalArgumentException | NullPointerException e) {
+			catch (IllegalArgumentException e) {
 				return UNKNOWN;
 			}
 		}

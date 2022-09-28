@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentAccountBinding;
@@ -16,15 +15,20 @@ import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.ChangePasswordDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateAccountDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.LoginDialogFragment;
-import de.jeisfeld.dsmessenger.util.Logger;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
+/**
+ * The fragment for account administration.
+ */
 public class AccountFragment extends Fragment {
-
+	/**
+	 * The view binding.
+	 */
 	private FragmentAccountBinding binding;
 
-	public View onCreateView(@NonNull LayoutInflater inflater,
-							 ViewGroup container, Bundle savedInstanceState) {
+	@Override
+	public final View onCreateView(@NonNull final LayoutInflater inflater,
+								   final ViewGroup container, final Bundle savedInstanceState) {
 
 		binding = FragmentAccountBinding.inflate(inflater, container, false);
 		String username = PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username);
@@ -48,7 +52,7 @@ public class AccountFragment extends Fragment {
 	}
 
 	@Override
-	public void onDestroyView() {
+	public final void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
 	}
@@ -86,11 +90,14 @@ public class AccountFragment extends Fragment {
 		});
 	}
 
-
 	/**
 	 * Handle the response of create account dialog.
+	 *
+	 * @param dialog   The dialog.
+	 * @param username The username.
+	 * @param password The password.
 	 */
-	protected void handleCreateAccountDialogResponse(CreateAccountDialogFragment dialog, String username, String password) {
+	protected void handleCreateAccountDialogResponse(final CreateAccountDialogFragment dialog, final String username, final String password) {
 		new HttpSender().sendMessage("db/usermanagement/createuser.php", false, (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
@@ -116,8 +123,12 @@ public class AccountFragment extends Fragment {
 
 	/**
 	 * Handle the response of login dialog.
+	 *
+	 * @param dialog   The dialog.
+	 * @param username The username.
+	 * @param password The password.
 	 */
-	protected void handleLoginDialogResponse(LoginDialogFragment dialog, String username, String password) {
+	protected void handleLoginDialogResponse(final LoginDialogFragment dialog, final String username, final String password) {
 		new HttpSender().sendMessage("db/usermanagement/login.php", false, (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
@@ -143,8 +154,12 @@ public class AccountFragment extends Fragment {
 
 	/**
 	 * Handle the response of change password dialog.
+	 *
+	 * @param dialog      The dialog.
+	 * @param oldPassword The old password.
+	 * @param newPassword The new password.
 	 */
-	protected void handleChangePasswordDialogResponse(ChangePasswordDialogFragment dialog, String oldPassword, String newPassword) {
+	protected void handleChangePasswordDialogResponse(final ChangePasswordDialogFragment dialog, final String oldPassword, final String newPassword) {
 		new HttpSender().sendMessage("db/usermanagement/changepassword.php", (response, responseData) -> {
 			if (responseData == null) {
 				Log.e(Application.TAG, "Error in server communication: " + response);

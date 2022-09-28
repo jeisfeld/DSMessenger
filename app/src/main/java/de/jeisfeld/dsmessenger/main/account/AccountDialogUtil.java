@@ -2,7 +2,6 @@ package de.jeisfeld.dsmessenger.main.account;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -19,6 +18,11 @@ import de.jeisfeld.dsmessenger.util.PreferenceUtil;
  */
 public final class AccountDialogUtil {
 	/**
+	 * The min length of passwords.
+	 */
+	private static final int MIN_PASSWORD_LENGTH = 8;
+
+	/**
 	 * Hide default constructor.
 	 */
 	private AccountDialogUtil() {
@@ -26,7 +30,7 @@ public final class AccountDialogUtil {
 	}
 
 	/**
-	 * Display dialog for account creation
+	 * Display dialog for account creation.
 	 *
 	 * @param accountFragment The triggering fragment.
 	 */
@@ -42,7 +46,7 @@ public final class AccountDialogUtil {
 	}
 
 	/**
-	 * Display dialog for login
+	 * Display dialog for login.
 	 *
 	 * @param accountFragment The triggering fragment.
 	 */
@@ -58,7 +62,7 @@ public final class AccountDialogUtil {
 	}
 
 	/**
-	 * Display dialog for change password
+	 * Display dialog for change password.
 	 *
 	 * @param accountFragment The triggering fragment.
 	 */
@@ -87,7 +91,7 @@ public final class AccountDialogUtil {
 		 *
 		 * @param resource The text resource.
 		 */
-		public void displayError(int resource) {
+		public void displayError(final int resource) {
 			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
 			binding.textViewErrorMessage.setText(resource);
 		}
@@ -97,7 +101,7 @@ public final class AccountDialogUtil {
 		 *
 		 * @param message The error message.
 		 */
-		public void displayError(String message) {
+		public void displayError(final String message) {
 			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
 			binding.textViewErrorMessage.setText(message);
 		}
@@ -123,7 +127,7 @@ public final class AccountDialogUtil {
 					displayError(R.string.error_passwords_do_not_match);
 					return;
 				}
-				if (binding.editTextPassword.getText() == null || binding.editTextPassword.getText().length() < 8) {
+				if (binding.editTextPassword.getText() == null || binding.editTextPassword.getText().length() < MIN_PASSWORD_LENGTH) {
 					displayError(R.string.error_password_too_short);
 					return;
 				}
@@ -149,7 +153,7 @@ public final class AccountDialogUtil {
 		 *
 		 * @param resource The text resource.
 		 */
-		public void displayError(int resource) {
+		public void displayError(final int resource) {
 			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
 			binding.textViewErrorMessage.setText(resource);
 		}
@@ -159,7 +163,7 @@ public final class AccountDialogUtil {
 		 *
 		 * @param message The error message.
 		 */
-		public void displayError(String message) {
+		public void displayError(final String message) {
 			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
 			binding.textViewErrorMessage.setText(message);
 		}
@@ -180,7 +184,7 @@ public final class AccountDialogUtil {
 					displayError(R.string.error_missing_username);
 					return;
 				}
-				if (binding.editTextPassword.getText() == null || binding.editTextPassword.getText().length() < 8) {
+				if (binding.editTextPassword.getText() == null || binding.editTextPassword.getText().length() < MIN_PASSWORD_LENGTH) {
 					displayError(R.string.error_password_too_short);
 					return;
 				}
@@ -206,7 +210,7 @@ public final class AccountDialogUtil {
 		 *
 		 * @param resource The text resource.
 		 */
-		public void displayError(int resource) {
+		public void displayError(final int resource) {
 			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
 			binding.textViewErrorMessage.setText(resource);
 		}
@@ -216,7 +220,7 @@ public final class AccountDialogUtil {
 		 *
 		 * @param message The error message.
 		 */
-		public void displayError(String message) {
+		public void displayError(final String message) {
 			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
 			binding.textViewErrorMessage.setText(message);
 		}
@@ -238,12 +242,12 @@ public final class AccountDialogUtil {
 					displayError(R.string.error_wrong_old_password);
 					return;
 				}
-				if ((binding.editTextNewPassword.getText() == null || binding.editTextRepeatPassword.getText() == null
-						|| !binding.editTextRepeatPassword.getText().toString().equals(binding.editTextNewPassword.getText().toString()))) {
+				if (binding.editTextNewPassword.getText() == null || binding.editTextRepeatPassword.getText() == null
+						|| !binding.editTextRepeatPassword.getText().toString().equals(binding.editTextNewPassword.getText().toString())) {
 					displayError(R.string.error_passwords_do_not_match);
 					return;
 				}
-				if (binding.editTextNewPassword.getText() == null || binding.editTextNewPassword.getText().length() < 8) {
+				if (binding.editTextNewPassword.getText() == null || binding.editTextNewPassword.getText().length() < MIN_PASSWORD_LENGTH) {
 					displayError(R.string.error_password_too_short);
 					return;
 				}
