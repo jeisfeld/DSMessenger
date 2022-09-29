@@ -1,27 +1,30 @@
 <?php
 function printError($errorCode, $errorMessage) {
-    die ("{\n  ".'"status": "error",'."\n  ".'"errorcode": "'.$errorCode.'",'."\n  ".'"errormessage": "'.$errorMessage.'"'."\n}");
+    $result = [
+        'status' => 'error',
+        'errorcode' => $errorCode,
+        'errormessage' => $errorMessage
+    ];
+    die (json_encode($result, JSON_PRETTY_PRINT));
 }
 
 function printSuccess($message, $data = null) {
-    echo "{\n  ".'"status": "success",'."\n";
+    $result = [ 'status' => 'success', 'message' => $message ];
     if ($data) {
         foreach ($data as $key => $value) {
-            echo '  "'.$key.'": "'.$value.'",'."\n";
+            $result[$key] = $value;
         }
     }
-    echo '  "message": "'.$message.'"'."\n";
-    echo '}';
+    echo json_encode($result, JSON_PRETTY_PRINT);
 }
-
 
 function verifyCredentials($conn, $username, $password)
 {
     if (! $username) {
-        die("Error: Missing username");
+        printError(105, "Missing username");
     }
     if (! $password) {
-        die("Error: Missing password");
+        printError(105, "Missing password");
     }
 
     $hashedpassword = null;
@@ -40,12 +43,9 @@ function verifyCredentials($conn, $username, $password)
     }
 }
 
-function getUserId($conn, $username, $password) {
+function getUserId($conn, $username) {
     if (! $username) {
         die("Error: Missing username");
-    }
-    if (! $password) {
-        die("Error: Missing password");
     }
     
     $id = null;
@@ -57,4 +57,3 @@ function getUserId($conn, $username, $password) {
     $stmt->close();
     return $id;
 }
-

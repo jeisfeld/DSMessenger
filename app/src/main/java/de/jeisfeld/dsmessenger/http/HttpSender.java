@@ -1,7 +1,9 @@
 package de.jeisfeld.dsmessenger.http;
 
 import android.util.Log;
+import android.util.SparseArray;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -23,6 +25,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.main.account.Contact;
+import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -171,9 +175,9 @@ public class HttpSender {
 		/**
 		 * Response data (if success).
 		 */
-		private final Map<String, String> data;
+		private final Map<String, Object> data;
 
-		private ResponseData(final boolean success, final int errorCode, final String errorMessage, final Map<String, String> data) {
+		private ResponseData(final boolean success, final int errorCode, final String errorMessage, final Map<String, Object> data) {
 			this.success = success;
 			this.errorCode = errorCode;
 			this.errorMessage = errorMessage;
@@ -190,11 +194,32 @@ public class HttpSender {
 			try {
 				JSONObject jsonObject = new JSONObject(response);
 				boolean success = "success".equals(jsonObject.getString("status"));
-				Map<String, String> data = new HashMap<>();
+				Map<String, Object> data = new HashMap<>();
 				if (success) {
 					for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
 						String key = it.next();
-						if (!"status".equals(key)) {
+						//noinspection StatementWithEmptyBody
+						if ("status".equals(key)) {
+							// do nothing
+						}
+						else if ("contacts".equals(key)) {
+							SparseArray<Contact> contacts = new SparseArray<>();
+							JSONArray jsonArray = jsonObject.getJSONArray(key);
+							for (int i = 0; i < jsonArray.length(); i++) {
+								JSONObject jsonContact = jsonArray.getJSONObject(i);
+								int relationId = jsonContact.getInt("relationId");
+								String connectionCode = jsonContact.getString("connectionCode");
+								String contactName = jsonContact.getString("contactName");
+								boolean isSlave = jsonContact.getBoolean("isSlave");
+								Contact contact = new Contact(relationId, contactName, isSlave, connectionCode, ContactStatus.INVITED);
+								contacts.put(relationId, contact);
+							}
+							data.put(key, contacts);
+						}
+						else if (jsonObject.get(key) instanceof Integer) {
+							data.put(key, jsonObject.getInt(key));
+						}
+						else {
 							data.put(key, jsonObject.getString(key));
 						}
 					}
@@ -207,7 +232,8 @@ public class HttpSender {
 				}
 			}
 			catch (Exception e) {
-				return null;
+				Log.e(Application.TAG, "Failed to extract response data", e);
+				return new ResponseData(false, 900, "Error parsing JSON: " + e.getMessage(), new HashMap<>());
 			}
 		}
 
@@ -223,7 +249,7 @@ public class HttpSender {
 			return errorMessage;
 		}
 
-		public Map<String, String> getData() {
+		public Map<String, Object> getData() {
 			return data;
 		}
 	}

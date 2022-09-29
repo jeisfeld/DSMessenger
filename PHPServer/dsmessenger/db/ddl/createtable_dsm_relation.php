@@ -26,7 +26,8 @@ slave_name VARCHAR(30),
 master_name VARCHAR(30),
 connection_code VARCHAR(24),
 FOREIGN KEY (slave_id) REFERENCES dsm_user(id),
-FOREIGN KEY (master_id) REFERENCES dsm_user(id)
+FOREIGN KEY (master_id) REFERENCES dsm_user(id),
+CONSTRAINT unique_connection UNIQUE(connection_code)
 )";
 
 if ($conn->query($sql) === TRUE) {

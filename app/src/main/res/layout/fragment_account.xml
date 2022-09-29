@@ -133,9 +133,10 @@
 
         <LinearLayout
             android:id="@+id/layoutMyDoms"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/text_my_doms"
@@ -143,6 +144,23 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="@dimen/margin_medium"
                 android:text="@string/text_my_doms"
+                android:textSize="@dimen/text_large" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutMySubs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/text_my_subs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_medium"
+                android:text="@string/text_my_subs"
                 android:textSize="@dimen/text_large" />
 
         </LinearLayout>

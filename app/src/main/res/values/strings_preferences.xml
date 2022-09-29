@@ -26,6 +26,13 @@
     <string name="pref_title_dummy_battery_optimizations">Configure battery optimizations</string>
     <string name="pref_title_use_test_server">Use test server</string>
 
+    <!-- Contact preferences -->
+    <string name="key_contact_ids" translatable="false">contact_ids</string>
+    <string name="key_contact_name" translatable="false">contact_name</string>
+    <string name="key_contact_is_slave" translatable="false">contact_is_slave</string>
+    <string name="key_contact_connection_code" translatable="false">contact_connection_code</string>
+    <string name="key_contact_status" translatable="false">contact_status</string>
+
     <!-- Arrays for list preferences -->
     <string-array name="pref_list_titles_language">
         <item>System language</item>

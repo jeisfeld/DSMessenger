@@ -8,7 +8,7 @@
     tools:context=".main.lut.LutFragment">
 
     <TextView
-        android:id="@+id/text_slideshow"
+        android:id="@+id/text_lut"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

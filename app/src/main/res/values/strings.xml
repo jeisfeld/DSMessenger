@@ -62,6 +62,10 @@
     <string name="text_connection_code">Connection Code</string>
     <string name="text_my_doms">My Doms</string>
     <string name="text_my_subs">My Subs</string>
+    <string name="text_delete">Delete</string>
+    <string name="text_edit">Edit</string>
+    <string name="text_pending">Pending</string>
+    <string name="text_confirmed">Confirmed</string>
 
     <string name="error_missing_username">Missing username</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>

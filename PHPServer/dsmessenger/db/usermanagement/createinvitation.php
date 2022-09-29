@@ -14,7 +14,7 @@ $username = @$_POST['username'];
 $password = @$_POST['password'];
 verifyCredentials($conn, $username, $password);
 
-$slaveid = getUserId($conn, $username, $password);
+$userId = getUserId($conn, $username);
 $isSlave = @$_POST['is_slave'];
 $myName = @$_POST['myname'];
 $contactName = @$_POST['contactname'];
@@ -28,9 +28,21 @@ else {
     $stmt = $conn->prepare("INSERT INTO dsm_relation (master_id, connection_code, master_name, slave_name) VALUES (?, ?, ?, ?)");
 }
 
-$stmt->bind_param("isss", $slaveid, $connectioncode, $myName, $contactName);
+$stmt->bind_param("isss", $userId, $connectioncode, $myName, $contactName);
 if ($stmt->execute()) {
-    printSuccess("Invitation for user " . $username . " successfully created.", array("connectioncode" => $connectioncode));
+    $stmt->close();
+    $relationId = null;
+    $stmt = $conn->prepare("SELECT id FROM dsm_relation WHERE connection_code = ?");
+    $stmt->bind_param("s", $connectioncode);
+    $stmt->execute();
+    $stmt->bind_result($relationId);
+    $stmt->fetch();
+    $stmt->close();
+    if (!$relationId) {
+        printError(106, "Failed to retrieve id of invitation");
+    }
+    printSuccess("Invitation for user " . $username . " successfully created.", 
+        array("connectionCode" => $connectioncode, "relationId" => $relationId));
 }
 else {
     $stmt->close();

@@ -23,7 +23,8 @@ id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 username VARCHAR(30) NOT NULL,
 password VARCHAR(60) NOT NULL,
 email VARCHAR(60),
-token VARCHAR(200)
+token VARCHAR(200),
+CONSTRAINT unique_username UNIQUE(username)
 )";
 
 if ($conn->query($sql) === TRUE) {

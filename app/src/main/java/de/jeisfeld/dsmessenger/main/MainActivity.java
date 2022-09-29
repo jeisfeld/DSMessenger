@@ -15,6 +15,7 @@ import androidx.navigation.ui.NavigationUI;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMainBinding;
+import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.service.FirebaseDsMessagingService;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 		NavigationUI.setupWithNavController(navigationView, navController);
 
 		logMessagingToken();
+
+		ContactRegistry.getInstance().refreshContacts(null);
 	}
 
 	@Override
