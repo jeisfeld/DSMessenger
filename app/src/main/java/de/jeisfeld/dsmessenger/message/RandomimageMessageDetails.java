@@ -9,19 +9,6 @@ import java.util.Map;
  */
 public class RandomimageMessageDetails extends MessageDetails {
 	/**
-	 * The origin from where the randomimage should be displayed.
-	 */
-	private static final String NAME_RANDOMIMAGE_ORIGIN = "randomImageOrigin";
-	/**
-	 * The parameter name for notification name.
-	 */
-	private static final String NAME_NOTIFICATION_NAME = "notificationName";
-	/**
-	 * The parameter name for notification name.
-	 */
-	private static final String NAME_WIDGET_NAME = "widgetName";
-
-	/**
 	 * The random image origin.
 	 */
 	private final RandomImageOrigin randomImageOrigin;
@@ -69,9 +56,9 @@ public class RandomimageMessageDetails extends MessageDetails {
 	public static RandomimageMessageDetails fromRemoteMessage(final RemoteMessage message) {
 		Map<String, String> data = message.getData();
 
-		RandomImageOrigin randomImageOrigin = RandomImageOrigin.fromName(data.get(NAME_RANDOMIMAGE_ORIGIN));
-		String notificationName = data.get(NAME_NOTIFICATION_NAME);
-		String widgetName = data.get(NAME_WIDGET_NAME);
+		RandomImageOrigin randomImageOrigin = RandomImageOrigin.fromName(data.get("randomImageOrigin"));
+		String notificationName = data.get("notificationName");
+		String widgetName = data.get("widgetName");
 		return new RandomimageMessageDetails(randomImageOrigin, notificationName, widgetName);
 	}
 

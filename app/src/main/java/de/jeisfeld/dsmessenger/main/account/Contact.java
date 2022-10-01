@@ -19,6 +19,10 @@ public class Contact {
 	 */
 	private final String name;
 	/**
+	 * The id of the contact in DB.
+	 */
+	private final int contactId;
+	/**
 	 * Flag indicating if the contact is slave or master.
 	 */
 	private final boolean isSlave;
@@ -36,12 +40,15 @@ public class Contact {
 	 *
 	 * @param relationId     The relation id
 	 * @param name           The name
+	 * @param contactId      The contactId
 	 * @param isSlave        The flag indicating if it is slave or master
 	 * @param connectionCode The connection code
 	 * @param status         The contact status
 	 */
-	public Contact(final int relationId, final String name, final boolean isSlave, final String connectionCode, final ContactStatus status) {
+	public Contact(final int relationId, final String name, final int contactId,
+				   final boolean isSlave, final String connectionCode, final ContactStatus status) {
 		this.name = name;
+		this.contactId = contactId;
 		this.isSlave = isSlave;
 		this.relationId = relationId;
 		this.connectionCode = connectionCode;
@@ -56,6 +63,7 @@ public class Contact {
 	protected Contact(final int relationId) {
 		this.relationId = relationId;
 		name = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_name, relationId);
+		contactId = PreferenceUtil.getIndexedSharedPreferenceInt(R.string.key_contact_contact_id, relationId, -1);
 		isSlave = PreferenceUtil.getIndexedSharedPreferenceBoolean(R.string.key_contact_is_slave, relationId, false);
 		connectionCode = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_connection_code, relationId);
 		status = ContactStatus.valueOf(PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_status, relationId));
@@ -67,6 +75,10 @@ public class Contact {
 
 	public String getName() {
 		return name;
+	}
+
+	public int getContactId() {
+		return contactId;
 	}
 
 	public boolean isSlave() {
@@ -85,7 +97,7 @@ public class Contact {
 	@Override
 	public String toString() {
 		return "Contact{" +
-				"relationId=" + relationId + ", name='" + name + '\'' + ", isSlave=" + isSlave +
+				"relationId=" + relationId + ", name='" + name + '\'' + ", contactId='" + contactId + '\'' + ", isSlave=" + isSlave +
 				", connectionCode='" + connectionCode + '\'' + ", status=" + status + '}';
 	}
 
@@ -95,10 +107,11 @@ public class Contact {
 	public void store() {
 		List<Integer> contactIds = PreferenceUtil.getSharedPreferenceIntList(R.string.key_contact_ids);
 		if (!contactIds.contains(relationId)) {
-			contactIds.add((Integer) relationId);
+			contactIds.add(relationId);
 		}
 		PreferenceUtil.setSharedPreferenceIntList(R.string.key_contact_ids, contactIds);
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_name, getRelationId(), getName());
+		PreferenceUtil.setIndexedSharedPreferenceInt(R.string.key_contact_contact_id, getRelationId(), getContactId());
 		PreferenceUtil.setIndexedSharedPreferenceBoolean(R.string.key_contact_is_slave, getRelationId(), isSlave());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_connection_code, getRelationId(), getConnectionCode());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_status, getRelationId(), getStatus().name());

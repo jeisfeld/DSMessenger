@@ -36,8 +36,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="dsmessenger.jeisfeld.de"
-                    android:scheme="app" />
+                    android:host="jeisfeld.de"
+                    android:pathPrefix="/dsmessenger"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity

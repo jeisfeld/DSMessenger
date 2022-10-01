@@ -10,6 +10,10 @@ import androidx.annotation.NonNull;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.account.AccountFragment;
+import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
+import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
+import de.jeisfeld.dsmessenger.message.AdminMessageDetails;
 import de.jeisfeld.dsmessenger.message.MessageActivity;
 import de.jeisfeld.dsmessenger.message.MessageDetails;
 import de.jeisfeld.dsmessenger.message.RandomimageMessageDetails;
@@ -53,6 +57,16 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			return;
 		}
 		switch (messageDetails.getType()) {
+		case ADMIN:
+			AdminMessageDetails adminDetails = (AdminMessageDetails) messageDetails;
+			switch (adminDetails.getAdminType()) {
+			case INVITATION_ACCEPTED:
+				ContactRegistry.getInstance().refreshContacts(() -> AccountFragment.sendBroadcast(this, ActionType.INVITATION_ACCEPTED));
+				break;
+			case UNKNOWN:
+				break;
+			}
+			break;
 		case TEXT:
 			startActivity(MessageActivity.createIntent(this, (TextMessageDetails) messageDetails));
 			break;
@@ -73,6 +87,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				break;
 			}
 			break;
+		case LUT:
 		case UNKNOWN:
 		default:
 			break;

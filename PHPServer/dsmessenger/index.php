@@ -1,59 +1,6 @@
 <?php
-namespace dsmessenger;
-require 'vendor/autoload.php';
-use Kreait\Firebase\Factory;
-use Kreait\Firebase\Messaging\CloudMessage;
-
-include 'token.php';
-
-function sendTextMessage($device, $messageText, $vibrate, $vibrationRepeated, $vibrationPattern, $displayOnLockScreen, $lockMessage, $keepScreenOn)
-{
-    $factory = (new Factory())->withServiceAccount(getKeyFileName());
-    $messaging = $factory->createMessaging();
-
-    $data = [
-        'messageType' => 'TEXT',
-        'messageText' => $messageText,
-        'vibrate' => $vibrate,
-        'vibrationRepeated' => $vibrationRepeated,
-        'vibrationPattern' => $vibrationPattern,
-        'displayOnLockScreen' => $displayOnLockScreen,
-        'lockMessage' => $lockMessage,
-        'keepScreenOn' => $keepScreenOn
-    ];
-
-    $token = ($device == 'tablet' ? getDeviceTokenTablet() : getDeviceToken());
-    $message = CloudMessage::withTarget('token', $token)->withData($data)->withHighestPossiblePriority();
-    $messaging->send($message);
-}
-
-if (isset($_POST['messageText'])) {
-    sendTextMessage($_POST['device'], $_POST['messageText'], @$_POST['vibrate'], @$_POST['vibrationRepeated'], @$_POST['vibrationPattern'], @$_POST['displayOnLockScreen'], @$_POST['lockMessage'], @$_POST['keepScreenOn']);
-}
-
-function sendRandomImageMessage($device, $randomImageOrigin, $notificationName, $widgetName)
-{
-    $factory = (new Factory())->withServiceAccount(getKeyFileName());
-    $messaging = $factory->createMessaging();
-
-    $data = [
-        'messageType' => 'RANDOMIMAGE',
-        'randomImageOrigin' => $randomImageOrigin,
-        'notificationName' => $notificationName,
-        'widgetName' => $widgetName
-    ];
-
-    $token = ($device == 'tablet' ? getDeviceTokenTablet() : getDeviceToken());
-    $message = CloudMessage::withTarget('token', $token)->withData($data)->withHighestPossiblePriority();
-    $messaging->send($message);
-}
-
-if (isset($_POST['randomImageOrigin'])) {
-    sendRandomImageMessage($_POST['device'], $_POST['randomImageOrigin'], $_POST['notificationName'], $_POST['widgetName']);
-}
-
+require_once 'firebase/firebasefunctions.php';
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">

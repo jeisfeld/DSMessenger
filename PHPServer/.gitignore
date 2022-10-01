@@ -1,5 +1,5 @@
-/dsmessenger/ds-messenger-f7c23-firebase-adminsdk-108qx-e83037ee2f.json
-/dsmessenger/token.php
 /dsmessenger/vendor
 /.htpasswd
 /dsmessenger/db/dbcredentials.php
+/dsmessenger/firebase/token.php
+/dsmessenger/firebase/ds-messenger-f7c23-firebase-adminsdk-108qx-e83037ee2f.json

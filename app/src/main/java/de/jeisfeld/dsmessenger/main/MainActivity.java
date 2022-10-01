@@ -1,5 +1,7 @@
 package de.jeisfeld.dsmessenger.main;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,8 +17,10 @@ import androidx.navigation.ui.NavigationUI;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMainBinding;
+import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.service.FirebaseDsMessagingService;
+import de.jeisfeld.dsmessenger.util.DialogUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -49,8 +53,42 @@ public class MainActivity extends AppCompatActivity {
 		NavigationUI.setupWithNavController(navigationView, navController);
 
 		logMessagingToken();
+		handleAppLink();
 
 		ContactRegistry.getInstance().refreshContacts(null);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		handleAppLink();
+	}
+
+	/**
+	 * Handle a link sent to the app.
+	 */
+	public void handleAppLink() {
+		if ("android.intent.action.VIEW".equals(getIntent().getAction())) {
+			Uri uri = getIntent().getData();
+			if (uri != null && "/dsmessenger/connect".equals(uri.getPath())) {
+				String connectionCode = uri.getQueryParameter("code");
+				if (connectionCode != null && connectionCode.length() == 24) {
+					if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) == null) {
+						DialogUtil.displayInfoMessage(this, R.string.title_dialog_info, R.string.button_ok, R.string.dialog_login_before_connect);
+					}
+					else {
+						NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+						navController.navigate(R.id.nav_account);
+						AccountDialogUtil.displayAcceptInvitationDialog(this, connectionCode);
+					}
+				}
+			}
+		}
 	}
 
 	@Override

@@ -9,33 +9,9 @@ import java.util.Map;
  */
 public class TextMessageDetails extends MessageDetails {
 	/**
-	 * The parameter name for message text.
-	 */
-	private static final String NAME_MESSAGE_TEXT = "messageText";
-	/**
-	 * The parameter name for display on lock screen flag.
-	 */
-	private static final String NAME_DISPLAY_ON_LOCK_SCREEN = "displayOnLockScreen";
-	/**
-	 * The parameter name for vibration flag.
-	 */
-	private static final String NAME_VIBRATE = "vibrate";
-	/**
-	 * The parameter name for vibration repetition flag.
-	 */
-	private static final String NAME_VIBRATION_REPEATED = "vibrationRepeated";
-	/**
 	 * The parameter name for vibration pattern flag.
 	 */
 	private static final String NAME_VIBRATION_PATTERN = "vibrationPattern";
-	/**
-	 * The parameter name for the lock message flag.
-	 */
-	private static final String LOCK_MESSAGE = "lockMessage";
-	/**
-	 * The parameter name for the keep screen on flag.
-	 */
-	private static final String KEEP_SCREEN_ON = "keepScreenOn";
 
 	/**
 	 * The message text.
@@ -99,10 +75,10 @@ public class TextMessageDetails extends MessageDetails {
 	public static TextMessageDetails fromRemoteMessage(final RemoteMessage message) {
 		Map<String, String> data = message.getData();
 
-		String messageText = data.get(NAME_MESSAGE_TEXT);
-		boolean displayOnLockScreen = Boolean.parseBoolean(data.get(NAME_DISPLAY_ON_LOCK_SCREEN));
-		boolean vibrate = Boolean.parseBoolean(data.get(NAME_VIBRATE));
-		boolean vibrationRepated = Boolean.parseBoolean(data.get(NAME_VIBRATION_REPEATED));
+		String messageText = data.get("messageText");
+		boolean displayOnLockScreen = Boolean.parseBoolean(data.get("displayOnLockScreen"));
+		boolean vibrate = Boolean.parseBoolean(data.get("vibrate"));
+		boolean vibrationRepated = Boolean.parseBoolean(data.get("vibrationRepeated"));
 		int vibrationPattern = 0;
 		try {
 			if (data.get(NAME_VIBRATION_PATTERN) != null) {
@@ -112,8 +88,8 @@ public class TextMessageDetails extends MessageDetails {
 		catch (NumberFormatException e) {
 			// ignore
 		}
-		boolean lockMessage = Boolean.parseBoolean(data.get(LOCK_MESSAGE));
-		boolean keepScreenOn = Boolean.parseBoolean(data.get(KEEP_SCREEN_ON));
+		boolean lockMessage = Boolean.parseBoolean(data.get("lockMessage"));
+		boolean keepScreenOn = Boolean.parseBoolean(data.get("keepScreenOn"));
 		return new TextMessageDetails(messageText, displayOnLockScreen, vibrate, vibrationRepated, vibrationPattern, lockMessage, keepScreenOn);
 	}
 

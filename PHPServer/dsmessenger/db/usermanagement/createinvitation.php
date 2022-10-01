@@ -1,6 +1,5 @@
 <?php
-require_once '../dbcredentials.php';
-require_once '../functions.php';
+require_once '../dbfunctions.php';
 
 // Create connection
 $conn = getDbConnection();
@@ -12,9 +11,8 @@ if ($conn->connect_error) {
 
 $username = @$_POST['username'];
 $password = @$_POST['password'];
-verifyCredentials($conn, $username, $password);
+$userId = verifyCredentials($conn, $username, $password);
 
-$userId = getUserId($conn, $username);
 $isSlave = @$_POST['is_slave'];
 $myName = @$_POST['myname'];
 $contactName = @$_POST['contactname'];

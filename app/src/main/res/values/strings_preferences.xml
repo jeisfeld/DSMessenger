@@ -29,6 +29,7 @@
     <!-- Contact preferences -->
     <string name="key_contact_ids" translatable="false">contact_ids</string>
     <string name="key_contact_name" translatable="false">contact_name</string>
+    <string name="key_contact_contact_id" translatable="false">contact_contact_id</string>
     <string name="key_contact_is_slave" translatable="false">contact_is_slave</string>
     <string name="key_contact_connection_code" translatable="false">contact_connection_code</string>
     <string name="key_contact_status" translatable="false">contact_status</string>

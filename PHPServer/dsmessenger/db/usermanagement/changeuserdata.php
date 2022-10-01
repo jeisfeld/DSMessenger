@@ -1,6 +1,5 @@
 <?php
-require_once '../dbcredentials.php';
-require_once '../functions.php';
+require_once '../dbfunctions.php';
 
 // Create connection
 $conn = getDbConnection();

@@ -95,6 +95,7 @@ public class ContactRegistry {
 		PreferenceUtil.setSharedPreferenceIntList(R.string.key_contact_ids, contactIds);
 
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_name, relationId);
+		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_contact_id, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_is_slave, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_connection_code, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_status, relationId);
@@ -104,8 +105,8 @@ public class ContactRegistry {
 	 * Clean all contacts.
 	 */
 	public void cleanContacts() {
-		for (int i = 0; i < contacts.size(); i++) {
-			remove(contacts.valueAt(i));
+		while (contacts.size() > 0) {
+			remove(contacts.valueAt(0));
 		}
 	}
 
@@ -125,13 +126,15 @@ public class ContactRegistry {
 					return;
 				}
 				List<Integer> keys = new ArrayList<>();
-				for (int i = 0; i < newContacts.size(); i++) {
-					keys.add(newContacts.keyAt(i));
-					addOrUpdate(newContacts.valueAt(i));
-				}
-				for (int i = 0; i < contacts.size(); i++) {
-					if (!keys.contains(contacts.keyAt(i))) {
-						remove(contacts.valueAt(i));
+				synchronized (contacts) {
+					for (int i = 0; i < newContacts.size(); i++) {
+						keys.add(newContacts.keyAt(i));
+						addOrUpdate(newContacts.valueAt(i));
+					}
+					for (int i = 0; i < contacts.size(); i++) {
+						if (!keys.contains(contacts.keyAt(i))) {
+							remove(contacts.valueAt(i));
+						}
 					}
 				}
 				if (runnable != null) {

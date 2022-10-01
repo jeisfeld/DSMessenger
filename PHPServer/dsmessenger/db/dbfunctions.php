@@ -1,4 +1,6 @@
 <?php
+require_once 'dbcredentials.php';
+
 function printError($errorCode, $errorMessage) {
     $result = [
         'status' => 'error',
@@ -28,10 +30,11 @@ function verifyCredentials($conn, $username, $password)
     }
 
     $hashedpassword = null;
-    $stmt = $conn->prepare("SELECT password FROM dsm_user WHERE username = ?");
+    $userid = null;
+    $stmt = $conn->prepare("SELECT password, id FROM dsm_user WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
-    $stmt->bind_result($hashedpassword);
+    $stmt->bind_result($hashedpassword, $userid);
     $stmt->fetch();
     $stmt->close();
 
@@ -41,19 +44,30 @@ function verifyCredentials($conn, $username, $password)
     if (! password_verify($password, $hashedpassword)) {
         printError(105, "Error: Wrong username or password");
     }
+    
+    return $userid;
 }
 
-function getUserId($conn, $username) {
-    if (! $username) {
-        die("Error: Missing username");
-    }
+
+function getToken($conn, $username, $password, $relationId) {
+    $userId = verifyCredentials($conn, $username, $password);
     
-    $id = null;
-    $stmt = $conn->prepare("SELECT id FROM dsm_user WHERE username = ?");
-    $stmt->bind_param("s", $username);
+    $token = null;
+    $stmt = $conn->prepare("SELECT u.token 
+FROM dsm_user u, dsm_relation r 
+WHERE u.id = r.master_id AND r.slave_id = ? AND r.id = ? 
+UNION
+SELECT u.token 
+FROM dsm_user u, dsm_relation r 
+WHERE u.id = r.slave_id AND r.master_id = ? AND r.id = ?");
+    $stmt->bind_param("iiii", $userId, $relationId, $userId, $relationId);
     $stmt->execute();
-    $stmt->bind_result($id);
+    $stmt->bind_result($token);
     $stmt->fetch();
     $stmt->close();
-    return $id;
+    if (!$token) {
+        printError(102, "Failed to retrieve token");
+    }
+    return $token;
 }
+

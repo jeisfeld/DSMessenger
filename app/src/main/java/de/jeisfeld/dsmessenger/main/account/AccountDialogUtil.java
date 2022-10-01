@@ -2,16 +2,23 @@ package de.jeisfeld.dsmessenger.main.account;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.databinding.DialogAcceptInvitationBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogChangePasswordBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogCreateAccountBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogCreateInvitationBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogLoginBinding;
+import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.MainActivity;
+import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
+import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -90,6 +97,48 @@ public final class AccountDialogUtil {
 			fragment.show(accountFragment.getChildFragmentManager(), fragment.getClass().toString());
 		}
 		catch (IllegalStateException e) {
+			// May appear if activity is not active any more - ignore.
+		}
+	}
+
+	/**
+	 * Display dialog for accept invitation.
+	 *
+	 * @param accountFragment The triggering fragment.
+	 */
+	public static void displayAcceptInvitationDialog(final AccountFragment accountFragment) {
+		AcceptInvitationDialogFragment fragment = new AcceptInvitationDialogFragment();
+		Bundle bundle = new Bundle();
+		bundle.putBoolean("fromActivity", false);
+		fragment.setArguments(bundle);
+		try {
+			fragment.show(accountFragment.getChildFragmentManager(), fragment.getClass().toString());
+		}
+		catch (IllegalStateException e) {
+			Log.e(Application.TAG, "Error displaying dialog", e);
+			// May appear if activity is not active any more - ignore.
+		}
+	}
+
+	/**
+	 * Display dialog for accept invitation.
+	 *
+	 * @param activity       The triggering activity.
+	 * @param connectionCode The connection code.
+	 */
+	public static void displayAcceptInvitationDialog(final MainActivity activity, final String connectionCode) {
+		AcceptInvitationDialogFragment fragment = new AcceptInvitationDialogFragment();
+		Bundle bundle = new Bundle();
+		bundle.putBoolean("fromActivity", true);
+		if (connectionCode != null) {
+			bundle.putString("connectionCode", connectionCode);
+		}
+		fragment.setArguments(bundle);
+		try {
+			fragment.show(activity.getSupportFragmentManager(), fragment.getClass().toString());
+		}
+		catch (IllegalStateException e) {
+			Log.e(Application.TAG, "Error displaying dialog", e);
 			// May appear if activity is not active any more - ignore.
 		}
 	}
@@ -324,6 +373,142 @@ public final class AccountDialogUtil {
 				String myName = binding.editTextMyName.getText() == null ? null : binding.editTextMyName.getText().toString();
 				((AccountFragment) requireParentFragment()).handleCreateInvitationDialogResponse(this, binding.radioButtonSub.isChecked(),
 						myName, binding.editTextContactName.getText().toString().trim());
+			});
+
+			return builder.create();
+		}
+	}
+
+	/**
+	 * Fragment to accept an invitation dialog.
+	 */
+	public static class AcceptInvitationDialogFragment extends DialogFragment {
+		/**
+		 * The binding of the view.
+		 */
+		private DialogAcceptInvitationBinding binding;
+		/**
+		 * The relation id.
+		 */
+		private int relationId;
+		/**
+		 * The contact id.
+		 */
+		private int contactId;
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param resource The text resource.
+		 */
+		public void displayError(final int resource) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(resource);
+		}
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param message The error message.
+		 */
+		public void displayError(final String message) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(message);
+		}
+
+		@NonNull
+		@Override
+		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
+			binding = DialogAcceptInvitationBinding.inflate(getLayoutInflater());
+
+			assert getArguments() != null;
+			final boolean fromActivity = getArguments().getBoolean("fromActivity");
+			final String initialConnectionCode = getArguments().getString("connectionCode");
+			if (initialConnectionCode != null) {
+				binding.editTextConnectionCode.setText(initialConnectionCode);
+				binding.editTextConnectionCode.setEnabled(false);
+			}
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+			builder.setTitle(R.string.button_accept_invitation).setView(binding.getRoot());
+
+			binding.buttonCancel.setOnClickListener(v -> dismiss());
+
+			binding.buttonReviewInvitation.setOnClickListener(v -> {
+				if (binding.editTextConnectionCode.getText() == null || binding.editTextConnectionCode.getText().toString().trim().length() == 0) {
+					displayError(R.string.error_missing_connectioncode);
+					return;
+				}
+				String connectionCode = binding.editTextConnectionCode.getText().toString().trim();
+				if (connectionCode.length() != 24 || (!connectionCode.startsWith("m") && !connectionCode.startsWith("s"))) {
+					displayError(R.string.error_invalid_connectioncode);
+					return;
+				}
+				new HttpSender().sendMessage("db/usermanagement/queryconnectioncode.php", (response, responseData) -> {
+					if (responseData == null) {
+						Log.e(Application.TAG, "Error in server communication: " + response);
+						displayError(R.string.error_technical_error);
+					}
+					else if (responseData.isSuccess()) {
+						relationId = (int) responseData.getData().get("relationId");
+						String myName = (String) responseData.getData().get("myname");
+						String contactName = (String) responseData.getData().get("contactname");
+						contactId = (int) responseData.getData().get("contactId");
+						boolean isSlave = (Boolean) responseData.getData().get("isSlave");
+						getActivity().runOnUiThread(() -> {
+							binding.editTextMyName.setText(myName);
+							binding.editTextContactName.setText(contactName);
+							if (isSlave) {
+								binding.radioButtonSub.setChecked(true);
+								binding.editTextMyName.setEnabled(false);
+								if (binding.editTextContactName.getText() != null
+										&& binding.editTextContactName.getText().toString().trim().length() > 0) {
+									binding.editTextContactName.setEnabled(false);
+								}
+							}
+							else {
+								binding.radioButtonDom.setChecked(true);
+							}
+							binding.tableMyAccount.setVisibility(View.VISIBLE);
+							binding.buttonReviewInvitation.setVisibility(View.INVISIBLE);
+							binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
+						});
+					}
+					else {
+						getActivity().runOnUiThread(() -> displayError(responseData.getErrorMessage()));
+					}
+				}, "connectioncode", connectionCode);
+			});
+
+			binding.buttonAcceptInvitation.setOnClickListener(v -> {
+				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
+				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0) {
+					displayError(R.string.error_missing_contactname);
+					return;
+				}
+				String myName = binding.editTextMyName.getText() == null ? null : binding.editTextMyName.getText().toString();
+				String contactName = binding.editTextContactName.getText().toString().trim();
+				boolean amSlave = binding.radioButtonSub.isChecked();
+				String connectionCode = binding.editTextConnectionCode.getText().toString().trim();
+
+				new HttpSender().sendMessage("db/usermanagement/acceptinvitation.php", (response, responseData) -> {
+							if (responseData == null) {
+								Log.e(Application.TAG, "Error in server communication: " + response);
+								requireActivity().runOnUiThread(() -> displayError(R.string.error_technical_error));
+							}
+							else if (responseData.isSuccess()) {
+								dismiss();
+								Contact contact = new Contact(relationId, contactName, contactId, !amSlave, null, ContactStatus.CONNECTED);
+								ContactRegistry.getInstance().addOrUpdate(contact);
+
+								AccountFragment.sendBroadcast(getContext(), ActionType.INVITATION_ACCEPTED);
+							}
+							else {
+								requireActivity().runOnUiThread(() -> displayError(responseData.getErrorMessage()));
+							}
+						}, "is_slave", amSlave ? "1" : "", "myname", myName, "contactname", contactName,
+						"contactId", Integer.toString(contactId), "connectioncode", connectionCode,
+						"relationId", Integer.toString(relationId));
 			});
 
 			return builder.create();

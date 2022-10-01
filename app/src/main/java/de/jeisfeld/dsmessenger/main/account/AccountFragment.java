@@ -1,5 +1,9 @@
 package de.jeisfeld.dsmessenger.main.account;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +13,7 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentAccountBinding;
@@ -26,9 +31,34 @@ import de.jeisfeld.dsmessenger.util.PreferenceUtil;
  */
 public class AccountFragment extends Fragment {
 	/**
+	 * The intent action for broadcast to this fragment.
+	 */
+	private static final String BROADCAST_ACTION = "de.jeisfeld.dsmessenger.account.AccountFragment";
+	/**
 	 * The view binding.
 	 */
 	private FragmentAccountBinding binding;
+
+	/**
+	 * The local broadcast receiver to do actions sent to this fragment.
+	 */
+	private final BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null) {
+				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
+				switch (actionType) {
+				case INVITATION_ACCEPTED:
+					if (binding != null) {
+						refreshDisplayedContactList();
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	};
 
 	@Override
 	public final View onCreateView(@NonNull final LayoutInflater inflater,
@@ -41,22 +71,65 @@ public class AccountFragment extends Fragment {
 			binding.tableRowUsername.setVisibility(View.GONE);
 			binding.tableRowButtonsLogout.setVisibility(View.GONE);
 			binding.tableRowButtonsLogin.setVisibility(View.VISIBLE);
+			binding.buttonCreateInvitation.setVisibility(View.GONE);
+			binding.buttonAcceptInvitation.setVisibility(View.GONE);
 		}
 		else {
 			binding.tableRowUsername.setVisibility(View.VISIBLE);
 			binding.tableRowButtonsLogout.setVisibility(View.VISIBLE);
 			binding.tableRowButtonsLogin.setVisibility(View.GONE);
 			binding.textViewUsername.setText(username);
+			binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
+			binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
 		}
 
 		configureMyAccountButtons();
-		configureInvitationButtons();
+		configureContactButtons();
 
 		for (Contact contact : ContactRegistry.getInstance().getContacts()) {
 			addContactToView(contact);
 		}
 
 		return binding.getRoot();
+	}
+	/**
+	 * Broadcastmanager to update fragment from external
+	 */
+	private LocalBroadcastManager broadcastManager;
+
+	public static void sendBroadcast(Context context, ActionType actionType, String... parameters) {
+		Intent intent = new Intent(BROADCAST_ACTION);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("actionType", actionType);
+		int i = 0;
+		while (i < parameters.length - 1) {
+			String key = parameters[i++];
+			String value = parameters[i++];
+			bundle.putString(key, value);
+		}
+		intent.putExtras(bundle);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+	}
+
+	@Override
+	public final void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
+	@Override
+	public void onAttach(@NonNull Context context) {
+		super.onAttach(context);
+		broadcastManager = LocalBroadcastManager.getInstance(context);
+		IntentFilter actionReceiver = new IntentFilter();
+		actionReceiver.addAction(BROADCAST_ACTION);
+		broadcastManager.registerReceiver(localBroadcastReceiver, actionReceiver);
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		broadcastManager.unregisterReceiver(localBroadcastReceiver);
 	}
 
 	/**
@@ -81,12 +154,6 @@ public class AccountFragment extends Fragment {
 		layout.addView(childBinding.getRoot());
 	}
 
-	@Override
-	public final void onDestroyView() {
-		super.onDestroyView();
-		binding = null;
-	}
-
 	/**
 	 * Configure the buttons for my account.
 	 */
@@ -98,17 +165,19 @@ public class AccountFragment extends Fragment {
 		binding.buttonChangePassword.setOnClickListener(v -> AccountDialogUtil.displayChangePasswordDialog(this));
 
 		binding.buttonLogout.setOnClickListener(v -> new HttpSender().sendMessage("db/usermanagement/logout.php", (response, responseData) -> {
+			PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
+			PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
+			ContactRegistry.getInstance().cleanContacts();
 			if (responseData != null && responseData.isSuccess()) {
 				requireActivity().runOnUiThread(() -> {
-					ContactRegistry.getInstance().cleanContacts();
-					cleanDisplayedContacts();
+					refreshDisplayedContactList();
 
-					PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
-					PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
 					binding.tableRowButtonsLogin.setVisibility(View.VISIBLE);
 					binding.tableRowButtonsLogout.setVisibility(View.GONE);
 					binding.tableRowUsername.setVisibility(View.GONE);
 					binding.textViewUsername.setText("");
+					binding.buttonCreateInvitation.setVisibility(View.GONE);
+					binding.buttonAcceptInvitation.setVisibility(View.GONE);
 				});
 			}
 		}));
@@ -119,28 +188,33 @@ public class AccountFragment extends Fragment {
 	 *
 	 * @param linearLayout The list.
 	 */
-	private void cleanDisplayedContacts(LinearLayout linearLayout) {
+	private void cleanupContactsFromList(LinearLayout linearLayout) {
 		linearLayout.setVisibility(View.GONE);
-		int contactCount = linearLayout.getChildCount();
-		// Remove all views except the headline.
-		for (int i = 1; i < contactCount; i++) {
-			linearLayout.removeView(linearLayout.getChildAt(i));
-		}
+		View headline = linearLayout.getChildAt(0);
+		linearLayout.removeAllViews();
+		linearLayout.addView(headline);
 	}
 
 	/**
-	 * Clean all displayed contacts.
+	 * Refresh the lists of contacts in display.
 	 */
-	private void cleanDisplayedContacts() {
-		cleanDisplayedContacts(binding.layoutMyDoms);
-		cleanDisplayedContacts(binding.layoutMySubs);
+	public void refreshDisplayedContactList() {
+		cleanupContactsFromList(binding.layoutMyDoms);
+		cleanupContactsFromList(binding.layoutMySubs);
+		for (Contact contact : ContactRegistry.getInstance().getContacts()) {
+			addContactToView(contact);
+		}
 	}
 
 	/**
 	 * Configure the buttons for invitations.
 	 */
-	private void configureInvitationButtons() {
+	private void configureContactButtons() {
 		binding.buttonCreateInvitation.setOnClickListener(v -> AccountDialogUtil.displayCreateInvitationDialog(this));
+		binding.buttonAcceptInvitation.setOnClickListener(v -> AccountDialogUtil.displayAcceptInvitationDialog(this));
+
+		binding.imageViewRefreshContacts.setOnClickListener(v ->
+				ContactRegistry.getInstance().refreshContacts(() -> requireActivity().runOnUiThread(this::refreshDisplayedContactList)));
 	}
 
 	/**
@@ -196,13 +270,10 @@ public class AccountFragment extends Fragment {
 							binding.tableRowButtonsLogout.setVisibility(View.VISIBLE);
 							binding.tableRowUsername.setVisibility(View.VISIBLE);
 							binding.textViewUsername.setText(username);
+							binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
+							binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
 						});
-						ContactRegistry.getInstance().refreshContacts(() -> getActivity().runOnUiThread(() -> {
-							cleanDisplayedContacts();
-							for (Contact contact : ContactRegistry.getInstance().getContacts()) {
-								addContactToView(contact);
-							}
-						}));
+						ContactRegistry.getInstance().refreshContacts(() -> requireActivity().runOnUiThread(this::refreshDisplayedContactList));
 					}
 					else {
 						requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
@@ -255,13 +326,29 @@ public class AccountFragment extends Fragment {
 				String connectionCode = (String) responseData.getData().get("connectionCode");
 				int relationId = (int) responseData.getData().get("relationId");
 
-				Contact contact = new Contact(relationId, contactName, !amSlave, connectionCode, ContactStatus.INVITED);
+				Contact contact = new Contact(relationId, contactName, -1, !amSlave, connectionCode, ContactStatus.INVITED);
 				ContactRegistry.getInstance().addOrUpdate(contact);
 				requireActivity().runOnUiThread(() -> addContactToView(contact));
+
+				Intent messageIntent = new Intent(Intent.ACTION_SEND);
+				messageIntent.setType("text/plain");
+				messageIntent.putExtra(Intent.EXTRA_SUBJECT, "Invitation to DSMessenger");
+				messageIntent.putExtra(Intent.EXTRA_TEXT, "https://jeisfeld.de/dsmessenger/connect?code=" + connectionCode);
+				startActivity(Intent.createChooser(messageIntent, "Send Invitation to DSMessenger"));
 			}
 			else {
 				requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
 			}
 		}, "is_slave", amSlave ? "1" : "", "myname", myName, "contactname", contactName);
+	}
+
+	/**
+	 * Action that can be sent to this fragment.
+	 */
+	public enum ActionType {
+		/**
+		 * Inform about invitation acceptance.
+		 */
+		INVITATION_ACCEPTED,
 	}
 }

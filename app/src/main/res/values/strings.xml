@@ -23,6 +23,7 @@
     <string name="button_login">Login</string>
     <string name="button_create_invitation">Create Invitation</string>
     <string name="button_accept_invitation">Accept Invitation</string>
+    <string name="button_review_invitation">Review Invitation</string>
     <string name="button_withdraw_invitation">Withdraw Invitation</string>
     <string name="button_logout">Logout</string>
     <string name="button_change_password">Change Password</string>
@@ -66,6 +67,7 @@
     <string name="text_edit">Edit</string>
     <string name="text_pending">Pending</string>
     <string name="text_confirmed">Confirmed</string>
+    <string name="text_refresh">Refresh</string>
 
     <string name="error_missing_username">Missing username</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>
@@ -73,8 +75,11 @@
     <string name="error_technical_error">Technical error</string>
     <string name="error_wrong_old_password">Wrong old password</string>
     <string name="error_missing_contactname">Missing contact name</string>
+    <string name="error_missing_connectioncode">Missing connection code</string>
+    <string name="error_invalid_connectioncode">Invalid connection code</string>
 
     <string name="dialog_screen_control_permission">In the following screen, please give the app %1$s permission to make displays on top of other apps.</string>
+    <string name="dialog_login_before_connect">Please login before connecting to another user.</string>
 
     <string-array name="array_vibrate_pattern_names">
         <item>Default</item>

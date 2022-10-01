@@ -10,11 +10,6 @@ import java.util.Map;
  */
 public class MessageDetails implements Serializable {
 	/**
-	 * The parameter name for message type.
-	 */
-	private static final String NAME_MESSAGE_TYPE = "messageType";
-
-	/**
 	 * The message type.
 	 */
 	private final MessageType type;
@@ -31,13 +26,15 @@ public class MessageDetails implements Serializable {
 	 */
 	public static MessageDetails fromRemoteMessage(final RemoteMessage message) {
 		Map<String, String> data = message.getData();
-		MessageType messageType = MessageType.fromName(data.get(NAME_MESSAGE_TYPE));
+		MessageType messageType = MessageType.fromName(data.get("messageType"));
 
 		switch (messageType) {
 		case TEXT:
 			return TextMessageDetails.fromRemoteMessage(message);
 		case RANDOMIMAGE:
 			return RandomimageMessageDetails.fromRemoteMessage(message);
+		case ADMIN:
+			return AdminMessageDetails.fromRemoteMessage(message);
 		case LUT:
 		case UNKNOWN:
 		default:
@@ -61,6 +58,10 @@ public class MessageDetails implements Serializable {
 		 * Text message.
 		 */
 		TEXT,
+		/**
+		 * Admin message.
+		 */
+		ADMIN,
 		/**
 		 * Randomimage notification.
 		 */

@@ -119,17 +119,30 @@
             </TableRow>
         </TableLayout>
 
-        <TextView
-            android:id="@+id/text_connected_accounts"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_medium"
             android:layout_marginBottom="@dimen/margin_medium"
-            android:text="@string/text_connected_accounts"
-            android:textSize="@dimen/text_xlarge"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/table_my_account" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/text_connected_accounts"
+                android:textSize="@dimen/text_xlarge"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageButton
+                android:id="@+id/imageViewRefreshContacts"
+                android:layout_width="@dimen/input_row_height"
+                android:layout_height="@dimen/input_row_height"
+                android:contentDescription="@string/text_refresh"
+                android:src="@drawable/ic_icon_refresh"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/layoutMyDoms"
@@ -142,7 +155,8 @@
                 android:id="@+id/text_my_doms"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/margin_medium"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginBottom="@dimen/margin_small"
                 android:text="@string/text_my_doms"
                 android:textSize="@dimen/text_large" />
 
@@ -159,7 +173,8 @@
                 android:id="@+id/text_my_subs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/margin_medium"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginBottom="@dimen/margin_small"
                 android:text="@string/text_my_subs"
                 android:textSize="@dimen/text_large" />
 
@@ -174,6 +189,17 @@
             android:layout_marginStart="@dimen/margin_small"
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/button_create_invitation"
+            android:textSize="@dimen/text_normal" />
+
+        <Button
+            android:id="@+id/button_accept_invitation"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/input_row_height"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_marginStart="@dimen/margin_small"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/button_accept_invitation"
             android:textSize="@dimen/text_normal" />
     </LinearLayout>
 </ScrollView>

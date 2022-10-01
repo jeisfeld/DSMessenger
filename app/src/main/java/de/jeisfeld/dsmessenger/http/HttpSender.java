@@ -150,7 +150,7 @@ public class HttpSender {
 		/**
 		 * Handle HTTP/HTTPS response.
 		 *
-		 * @param response The response as String.
+		 * @param response     The response as String.
 		 * @param responseData The response as data.
 		 */
 		void onHttpResponse(String response, ResponseData responseData);
@@ -210,14 +210,20 @@ public class HttpSender {
 								int relationId = jsonContact.getInt("relationId");
 								String connectionCode = jsonContact.getString("connectionCode");
 								String contactName = jsonContact.getString("contactName");
+								int contactId = jsonContact.getInt("contactId");
 								boolean isSlave = jsonContact.getBoolean("isSlave");
-								Contact contact = new Contact(relationId, contactName, isSlave, connectionCode, ContactStatus.INVITED);
+								boolean isConfirmed = jsonContact.getBoolean("isConfirmed");
+								Contact contact = new Contact(relationId, contactName, contactId, isSlave, connectionCode,
+										isConfirmed ? ContactStatus.CONNECTED : ContactStatus.INVITED);
 								contacts.put(relationId, contact);
 							}
 							data.put(key, contacts);
 						}
 						else if (jsonObject.get(key) instanceof Integer) {
 							data.put(key, jsonObject.getInt(key));
+						}
+						else if (jsonObject.get(key) instanceof Boolean) {
+							data.put(key, jsonObject.getBoolean(key));
 						}
 						else {
 							data.put(key, jsonObject.getString(key));
@@ -232,7 +238,7 @@ public class HttpSender {
 				}
 			}
 			catch (Exception e) {
-				Log.e(Application.TAG, "Failed to extract response data", e);
+				Log.e(Application.TAG, "Failed to extract response data from " + response, e);
 				return new ResponseData(false, 900, "Error parsing JSON: " + e.getMessage(), new HashMap<>());
 			}
 		}
