@@ -61,7 +61,9 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			AdminMessageDetails adminDetails = (AdminMessageDetails) messageDetails;
 			switch (adminDetails.getAdminType()) {
 			case INVITATION_ACCEPTED:
-				ContactRegistry.getInstance().refreshContacts(() -> AccountFragment.sendBroadcast(this, ActionType.INVITATION_ACCEPTED));
+			case CONTACT_DELETED:
+			case CONTACT_UPDATED:
+				ContactRegistry.getInstance().refreshContacts(() -> AccountFragment.sendBroadcast(this, ActionType.CONTACTS_CHANGED));
 				break;
 			case UNKNOWN:
 				break;

@@ -95,6 +95,7 @@ public class ContactRegistry {
 		PreferenceUtil.setSharedPreferenceIntList(R.string.key_contact_ids, contactIds);
 
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_name, relationId);
+		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_my_name, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_contact_id, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_is_slave, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_connection_code, relationId);

@@ -80,7 +80,15 @@ public class AdminMessageDetails extends MessageDetails {
 		/**
 		 * Invitation accepted.
 		 */
-		INVITATION_ACCEPTED;
+		INVITATION_ACCEPTED,
+		/**
+		 * Contact deleted.
+		 */
+		CONTACT_DELETED,
+		/**
+		 * Contact updated.
+		 */
+		CONTACT_UPDATED;
 
 		private static AdminType fromName(final String name) {
 			if (name == null) {

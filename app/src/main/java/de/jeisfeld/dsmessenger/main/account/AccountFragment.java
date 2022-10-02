@@ -22,8 +22,10 @@ import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.ChangePasswordDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateAccountDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateInvitationDialogFragment;
+import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.EditContactDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.LoginDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
+import de.jeisfeld.dsmessenger.util.DialogUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -48,7 +50,7 @@ public class AccountFragment extends Fragment {
 			if (intent != null) {
 				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
 				switch (actionType) {
-				case INVITATION_ACCEPTED:
+				case CONTACTS_CHANGED:
 					if (binding != null) {
 						refreshDisplayedContactList();
 					}
@@ -92,6 +94,7 @@ public class AccountFragment extends Fragment {
 
 		return binding.getRoot();
 	}
+
 	/**
 	 * Broadcastmanager to update fragment from external
 	 */
@@ -151,6 +154,33 @@ public class AccountFragment extends Fragment {
 			childBinding.imageViewConfirmed.setVisibility(View.VISIBLE);
 			break;
 		}
+
+		if (contact.isSlave() || contact.getStatus() == ContactStatus.INVITED) {
+			childBinding.buttonDelete.setVisibility(View.VISIBLE);
+			childBinding.buttonDelete.setOnClickListener(v -> DialogUtil.displayConfirmationMessage(requireActivity(), dialog ->
+							new HttpSender().sendMessage("db/usermanagement/deletecontact.php", (response, responseData) -> {
+										if (responseData == null) {
+											Log.e(Application.TAG, "Error in server communication: " + response);
+										}
+										else if (responseData.isSuccess()) {
+											ContactRegistry.getInstance().refreshContacts(() ->
+													requireActivity().runOnUiThread(this::refreshDisplayedContactList));
+										}
+										else {
+											Log.e(Application.TAG, "Failed to delete contact: " + responseData.getErrorMessage());
+										}
+									}, "isSlave", contact.isSlave() ? "1" : "", "relationId", Integer.toString(contact.getRelationId()),
+									"isConnected", contact.getStatus() == ContactStatus.CONNECTED ? "1" : ""),
+					R.string.title_dialog_confirm_deletion, R.string.button_cancel, R.string.button_delete_contact,
+					R.string.dialog_confirm_delete_contact, contact.getName()));
+			childBinding.buttonEdit.setVisibility(View.VISIBLE);
+			childBinding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditContactDialog(this, contact));
+		}
+		else {
+			childBinding.buttonDelete.setVisibility(View.GONE);
+			childBinding.buttonEdit.setVisibility(View.GONE);
+		}
+
 		layout.addView(childBinding.getRoot());
 	}
 
@@ -326,7 +356,7 @@ public class AccountFragment extends Fragment {
 				String connectionCode = (String) responseData.getData().get("connectionCode");
 				int relationId = (int) responseData.getData().get("relationId");
 
-				Contact contact = new Contact(relationId, contactName, -1, !amSlave, connectionCode, ContactStatus.INVITED);
+				Contact contact = new Contact(relationId, contactName, myName, -1, !amSlave, connectionCode, ContactStatus.INVITED);
 				ContactRegistry.getInstance().addOrUpdate(contact);
 				requireActivity().runOnUiThread(() -> addContactToView(contact));
 
@@ -343,12 +373,36 @@ public class AccountFragment extends Fragment {
 	}
 
 	/**
+	 * Handle the response of edit contact dialog.
+	 *
+	 * @param dialog  The dialog.
+	 * @param contact The new contact data.
+	 */
+	protected void handleEditContactDialogResponse(final EditContactDialogFragment dialog, final Contact contact) {
+		new HttpSender().sendMessage("db/usermanagement/updatecontact.php", (response, responseData) -> {
+					if (responseData == null) {
+						Log.e(Application.TAG, "Error in server communication: " + response);
+						requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+					}
+					else if (responseData.isSuccess()) {
+						dialog.dismiss();
+						ContactRegistry.getInstance().addOrUpdate(contact);
+						requireActivity().runOnUiThread(this::refreshDisplayedContactList);
+					}
+					else {
+						requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
+					}
+				}, "myName", contact.getMyName(), "contactName", contact.getName(), "relationId", Integer.toString(contact.getRelationId()),
+				"isSlave", contact.isSlave() ? "1" : "", "isConnected", contact.getStatus() == ContactStatus.CONNECTED ? "1" : "");
+	}
+
+	/**
 	 * Action that can be sent to this fragment.
 	 */
 	public enum ActionType {
 		/**
-		 * Inform about invitation acceptance.
+		 * Inform about contacts changed.
 		 */
-		INVITATION_ACCEPTED,
+		CONTACTS_CHANGED
 	}
 }

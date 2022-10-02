@@ -210,10 +210,11 @@ public class HttpSender {
 								int relationId = jsonContact.getInt("relationId");
 								String connectionCode = jsonContact.getString("connectionCode");
 								String contactName = jsonContact.getString("contactName");
+								String myName = jsonContact.getString("myName");
 								int contactId = jsonContact.getInt("contactId");
 								boolean isSlave = jsonContact.getBoolean("isSlave");
 								boolean isConfirmed = jsonContact.getBoolean("isConfirmed");
-								Contact contact = new Contact(relationId, contactName, contactId, isSlave, connectionCode,
+								Contact contact = new Contact(relationId, contactName, myName, contactId, isSlave, connectionCode,
 										isConfirmed ? ContactStatus.CONNECTED : ContactStatus.INVITED);
 								contacts.put(relationId, contact);
 							}

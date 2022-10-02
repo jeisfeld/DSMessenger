@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.main.account;
 
+import java.io.Serializable;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -9,7 +10,7 @@ import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 /**
  * Class holding contact data.
  */
-public class Contact {
+public class Contact implements Serializable {
 	/**
 	 * The id of the relation in DB.
 	 */
@@ -18,6 +19,10 @@ public class Contact {
 	 * The contact name.
 	 */
 	private final String name;
+	/**
+	 * My name for the contact.
+	 */
+	private final String myName;
 	/**
 	 * The id of the contact in DB.
 	 */
@@ -40,17 +45,19 @@ public class Contact {
 	 *
 	 * @param relationId     The relation id
 	 * @param name           The name
+	 * @param myName         My name for the contact
 	 * @param contactId      The contactId
 	 * @param isSlave        The flag indicating if it is slave or master
 	 * @param connectionCode The connection code
 	 * @param status         The contact status
 	 */
-	public Contact(final int relationId, final String name, final int contactId,
+	public Contact(final int relationId, final String name, final String myName, final int contactId,
 				   final boolean isSlave, final String connectionCode, final ContactStatus status) {
+		this.relationId = relationId;
 		this.name = name;
+		this.myName = myName;
 		this.contactId = contactId;
 		this.isSlave = isSlave;
-		this.relationId = relationId;
 		this.connectionCode = connectionCode;
 		this.status = status;
 	}
@@ -63,6 +70,7 @@ public class Contact {
 	protected Contact(final int relationId) {
 		this.relationId = relationId;
 		name = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_name, relationId);
+		myName = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_my_name, relationId);
 		contactId = PreferenceUtil.getIndexedSharedPreferenceInt(R.string.key_contact_contact_id, relationId, -1);
 		isSlave = PreferenceUtil.getIndexedSharedPreferenceBoolean(R.string.key_contact_is_slave, relationId, false);
 		connectionCode = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_connection_code, relationId);
@@ -75,6 +83,10 @@ public class Contact {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getMyName() {
+		return myName;
 	}
 
 	public int getContactId() {
@@ -97,8 +109,8 @@ public class Contact {
 	@Override
 	public String toString() {
 		return "Contact{" +
-				"relationId=" + relationId + ", name='" + name + '\'' + ", contactId='" + contactId + '\'' + ", isSlave=" + isSlave +
-				", connectionCode='" + connectionCode + '\'' + ", status=" + status + '}';
+				"relationId=" + relationId + ", name='" + name + '\'' + ", myName='" + myName + '\'' + ", contactId='" + contactId + '\''
+				+ ", isSlave=" + isSlave + ", connectionCode='" + connectionCode + '\'' + ", status=" + status + '}';
 	}
 
 	/**
@@ -111,6 +123,7 @@ public class Contact {
 		}
 		PreferenceUtil.setSharedPreferenceIntList(R.string.key_contact_ids, contactIds);
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_name, getRelationId(), getName());
+		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_my_name, getRelationId(), getMyName());
 		PreferenceUtil.setIndexedSharedPreferenceInt(R.string.key_contact_contact_id, getRelationId(), getContactId());
 		PreferenceUtil.setIndexedSharedPreferenceBoolean(R.string.key_contact_is_slave, getRelationId(), isSlave());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_connection_code, getRelationId(), getConnectionCode());

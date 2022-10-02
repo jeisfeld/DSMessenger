@@ -12,65 +12,12 @@
         android:paddingEnd="?attr/dialogPreferredPadding"
         android:paddingBottom="?attr/dialogPreferredPadding">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/layoutConnectionCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextConnectionCode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/text_connection_code"
-                android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
-
         <TableLayout
             android:id="@+id/table_my_account"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/layoutConnectionCode">
-
-            <TableRow
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_width"
-                    android:text="@string/text_my_role" />
-
-                <RadioGroup
-                    android:id="@+id/radioGroup"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="@integer/selector_input_width"
-                    android:checkedButton="@+id/radio_button_1"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/radio_button_sub"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:enabled="false"
-                        android:text="@string/text_sub" />
-
-                    <com.google.android.material.radiobutton.MaterialRadioButton
-                        android:id="@+id/radio_button_dom"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:enabled="false"
-                        android:text="@string/text_dom" />
-                </RadioGroup>
-
-            </TableRow>
+            app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -113,27 +60,14 @@
             app:layout_constraintTop_toBottomOf="@id/table_my_account" />
 
         <Button
-            android:id="@+id/button_accept_invitation"
+            android:id="@+id/button_save_contact"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_medium"
             android:paddingStart="@dimen/margin_small"
             android:paddingEnd="@dimen/margin_small"
-            android:text="@string/button_accept_invitation"
-            android:visibility="invisible"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textViewErrorMessage" />
-
-        <Button
-            android:id="@+id/button_review_invitation"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:paddingStart="@dimen/margin_small"
-            android:paddingEnd="@dimen/margin_small"
-            android:text="@string/button_review_invitation"
+            android:text="@string/button_save_contact"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewErrorMessage" />
 
@@ -147,7 +81,7 @@
             android:paddingStart="@dimen/margin_small"
             android:paddingEnd="@dimen/margin_small"
             android:text="@string/button_cancel"
-            app:layout_constraintEnd_toStartOf="@id/button_accept_invitation"
+            app:layout_constraintEnd_toStartOf="@id/button_save_contact"
             app:layout_constraintTop_toBottomOf="@id/textViewErrorMessage" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

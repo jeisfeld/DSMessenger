@@ -14,6 +14,7 @@ import de.jeisfeld.dsmessenger.databinding.DialogAcceptInvitationBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogChangePasswordBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogCreateAccountBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogCreateInvitationBinding;
+import de.jeisfeld.dsmessenger.databinding.DialogEditContactBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogLoginBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
@@ -115,7 +116,6 @@ public final class AccountDialogUtil {
 			fragment.show(accountFragment.getChildFragmentManager(), fragment.getClass().toString());
 		}
 		catch (IllegalStateException e) {
-			Log.e(Application.TAG, "Error displaying dialog", e);
 			// May appear if activity is not active any more - ignore.
 		}
 	}
@@ -138,7 +138,24 @@ public final class AccountDialogUtil {
 			fragment.show(activity.getSupportFragmentManager(), fragment.getClass().toString());
 		}
 		catch (IllegalStateException e) {
-			Log.e(Application.TAG, "Error displaying dialog", e);
+			// May appear if activity is not active any more - ignore.
+		}
+	}
+
+	/**
+	 * Display dialog for edit contact.
+	 *
+	 * @param accountFragment The triggering fragment.
+	 */
+	public static void displayEditContactDialog(final AccountFragment accountFragment, final Contact contact) {
+		EditContactDialogFragment fragment = new EditContactDialogFragment();
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("contact", contact);
+		fragment.setArguments(bundle);
+		try {
+			fragment.show(accountFragment.getChildFragmentManager(), fragment.getClass().toString());
+		}
+		catch (IllegalStateException e) {
 			// May appear if activity is not active any more - ignore.
 		}
 	}
@@ -370,7 +387,7 @@ public final class AccountDialogUtil {
 					displayError(R.string.error_missing_contactname);
 					return;
 				}
-				String myName = binding.editTextMyName.getText() == null ? null : binding.editTextMyName.getText().toString();
+				String myName = binding.editTextMyName.getText() == null ? null : binding.editTextMyName.getText().toString().trim();
 				((AccountFragment) requireParentFragment()).handleCreateInvitationDialogResponse(this, binding.radioButtonSub.isChecked(),
 						myName, binding.editTextContactName.getText().toString().trim());
 			});
@@ -482,11 +499,15 @@ public final class AccountDialogUtil {
 
 			binding.buttonAcceptInvitation.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
+				if (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().length() == 0) {
+					displayError(R.string.error_missing_ownname);
+					return;
+				}
 				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0) {
 					displayError(R.string.error_missing_contactname);
 					return;
 				}
-				String myName = binding.editTextMyName.getText() == null ? null : binding.editTextMyName.getText().toString();
+				String myName = binding.editTextMyName.getText().toString().trim();
 				String contactName = binding.editTextContactName.getText().toString().trim();
 				boolean amSlave = binding.radioButtonSub.isChecked();
 				String connectionCode = binding.editTextConnectionCode.getText().toString().trim();
@@ -498,10 +519,10 @@ public final class AccountDialogUtil {
 							}
 							else if (responseData.isSuccess()) {
 								dismiss();
-								Contact contact = new Contact(relationId, contactName, contactId, !amSlave, null, ContactStatus.CONNECTED);
+								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, ContactStatus.CONNECTED);
 								ContactRegistry.getInstance().addOrUpdate(contact);
 
-								AccountFragment.sendBroadcast(getContext(), ActionType.INVITATION_ACCEPTED);
+								AccountFragment.sendBroadcast(getContext(), ActionType.CONTACTS_CHANGED);
 							}
 							else {
 								requireActivity().runOnUiThread(() -> displayError(responseData.getErrorMessage()));
@@ -509,6 +530,82 @@ public final class AccountDialogUtil {
 						}, "is_slave", amSlave ? "1" : "", "myname", myName, "contactname", contactName,
 						"contactId", Integer.toString(contactId), "connectioncode", connectionCode,
 						"relationId", Integer.toString(relationId));
+			});
+
+			return builder.create();
+		}
+	}
+
+	/**
+	 * Fragment to edit contact dialog.
+	 */
+	public static class EditContactDialogFragment extends DialogFragment {
+		/**
+		 * The binding of the view.
+		 */
+		private DialogEditContactBinding binding;
+		/**
+		 * The relation id.
+		 */
+		private int relationId;
+		/**
+		 * The contact id.
+		 */
+		private int contactId;
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param resource The text resource.
+		 */
+		public void displayError(final int resource) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(resource);
+		}
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param message The error message.
+		 */
+		public void displayError(final String message) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(message);
+		}
+
+		@NonNull
+		@Override
+		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
+			binding = DialogEditContactBinding.inflate(getLayoutInflater());
+
+			assert getArguments() != null;
+			final Contact contact = (Contact) getArguments().getSerializable("contact");
+
+			binding.editTextMyName.setText(contact.getMyName());
+			binding.editTextContactName.setText(contact.getName());
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+			builder.setTitle(R.string.title_dialog_edit_contact).setView(binding.getRoot());
+
+			binding.buttonCancel.setOnClickListener(v -> dismiss());
+
+			binding.buttonSaveContact.setOnClickListener(v -> {
+				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
+				if (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().length() == 0) {
+					displayError(R.string.error_missing_ownname);
+					return;
+				}
+				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0) {
+					displayError(R.string.error_missing_contactname);
+					return;
+				}
+				String myName = binding.editTextMyName.getText().toString().trim();
+				String contactName = binding.editTextContactName.getText().toString().trim();
+
+				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
+						contact.getConnectionCode(), contact.getStatus());
+				((AccountFragment) requireParentFragment()).handleEditContactDialogResponse(this, newContact);
+
 			});
 
 			return builder.create();

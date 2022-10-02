@@ -17,14 +17,15 @@ $relationId = null;
 $connectionCode = null;
 $contactName = null;
 $contactId = null;
+$myName = null;
 $isSlave = null;
-$stmt = $conn->prepare("SELECT id, connection_code, master_name, master_id, false as is_slave FROM dsm_relation WHERE slave_id = ?
+$stmt = $conn->prepare("SELECT id, connection_code, master_name, master_id, slave_name, false as is_slave FROM dsm_relation WHERE slave_id = ?
 UNION
-SELECT id, connection_code, slave_name, slave_id, true as is_slave FROM dsm_relation WHERE master_id = ?");
+SELECT id, connection_code, slave_name, slave_id, master_name, true as is_slave FROM dsm_relation WHERE master_id = ?");
 
 $stmt->bind_param("ss", $userid, $userid);
 $stmt->execute();
-$stmt->bind_result($relationId, $connectionCode, $contactName, $contactId, $isSlave);
+$stmt->bind_result($relationId, $connectionCode, $contactName, $contactId, $myName, $isSlave);
 
 $contacts = array();
 while ($stmt->fetch()) {
@@ -33,6 +34,7 @@ while ($stmt->fetch()) {
         'connectionCode' => $connectionCode,
         'contactName' => $contactName,
         'contactId' => $contactId == null ? -1 : $contactId,
+        'myName' => $myName,
         'isSlave' => $isSlave ? true : false,
         'isConfirmed' => $contactId ? true : false
     ];

@@ -7,6 +7,8 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="title_activity_message">MessageActivity</string>
     <string name="title_dialog_confirmation">Confirmation</string>
+    <string name="title_dialog_confirm_deletion">Confirm deletion</string>
+    <string name="title_dialog_edit_contact">Edit Contact</string>
     <string name="title_dialog_info">Info</string>
 
     <string name="menu_account">Account</string>
@@ -27,6 +29,8 @@
     <string name="button_withdraw_invitation">Withdraw Invitation</string>
     <string name="button_logout">Logout</string>
     <string name="button_change_password">Change Password</string>
+    <string name="button_delete_contact">Delete Contact</string>
+    <string name="button_save_contact">Save Contact</string>
 
     <string name="text_send_message">Send Message</string>
     <string name="text_display_random_image">Display RandomImage</string>
@@ -57,6 +61,7 @@
     <string name="text_connected_accounts">Connected Accounts</string>
     <string name="text_my_role">My Role</string>
     <string name="text_my_name">My Name</string>
+    <string name="text_my_name_m">My Name *</string>
     <string name="text_contact_name">Contact Name *</string>
     <string name="text_sub">Sub</string>
     <string name="text_dom">Dom</string>
@@ -74,12 +79,14 @@
     <string name="error_password_too_short">Password must have min 8 characters</string>
     <string name="error_technical_error">Technical error</string>
     <string name="error_wrong_old_password">Wrong old password</string>
+    <string name="error_missing_ownname">Missing own name</string>
     <string name="error_missing_contactname">Missing contact name</string>
     <string name="error_missing_connectioncode">Missing connection code</string>
     <string name="error_invalid_connectioncode">Invalid connection code</string>
 
     <string name="dialog_screen_control_permission">In the following screen, please give the app %1$s permission to make displays on top of other apps.</string>
     <string name="dialog_login_before_connect">Please login before connecting to another user.</string>
+    <string name="dialog_confirm_delete_contact">Do you really want to delete contact %1$s?</string>
 
     <string-array name="array_vibrate_pattern_names">
         <item>Default</item>
