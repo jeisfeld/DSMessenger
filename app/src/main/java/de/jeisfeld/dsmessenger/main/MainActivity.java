@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -11,6 +12,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -31,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
 	 * The configuration of the app bar.
 	 */
 	private AppBarConfiguration mAppBarConfiguration;
+	/**
+	 * The id of the navigation start.
+	 */
+	private int navigationStartId = R.id.nav_message;
 
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
@@ -42,12 +48,14 @@ public class MainActivity extends AppCompatActivity {
 		setSupportActionBar(binding.appBarMain.toolbar);
 		DrawerLayout drawer = binding.drawerLayout;
 		NavigationView navigationView = binding.navView;
+
 		// Passing each menu ID as a set of Ids because each
 		// menu should be considered as top level destinations.
 		mAppBarConfiguration = new AppBarConfiguration.Builder(
-				R.id.nav_account, R.id.nav_message, R.id.nav_randomimage, R.id.nav_lut, R.id.nav_settings)
+				R.id.nav_message, R.id.nav_randomimage, R.id.nav_lut, R.id.nav_account, R.id.nav_settings)
 				.setOpenableLayout(drawer)
 				.build();
+
 		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
 		NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
 		NavigationUI.setupWithNavController(navigationView, navController);
@@ -58,13 +66,65 @@ public class MainActivity extends AppCompatActivity {
 		ContactRegistry.getInstance().refreshContacts(null);
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+	/**
+	 * Find out if user is logged in and connected.
+	 *
+	 * @return true if logged in and connected.
+	 */
+	private boolean isConnected() {
+		return PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) != null
+				&& ContactRegistry.getInstance().getConnectedContacts().size() > 0;
 	}
 
 	@Override
-	protected void onNewIntent(Intent intent) {
+	protected final void onResume() {
+		super.onResume();
+		if (isConnected()) {
+			if (navigationStartId == R.id.nav_account) {
+				NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+				NavOptions navOptions = new NavOptions.Builder()
+						.setPopUpTo(R.id.nav_account, true)
+						.build();
+				navController.navigate(R.id.nav_message, null, navOptions);
+				navigationStartId = R.id.nav_message;
+			}
+			updateNavigationDrawer();
+		}
+		else {
+			if (navigationStartId == R.id.nav_message) {
+				NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+				NavOptions navOptions = new NavOptions.Builder()
+						.setPopUpTo(R.id.nav_message, true)
+						.build();
+				navController.navigate(R.id.nav_account, null, navOptions);
+				navigationStartId = R.id.nav_account;
+			}
+			updateNavigationDrawer();
+		}
+	}
+
+	/**
+	 * Enable/disable navigation drawer elements based on contact status.
+	 */
+	public void updateNavigationDrawer() {
+		if (isConnected()) {
+			NavigationView navigationView = findViewById(R.id.nav_view);
+			Menu menuNav = navigationView.getMenu();
+			menuNav.findItem(R.id.nav_message).setEnabled(true);
+			menuNav.findItem(R.id.nav_randomimage).setEnabled(true);
+			menuNav.findItem(R.id.nav_lut).setEnabled(true);
+		}
+		else {
+			NavigationView navigationView = findViewById(R.id.nav_view);
+			Menu menuNav = navigationView.getMenu();
+			menuNav.findItem(R.id.nav_message).setEnabled(false);
+			menuNav.findItem(R.id.nav_randomimage).setEnabled(false);
+			menuNav.findItem(R.id.nav_lut).setEnabled(false);
+		}
+	}
+
+	@Override
+	protected final void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
 		handleAppLink();
 	}

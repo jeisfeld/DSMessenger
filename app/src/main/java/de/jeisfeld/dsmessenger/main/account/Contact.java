@@ -77,39 +77,38 @@ public class Contact implements Serializable {
 		status = ContactStatus.valueOf(PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_status, relationId));
 	}
 
-	public int getRelationId() {
+	public final int getRelationId() {
 		return relationId;
 	}
 
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 
-	public String getMyName() {
+	public final String getMyName() {
 		return myName;
 	}
 
-	public int getContactId() {
+	public final int getContactId() {
 		return contactId;
 	}
 
-	public boolean isSlave() {
+	public final boolean isSlave() {
 		return isSlave;
 	}
 
-	public String getConnectionCode() {
+	public final String getConnectionCode() {
 		return connectionCode;
 	}
 
-	public ContactStatus getStatus() {
+	public final ContactStatus getStatus() {
 		return status;
 	}
 
 	@NonNull
 	@Override
-	public String toString() {
-		return "Contact{" +
-				"relationId=" + relationId + ", name='" + name + '\'' + ", myName='" + myName + '\'' + ", contactId='" + contactId + '\''
+	public final String toString() {
+		return "Contact{" + "relationId=" + relationId + ", name='" + name + '\'' + ", myName='" + myName + '\'' + ", contactId='" + contactId + '\''
 				+ ", isSlave=" + isSlave + ", connectionCode='" + connectionCode + '\'' + ", status=" + status + '}';
 	}
 

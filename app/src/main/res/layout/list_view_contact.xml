@@ -29,8 +29,8 @@
 
     <ImageView
         android:id="@+id/imageViewPending"
-        android:layout_width="@dimen/input_row_height"
-        android:layout_height="@dimen/input_row_height"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
         android:layout_marginEnd="@dimen/margin_small"
         android:contentDescription="@string/text_pending"
         android:src="@drawable/ic_icon_pending"
@@ -41,8 +41,8 @@
 
     <ImageView
         android:id="@+id/imageViewConfirmed"
-        android:layout_width="@dimen/input_row_height"
-        android:layout_height="@dimen/input_row_height"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
         android:layout_marginEnd="@dimen/margin_small"
         android:contentDescription="@string/text_confirmed"
         android:src="@drawable/ic_icon_confirmed"

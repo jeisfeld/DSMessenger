@@ -44,5 +44,6 @@
 	<classpathentry kind="lib" path="libs-local/play-services-tasks-18.0.2.jar"/>
 	<classpathentry kind="lib" path="libs-local/play-services-base-18.1.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/localbroadcastmanager-1.1.0.jar"/>
+	<classpathentry kind="lib" path="libs-local/kotlin-stdlib-1.7.20.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

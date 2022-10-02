@@ -146,6 +146,7 @@ public final class AccountDialogUtil {
 	 * Display dialog for edit contact.
 	 *
 	 * @param accountFragment The triggering fragment.
+	 * @param contact         The contact.
 	 */
 	public static void displayEditContactDialog(final AccountFragment accountFragment, final Contact contact) {
 		EditContactDialogFragment fragment = new EditContactDialogFragment();
@@ -439,7 +440,6 @@ public final class AccountDialogUtil {
 			binding = DialogAcceptInvitationBinding.inflate(getLayoutInflater());
 
 			assert getArguments() != null;
-			final boolean fromActivity = getArguments().getBoolean("fromActivity");
 			final String initialConnectionCode = getArguments().getString("connectionCode");
 			if (initialConnectionCode != null) {
 				binding.editTextConnectionCode.setText(initialConnectionCode);
@@ -457,7 +457,7 @@ public final class AccountDialogUtil {
 					return;
 				}
 				String connectionCode = binding.editTextConnectionCode.getText().toString().trim();
-				if (connectionCode.length() != 24 || (!connectionCode.startsWith("m") && !connectionCode.startsWith("s"))) {
+				if (connectionCode.length() != 24 || !connectionCode.startsWith("m") && !connectionCode.startsWith("s")) {
 					displayError(R.string.error_invalid_connectioncode);
 					return;
 				}
@@ -544,14 +544,6 @@ public final class AccountDialogUtil {
 		 * The binding of the view.
 		 */
 		private DialogEditContactBinding binding;
-		/**
-		 * The relation id.
-		 */
-		private int relationId;
-		/**
-		 * The contact id.
-		 */
-		private int contactId;
 
 		/**
 		 * Display an error in the dialog.
@@ -591,7 +583,8 @@ public final class AccountDialogUtil {
 
 			binding.buttonSaveContact.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
-				if (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().length() == 0) {
+				if (contact.getStatus() == ContactStatus.CONNECTED
+						&& (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().length() == 0)) {
 					displayError(R.string.error_missing_ownname);
 					return;
 				}

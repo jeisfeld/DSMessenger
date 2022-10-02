@@ -46,7 +46,7 @@ public class AdminMessageDetails extends MessageDetails {
 		return new AdminMessageDetails(adminType, data);
 	}
 
-	public AdminType getAdminType() {
+	public final AdminType getAdminType() {
 		return adminType;
 	}
 
@@ -65,7 +65,7 @@ public class AdminMessageDetails extends MessageDetails {
 	 * @param key The key.
 	 * @return The value.
 	 */
-	public String getValue(String key) {
+	public String getValue(final String key) {
 		return data.get(key);
 	}
 

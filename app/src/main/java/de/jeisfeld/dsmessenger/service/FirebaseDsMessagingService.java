@@ -66,6 +66,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				ContactRegistry.getInstance().refreshContacts(() -> AccountFragment.sendBroadcast(this, ActionType.CONTACTS_CHANGED));
 				break;
 			case UNKNOWN:
+			default:
 				break;
 			}
 			break;

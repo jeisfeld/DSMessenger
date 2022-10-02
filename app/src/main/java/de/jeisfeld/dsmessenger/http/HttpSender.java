@@ -198,7 +198,7 @@ public class HttpSender {
 				if (success) {
 					for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
 						String key = it.next();
-						//noinspection StatementWithEmptyBody
+						// noinspection StatementWithEmptyBody
 						if ("status".equals(key)) {
 							// do nothing
 						}

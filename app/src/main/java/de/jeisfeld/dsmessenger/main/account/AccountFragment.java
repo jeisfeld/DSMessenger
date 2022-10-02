@@ -19,6 +19,7 @@ import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentAccountBinding;
 import de.jeisfeld.dsmessenger.databinding.ListViewContactBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.ChangePasswordDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateAccountDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateInvitationDialogFragment;
@@ -46,7 +47,7 @@ public class AccountFragment extends Fragment {
 	 */
 	private final BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(final Context context, final Intent intent) {
 			if (intent != null) {
 				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
 				switch (actionType) {
@@ -61,6 +62,31 @@ public class AccountFragment extends Fragment {
 			}
 		}
 	};
+	/**
+	 * Broadcastmanager to update fragment from external.
+	 */
+	private LocalBroadcastManager broadcastManager;
+
+	/**
+	 * Send a broadcast to this fragment.
+	 *
+	 * @param context    The context.
+	 * @param actionType The action type.
+	 * @param parameters The parameters.
+	 */
+	public static void sendBroadcast(final Context context, final ActionType actionType, final String... parameters) {
+		Intent intent = new Intent(BROADCAST_ACTION);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("actionType", actionType);
+		int i = 0;
+		while (i < parameters.length - 1) {
+			String key = parameters[i++];
+			String value = parameters[i++];
+			bundle.putString(key, value);
+		}
+		intent.putExtras(bundle);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+	}
 
 	@Override
 	public final View onCreateView(@NonNull final LayoutInflater inflater,
@@ -95,25 +121,6 @@ public class AccountFragment extends Fragment {
 		return binding.getRoot();
 	}
 
-	/**
-	 * Broadcastmanager to update fragment from external
-	 */
-	private LocalBroadcastManager broadcastManager;
-
-	public static void sendBroadcast(Context context, ActionType actionType, String... parameters) {
-		Intent intent = new Intent(BROADCAST_ACTION);
-		Bundle bundle = new Bundle();
-		bundle.putSerializable("actionType", actionType);
-		int i = 0;
-		while (i < parameters.length - 1) {
-			String key = parameters[i++];
-			String value = parameters[i++];
-			bundle.putString(key, value);
-		}
-		intent.putExtras(bundle);
-		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-	}
-
 	@Override
 	public final void onDestroyView() {
 		super.onDestroyView();
@@ -121,7 +128,7 @@ public class AccountFragment extends Fragment {
 	}
 
 	@Override
-	public void onAttach(@NonNull Context context) {
+	public final void onAttach(@NonNull final Context context) {
 		super.onAttach(context);
 		broadcastManager = LocalBroadcastManager.getInstance(context);
 		IntentFilter actionReceiver = new IntentFilter();
@@ -130,7 +137,7 @@ public class AccountFragment extends Fragment {
 	}
 
 	@Override
-	public void onDetach() {
+	public final void onDetach() {
 		super.onDetach();
 		broadcastManager.unregisterReceiver(localBroadcastReceiver);
 	}
@@ -148,6 +155,7 @@ public class AccountFragment extends Fragment {
 		switch (contact.getStatus()) {
 		case INVITED:
 			childBinding.imageViewPending.setVisibility(View.VISIBLE);
+			childBinding.imageViewPending.setOnClickListener(v -> sendInvitationUrl(contact.getConnectionCode()));
 			break;
 		case CONNECTED:
 		default:
@@ -157,20 +165,19 @@ public class AccountFragment extends Fragment {
 
 		if (contact.isSlave() || contact.getStatus() == ContactStatus.INVITED) {
 			childBinding.buttonDelete.setVisibility(View.VISIBLE);
-			childBinding.buttonDelete.setOnClickListener(v -> DialogUtil.displayConfirmationMessage(requireActivity(), dialog ->
-							new HttpSender().sendMessage("db/usermanagement/deletecontact.php", (response, responseData) -> {
-										if (responseData == null) {
-											Log.e(Application.TAG, "Error in server communication: " + response);
-										}
-										else if (responseData.isSuccess()) {
-											ContactRegistry.getInstance().refreshContacts(() ->
-													requireActivity().runOnUiThread(this::refreshDisplayedContactList));
-										}
-										else {
-											Log.e(Application.TAG, "Failed to delete contact: " + responseData.getErrorMessage());
-										}
-									}, "isSlave", contact.isSlave() ? "1" : "", "relationId", Integer.toString(contact.getRelationId()),
-									"isConnected", contact.getStatus() == ContactStatus.CONNECTED ? "1" : ""),
+			childBinding.buttonDelete.setOnClickListener(v -> DialogUtil.displayConfirmationMessage(requireActivity(),
+					dialog -> new HttpSender().sendMessage("db/usermanagement/deletecontact.php", (response, responseData) -> {
+								if (responseData == null) {
+									Log.e(Application.TAG, "Error in server communication: " + response);
+								}
+								else if (responseData.isSuccess()) {
+									ContactRegistry.getInstance().refreshContacts(() -> requireActivity().runOnUiThread(this::refreshDisplayedContactList));
+								}
+								else {
+									Log.e(Application.TAG, "Failed to delete contact: " + responseData.getErrorMessage());
+								}
+							}, "isSlave", contact.isSlave() ? "1" : "", "relationId", Integer.toString(contact.getRelationId()),
+							"isConnected", contact.getStatus() == ContactStatus.CONNECTED ? "1" : ""),
 					R.string.title_dialog_confirm_deletion, R.string.button_cancel, R.string.button_delete_contact,
 					R.string.dialog_confirm_delete_contact, contact.getName()));
 			childBinding.buttonEdit.setVisibility(View.VISIBLE);
@@ -182,6 +189,8 @@ public class AccountFragment extends Fragment {
 		}
 
 		layout.addView(childBinding.getRoot());
+
+		((MainActivity) requireActivity()).updateNavigationDrawer();
 	}
 
 	/**
@@ -218,11 +227,13 @@ public class AccountFragment extends Fragment {
 	 *
 	 * @param linearLayout The list.
 	 */
-	private void cleanupContactsFromList(LinearLayout linearLayout) {
+	private void cleanupContactsFromList(final LinearLayout linearLayout) {
 		linearLayout.setVisibility(View.GONE);
 		View headline = linearLayout.getChildAt(0);
 		linearLayout.removeAllViews();
 		linearLayout.addView(headline);
+
+		((MainActivity) requireActivity()).updateNavigationDrawer();
 	}
 
 	/**
@@ -243,14 +254,14 @@ public class AccountFragment extends Fragment {
 		binding.buttonCreateInvitation.setOnClickListener(v -> AccountDialogUtil.displayCreateInvitationDialog(this));
 		binding.buttonAcceptInvitation.setOnClickListener(v -> AccountDialogUtil.displayAcceptInvitationDialog(this));
 
-		binding.imageViewRefreshContacts.setOnClickListener(v ->
-				ContactRegistry.getInstance().refreshContacts(() -> requireActivity().runOnUiThread(this::refreshDisplayedContactList)));
+		binding.imageViewRefreshContacts.setOnClickListener(
+				v -> ContactRegistry.getInstance().refreshContacts(() -> requireActivity().runOnUiThread(this::refreshDisplayedContactList)));
 	}
 
 	/**
 	 * Handle the response of create account dialog.
 	 *
-	 * @param dialog   The dialog.
+	 * @param dialog The dialog.
 	 * @param username The username.
 	 * @param password The password.
 	 */
@@ -281,7 +292,7 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Handle the response of login dialog.
 	 *
-	 * @param dialog   The dialog.
+	 * @param dialog The dialog.
 	 * @param username The username.
 	 * @param password The password.
 	 */
@@ -315,7 +326,7 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Handle the response of change password dialog.
 	 *
-	 * @param dialog      The dialog.
+	 * @param dialog The dialog.
 	 * @param oldPassword The old password.
 	 * @param newPassword The new password.
 	 */
@@ -360,11 +371,7 @@ public class AccountFragment extends Fragment {
 				ContactRegistry.getInstance().addOrUpdate(contact);
 				requireActivity().runOnUiThread(() -> addContactToView(contact));
 
-				Intent messageIntent = new Intent(Intent.ACTION_SEND);
-				messageIntent.setType("text/plain");
-				messageIntent.putExtra(Intent.EXTRA_SUBJECT, "Invitation to DSMessenger");
-				messageIntent.putExtra(Intent.EXTRA_TEXT, "https://jeisfeld.de/dsmessenger/connect?code=" + connectionCode);
-				startActivity(Intent.createChooser(messageIntent, "Send Invitation to DSMessenger"));
+				sendInvitationUrl(connectionCode);
 			}
 			else {
 				requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
@@ -373,9 +380,22 @@ public class AccountFragment extends Fragment {
 	}
 
 	/**
+	 * Send an invitation URL.
+	 *
+	 * @param connectionCode The connection code.
+	 */
+	private void sendInvitationUrl(final String connectionCode) {
+		Intent messageIntent = new Intent(Intent.ACTION_SEND);
+		messageIntent.setType("text/plain");
+		messageIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.text_subject_invitation));
+		messageIntent.putExtra(Intent.EXTRA_TEXT, "https://jeisfeld.de/dsmessenger/connect?code=" + connectionCode);
+		startActivity(Intent.createChooser(messageIntent, null));
+	}
+
+	/**
 	 * Handle the response of edit contact dialog.
 	 *
-	 * @param dialog  The dialog.
+	 * @param dialog The dialog.
 	 * @param contact The new contact data.
 	 */
 	protected void handleEditContactDialogResponse(final EditContactDialogFragment dialog, final Contact contact) {

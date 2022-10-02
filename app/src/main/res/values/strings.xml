@@ -73,6 +73,7 @@
     <string name="text_pending">Pending</string>
     <string name="text_confirmed">Confirmed</string>
     <string name="text_refresh">Refresh</string>
+    <string name="text_subject_invitation">Invitation to DSMessenger</string>
 
     <string name="error_missing_username">Missing username</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>

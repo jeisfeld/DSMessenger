@@ -9,12 +9,13 @@ import java.util.List;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
  * Registry for contacts.
  */
-public class ContactRegistry {
+public final class ContactRegistry {
 	/**
 	 * The singleton instance.
 	 */
@@ -34,6 +35,11 @@ public class ContactRegistry {
 		}
 	}
 
+	/**
+	 * Get an the singleton instance.
+	 *
+	 * @return The singleton instance.
+	 */
 	public static synchronized ContactRegistry getInstance() {
 		if (instance == null) {
 			instance = new ContactRegistry();
@@ -50,6 +56,22 @@ public class ContactRegistry {
 		List<Contact> result = new ArrayList<>();
 		for (int i = 0; i < contacts.size(); i++) {
 			result.add(contacts.valueAt(i));
+		}
+		return result;
+	}
+
+	/**
+	 * Get all contacts.
+	 *
+	 * @return The list of contacts.
+	 */
+	public List<Contact> getConnectedContacts() {
+		List<Contact> result = new ArrayList<>();
+		for (int i = 0; i < contacts.size(); i++) {
+			Contact contact = contacts.valueAt(i);
+			if (contact.getStatus() == ContactStatus.CONNECTED) {
+				result.add(contact);
+			}
 		}
 		return result;
 	}
