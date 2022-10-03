@@ -32,7 +32,7 @@ if ($stmt->execute()) {
     printSuccess("Contact successfully updated");
     
     if ($isConnected) {
-        $token = getToken($conn, $username, $password, $relationId);
+        $token = getToken($conn, $username, $password, $relationId, $isSlave);
         $data = [
             'messageType' => 'ADMIN',
             'adminType' => 'CONTACT_UPDATED'

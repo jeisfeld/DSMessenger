@@ -4,11 +4,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentMessageBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.account.Contact;
+import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 
 /**
  * Fragment for sending messages.
@@ -35,6 +41,31 @@ public class MessageFragment extends Fragment {
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		List<Contact> contactList = ContactRegistry.getInstance().getConnectedContacts();
+
+		ArrayAdapter<Contact> dataAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, contactList);
+		binding.spinnerContact.setAdapter(dataAdapter);
+
+		if (contactList.size() == 0) {
+			binding.scrollViewSendMessage.setVisibility(View.GONE);
+			binding.buttonSend.setVisibility(View.GONE);
+			binding.spinnerContact.setVisibility(View.GONE);
+		}
+		else if (contactList.size() == 1) {
+			binding.scrollViewSendMessage.setVisibility(View.VISIBLE);
+			binding.buttonSend.setVisibility(View.VISIBLE);
+			binding.spinnerContact.setVisibility(View.GONE);
+		}
+		else {
+			binding.scrollViewSendMessage.setVisibility(View.VISIBLE);
+			binding.buttonSend.setVisibility(View.VISIBLE);
+			binding.spinnerContact.setVisibility(View.VISIBLE);
+		}
+	}
+
+	@Override
 	public final void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
@@ -44,7 +75,8 @@ public class MessageFragment extends Fragment {
 	 * Send the message.
 	 */
 	private void sendMessage() {
-		String device = binding.radioDeviceTablet.isChecked() ? "tablet" : "handy";
+		binding.textMessageResponse.setText(R.string.text_sending_message);
+
 		String messageText = binding.editTextMessageText.getText().toString();
 		boolean vibrate = binding.checkboxVibrate.isChecked();
 		boolean repeatVibration = vibrate && binding.checkboxRepeatVibration.isChecked();
@@ -52,9 +84,17 @@ public class MessageFragment extends Fragment {
 		boolean displayOnLockScreen = binding.checkboxDisplayOnLockScreen.isChecked();
 		boolean lockMessage = binding.checkboxLockMessage.isChecked();
 		boolean keepScreenOn = binding.checkboxKeepScreenOn.isChecked();
+		Contact contact = (Contact) binding.spinnerContact.getSelectedItem();
 
-		new HttpSender().sendMessage("index.php", false, null,
-				"device", device, "messageType", "TEXT", "messageText", messageText, "vibrate", Boolean.toString(vibrate),
+		new HttpSender().sendMessage("firebase/sendmessage.php", contact, (response, responseData) -> requireActivity().runOnUiThread(() -> {
+					if (responseData == null || !responseData.isSuccess()) {
+						binding.textMessageResponse.setText(responseData == null ? response : responseData.getErrorMessage());
+					}
+					else {
+						binding.textMessageResponse.setText(R.string.text_message_sent);
+					}
+				}),
+				"messageType", "TEXT", "messageText", messageText, "vibrate", Boolean.toString(vibrate),
 				"vibrationRepeated", Boolean.toString(repeatVibration), "vibrationPattern", Integer.toString(vibrationPattern),
 				"displayOnLockScreen", Boolean.toString(displayOnLockScreen), "lockMessage", Boolean.toString(lockMessage),
 				"keepScreenOn", Boolean.toString(keepScreenOn));

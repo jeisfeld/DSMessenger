@@ -56,7 +56,7 @@ public class RandomimageFragment extends Fragment {
 		String notificationName = binding.spinnerNotificationName.getSelectedItem().toString();
 		String widgetName = binding.spinnerWidgetName.getSelectedItem().toString();
 
-		new HttpSender().sendMessage("index.php", false, null,
+		new HttpSender().sendMessage("index.php", false, null, null,
 				"device", device, "messageType", "RANDOMIMAGE", "randomImageOrigin", randomImageOrigin,
 				"notificationName", notificationName, "widgetName", widgetName);
 	}

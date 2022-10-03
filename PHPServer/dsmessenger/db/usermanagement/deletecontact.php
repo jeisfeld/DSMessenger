@@ -18,7 +18,7 @@ $isSlave = @$_POST['isSlave'];
 $isConnected = @$_POST['isConnected'];
 
 if ($isConnected) {
-    $token = getToken($conn, $username, $password, $relationId);
+    $token = getToken($conn, $username, $password, $relationId, $isSlave);
 }
 
 if ($isSlave) {

@@ -38,11 +38,12 @@ public class HttpSender {
 	 *
 	 * @param urlPostfix     The postfix of the URL.
 	 * @param addCredentials Flag indicating if username, password should be added.
+	 * @param contact        The contact.
 	 * @param listener       The response listener.
 	 * @param parameters     The POST parameters.
 	 */
-	public void sendMessage(final String urlPostfix, final boolean addCredentials, final OnHttpResponseListener listener,
-							final String... parameters) {
+	public void sendMessage(final String urlPostfix, final boolean addCredentials, final Contact contact,
+							final OnHttpResponseListener listener, final String... parameters) {
 		Authenticator.setDefault(new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -67,7 +68,7 @@ public class HttpSender {
 					urlConnection.setDoOutput(true);
 					((HttpsURLConnection) urlConnection).setRequestMethod("POST");
 					urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-					byte[] postDataBytes = getPostData(addCredentials, parameters).getBytes(StandardCharsets.UTF_8);
+					byte[] postDataBytes = getPostData(addCredentials, contact, parameters).getBytes(StandardCharsets.UTF_8);
 					urlConnection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
 					urlConnection.getOutputStream().write(postDataBytes);
 
@@ -102,21 +103,34 @@ public class HttpSender {
 	 * Send a POST message to Server, including credentials.
 	 *
 	 * @param urlPostfix The postfix of the URL.
+	 * @param contact    The contact.
+	 * @param listener   The response listener.
+	 * @param parameters The POST parameters.
+	 */
+	public void sendMessage(final String urlPostfix, final Contact contact, final OnHttpResponseListener listener, final String... parameters) {
+		sendMessage(urlPostfix, true, contact, listener, parameters);
+	}
+
+	/**
+	 * Send a POST message to Server, including credentials.
+	 *
+	 * @param urlPostfix The postfix of the URL.
 	 * @param listener   The response listener.
 	 * @param parameters The POST parameters.
 	 */
 	public void sendMessage(final String urlPostfix, final OnHttpResponseListener listener, final String... parameters) {
-		sendMessage(urlPostfix, true, listener, parameters);
+		sendMessage(urlPostfix, null, listener, parameters);
 	}
 
 	/**
 	 * Get post data from the parameters, which are name value entries.
 	 *
 	 * @param addCredentials Flag indicating if username, password should be added.
+	 * @param contact        The related contact.
 	 * @param parameters     the name value entries.
 	 * @return The data to be posted.
 	 */
-	private String getPostData(final boolean addCredentials, final String... parameters) throws UnsupportedEncodingException {
+	private String getPostData(final boolean addCredentials, final Contact contact, final String... parameters) throws UnsupportedEncodingException {
 		int i = 0;
 		StringBuilder postData = new StringBuilder();
 		while (i < parameters.length - 1) {
@@ -139,6 +153,19 @@ public class HttpSender {
 			postData.append(URLEncoder.encode(PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username), StandardCharsets.UTF_8.name()));
 			postData.append("&password=");
 			postData.append(URLEncoder.encode(PreferenceUtil.getSharedPreferenceString(R.string.key_pref_password), StandardCharsets.UTF_8.name()));
+		}
+		if (contact != null) {
+			if (postData.length() > 0) {
+				postData.append('&');
+			}
+			postData.append("relationId=");
+			postData.append(contact.getRelationId());
+			postData.append("&contactId=");
+			postData.append(contact.getContactId());
+			postData.append("&isSlave=");
+			postData.append(contact.isSlave() ? "1" : "");
+			postData.append("&isConnected=");
+			postData.append(contact.getStatus() == ContactStatus.CONNECTED ? "1" : "");
 		}
 		return postData.toString();
 	}

@@ -266,7 +266,7 @@ public class AccountFragment extends Fragment {
 	 * @param password The password.
 	 */
 	protected void handleCreateAccountDialogResponse(final CreateAccountDialogFragment dialog, final String username, final String password) {
-		new HttpSender().sendMessage("db/usermanagement/createuser.php", false, (response, responseData) -> {
+		new HttpSender().sendMessage("db/usermanagement/createuser.php", false, null, (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
 						requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
@@ -297,7 +297,7 @@ public class AccountFragment extends Fragment {
 	 * @param password The password.
 	 */
 	protected void handleLoginDialogResponse(final LoginDialogFragment dialog, final String username, final String password) {
-		new HttpSender().sendMessage("db/usermanagement/login.php", false, (response, responseData) -> {
+		new HttpSender().sendMessage("db/usermanagement/login.php", false, null, (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
 						requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
@@ -399,21 +399,20 @@ public class AccountFragment extends Fragment {
 	 * @param contact The new contact data.
 	 */
 	protected void handleEditContactDialogResponse(final EditContactDialogFragment dialog, final Contact contact) {
-		new HttpSender().sendMessage("db/usermanagement/updatecontact.php", (response, responseData) -> {
-					if (responseData == null) {
-						Log.e(Application.TAG, "Error in server communication: " + response);
-						requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
-					}
-					else if (responseData.isSuccess()) {
-						dialog.dismiss();
-						ContactRegistry.getInstance().addOrUpdate(contact);
-						requireActivity().runOnUiThread(this::refreshDisplayedContactList);
-					}
-					else {
-						requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
-					}
-				}, "myName", contact.getMyName(), "contactName", contact.getName(), "relationId", Integer.toString(contact.getRelationId()),
-				"isSlave", contact.isSlave() ? "1" : "", "isConnected", contact.getStatus() == ContactStatus.CONNECTED ? "1" : "");
+		new HttpSender().sendMessage("db/usermanagement/updatecontact.php", contact, (response, responseData) -> {
+			if (responseData == null) {
+				Log.e(Application.TAG, "Error in server communication: " + response);
+				requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+			}
+			else if (responseData.isSuccess()) {
+				dialog.dismiss();
+				ContactRegistry.getInstance().addOrUpdate(contact);
+				requireActivity().runOnUiThread(this::refreshDisplayedContactList);
+			}
+			else {
+				requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
+			}
+		}, "myName", contact.getMyName(), "contactName", contact.getName());
 	}
 
 	/**

@@ -108,6 +108,15 @@ public class Contact implements Serializable {
 	@NonNull
 	@Override
 	public final String toString() {
+		return getName();
+	}
+
+	/**
+	 * Get detailed String representation
+	 *
+	 * @return A detailed String representation.
+	 */
+	public final String toDetailedString() {
 		return "Contact{" + "relationId=" + relationId + ", name='" + name + '\'' + ", myName='" + myName + '\'' + ", contactId='" + contactId + '\''
 				+ ", isSlave=" + isSlave + ", connectionCode='" + connectionCode + '\'' + ", status=" + status + '}';
 	}

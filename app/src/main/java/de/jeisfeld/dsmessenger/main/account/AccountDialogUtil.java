@@ -527,7 +527,7 @@ public final class AccountDialogUtil {
 							else {
 								requireActivity().runOnUiThread(() -> displayError(responseData.getErrorMessage()));
 							}
-						}, "is_slave", amSlave ? "1" : "", "myname", myName, "contactname", contactName,
+						}, "isSlave", amSlave ? "" : "1", "myname", myName, "contactname", contactName,
 						"contactId", Integer.toString(contactId), "connectioncode", connectionCode,
 						"relationId", Integer.toString(relationId));
 			});

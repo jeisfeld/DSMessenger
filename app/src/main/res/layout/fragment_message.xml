@@ -16,13 +16,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Spinner
+        android:id="@+id/spinnerContact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@id/textSendMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/textSendMessage" />
+
+    <TextView
+        android:id="@+id/textSendMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:text="@string/text_send_message"
+        android:textSize="@dimen/text_xlarge"
+        app:layout_constraintEnd_toStartOf="@id/spinnerContact"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ScrollView
+        android:id="@+id/scrollViewSendMessage"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/buttonSend"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textSendMessage"
         app:layout_constraintVertical_bias="0"
         app:layout_constraintVertical_chainStyle="spread">
 
@@ -30,56 +51,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/textMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/margin_medium"
-                android:text="@string/text_send_message"
-                android:textAlignment="center"
-                android:textSize="@dimen/text_xlarge"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TableRow
-                android:id="@+id/tableRowDevice"
-                android:layout_marginBottom="@dimen/margin_medium">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_width"
-                    android:labelFor="@id/radioGroupDevice"
-                    android:text="@string/text_device"
-                    android:textSize="@dimen/text_normal" />
-
-                <RadioGroup
-                    android:id="@+id/radioGroupDevice"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/input_row_height"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/margin_medium"
-                    android:layout_weight="@integer/selector_input_width"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/radioDeviceHandy"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/input_row_height"
-                        android:layout_weight="1"
-                        android:checked="true"
-                        android:text="@string/text_device_handy" />
-
-                    <RadioButton
-                        android:id="@+id/radioDeviceTablet"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/input_row_height"
-                        android:layout_weight="1"
-                        android:text="@string/text_device_tablet" />
-                </RadioGroup>
-            </TableRow>
 
             <TableRow
                 android:id="@+id/tableRowMessageText"
@@ -111,7 +82,8 @@
                     tools:ignore="RtlSymmetry" />
             </TableRow>
 
-            <TableRow android:id="@+id/tableRowVibrate"
+            <TableRow
+                android:id="@+id/tableRowVibrate"
                 android:layout_marginTop="@dimen/margin_small"
                 android:layout_marginBottom="@dimen/margin_small">
 
@@ -184,7 +156,8 @@
                     android:textSize="@dimen/text_normal" />
             </TableRow>
 
-            <TableRow android:id="@+id/tableDisplayOnLockScreen"
+            <TableRow
+                android:id="@+id/tableDisplayOnLockScreen"
                 android:layout_marginBottom="@dimen/margin_small">
 
                 <TextView
@@ -208,7 +181,8 @@
 
             </TableRow>
 
-            <TableRow android:id="@+id/tableLockMessage"
+            <TableRow
+                android:id="@+id/tableLockMessage"
                 android:layout_marginBottom="@dimen/margin_small">
 
                 <TextView
@@ -232,7 +206,8 @@
 
             </TableRow>
 
-            <TableRow android:id="@+id/tableKeepScreenOn"
+            <TableRow
+                android:id="@+id/tableKeepScreenOn"
                 android:layout_marginBottom="@dimen/margin_small">
 
                 <TextView
@@ -256,6 +231,13 @@
 
             </TableRow>
 
+            <TextView
+                android:id="@+id/textMessageResponse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="@dimen/text_normal" />
         </TableLayout>
     </ScrollView>
 
