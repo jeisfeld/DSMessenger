@@ -1,5 +1,4 @@
-/dsmessenger/vendor
-/.htpasswd
-/dsmessenger/db/dbcredentials.php
-/dsmessenger/firebase/token.php
-/dsmessenger/firebase/ds-messenger-f7c23-firebase-adminsdk-*.json
+/vendor
+/db/dbcredentials.php
+/firebase/token.php
+/firebase/ds-messenger-f7c23-firebase-adminsdk-*.json

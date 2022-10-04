@@ -67,7 +67,7 @@ public class HttpSender {
 		});
 		String urlBase;
 		if (PreferenceUtil.getSharedPreferenceBoolean(R.string.key_pref_use_test_server)) {
-			urlBase = "https://pc-joerg:8101/dsmessenger/";
+			urlBase = "https://pc-joerg:8101/";
 		}
 		else {
 			urlBase = "https://jeisfeld.de/dsmessenger/";
