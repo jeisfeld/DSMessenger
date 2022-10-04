@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.main.message;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,14 +87,19 @@ public class MessageFragment extends Fragment {
 		boolean keepScreenOn = binding.checkboxKeepScreenOn.isChecked();
 		Contact contact = (Contact) binding.spinnerContact.getSelectedItem();
 
-		new HttpSender().sendMessage("firebase/sendmessage.php", contact, (response, responseData) -> requireActivity().runOnUiThread(() -> {
-					if (responseData == null || !responseData.isSuccess()) {
-						binding.textMessageResponse.setText(responseData == null ? response : responseData.getErrorMessage());
+		new HttpSender(getContext()).sendMessage("firebase/sendmessage.php", contact, (response, responseData) -> {
+					Activity activity = getActivity();
+					if (activity != null) {
+						activity.runOnUiThread(() -> {
+							if (responseData == null || !responseData.isSuccess()) {
+								binding.textMessageResponse.setText(responseData == null ? response : responseData.getMappedErrorMessage(getContext()));
+							}
+							else {
+								binding.textMessageResponse.setText(R.string.text_message_sent);
+							}
+						});
 					}
-					else {
-						binding.textMessageResponse.setText(R.string.text_message_sent);
-					}
-				}),
+				},
 				"messageType", "TEXT", "messageText", messageText, "vibrate", Boolean.toString(vibrate),
 				"vibrationRepeated", Boolean.toString(repeatVibration), "vibrationPattern", Integer.toString(vibrationPattern),
 				"displayOnLockScreen", Boolean.toString(displayOnLockScreen), "lockMessage", Boolean.toString(lockMessage),

@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.main.account;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -165,13 +166,18 @@ public class AccountFragment extends Fragment {
 
 		if (contact.isSlave() || contact.getStatus() == ContactStatus.INVITED) {
 			childBinding.buttonDelete.setVisibility(View.VISIBLE);
-			childBinding.buttonDelete.setOnClickListener(v -> DialogUtil.displayConfirmationMessage(requireActivity(),
-					dialog -> new HttpSender().sendMessage("db/usermanagement/deletecontact.php", (response, responseData) -> {
+			childBinding.buttonDelete.setOnClickListener(v -> DialogUtil.displayConfirmationMessage(getActivity(),
+					dialog -> new HttpSender(getContext()).sendMessage("db/usermanagement/deletecontact.php", (response, responseData) -> {
 								if (responseData == null) {
 									Log.e(Application.TAG, "Error in server communication: " + response);
 								}
 								else if (responseData.isSuccess()) {
-									ContactRegistry.getInstance().refreshContacts(() -> requireActivity().runOnUiThread(this::refreshDisplayedContactList));
+									ContactRegistry.getInstance().refreshContacts(getContext(), () -> {
+										Activity activity = getActivity();
+										if (activity != null) {
+											activity.runOnUiThread(this::refreshDisplayedContactList);
+										}
+									});
 								}
 								else {
 									Log.e(Application.TAG, "Failed to delete contact: " + responseData.getErrorMessage());
@@ -190,7 +196,10 @@ public class AccountFragment extends Fragment {
 
 		layout.addView(childBinding.getRoot());
 
-		((MainActivity) requireActivity()).updateNavigationDrawer();
+		Activity activity = getActivity();
+		if (activity != null) {
+			((MainActivity) activity).updateNavigationDrawer();
+		}
 	}
 
 	/**
@@ -203,21 +212,24 @@ public class AccountFragment extends Fragment {
 
 		binding.buttonChangePassword.setOnClickListener(v -> AccountDialogUtil.displayChangePasswordDialog(this));
 
-		binding.buttonLogout.setOnClickListener(v -> new HttpSender().sendMessage("db/usermanagement/logout.php", (response, responseData) -> {
+		binding.buttonLogout.setOnClickListener(v -> new HttpSender(getContext()).sendMessage("db/usermanagement/logout.php", (response, responseData) -> {
 			PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
 			PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
 			ContactRegistry.getInstance().cleanContacts();
 			if (responseData != null && responseData.isSuccess()) {
-				requireActivity().runOnUiThread(() -> {
-					refreshDisplayedContactList();
+				Activity activity = getActivity();
+				if (activity != null) {
+					activity.runOnUiThread(() -> {
+						refreshDisplayedContactList();
 
-					binding.tableRowButtonsLogin.setVisibility(View.VISIBLE);
-					binding.tableRowButtonsLogout.setVisibility(View.GONE);
-					binding.tableRowUsername.setVisibility(View.GONE);
-					binding.textViewUsername.setText("");
-					binding.buttonCreateInvitation.setVisibility(View.GONE);
-					binding.buttonAcceptInvitation.setVisibility(View.GONE);
-				});
+						binding.tableRowButtonsLogin.setVisibility(View.VISIBLE);
+						binding.tableRowButtonsLogout.setVisibility(View.GONE);
+						binding.tableRowUsername.setVisibility(View.GONE);
+						binding.textViewUsername.setText("");
+						binding.buttonCreateInvitation.setVisibility(View.GONE);
+						binding.buttonAcceptInvitation.setVisibility(View.GONE);
+					});
+				}
 			}
 		}));
 	}
@@ -233,7 +245,10 @@ public class AccountFragment extends Fragment {
 		linearLayout.removeAllViews();
 		linearLayout.addView(headline);
 
-		((MainActivity) requireActivity()).updateNavigationDrawer();
+		Activity activity = getActivity();
+		if (activity != null) {
+			((MainActivity) activity).updateNavigationDrawer();
+		}
 	}
 
 	/**
@@ -255,35 +270,53 @@ public class AccountFragment extends Fragment {
 		binding.buttonAcceptInvitation.setOnClickListener(v -> AccountDialogUtil.displayAcceptInvitationDialog(this));
 
 		binding.imageViewRefreshContacts.setOnClickListener(
-				v -> ContactRegistry.getInstance().refreshContacts(() -> requireActivity().runOnUiThread(this::refreshDisplayedContactList)));
+				v -> ContactRegistry.getInstance().refreshContacts(getContext(), () -> {
+					Activity activity = getActivity();
+					if (activity != null) {
+						activity.runOnUiThread(this::refreshDisplayedContactList);
+					}
+				}));
 	}
 
 	/**
 	 * Handle the response of create account dialog.
 	 *
-	 * @param dialog The dialog.
+	 * @param dialog   The dialog.
 	 * @param username The username.
 	 * @param password The password.
 	 */
 	protected void handleCreateAccountDialogResponse(final CreateAccountDialogFragment dialog, final String username, final String password) {
-		new HttpSender().sendMessage("db/usermanagement/createuser.php", false, null, (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("db/usermanagement/createuser.php", false, null, (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
-						requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+
+						Activity activity = getActivity();
+						if (activity != null) {
+							activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+						}
 					}
 					else if (responseData.isSuccess()) {
 						dialog.dismiss();
-						requireActivity().runOnUiThread(() -> {
-							binding.tableRowButtonsLogin.setVisibility(View.GONE);
-							binding.tableRowButtonsLogout.setVisibility(View.VISIBLE);
-							binding.tableRowUsername.setVisibility(View.VISIBLE);
-							binding.textViewUsername.setText(username);
-							PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
-							PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
-						});
+
+						Activity activity = getActivity();
+						if (activity != null) {
+							activity.runOnUiThread(() -> {
+								binding.tableRowButtonsLogin.setVisibility(View.GONE);
+								binding.tableRowButtonsLogout.setVisibility(View.VISIBLE);
+								binding.tableRowUsername.setVisibility(View.VISIBLE);
+								binding.textViewUsername.setText(username);
+								binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
+								binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
+								PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
+								PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
+							});
+						}
 					}
 					else {
-						requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
+						Activity activity = getActivity();
+						if (activity != null) {
+							activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
+						}
 					}
 				}, "username", username, "password", password,
 				"token", PreferenceUtil.getSharedPreferenceString(R.string.key_pref_messaging_token));
@@ -292,32 +325,45 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Handle the response of login dialog.
 	 *
-	 * @param dialog The dialog.
+	 * @param dialog   The dialog.
 	 * @param username The username.
 	 * @param password The password.
 	 */
 	protected void handleLoginDialogResponse(final LoginDialogFragment dialog, final String username, final String password) {
-		new HttpSender().sendMessage("db/usermanagement/login.php", false, null, (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("db/usermanagement/login.php", false, null, (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
-						requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+						Activity activity = getActivity();
+						if (activity != null) {
+							activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+						}
 					}
 					else if (responseData.isSuccess()) {
 						dialog.dismiss();
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
-						requireActivity().runOnUiThread(() -> {
-							binding.tableRowButtonsLogin.setVisibility(View.GONE);
-							binding.tableRowButtonsLogout.setVisibility(View.VISIBLE);
-							binding.tableRowUsername.setVisibility(View.VISIBLE);
-							binding.textViewUsername.setText(username);
-							binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
-							binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
+						final Activity activity = getActivity();
+						if (activity != null) {
+							activity.runOnUiThread(() -> {
+								binding.tableRowButtonsLogin.setVisibility(View.GONE);
+								binding.tableRowButtonsLogout.setVisibility(View.VISIBLE);
+								binding.tableRowUsername.setVisibility(View.VISIBLE);
+								binding.textViewUsername.setText(username);
+								binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
+								binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
+							});
+						}
+						ContactRegistry.getInstance().refreshContacts(getContext(), () -> {
+							if (activity != null) {
+								activity.runOnUiThread(this::refreshDisplayedContactList);
+							}
 						});
-						ContactRegistry.getInstance().refreshContacts(() -> requireActivity().runOnUiThread(this::refreshDisplayedContactList));
 					}
 					else {
-						requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
+						Activity activity = getActivity();
+						if (activity != null) {
+							activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
+						}
 					}
 				}, "username", username, "password", password,
 				"token", PreferenceUtil.getSharedPreferenceString(R.string.key_pref_messaging_token));
@@ -326,22 +372,28 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Handle the response of change password dialog.
 	 *
-	 * @param dialog The dialog.
+	 * @param dialog      The dialog.
 	 * @param oldPassword The old password.
 	 * @param newPassword The new password.
 	 */
 	protected void handleChangePasswordDialogResponse(final ChangePasswordDialogFragment dialog, final String oldPassword, final String newPassword) {
-		new HttpSender().sendMessage("db/usermanagement/changepassword.php", (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("db/usermanagement/changepassword.php", (response, responseData) -> {
 			if (responseData == null) {
 				Log.e(Application.TAG, "Error in server communication: " + response);
-				requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+				Activity activity = getActivity();
+				if (activity != null) {
+					activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+				}
 			}
 			else if (responseData.isSuccess()) {
 				PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, newPassword);
 				dialog.dismiss();
 			}
 			else {
-				requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
+				Activity activity = getActivity();
+				if (activity != null) {
+					activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
+				}
 			}
 		}, "newpassword", newPassword);
 	}
@@ -356,10 +408,13 @@ public class AccountFragment extends Fragment {
 	 */
 	protected void handleCreateInvitationDialogResponse(final CreateInvitationDialogFragment dialog, final boolean amSlave,
 														final String myName, final String contactName) {
-		new HttpSender().sendMessage("db/usermanagement/createinvitation.php", (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("db/usermanagement/createinvitation.php", (response, responseData) -> {
 			if (responseData == null) {
 				Log.e(Application.TAG, "Error in server communication: " + response);
-				requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+				Activity activity = getActivity();
+				if (activity != null) {
+					activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+				}
 			}
 			else if (responseData.isSuccess()) {
 				dialog.dismiss();
@@ -369,12 +424,17 @@ public class AccountFragment extends Fragment {
 
 				Contact contact = new Contact(relationId, contactName, myName, -1, !amSlave, connectionCode, ContactStatus.INVITED);
 				ContactRegistry.getInstance().addOrUpdate(contact);
-				requireActivity().runOnUiThread(() -> addContactToView(contact));
-
+				Activity activity = getActivity();
+				if (activity != null) {
+					activity.runOnUiThread(() -> addContactToView(contact));
+				}
 				sendInvitationUrl(connectionCode);
 			}
 			else {
-				requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
+				Activity activity = getActivity();
+				if (activity != null) {
+					activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
+				}
 			}
 		}, "is_slave", amSlave ? "1" : "", "myname", myName, "contactname", contactName);
 	}
@@ -395,22 +455,31 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Handle the response of edit contact dialog.
 	 *
-	 * @param dialog The dialog.
+	 * @param dialog  The dialog.
 	 * @param contact The new contact data.
 	 */
 	protected void handleEditContactDialogResponse(final EditContactDialogFragment dialog, final Contact contact) {
-		new HttpSender().sendMessage("db/usermanagement/updatecontact.php", contact, (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("db/usermanagement/updatecontact.php", contact, (response, responseData) -> {
 			if (responseData == null) {
 				Log.e(Application.TAG, "Error in server communication: " + response);
-				requireActivity().runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+				Activity activity = getActivity();
+				if (activity != null) {
+					activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+				}
 			}
 			else if (responseData.isSuccess()) {
 				dialog.dismiss();
 				ContactRegistry.getInstance().addOrUpdate(contact);
-				requireActivity().runOnUiThread(this::refreshDisplayedContactList);
+				Activity activity = getActivity();
+				if (activity != null) {
+					activity.runOnUiThread(this::refreshDisplayedContactList);
+				}
 			}
 			else {
-				requireActivity().runOnUiThread(() -> dialog.displayError(responseData.getErrorMessage()));
+				Activity activity = getActivity();
+				if (activity != null) {
+					activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
+				}
 			}
 		}, "myName", contact.getMyName(), "contactName", contact.getName());
 	}

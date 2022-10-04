@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.service;
 
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
@@ -27,11 +28,12 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 	/**
 	 * Update the token locally and on the server.
 	 *
-	 * @param token The new token.
+	 * @param context The context.
+	 * @param token   The new token.
 	 */
-	public static void updateToken(final String token) {
+	public static void updateToken(final Context context, final String token) {
 		if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) != null) {
-			new HttpSender().sendMessage("db/usermanagement/changeuserdata.php", (response, responseData) -> {
+			new HttpSender(context).sendMessage("db/usermanagement/changeuserdata.php", (response, responseData) -> {
 				if (responseData != null && responseData.isSuccess()) {
 					PreferenceUtil.setSharedPreferenceString(R.string.key_pref_messaging_token, token);
 				}
@@ -63,7 +65,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			case INVITATION_ACCEPTED:
 			case CONTACT_DELETED:
 			case CONTACT_UPDATED:
-				ContactRegistry.getInstance().refreshContacts(() -> AccountFragment.sendBroadcast(this, ActionType.CONTACTS_CHANGED));
+				ContactRegistry.getInstance().refreshContacts(this, () -> AccountFragment.sendBroadcast(this, ActionType.CONTACTS_CHANGED));
 				break;
 			case UNKNOWN:
 			default:
@@ -100,6 +102,6 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 	@Override
 	public final void onNewToken(@NonNull final String token) {
 		Log.i(Application.TAG, "Received new messaging token: " + token);
-		updateToken(token);
+		updateToken(this, token);
 	}
 }

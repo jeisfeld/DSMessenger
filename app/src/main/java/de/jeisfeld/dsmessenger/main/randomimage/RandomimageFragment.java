@@ -4,11 +4,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentRandomimageBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.account.Contact;
+import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 
 /**
  * Fragment for triggering Randomimage notificactions.
@@ -41,6 +47,37 @@ public class RandomimageFragment extends Fragment {
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		List<Contact> contactList = ContactRegistry.getInstance().getConnectedContacts();
+
+		ArrayAdapter<Contact> dataAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, contactList);
+		binding.spinnerContact.setAdapter(dataAdapter);
+
+		if (contactList.size() == 0) {
+			binding.tableRowOrigin.setVisibility(View.GONE);
+			binding.tableRowNotificationName.setVisibility(View.GONE);
+			binding.tableRowWidgetName.setVisibility(View.GONE);
+			binding.buttonSend.setVisibility(View.GONE);
+			binding.spinnerContact.setVisibility(View.GONE);
+		}
+		else if (contactList.size() == 1) {
+			binding.tableRowOrigin.setVisibility(View.VISIBLE);
+			binding.tableRowNotificationName.setVisibility(View.VISIBLE);
+			binding.tableRowWidgetName.setVisibility(View.VISIBLE);
+			binding.buttonSend.setVisibility(View.VISIBLE);
+			binding.spinnerContact.setVisibility(View.GONE);
+		}
+		else {
+			binding.tableRowOrigin.setVisibility(View.VISIBLE);
+			binding.tableRowNotificationName.setVisibility(View.VISIBLE);
+			binding.tableRowWidgetName.setVisibility(View.VISIBLE);
+			binding.buttonSend.setVisibility(View.VISIBLE);
+			binding.spinnerContact.setVisibility(View.VISIBLE);
+		}
+	}
+
+	@Override
 	public final void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
@@ -50,14 +87,14 @@ public class RandomimageFragment extends Fragment {
 	 * Send the message.
 	 */
 	private void sendMessage() {
-		String device = binding.radioDeviceTablet.isChecked() ? "tablet" : "handy";
 		String randomImageOrigin =
 				binding.radioGroupOrigin.getCheckedRadioButtonId() == binding.radioOriginWidget.getId() ? "WIDGET" : "NOTIFICATION";
 		String notificationName = binding.spinnerNotificationName.getSelectedItem().toString();
 		String widgetName = binding.spinnerWidgetName.getSelectedItem().toString();
+		Contact contact = (Contact) binding.spinnerContact.getSelectedItem();
 
-		new HttpSender().sendMessage("index.php", false, null, null,
-				"device", device, "messageType", "RANDOMIMAGE", "randomImageOrigin", randomImageOrigin,
+		new HttpSender(getContext()).sendMessage("firebase/displayrandomimage.php", contact, null,
+				"messageType", "RANDOMIMAGE", "randomImageOrigin", randomImageOrigin,
 				"notificationName", notificationName, "widgetName", widgetName);
 	}
 

@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.http;
 
+import android.content.Context;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -33,6 +34,20 @@ import de.jeisfeld.dsmessenger.util.PreferenceUtil;
  * Helper class for sending http(s) messages to server.
  */
 public class HttpSender {
+	/**
+	 * The context.
+	 */
+	private final Context context;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param context The context.
+	 */
+	public HttpSender(Context context) {
+		this.context = context;
+	}
+
 	/**
 	 * Send a POST message to Server.
 	 *
@@ -78,7 +93,7 @@ public class HttpSender {
 						result.append((char) c);
 					}
 					if (listener != null) {
-						ResponseData responseData = ResponseData.extractResponseData(result.toString());
+						ResponseData responseData = ResponseData.extractResponseData(context, result.toString());
 						listener.onHttpResponse(result.toString(), responseData);
 					}
 				}
@@ -214,10 +229,11 @@ public class HttpSender {
 		/**
 		 * Extract response data from server response.
 		 *
+		 * @param context  The context
 		 * @param response The server response.
 		 * @return The response data.
 		 */
-		private static ResponseData extractResponseData(final String response) {
+		private static ResponseData extractResponseData(final Context context, final String response) {
 			try {
 				JSONObject jsonObject = new JSONObject(response);
 				boolean success = "success".equals(jsonObject.getString("status"));
@@ -277,6 +293,24 @@ public class HttpSender {
 
 		public int getErrorCode() {
 			return errorCode;
+		}
+
+		/**
+		 * Get the error String, mapping error code if applicable.
+		 *
+		 * @param context The context.
+		 * @return The mapped error String.
+		 */
+		public String getMappedErrorMessage(final Context context) {
+			if (context == null) {
+				return getErrorMessage();
+			}
+			switch (getErrorCode()) {
+			case 105:
+				return context.getString(R.string.error_invalid_credentials);
+			default:
+				return getErrorMessage();
+			}
 		}
 
 		public String getErrorMessage() {

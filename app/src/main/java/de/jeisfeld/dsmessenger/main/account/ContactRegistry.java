@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.main.account;
 
+import android.content.Context;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -136,13 +137,14 @@ public final class ContactRegistry {
 	/**
 	 * Async query for contact information. From results, update stored contacts.
 	 *
+	 * @param context  The context.
 	 * @param runnable Code to be executed after finishing the refresh.
 	 */
-	public void refreshContacts(final Runnable runnable) {
+	public void refreshContacts(final Context context, final Runnable runnable) {
 		if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) == null) {
 			return;
 		}
-		new Thread(() -> new HttpSender().sendMessage("db/usermanagement/querycontacts.php", (response, responseData) -> {
+		new Thread(() -> new HttpSender(context).sendMessage("db/usermanagement/querycontacts.php", (response, responseData) -> {
 			if (responseData.isSuccess()) {
 				SparseArray<Contact> newContacts = (SparseArray<Contact>) responseData.getData().get("contacts");
 				if (newContacts == null) {

@@ -461,7 +461,7 @@ public final class AccountDialogUtil {
 					displayError(R.string.error_invalid_connectioncode);
 					return;
 				}
-				new HttpSender().sendMessage("db/usermanagement/queryconnectioncode.php", (response, responseData) -> {
+				new HttpSender(getContext()).sendMessage("db/usermanagement/queryconnectioncode.php", (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
 						displayError(R.string.error_technical_error);
@@ -492,7 +492,7 @@ public final class AccountDialogUtil {
 						});
 					}
 					else {
-						getActivity().runOnUiThread(() -> displayError(responseData.getErrorMessage()));
+						getActivity().runOnUiThread(() -> displayError(responseData.getMappedErrorMessage(getContext())));
 					}
 				}, "connectioncode", connectionCode);
 			});
@@ -512,7 +512,7 @@ public final class AccountDialogUtil {
 				boolean amSlave = binding.radioButtonSub.isChecked();
 				String connectionCode = binding.editTextConnectionCode.getText().toString().trim();
 
-				new HttpSender().sendMessage("db/usermanagement/acceptinvitation.php", (response, responseData) -> {
+				new HttpSender(getContext()).sendMessage("db/usermanagement/acceptinvitation.php", (response, responseData) -> {
 							if (responseData == null) {
 								Log.e(Application.TAG, "Error in server communication: " + response);
 								requireActivity().runOnUiThread(() -> displayError(R.string.error_technical_error));
@@ -525,7 +525,7 @@ public final class AccountDialogUtil {
 								AccountFragment.sendBroadcast(getContext(), ActionType.CONTACTS_CHANGED);
 							}
 							else {
-								requireActivity().runOnUiThread(() -> displayError(responseData.getErrorMessage()));
+								requireActivity().runOnUiThread(() -> displayError(responseData.getMappedErrorMessage(getContext())));
 							}
 						}, "isSlave", amSlave ? "" : "1", "myname", myName, "contactname", contactName,
 						"contactId", Integer.toString(contactId), "connectioncode", connectionCode,

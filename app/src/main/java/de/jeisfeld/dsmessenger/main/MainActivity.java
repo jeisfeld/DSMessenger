@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
 		logMessagingToken();
 		handleAppLink();
 
-		ContactRegistry.getInstance().refreshContacts(null);
+		ContactRegistry.getInstance().refreshContacts(this, null);
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
 					}
 					else {
 						Log.i(Application.TAG, "Got new messaging token: " + token);
-						FirebaseDsMessagingService.updateToken(token);
+						FirebaseDsMessagingService.updateToken(this, token);
 					}
 
 				});

@@ -126,6 +126,9 @@ public final class DialogUtil {
 	public static void displayConfirmationMessage(final FragmentActivity activity, final ConfirmDialogListener listener,
 												  final Integer titleResource, final Integer cancelButtonResource, final int confirmButtonResource,
 												  final int messageResource, final Object... args) {
+		if (activity == null) {
+			return;
+		}
 		String message = capitalizeFirst(activity.getString(messageResource, args));
 		Bundle bundle = new Bundle();
 		bundle.putCharSequence(PARAM_MESSAGE, message);

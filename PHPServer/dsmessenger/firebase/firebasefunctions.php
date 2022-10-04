@@ -13,34 +13,4 @@ function sendFirebaseMessage($token, $data) {
     $messaging->send($message);
 }
 
-function sendTextMessage($device, $messageText, $vibrate, $vibrationRepeated, $vibrationPattern, $displayOnLockScreen, $lockMessage, $keepScreenOn)
-{
-    $data = [
-        'messageType' => 'TEXT',
-        'messageText' => $messageText,
-        'vibrate' => $vibrate,
-        'vibrationRepeated' => $vibrationRepeated,
-        'vibrationPattern' => $vibrationPattern,
-        'displayOnLockScreen' => $displayOnLockScreen,
-        'lockMessage' => $lockMessage,
-        'keepScreenOn' => $keepScreenOn
-    ];
-
-    $token = ($device == 'tablet' ? getDeviceTokenTablet() : getDeviceToken());
-    sendFirebaseMessage($token, $data);
-}
-
-function sendRandomImageMessage($device, $randomImageOrigin, $notificationName, $widgetName)
-{
-    $data = [
-        'messageType' => 'RANDOMIMAGE',
-        'randomImageOrigin' => $randomImageOrigin,
-        'notificationName' => $notificationName,
-        'widgetName' => $widgetName
-    ];
-
-    $token = ($device == 'tablet' ? getDeviceTokenTablet() : getDeviceToken());
-    sendFirebaseMessage($token, $data);
-}
-
 ?>

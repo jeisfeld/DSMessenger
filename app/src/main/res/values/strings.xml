@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">DS Messenger</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">DS Messenger</string>
     <string name="nav_header_subtitle">dsmessenger@jeisfeld.de</string>
     <string name="nav_header_desc">Navigation header</string>
@@ -26,7 +24,6 @@
     <string name="button_create_invitation">Create Invitation</string>
     <string name="button_accept_invitation">Accept Invitation</string>
     <string name="button_review_invitation">Review Invitation</string>
-    <string name="button_withdraw_invitation">Withdraw Invitation</string>
     <string name="button_logout">Logout</string>
     <string name="button_change_password">Change Password</string>
     <string name="button_delete_contact">Delete Contact</string>
@@ -43,8 +40,6 @@
     <string name="text_lock_message">Pin the message</string>
     <string name="text_keep_screen_on">Keep screen on</string>
     <string name="text_device">Device</string>
-    <string name="text_device_handy">Handy</string>
-    <string name="text_device_tablet">Tablet</string>
     <string name="text_origin">Origin</string>
     <string name="text_origin_widget">Widget</string>
     <string name="text_origin_notification">Notification</string>
@@ -86,6 +81,7 @@
     <string name="error_missing_contactname">Missing contact name</string>
     <string name="error_missing_connectioncode">Missing connection code</string>
     <string name="error_invalid_connectioncode">Invalid connection code</string>
+    <string name="error_invalid_credentials">Username or Password is not correct</string>
 
     <string name="dialog_screen_control_permission">In the following screen, please give the app %1$s permission to make displays on top of other apps.</string>
     <string name="dialog_login_before_connect">Please login before connecting to another user.</string>

@@ -42,44 +42,11 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TableRow
-                android:id="@+id/tableRowDevice"
-                android:layout_marginBottom="@dimen/margin_medium">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_width"
-                    android:labelFor="@id/radioGroupDevice"
-                    android:text="@string/text_device"
-                    android:textSize="@dimen/text_normal" />
-
-                <RadioGroup
-                    android:id="@+id/radioGroupDevice"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/input_row_height"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="@dimen/margin_medium"
-                    android:layout_weight="@integer/selector_input_width"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/radioDeviceHandy"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/input_row_height"
-                        android:layout_weight="1"
-                        android:checked="true"
-                        android:text="@string/text_device_handy" />
-
-                    <RadioButton
-                        android:id="@+id/radioDeviceTablet"
-                        android:layout_width="0dp"
-                        android:layout_height="@dimen/input_row_height"
-                        android:layout_weight="1"
-                        android:text="@string/text_device_tablet" />
-                </RadioGroup>
-            </TableRow>
+            <Spinner
+                android:id="@+id/spinnerContact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@id/textSendMessage" />
 
             <TableRow
                 android:id="@+id/tableRowOrigin"
