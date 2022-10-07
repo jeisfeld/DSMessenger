@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import java.util.List;
+import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -92,8 +93,9 @@ public class RandomimageFragment extends Fragment {
 		String notificationName = binding.spinnerNotificationName.getSelectedItem().toString();
 		String widgetName = binding.spinnerWidgetName.getSelectedItem().toString();
 		Contact contact = (Contact) binding.spinnerContact.getSelectedItem();
+		UUID messageId = UUID.randomUUID();
 
-		new HttpSender(getContext()).sendMessage("firebase/displayrandomimage.php", contact, null,
+		new HttpSender(getContext()).sendMessage("firebase/displayrandomimage.php", contact, messageId, null,
 				"messageType", "RANDOMIMAGE", "randomImageOrigin", randomImageOrigin,
 				"notificationName", notificationName, "widgetName", widgetName);
 	}

@@ -2,7 +2,10 @@ package de.jeisfeld.dsmessenger.message;
 
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.time.Instant;
 import java.util.Map;
+
+import de.jeisfeld.dsmessenger.util.DateUtil;
 
 /**
  * The details of a text message.
@@ -24,12 +27,15 @@ public class RandomimageMessageDetails extends MessageDetails {
 	/**
 	 * Generate message details.
 	 *
+	 * @param messageId         The message id.
+	 * @param messageTime       The message time.
 	 * @param randomImageOrigin the random image origin.
 	 * @param notificationName  The notification name.
 	 * @param widgetName        The widget name.
 	 */
-	public RandomimageMessageDetails(final RandomImageOrigin randomImageOrigin, final String notificationName, final String widgetName) {
-		super(MessageType.RANDOMIMAGE);
+	public RandomimageMessageDetails(final String messageId, final Instant messageTime, final RandomImageOrigin randomImageOrigin,
+									 final String notificationName, final String widgetName) {
+		super(MessageType.RANDOMIMAGE, messageId, messageTime);
 		this.randomImageOrigin = randomImageOrigin;
 		this.notificationName = notificationName;
 		this.widgetName = widgetName;
@@ -56,10 +62,12 @@ public class RandomimageMessageDetails extends MessageDetails {
 	public static RandomimageMessageDetails fromRemoteMessage(final RemoteMessage message) {
 		Map<String, String> data = message.getData();
 
+		Instant messageTime = DateUtil.jsonDateToInstant(data.get("messageTime"));
+		String messageId = data.get("messageId");
 		RandomImageOrigin randomImageOrigin = RandomImageOrigin.fromName(data.get("randomImageOrigin"));
 		String notificationName = data.get("notificationName");
 		String widgetName = data.get("widgetName");
-		return new RandomimageMessageDetails(randomImageOrigin, notificationName, widgetName);
+		return new RandomimageMessageDetails(messageId, messageTime, randomImageOrigin, notificationName, widgetName);
 	}
 
 	/**

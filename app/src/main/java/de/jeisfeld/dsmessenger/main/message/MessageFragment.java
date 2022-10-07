@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import java.util.List;
+import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -86,8 +87,9 @@ public class MessageFragment extends Fragment {
 		boolean lockMessage = binding.checkboxLockMessage.isChecked();
 		boolean keepScreenOn = binding.checkboxKeepScreenOn.isChecked();
 		Contact contact = (Contact) binding.spinnerContact.getSelectedItem();
+		UUID messageId = UUID.randomUUID();
 
-		new HttpSender(getContext()).sendMessage("firebase/sendmessage.php", contact, (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("firebase/sendmessage.php", contact, messageId, (response, responseData) -> {
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {

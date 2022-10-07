@@ -18,9 +18,11 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -28,6 +30,7 @@ import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
+import de.jeisfeld.dsmessenger.util.DateUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -54,10 +57,11 @@ public class HttpSender {
 	 * @param urlPostfix     The postfix of the URL.
 	 * @param addCredentials Flag indicating if username, password should be added.
 	 * @param contact        The contact.
+	 * @param messageId      The messageId
 	 * @param listener       The response listener.
 	 * @param parameters     The POST parameters.
 	 */
-	public void sendMessage(final String urlPostfix, final boolean addCredentials, final Contact contact,
+	public void sendMessage(final String urlPostfix, final boolean addCredentials, final Contact contact, final UUID messageId,
 							final OnHttpResponseListener listener, final String... parameters) {
 		Authenticator.setDefault(new Authenticator() {
 			@Override
@@ -73,45 +77,42 @@ public class HttpSender {
 			urlBase = "https://jeisfeld.de/dsmessenger/";
 		}
 
-		new Thread() {
-			@Override
-			public void run() {
-				Reader in = null;
-				try {
-					URL url = new URL(urlBase + urlPostfix);
-					URLConnection urlConnection = url.openConnection();
-					urlConnection.setDoOutput(true);
-					((HttpsURLConnection) urlConnection).setRequestMethod("POST");
-					urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-					byte[] postDataBytes = getPostData(addCredentials, contact, parameters).getBytes(StandardCharsets.UTF_8);
-					urlConnection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
-					urlConnection.getOutputStream().write(postDataBytes);
+		new Thread(() -> {
+			Reader in = null;
+			try {
+				URL url = new URL(urlBase + urlPostfix);
+				URLConnection urlConnection = url.openConnection();
+				urlConnection.setDoOutput(true);
+				((HttpsURLConnection) urlConnection).setRequestMethod("POST");
+				urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+				byte[] postDataBytes = getPostData(addCredentials, contact, messageId, parameters).getBytes(StandardCharsets.UTF_8);
+				urlConnection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+				urlConnection.getOutputStream().write(postDataBytes);
 
-					in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8));
-					StringBuilder result = new StringBuilder();
-					for (int c; (c = in.read()) >= 0; ) {
-						result.append((char) c);
-					}
-					if (listener != null) {
-						ResponseData responseData = ResponseData.extractResponseData(context, result.toString());
-						listener.onHttpResponse(result.toString(), responseData);
-					}
+				in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8));
+				StringBuilder result = new StringBuilder();
+				for (int c; (c = in.read()) >= 0; ) {
+					result.append((char) c);
 				}
-				catch (IOException e) {
-					Log.e(Application.TAG, "Invalid URL", e);
+				if (listener != null) {
+					ResponseData responseData = ResponseData.extractResponseData(context, result.toString());
+					listener.onHttpResponse(result.toString(), responseData);
 				}
-				finally {
-					if (in != null) {
-						try {
-							in.close();
-						}
-						catch (IOException e) {
-							// ignore
-						}
+			}
+			catch (IOException e) {
+				Log.e(Application.TAG, "Invalid URL", e);
+			}
+			finally {
+				if (in != null) {
+					try {
+						in.close();
+					}
+					catch (IOException e) {
+						// ignore
 					}
 				}
 			}
-		}.start();
+		}).start();
 	}
 
 	/**
@@ -119,22 +120,24 @@ public class HttpSender {
 	 *
 	 * @param urlPostfix The postfix of the URL.
 	 * @param contact    The contact.
+	 * @param messageId  The messageId.
 	 * @param listener   The response listener.
 	 * @param parameters The POST parameters.
 	 */
-	public void sendMessage(final String urlPostfix, final Contact contact, final OnHttpResponseListener listener, final String... parameters) {
-		sendMessage(urlPostfix, true, contact, listener, parameters);
+	public void sendMessage(final String urlPostfix, final Contact contact, final UUID messageId,
+							final OnHttpResponseListener listener, final String... parameters) {
+		sendMessage(urlPostfix, true, contact, messageId, listener, parameters);
 	}
 
 	/**
-	 * Send a POST message to Server, including credentials.
+	 * Send a POST message to Server, including credentials but without contact.
 	 *
 	 * @param urlPostfix The postfix of the URL.
 	 * @param listener   The response listener.
 	 * @param parameters The POST parameters.
 	 */
 	public void sendMessage(final String urlPostfix, final OnHttpResponseListener listener, final String... parameters) {
-		sendMessage(urlPostfix, null, listener, parameters);
+		sendMessage(urlPostfix, null, null, listener, parameters);
 	}
 
 	/**
@@ -142,38 +145,38 @@ public class HttpSender {
 	 *
 	 * @param addCredentials Flag indicating if username, password should be added.
 	 * @param contact        The related contact.
+	 * @param messageId      The unique message id.
 	 * @param parameters     the name value entries.
 	 * @return The data to be posted.
 	 */
-	private String getPostData(final boolean addCredentials, final Contact contact, final String... parameters) throws UnsupportedEncodingException {
-		int i = 0;
+	private String getPostData(final boolean addCredentials, final Contact contact,
+							   final UUID messageId, final String... parameters) throws UnsupportedEncodingException {
 		StringBuilder postData = new StringBuilder();
+		postData.append("messageTime=");
+		postData.append(DateUtil.instantToJsonDate(Instant.now()));
+		if (messageId != null) {
+			postData.append("&messageId=");
+			postData.append(messageId);
+		}
+		int i = 0;
 		while (i < parameters.length - 1) {
 			final String name = parameters[i++];
 			final String value = parameters[i++];
 			if (value != null) {
-				if (postData.length() > 0) {
-					postData.append('&');
-				}
+				postData.append('&');
 				postData.append(URLEncoder.encode(name, StandardCharsets.UTF_8.name()));
 				postData.append('=');
 				postData.append(URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
 			}
 		}
 		if (addCredentials) {
-			if (postData.length() > 0) {
-				postData.append('&');
-			}
-			postData.append("username=");
+			postData.append("&username=");
 			postData.append(URLEncoder.encode(PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username), StandardCharsets.UTF_8.name()));
 			postData.append("&password=");
 			postData.append(URLEncoder.encode(PreferenceUtil.getSharedPreferenceString(R.string.key_pref_password), StandardCharsets.UTF_8.name()));
 		}
 		if (contact != null) {
-			if (postData.length() > 0) {
-				postData.append('&');
-			}
-			postData.append("relationId=");
+			postData.append("&relationId=");
 			postData.append(contact.getRelationId());
 			postData.append("&contactId=");
 			postData.append(contact.getContactId());

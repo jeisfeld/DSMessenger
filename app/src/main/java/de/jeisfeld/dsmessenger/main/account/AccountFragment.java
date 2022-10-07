@@ -286,7 +286,7 @@ public class AccountFragment extends Fragment {
 	 * @param password The password.
 	 */
 	protected void handleCreateAccountDialogResponse(final CreateAccountDialogFragment dialog, final String username, final String password) {
-		new HttpSender(getContext()).sendMessage("db/usermanagement/createuser.php", false, null, (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("db/usermanagement/createuser.php", false, null, null, (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
 
@@ -330,7 +330,7 @@ public class AccountFragment extends Fragment {
 	 * @param password The password.
 	 */
 	protected void handleLoginDialogResponse(final LoginDialogFragment dialog, final String username, final String password) {
-		new HttpSender(getContext()).sendMessage("db/usermanagement/login.php", false, null, (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("db/usermanagement/login.php", false, null, null, (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
 						Activity activity = getActivity();
@@ -459,7 +459,7 @@ public class AccountFragment extends Fragment {
 	 * @param contact The new contact data.
 	 */
 	protected void handleEditContactDialogResponse(final EditContactDialogFragment dialog, final Contact contact) {
-		new HttpSender(getContext()).sendMessage("db/usermanagement/updatecontact.php", contact, (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("db/usermanagement/updatecontact.php", contact, null, (response, responseData) -> {
 			if (responseData == null) {
 				Log.e(Application.TAG, "Error in server communication: " + response);
 				Activity activity = getActivity();

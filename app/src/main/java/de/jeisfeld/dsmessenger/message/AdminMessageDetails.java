@@ -2,9 +2,12 @@ package de.jeisfeld.dsmessenger.message;
 
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import de.jeisfeld.dsmessenger.util.DateUtil;
 
 /**
  * The details of a text message.
@@ -22,11 +25,13 @@ public class AdminMessageDetails extends MessageDetails {
 	/**
 	 * Generate message details.
 	 *
-	 * @param adminType The admin type
-	 * @param data      The data
+	 * @param messageId   The message id.
+	 * @param messageTime The message time.
+	 * @param adminType   The admin type
+	 * @param data        The data
 	 */
-	public AdminMessageDetails(final AdminType adminType, final Map<String, String> data) {
-		super(MessageType.ADMIN);
+	public AdminMessageDetails(final String messageId, final Instant messageTime, final AdminType adminType, final Map<String, String> data) {
+		super(MessageType.ADMIN, messageId, messageTime);
 		this.adminType = adminType;
 		this.data = data;
 	}
@@ -40,10 +45,14 @@ public class AdminMessageDetails extends MessageDetails {
 	public static AdminMessageDetails fromRemoteMessage(final RemoteMessage message) {
 		Map<String, String> retrievedData = message.getData();
 		AdminType adminType = AdminType.fromName(retrievedData.get("adminType"));
+		Instant messageTime = DateUtil.jsonDateToInstant(retrievedData.get("messageTime"));
+		String messageId = retrievedData.get("messageId");
 		Map<String, String> data = new HashMap<>(retrievedData);
+		data.remove("messageId");
+		data.remove("messageTime");
 		data.remove("messageType");
 		data.remove("adminType");
-		return new AdminMessageDetails(adminType, data);
+		return new AdminMessageDetails(messageId, messageTime, adminType, data);
 	}
 
 	public final AdminType getAdminType() {

@@ -3,6 +3,7 @@ package de.jeisfeld.dsmessenger.message;
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -13,9 +14,26 @@ public class MessageDetails implements Serializable {
 	 * The message type.
 	 */
 	private final MessageType type;
+	/**
+	 * The messageId.
+	 */
+	private final String messageId;
+	/**
+	 * The messageTime.
+	 */
+	private final Instant messageTime;
 
-	public MessageDetails(final MessageType type) {
+	/**
+	 * Constructor.
+	 *
+	 * @param type        The message type.
+	 * @param messageId   The message id.
+	 * @param messageTime The message time.
+	 */
+	public MessageDetails(final MessageType type, final String messageId, final Instant messageTime) {
 		this.type = type;
+		this.messageId = messageId;
+		this.messageTime = messageTime;
 	}
 
 	/**
@@ -38,12 +56,20 @@ public class MessageDetails implements Serializable {
 		case LUT:
 		case UNKNOWN:
 		default:
-			return new MessageDetails(MessageType.UNKNOWN);
+			return new MessageDetails(MessageType.UNKNOWN, null, null);
 		}
 	}
 
 	public final MessageType getType() {
 		return type;
+	}
+
+	public String getMessageId() {
+		return messageId;
+	}
+
+	public Instant getMessageTime() {
+		return messageTime;
 	}
 
 	/**

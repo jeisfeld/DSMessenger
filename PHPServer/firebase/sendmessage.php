@@ -4,6 +4,8 @@ require_once 'firebasefunctions.php';
 $token = getVerifiedTokenFromRequestData();
 
 $data = [
+    'messageTime' => $_POST['messageTime'],
+    'messageId' => $_POST['messageId'],
     'messageType' => $_POST['messageType'],
     'messageText' => $_POST['messageText'],
     'vibrate' => $_POST['vibrate'],
