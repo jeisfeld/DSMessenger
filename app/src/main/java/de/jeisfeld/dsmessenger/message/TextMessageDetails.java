@@ -4,8 +4,9 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
-import de.jeisfeld.dsmessenger.util.DateUtil;
+import de.jeisfeld.dsmessenger.main.account.Contact;
 
 /**
  * The details of a text message.
@@ -51,6 +52,7 @@ public class TextMessageDetails extends MessageDetails {
 	 *
 	 * @param messageId           The message id.
 	 * @param messageTime         The message time.
+	 * @param contact             The contact who sent the message.
 	 * @param messageText         The message text.
 	 * @param displayOnLockScreen The display on lock screen flag.
 	 * @param vibrate             The vibration flag.
@@ -59,10 +61,10 @@ public class TextMessageDetails extends MessageDetails {
 	 * @param lockMessage         The lock message flag.
 	 * @param keepScreenOn        The Keep screen on flag.
 	 */
-	public TextMessageDetails(final String messageId, final Instant messageTime, final String messageText, final boolean displayOnLockScreen,
-							  final boolean vibrate, final boolean vibrationRepeated, final int vibrationPattern,
+	public TextMessageDetails(final UUID messageId, final Instant messageTime, final Contact contact, final String messageText,
+							  final boolean displayOnLockScreen, final boolean vibrate, final boolean vibrationRepeated, final int vibrationPattern,
 							  final boolean lockMessage, final boolean keepScreenOn) {
-		super(MessageType.TEXT, messageId, messageTime);
+		super(MessageType.TEXT, messageId, messageTime, contact);
 		this.messageText = messageText;
 		this.displayOnLockScreen = displayOnLockScreen;
 		this.vibrate = vibrate;
@@ -75,14 +77,14 @@ public class TextMessageDetails extends MessageDetails {
 	/**
 	 * Extract messageDetails from remote message.
 	 *
-	 * @param message The remote message.
+	 * @param message     The remote message.
+	 * @param messageTime The message time.
+	 * @param messageId   The message id.
+	 * @param contact     The contact.
 	 * @return The message details.
 	 */
-	public static TextMessageDetails fromRemoteMessage(final RemoteMessage message) {
+	public static TextMessageDetails fromRemoteMessage(final RemoteMessage message, UUID messageId, Instant messageTime, Contact contact) {
 		Map<String, String> data = message.getData();
-
-		Instant messageTime = DateUtil.jsonDateToInstant(data.get("messageTime"));
-		String messageId = data.get("messageId");
 		String messageText = data.get("messageText");
 		boolean displayOnLockScreen = Boolean.parseBoolean(data.get("displayOnLockScreen"));
 		boolean vibrate = Boolean.parseBoolean(data.get("vibrate"));
@@ -98,7 +100,7 @@ public class TextMessageDetails extends MessageDetails {
 		}
 		boolean lockMessage = Boolean.parseBoolean(data.get("lockMessage"));
 		boolean keepScreenOn = Boolean.parseBoolean(data.get("keepScreenOn"));
-		return new TextMessageDetails(messageId, messageTime, messageText, displayOnLockScreen,
+		return new TextMessageDetails(messageId, messageTime, contact, messageText, displayOnLockScreen,
 				vibrate, vibrationRepated, vibrationPattern, lockMessage, keepScreenOn);
 	}
 

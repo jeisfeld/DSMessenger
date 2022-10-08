@@ -6,8 +6,9 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
-import de.jeisfeld.dsmessenger.util.DateUtil;
+import de.jeisfeld.dsmessenger.main.account.Contact;
 
 /**
  * The details of a text message.
@@ -27,11 +28,13 @@ public class AdminMessageDetails extends MessageDetails {
 	 *
 	 * @param messageId   The message id.
 	 * @param messageTime The message time.
+	 * @param contact     The contact who sent the message.
 	 * @param adminType   The admin type
 	 * @param data        The data
 	 */
-	public AdminMessageDetails(final String messageId, final Instant messageTime, final AdminType adminType, final Map<String, String> data) {
-		super(MessageType.ADMIN, messageId, messageTime);
+	public AdminMessageDetails(final UUID messageId, final Instant messageTime, final Contact contact,
+							   final AdminType adminType, final Map<String, String> data) {
+		super(MessageType.ADMIN, messageId, messageTime, contact);
 		this.adminType = adminType;
 		this.data = data;
 	}
@@ -39,20 +42,21 @@ public class AdminMessageDetails extends MessageDetails {
 	/**
 	 * Extract messageDetails from remote message.
 	 *
-	 * @param message The remote message.
+	 * @param message     The remote message.
+	 * @param messageTime The message time.
+	 * @param messageId   The message id.
+	 * @param contact     The contact.
 	 * @return The message details.
 	 */
-	public static AdminMessageDetails fromRemoteMessage(final RemoteMessage message) {
+	public static AdminMessageDetails fromRemoteMessage(final RemoteMessage message, UUID messageId, Instant messageTime, Contact contact) {
 		Map<String, String> retrievedData = message.getData();
 		AdminType adminType = AdminType.fromName(retrievedData.get("adminType"));
-		Instant messageTime = DateUtil.jsonDateToInstant(retrievedData.get("messageTime"));
-		String messageId = retrievedData.get("messageId");
 		Map<String, String> data = new HashMap<>(retrievedData);
 		data.remove("messageId");
 		data.remove("messageTime");
 		data.remove("messageType");
 		data.remove("adminType");
-		return new AdminMessageDetails(messageId, messageTime, adminType, data);
+		return new AdminMessageDetails(messageId, messageTime, contact, adminType, data);
 	}
 
 	public final AdminType getAdminType() {
@@ -97,7 +101,15 @@ public class AdminMessageDetails extends MessageDetails {
 		/**
 		 * Contact updated.
 		 */
-		CONTACT_UPDATED;
+		CONTACT_UPDATED,
+		/**
+		 * Message received.
+		 */
+		MESSAGE_RECEIVED,
+		/**
+		 * Message acknowledged.
+		 */
+		MESSAGE_ACKNOWLEDGED;
 
 		private static AdminType fromName(final String name) {
 			if (name == null) {

@@ -16,6 +16,7 @@ import de.jeisfeld.dsmessenger.databinding.FragmentRandomimageBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
+import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 
 /**
  * Fragment for triggering Randomimage notificactions.
@@ -95,8 +96,8 @@ public class RandomimageFragment extends Fragment {
 		Contact contact = (Contact) binding.spinnerContact.getSelectedItem();
 		UUID messageId = UUID.randomUUID();
 
-		new HttpSender(getContext()).sendMessage("firebase/displayrandomimage.php", contact, messageId, null,
-				"messageType", "RANDOMIMAGE", "randomImageOrigin", randomImageOrigin,
+		new HttpSender(getContext()).sendMessage(contact, messageId, null,
+				"messageType", MessageType.RANDOMIMAGE.name(), "randomImageOrigin", randomImageOrigin,
 				"notificationName", notificationName, "widgetName", widgetName);
 	}
 

@@ -9,9 +9,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 
+import java.util.UUID;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
+import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.account.Contact;
+import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
+import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 
 /**
  * Activity to display messages.
@@ -25,7 +31,10 @@ public class MessageActivity extends AppCompatActivity {
 	 * String for storing message in instance state.
 	 */
 	private static final String STRING_MESSAGE = "MESSAGE";
-
+	/**
+	 * The contact currently on top.
+	 */
+	private static Contact currentTopContact = null;
 	/**
 	 * The binding of the activity.
 	 */
@@ -49,7 +58,13 @@ public class MessageActivity extends AppCompatActivity {
 	public static Intent createIntent(final Context context, final TextMessageDetails textMessageDetails) {
 		Intent intent = new Intent(context, MessageActivity.class);
 		intent.putExtra(STRING_EXTRA_MESSAGE_DETAILS, textMessageDetails);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+		if (textMessageDetails.getContact() != null && currentTopContact != null
+				&& textMessageDetails.getContact().getRelationId() != currentTopContact.getRelationId()) {
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+		}
+		else {
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+		}
 		return intent;
 	}
 
@@ -68,13 +83,6 @@ public class MessageActivity extends AppCompatActivity {
 		}
 
 		handleIntentData(getIntent());
-
-		binding.buttonAcknowledge.setOnClickListener(v -> {
-			if (messageVibration != null) {
-				messageVibration.cancelVibration();
-			}
-			binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
-		});
 	}
 
 	@Override
@@ -113,6 +121,8 @@ public class MessageActivity extends AppCompatActivity {
 		binding.textviewMessage.setText(messageText);
 
 		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
+		MessageActivity.currentTopContact = textMessageDetails.getContact();
+
 		if (textMessageDetails.isVibrate()) {
 			messageVibration = new MessageVibration(this);
 			messageVibration.vibrate(textMessageDetails);
@@ -126,6 +136,27 @@ public class MessageActivity extends AppCompatActivity {
 		if (textMessageDetails.isKeepScreenOn()) {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
+
+		sendConfirmation(AdminType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(), textMessageDetails.getContact());
+
+		binding.buttonAcknowledge.setOnClickListener(v -> {
+			if (messageVibration != null) {
+				messageVibration.cancelVibration();
+			}
+			sendConfirmation(AdminType.MESSAGE_ACKNOWLEDGED, textMessageDetails.getMessageId(), textMessageDetails.getContact());
+			binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
+		});
+	}
+
+	/**
+	 * Send confirmation for the message.
+	 *
+	 * @param adminType The type of confirmation.
+	 * @param messageId The messageId.
+	 */
+	private void sendConfirmation(AdminType adminType, UUID messageId, Contact contact) {
+		new HttpSender(this).sendMessage(contact, messageId, null,
+				"messageType", MessageType.ADMIN.name(), "adminType", adminType.name());
 	}
 
 	/**

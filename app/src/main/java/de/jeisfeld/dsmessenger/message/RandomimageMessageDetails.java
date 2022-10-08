@@ -4,8 +4,9 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
-import de.jeisfeld.dsmessenger.util.DateUtil;
+import de.jeisfeld.dsmessenger.main.account.Contact;
 
 /**
  * The details of a text message.
@@ -29,13 +30,14 @@ public class RandomimageMessageDetails extends MessageDetails {
 	 *
 	 * @param messageId         The message id.
 	 * @param messageTime       The message time.
+	 * @param contact           The contact who sent the message.
 	 * @param randomImageOrigin the random image origin.
 	 * @param notificationName  The notification name.
 	 * @param widgetName        The widget name.
 	 */
-	public RandomimageMessageDetails(final String messageId, final Instant messageTime, final RandomImageOrigin randomImageOrigin,
-									 final String notificationName, final String widgetName) {
-		super(MessageType.RANDOMIMAGE, messageId, messageTime);
+	public RandomimageMessageDetails(final UUID messageId, final Instant messageTime, final Contact contact,
+									 final RandomImageOrigin randomImageOrigin, final String notificationName, final String widgetName) {
+		super(MessageType.RANDOMIMAGE, messageId, messageTime, contact);
 		this.randomImageOrigin = randomImageOrigin;
 		this.notificationName = notificationName;
 		this.widgetName = widgetName;
@@ -56,18 +58,19 @@ public class RandomimageMessageDetails extends MessageDetails {
 	/**
 	 * Extract messageDetails from remote message.
 	 *
-	 * @param message The remote message.
+	 * @param message     The remote message.
+	 * @param messageTime The message time.
+	 * @param messageId   The message id.
+	 * @param contact     The contact.
 	 * @return The message details.
 	 */
-	public static RandomimageMessageDetails fromRemoteMessage(final RemoteMessage message) {
+	public static RandomimageMessageDetails fromRemoteMessage(final RemoteMessage message, UUID messageId, Instant messageTime, Contact contact) {
 		Map<String, String> data = message.getData();
 
-		Instant messageTime = DateUtil.jsonDateToInstant(data.get("messageTime"));
-		String messageId = data.get("messageId");
 		RandomImageOrigin randomImageOrigin = RandomImageOrigin.fromName(data.get("randomImageOrigin"));
 		String notificationName = data.get("notificationName");
 		String widgetName = data.get("widgetName");
-		return new RandomimageMessageDetails(messageId, messageTime, randomImageOrigin, notificationName, widgetName);
+		return new RandomimageMessageDetails(messageId, messageTime, contact, randomImageOrigin, notificationName, widgetName);
 	}
 
 	/**

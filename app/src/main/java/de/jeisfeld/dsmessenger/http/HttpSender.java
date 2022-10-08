@@ -130,6 +130,18 @@ public class HttpSender {
 	}
 
 	/**
+	 * Send a POST message to Server, including credentials.
+	 *
+	 * @param contact    The contact.
+	 * @param messageId  The messageId.
+	 * @param listener   The response listener.
+	 * @param parameters The POST parameters.
+	 */
+	public void sendMessage(final Contact contact, final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
+		sendMessage("firebase/sendmessage.php", contact, messageId, listener, parameters);
+	}
+
+	/**
 	 * Send a POST message to Server, including credentials but without contact.
 	 *
 	 * @param urlPostfix The postfix of the URL.

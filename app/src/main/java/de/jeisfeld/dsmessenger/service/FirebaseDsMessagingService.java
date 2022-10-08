@@ -14,6 +14,7 @@ import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
+import de.jeisfeld.dsmessenger.main.message.MessageFragment;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails;
 import de.jeisfeld.dsmessenger.message.MessageActivity;
 import de.jeisfeld.dsmessenger.message.MessageDetails;
@@ -66,6 +67,12 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			case CONTACT_DELETED:
 			case CONTACT_UPDATED:
 				ContactRegistry.getInstance().refreshContacts(this, () -> AccountFragment.sendBroadcast(this, ActionType.CONTACTS_CHANGED));
+				break;
+			case MESSAGE_RECEIVED:
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId());
+				break;
+			case MESSAGE_ACKNOWLEDGED:
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId());
 				break;
 			case UNKNOWN:
 			default:

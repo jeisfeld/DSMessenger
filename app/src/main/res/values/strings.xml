@@ -71,6 +71,8 @@
     <string name="text_subject_invitation">Invitation to DSMessenger</string>
     <string name="text_sending_message">Sending message…</string>
     <string name="text_message_sent">Message sent</string>
+    <string name="text_message_received">Message received</string>
+    <string name="text_message_acknowledged">Message acknowledged</string>
 
     <string name="error_missing_username">Missing username</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>

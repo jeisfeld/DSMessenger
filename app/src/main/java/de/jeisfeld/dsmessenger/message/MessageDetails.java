@@ -5,6 +5,11 @@ import com.google.firebase.messaging.RemoteMessage;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
+
+import de.jeisfeld.dsmessenger.main.account.Contact;
+import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
+import de.jeisfeld.dsmessenger.util.DateUtil;
 
 /**
  * The details of a message.
@@ -17,11 +22,15 @@ public class MessageDetails implements Serializable {
 	/**
 	 * The messageId.
 	 */
-	private final String messageId;
+	private final UUID messageId;
 	/**
 	 * The messageTime.
 	 */
 	private final Instant messageTime;
+	/**
+	 * The contact who sent the message.
+	 */
+	private final Contact contact;
 
 	/**
 	 * Constructor.
@@ -29,11 +38,13 @@ public class MessageDetails implements Serializable {
 	 * @param type        The message type.
 	 * @param messageId   The message id.
 	 * @param messageTime The message time.
+	 * @param contact     The contact who sent the message.
 	 */
-	public MessageDetails(final MessageType type, final String messageId, final Instant messageTime) {
+	public MessageDetails(final MessageType type, final UUID messageId, final Instant messageTime, final Contact contact) {
 		this.type = type;
 		this.messageId = messageId;
 		this.messageTime = messageTime;
+		this.contact = contact;
 	}
 
 	/**
@@ -46,17 +57,29 @@ public class MessageDetails implements Serializable {
 		Map<String, String> data = message.getData();
 		MessageType messageType = MessageType.fromName(data.get("messageType"));
 
+		Instant messageTime = DateUtil.jsonDateToInstant(data.get("messageTime"));
+		UUID messageId = null;
+		String messageIdString = data.get("messageId");
+		if (messageIdString != null) {
+			messageId = UUID.fromString(messageIdString);
+		}
+		String relationId = data.get("relationId");
+		Contact contact = null;
+		if (relationId != null) {
+			contact = ContactRegistry.getInstance().getContact(Integer.parseInt(relationId));
+		}
+
 		switch (messageType) {
 		case TEXT:
-			return TextMessageDetails.fromRemoteMessage(message);
+			return TextMessageDetails.fromRemoteMessage(message, messageId, messageTime, contact);
 		case RANDOMIMAGE:
-			return RandomimageMessageDetails.fromRemoteMessage(message);
+			return RandomimageMessageDetails.fromRemoteMessage(message, messageId, messageTime, contact);
 		case ADMIN:
-			return AdminMessageDetails.fromRemoteMessage(message);
+			return AdminMessageDetails.fromRemoteMessage(message, messageId, messageTime, contact);
 		case LUT:
 		case UNKNOWN:
 		default:
-			return new MessageDetails(MessageType.UNKNOWN, null, null);
+			return new MessageDetails(MessageType.UNKNOWN, messageId, messageTime, contact);
 		}
 	}
 
@@ -64,12 +87,16 @@ public class MessageDetails implements Serializable {
 		return type;
 	}
 
-	public String getMessageId() {
+	public UUID getMessageId() {
 		return messageId;
 	}
 
 	public Instant getMessageTime() {
 		return messageTime;
+	}
+
+	public Contact getContact() {
+		return contact;
 	}
 
 	/**

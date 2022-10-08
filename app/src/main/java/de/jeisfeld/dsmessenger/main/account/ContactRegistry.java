@@ -78,6 +78,16 @@ public final class ContactRegistry {
 	}
 
 	/**
+	 * Get the contact for a given relationId.
+	 *
+	 * @param relationId The relationId.
+	 * @return The contact.
+	 */
+	public Contact getContact(int relationId) {
+		return contacts.get(relationId);
+	}
+
+	/**
 	 * Get all contacts of one type.
 	 *
 	 * @param isSlave Flag indicating if doms or subs are requested.
