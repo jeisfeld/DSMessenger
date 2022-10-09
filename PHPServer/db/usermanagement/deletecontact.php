@@ -42,7 +42,7 @@ if ($stmt->execute()) {
     }
 }
 else {
-    printError(102, "Failed to accept invitation");
+    printError(102, "Failed to delete contact");
 }
 
 $conn->close();

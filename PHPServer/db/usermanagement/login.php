@@ -24,7 +24,9 @@ $stmt->fetch();
 $stmt->close();
 
 if ($oldtoken) {
-    printError(106, "User " . $username . " is logged in on another device.");
+    printError(115, "User " . $username . " is logged in on another device.", [
+        "username" => $username
+    ]);
 }
 
 $stmt = $conn->prepare("UPDATE dsm_user SET token=? WHERE username = ?");

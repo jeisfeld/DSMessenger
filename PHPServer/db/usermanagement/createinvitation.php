@@ -37,7 +37,7 @@ if ($stmt->execute()) {
     $stmt->fetch();
     $stmt->close();
     if (!$relationId) {
-        printError(106, "Failed to retrieve id of invitation");
+        printError(102, "Failed to retrieve id of invitation");
     }
     printSuccess("Invitation for user " . $username . " successfully created.", 
         array("connectionCode" => $connectioncode, "relationId" => $relationId));

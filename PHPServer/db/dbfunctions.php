@@ -8,12 +8,17 @@ function getDbConnection() {
     return $dbConnection;
 }
 
-function printError($errorCode, $errorMessage) {
+function printError($errorCode, $errorMessage, $data = null) {
     $result = [
         'status' => 'error',
         'errorcode' => $errorCode,
         'errormessage' => $errorMessage
     ];
+    if ($data) {
+        foreach ($data as $key => $value) {
+            $result[$key] = $value;
+        }
+    }
     die (json_encode($result, JSON_PRETTY_PRINT));
 }
 
@@ -30,10 +35,10 @@ function printSuccess($message, $data = null) {
 function verifyCredentials($conn, $username, $password)
 {
     if (! $username) {
-        printError(105, "Missing username");
+        printError(111, "Missing username");
     }
     if (! $password) {
-        printError(105, "Missing password");
+        printError(112, "Password must have length at least 8");
     }
 
     $hashedpassword = null;
@@ -78,7 +83,7 @@ WHERE u.id = r.master_id AND r.slave_id = ? AND r.id = ?");
     $stmt->fetch();
     $stmt->close();
     if (!$token) {
-        printError(102, "Failed to retrieve token");
+        printError(106, "Failed to retrieve token");
     }
     return $token;
 }

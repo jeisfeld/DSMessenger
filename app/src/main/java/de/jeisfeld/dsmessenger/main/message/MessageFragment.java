@@ -23,7 +23,6 @@ import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
-import de.jeisfeld.dsmessenger.util.Logger;
 
 /**
  * Fragment for sending messages.
@@ -48,16 +47,12 @@ public class MessageFragment extends Fragment {
 	private final BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(final Context context, final Intent intent) {
-			Logger.log("Received broadcast");
 			if (intent != null) {
 				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
 				switch (actionType) {
 				case MESSAGE_RECEIVED:
 				case MESSAGE_ACKNOWLEDGED:
 					UUID messageId = (UUID) intent.getSerializableExtra("messageId");
-
-					Logger.log("Received " + actionType + " - " + messageId + " - " + lastMessageId);
-
 					if (messageId.equals(lastMessageId)) {
 						binding.textMessageResponse.setText(
 								actionType == ActionType.MESSAGE_RECEIVED ? R.string.text_message_received : R.string.text_message_acknowledged);
@@ -94,7 +89,6 @@ public class MessageFragment extends Fragment {
 			bundle.putString(key, value);
 		}
 		intent.putExtras(bundle);
-		Logger.log("Sending broadcast");
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	}
 

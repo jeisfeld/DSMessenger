@@ -11,11 +11,11 @@ if ($conn->connect_error) {
 
 $username = @$_POST['username'];
 if (! $username) {
-    printError(104, "Missing username");
+    printError(111, "Missing username");
 }
 $password = @$_POST['password'];
 if (! $password || strlen($password) < 8) {
-    printError(104, "Password must have length at least 8");
+    printError(112, "Password must have length at least 8");
 }
 
 $hashedpassword = password_hash($password, PASSWORD_BCRYPT);
@@ -28,7 +28,9 @@ $stmt->bind_param("s", $username);
 $stmt->execute();
 
 if ($stmt->get_result()->num_rows) {
-    printError(104, "Username " . $username . " already exists");
+    printError(113, "Username " . $username . " already exists", [
+        "username" => $username
+    ]);
 }
 $stmt->close();
 

@@ -15,7 +15,7 @@ verifyCredentials($conn, $username, $password);
 
 $newpassword = @$_POST['newpassword'];
 if (! $newpassword || strlen($newpassword) < 8) {
-    printError(104, "New password must have length at least 8");
+    printError(112, "New password must have length at least 8");
 }
 $hashedpassword = password_hash($newpassword, PASSWORD_BCRYPT);
 

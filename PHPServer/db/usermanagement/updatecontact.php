@@ -41,7 +41,7 @@ if ($stmt->execute()) {
     }
 }
 else {
-    printError(102, "Failed to accept invitation");
+    printError(102, "Failed to update contact");
 }
 
 $conn->close();

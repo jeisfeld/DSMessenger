@@ -84,6 +84,10 @@
     <string name="error_missing_connectioncode">Missing connection code</string>
     <string name="error_invalid_connectioncode">Invalid connection code</string>
     <string name="error_invalid_credentials">Username or Password is not correct</string>
+    <string name="error_connection_failed">Connection failed</string>
+    <string name="error_contact_not_connected">Contact is not connected</string>
+    <string name="error_user_already_exists">User %1$s already exists</string>
+    <string name="error_user_already_logged_in">User %1$s is already logged in on another device</string>
 
     <string name="dialog_screen_control_permission">In the following screen, please give the app %1$s permission to make displays on top of other apps.</string>
     <string name="dialog_login_before_connect">Please login before connecting to another user.</string>

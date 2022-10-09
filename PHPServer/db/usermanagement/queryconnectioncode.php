@@ -15,7 +15,7 @@ verifyCredentials($conn, $username, $password);
 
 $connectionCode = @$_POST['connectioncode'];
 if (! $connectionCode) {
-    printError(104, "Missing connection code");
+    printError(102, "Missing connection code");
 }
 $typeString = substr($connectionCode, 0, 1);
 if ($typeString == "m") {
@@ -25,7 +25,7 @@ elseif ($typeString = "s") {
     $isSlave = true;
 }
 else {
-    printError(106, "Invalid connection code");
+    printError(114, "Invalid Connection Code");
 }
 
 $relationId = null;
@@ -37,7 +37,7 @@ $stmt->bind_param("s", $connectionCode);
 $stmt->execute();
 $stmt->bind_result($relationId, $myName, $contactName, $contactId);
 if (! $stmt->fetch()) {
-    printError(106, "Invalid Connection Code");
+    printError(114, "Invalid Connection Code");
 }
 
 printSuccess("Connection data retrieved", [

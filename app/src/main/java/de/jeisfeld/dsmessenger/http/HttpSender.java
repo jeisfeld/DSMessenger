@@ -293,6 +293,12 @@ public class HttpSender {
 				else {
 					int errorCode = jsonObject.getInt("errorcode");
 					String errorMessage = jsonObject.getString("errormessage");
+					for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
+						String key = it.next();
+						if (!"status".equals(key) && !"errorcode".equals(key) && !"errormessage".equals(key)) {
+							data.put(key, jsonObject.getString(key));
+						}
+					}
 					return new ResponseData(false, errorCode, errorMessage, data);
 				}
 			}
@@ -321,8 +327,22 @@ public class HttpSender {
 				return getErrorMessage();
 			}
 			switch (getErrorCode()) {
+			case 101:
+				return context.getString(R.string.error_connection_failed);
 			case 105:
 				return context.getString(R.string.error_invalid_credentials);
+			case 106:
+				return context.getString(R.string.error_contact_not_connected);
+			case 111:
+				return context.getString(R.string.error_missing_username);
+			case 112:
+				return context.getString(R.string.error_password_too_short);
+			case 113:
+				return context.getString(R.string.error_user_already_exists, data.get("username"));
+			case 114:
+				return context.getString(R.string.error_invalid_connectioncode);
+			case 115:
+				return context.getString(R.string.error_user_already_logged_in, data.get("username"));
 			default:
 				return getErrorMessage();
 			}
