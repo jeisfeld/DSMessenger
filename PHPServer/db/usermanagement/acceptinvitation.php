@@ -12,6 +12,7 @@ if ($conn->connect_error) {
 $username = @$_POST['username'];
 $password = @$_POST['password'];
 $userId = verifyCredentials($conn, $username, $password);
+$messageTime = @$_POST['messageTime'];
 
 $isSlave = @$_POST['isSlave'];
 $myName = @$_POST['myname'];
@@ -33,14 +34,16 @@ WHERE connection_code = ? and id = ?");
 }
 
 if ($stmt->execute()) {
-    printSuccess("Invitation successfully accepted");
-    
-    $token = getToken($conn, $username, $password, $relationId, $isSlave);
+    $tokens = getTokens($conn, $username, $password, $relationId, $isSlave);
+    printSuccess("Invitation successfully accepted", ['tokens' => $tokens]);
     $data = [
         'messageType' => 'ADMIN',
-        'adminType' => 'INVITATION_ACCEPTED'
+        'adminType' => 'INVITATION_ACCEPTED',
+        'messageTime' => $messageTime
     ];
-    sendFirebaseMessage($token, $data);    
+    foreach ($tokens as $token) {
+        sendFirebaseMessage($token, $data);
+    }
 }
 else {
     printError(102, "Failed to accept invitation");

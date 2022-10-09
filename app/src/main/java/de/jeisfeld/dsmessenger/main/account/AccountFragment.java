@@ -215,6 +215,7 @@ public class AccountFragment extends Fragment {
 		binding.buttonLogout.setOnClickListener(v -> new HttpSender(getContext()).sendMessage("db/usermanagement/logout.php", (response, responseData) -> {
 			PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
 			PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
+			PreferenceUtil.removeSharedPreference(R.string.key_pref_device_id);
 			ContactRegistry.getInstance().cleanContacts();
 			if (responseData != null && responseData.isSuccess()) {
 				Activity activity = getActivity();
@@ -231,7 +232,7 @@ public class AccountFragment extends Fragment {
 					});
 				}
 			}
-		}));
+		}, "deviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1))));
 	}
 
 	/**
@@ -297,7 +298,10 @@ public class AccountFragment extends Fragment {
 					}
 					else if (responseData.isSuccess()) {
 						dialog.dismiss();
-
+						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
+						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
+						int deviceId = (int) responseData.getData().get("deviceId");
+						PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_device_id, deviceId);
 						Activity activity = getActivity();
 						if (activity != null) {
 							activity.runOnUiThread(() -> {
@@ -307,8 +311,6 @@ public class AccountFragment extends Fragment {
 								binding.textViewUsername.setText(username);
 								binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
 								binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
-								PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
-								PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
 							});
 						}
 					}
@@ -342,6 +344,8 @@ public class AccountFragment extends Fragment {
 						dialog.dismiss();
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
+						int deviceId = (int) responseData.getData().get("deviceId");
+						PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_device_id, deviceId);
 						final Activity activity = getActivity();
 						if (activity != null) {
 							activity.runOnUiThread(() -> {
@@ -373,10 +377,9 @@ public class AccountFragment extends Fragment {
 	 * Handle the response of change password dialog.
 	 *
 	 * @param dialog      The dialog.
-	 * @param oldPassword The old password.
 	 * @param newPassword The new password.
 	 */
-	protected void handleChangePasswordDialogResponse(final ChangePasswordDialogFragment dialog, final String oldPassword, final String newPassword) {
+	protected void handleChangePasswordDialogResponse(final ChangePasswordDialogFragment dialog, final String newPassword) {
 		new HttpSender(getContext()).sendMessage("db/usermanagement/changepassword.php", (response, responseData) -> {
 			if (responseData == null) {
 				Log.e(Application.TAG, "Error in server communication: " + response);
@@ -395,7 +398,7 @@ public class AccountFragment extends Fragment {
 					activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
 				}
 			}
-		}, "newpassword", newPassword);
+		}, "newPassword", newPassword);
 	}
 
 	/**

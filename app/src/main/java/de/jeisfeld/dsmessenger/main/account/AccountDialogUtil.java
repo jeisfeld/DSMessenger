@@ -336,7 +336,7 @@ public final class AccountDialogUtil {
 					return;
 				}
 				((AccountFragment) requireParentFragment()).handleChangePasswordDialogResponse(this,
-						binding.editTextOldPassword.getText().toString().trim(), binding.editTextNewPassword.getText().toString());
+						binding.editTextNewPassword.getText().toString());
 			});
 
 			return builder.create();

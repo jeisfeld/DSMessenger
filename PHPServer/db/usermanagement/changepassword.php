@@ -13,11 +13,11 @@ $username = @$_POST['username'];
 $password = @$_POST['password'];
 verifyCredentials($conn, $username, $password);
 
-$newpassword = @$_POST['newpassword'];
-if (! $newpassword || strlen($newpassword) < 8) {
+$newPassword = @$_POST['newPassword'];
+if (! $newPassword || strlen($newPassword) < 8) {
     printError(112, "New password must have length at least 8");
 }
-$hashedpassword = password_hash($newpassword, PASSWORD_BCRYPT);
+$hashedpassword = password_hash($newPassword, PASSWORD_BCRYPT);
 
 $stmt = $conn->prepare("UPDATE dsm_user SET password = ? WHERE username = ?");
 $stmt->bind_param("ss", $hashedpassword, $username);

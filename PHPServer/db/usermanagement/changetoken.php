@@ -13,17 +13,18 @@ $username = @$_POST['username'];
 $password = @$_POST['password'];
 $userId = verifyCredentials($conn, $username, $password);
 
+$token = @$_POST['token'];
 $deviceId = @$_POST['deviceId'];
 
-$stmt = $conn->prepare("DELETE FROM dsm_device WHERE id = ? and user_id = ?");
-$stmt->bind_param("ii", $deviceId, $userId);
+$stmt = $conn->prepare("UPDATE dsm_device SET token = ? WHERE id = ? AND user_id = ?");
+$stmt->bind_param("sii", $token, $deviceId, $userId);
 
 if ($stmt->execute()) {
-    printSuccess("User " . $username . " successfully logged out.");
+    printSuccess("Token from user " . $username . " successfully updated.");
 }
 else {
     $stmt->close();
-    printError(102, "Failed to logout.");
+    printError(102, "Failed to update user token.");
 }
 
 $conn->close();

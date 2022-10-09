@@ -61,34 +61,38 @@ function verifyCredentials($conn, $username, $password)
 }
 
 
-function getToken($conn, $username, $password, $relationId, $isSlave) {
+function getTokens($conn, $username, $password, $relationId, $isSlave) {
     $userId = verifyCredentials($conn, $username, $password);
     
-    $token = null;
-    
     if ($isSlave) {
-        $stmt = $conn->prepare("SELECT u.token
-FROM dsm_user u, dsm_relation r
-WHERE u.id = r.slave_id AND r.master_id = ? AND r.id = ?");
+        $stmt = $conn->prepare("SELECT d.token
+FROM dsm_device d, dsm_relation r
+WHERE d.user_id = r.slave_id AND r.master_id = ? AND r.id = ?");
     }
     else {
-        $stmt = $conn->prepare("SELECT u.token
-FROM dsm_user u, dsm_relation r
-WHERE u.id = r.master_id AND r.slave_id = ? AND r.id = ?");
+        $stmt = $conn->prepare("SELECT d.token
+FROM dsm_device d, dsm_relation r
+WHERE d.user_id = r.master_id AND r.slave_id = ? AND r.id = ?");
     }
 
+    $token = null;
     $stmt->bind_param("ii", $userId, $relationId);
     $stmt->execute();
     $stmt->bind_result($token);
-    $stmt->fetch();
+
+    $tokens = array();
+    while ($stmt->fetch()) {
+        $tokens[] = $token;
+    }
+    
     $stmt->close();
-    if (!$token) {
+    if (!sizeof($tokens)) {
         printError(106, "Failed to retrieve token");
     }
-    return $token;
+    return $tokens;
 }
 
-function getVerifiedTokenFromRequestData() {
+function getVerifiedTokensFromRequestData() {
     // Create connection
     $conn = getDbConnection();
     
@@ -102,6 +106,6 @@ function getVerifiedTokenFromRequestData() {
     $relationId = @$_POST['relationId'];
     $isSlave = @$_POST['isSlave'];
     
-    return getToken($conn, $username, $password, $relationId, $isSlave);
+    return getTokens($conn, $username, $password, $relationId, $isSlave);
 }
 

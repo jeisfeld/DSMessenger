@@ -1,7 +1,7 @@
 <?php
 require_once 'firebasefunctions.php';
 
-$token = getVerifiedTokenFromRequestData();
+$tokens = getVerifiedTokensFromRequestData();
 
 $data = [];
 
@@ -11,7 +11,9 @@ foreach ($_POST as $key => $value) {
     }
 }
 
-sendFirebaseMessage($token, $data);
+foreach ($tokens as $token) {
+    sendFirebaseMessage($token, $data);
+}
 
 printSuccess("Message successfully sent");
 

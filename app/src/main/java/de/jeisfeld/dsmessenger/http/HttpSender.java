@@ -343,6 +343,8 @@ public class HttpSender {
 				return context.getString(R.string.error_invalid_connectioncode);
 			case 115:
 				return context.getString(R.string.error_user_already_logged_in, data.get("username"));
+			case 116:
+				return context.getString(R.string.error_device_already_exists, data.get("deviceName"));
 			default:
 				return getErrorMessage();
 			}

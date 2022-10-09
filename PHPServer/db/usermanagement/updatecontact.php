@@ -12,6 +12,7 @@ if ($conn->connect_error) {
 $username = @$_POST['username'];
 $password = @$_POST['password'];
 $userId = verifyCredentials($conn, $username, $password);
+$messageTime = @$_POST['messageTime'];
 
 $relationId = @$_POST['relationId'];
 $myName= @$_POST['myName'];
@@ -32,12 +33,15 @@ if ($stmt->execute()) {
     printSuccess("Contact successfully updated");
     
     if ($isConnected) {
-        $token = getToken($conn, $username, $password, $relationId, $isSlave);
+        $tokens = getTokens($conn, $username, $password, $relationId, $isSlave);
         $data = [
             'messageType' => 'ADMIN',
-            'adminType' => 'CONTACT_UPDATED'
+            'adminType' => 'CONTACT_UPDATED',
+            'messageTime' => $messageTime
         ];
-        sendFirebaseMessage($token, $data);
+        foreach ($tokens as $token) {
+            sendFirebaseMessage($token, $data);
+        }
     }
 }
 else {

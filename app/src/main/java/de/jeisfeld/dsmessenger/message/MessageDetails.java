@@ -56,7 +56,6 @@ public class MessageDetails implements Serializable {
 	public static MessageDetails fromRemoteMessage(final RemoteMessage message) {
 		Map<String, String> data = message.getData();
 		MessageType messageType = MessageType.fromName(data.get("messageType"));
-
 		Instant messageTime = DateUtil.jsonDateToInstant(data.get("messageTime"));
 		UUID messageId = null;
 		String messageIdString = data.get("messageId");

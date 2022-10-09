@@ -12,13 +12,14 @@ if ($conn->connect_error) {
 $username = @$_POST['username'];
 $password = @$_POST['password'];
 $userId = verifyCredentials($conn, $username, $password);
+$messageTime = @$_POST['messageTime'];
 
 $relationId = @$_POST['relationId'];
 $isSlave = @$_POST['isSlave'];
 $isConnected = @$_POST['isConnected'];
 
 if ($isConnected) {
-    $token = getToken($conn, $username, $password, $relationId, $isSlave);
+    $tokens = getTokens($conn, $username, $password, $relationId, $isSlave);
 }
 
 if ($isSlave) {
@@ -33,12 +34,15 @@ $stmt->bind_param("ii", $relationId, $userId);
 if ($stmt->execute()) {
     printSuccess("Contact successfully deleted");
     
-    if ($token) {
+    if (sizeOf($tokens)) {
         $data = [
             'messageType' => 'ADMIN',
-            'adminType' => 'CONTACT_DELETED'
+            'adminType' => 'CONTACT_DELETED',
+            'messageTime' => $messageTime
         ];
-        sendFirebaseMessage($token, $data);
+        foreach ($tokens as $token) {
+            sendFirebaseMessage($token, $data);
+        }
     }
 }
 else {

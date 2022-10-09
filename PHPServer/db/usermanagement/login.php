@@ -11,29 +11,59 @@ if ($conn->connect_error) {
 
 $username = @$_POST['username'];
 $password = @$_POST['password'];
-verifyCredentials($conn, $username, $password);
+$userId = verifyCredentials($conn, $username, $password);
 
 $token = @$_POST['token'];
+$deviceName = @$_POST['deviceName'];
 
-$oldtoken = null;
-$stmt = $conn->prepare("SELECT token FROM dsm_user WHERE username = ?");
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$stmt->bind_result($oldtoken);
-$stmt->fetch();
-$stmt->close();
-
-if ($oldtoken) {
-    printError(115, "User " . $username . " is logged in on another device.", [
-        "username" => $username
-    ]);
+if ($deviceName) {
+    $deviceId = null;
+    $stmt = $conn->prepare("SELECT id FROM dsm_device WHERE user_id = ? and name = ?");
+    $stmt->bind_param("is", $userId, $deviceName);
+    $stmt->execute();
+    $stmt->bind_result($deviceId);
+    $stmt->fetch();
+    $stmt->close();
+    if ($deviceId) {
+        printError(116, "Device " . $deviceName . " already exists.", [
+            "deviceName" => $deviceName
+        ]);
+    }
+}
+else {
+    $deviceId = null;
+    $stmt = $conn->prepare("SELECT id FROM dsm_device WHERE user_id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->bind_result($deviceId);
+    $stmt->fetch();
+    $stmt->close();
+    if ($deviceId) {
+        printError(115, "User " . $username . " is logged in on another device.", [
+            "username" => $username
+        ]);
+    }
 }
 
-$stmt = $conn->prepare("UPDATE dsm_user SET token=? WHERE username = ?");
-$stmt->bind_param("ss", $token, $username);
+if (! $deviceName) {
+    $deviceName = "Device 1";
+}
+
+$stmt = $conn->prepare("INSERT INTO dsm_device (user_id, name, token) values (?, ?, ?)");
+$stmt->bind_param("iss", $userId, $deviceName, $token);
 
 if ($stmt->execute()) {
-    printSuccess("User " . $username . " successfully logged in.");
+    $stmt = $conn->prepare("SELECT id FROM dsm_device WHERE user_id=? AND NAME=?");
+    $stmt->bind_param("is", $userId, $deviceName);
+    $stmt->execute();
+    $stmt->bind_result($deviceId);
+    $stmt->fetch();
+    $stmt->close();
+    if (!$deviceId) {
+        printError(102, "Failed to retrieve deviceId");
+    }
+        
+    printSuccess("User " . $username . " successfully logged in.", ['userId' => $userId, 'deviceId' => $deviceId]);
 }
 else {
     $stmt->close();

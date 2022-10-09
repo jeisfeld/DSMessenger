@@ -10,9 +10,7 @@ if ($conn->connect_error) {
 }
 
 // sql to create table dsm_relation
-$sql = "ALTER TABLE dsm_user
-ADD CONSTRAINT unique_username UNIQUE(username)
-";
+$sql = "ALTER TABLE dsm_user DROP COLUMN token, DROP COLUMN email";
 
 if ($conn->query($sql) === TRUE) {
     printSuccess("Table dsm_user updated successfully");

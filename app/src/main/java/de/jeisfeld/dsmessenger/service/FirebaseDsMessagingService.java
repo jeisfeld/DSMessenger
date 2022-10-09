@@ -33,12 +33,13 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 	 * @param token   The new token.
 	 */
 	public static void updateToken(final Context context, final String token) {
-		if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) != null) {
-			new HttpSender(context).sendMessage("db/usermanagement/changeuserdata.php", (response, responseData) -> {
+		if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) != null
+				&& PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1) >= 0) {
+			new HttpSender(context).sendMessage("db/usermanagement/changetoken.php", (response, responseData) -> {
 				if (responseData != null && responseData.isSuccess()) {
 					PreferenceUtil.setSharedPreferenceString(R.string.key_pref_messaging_token, token);
 				}
-			}, "token", token);
+			}, "token", token, "deviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1)));
 		}
 		else {
 			PreferenceUtil.setSharedPreferenceString(R.string.key_pref_messaging_token, token);
