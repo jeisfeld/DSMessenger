@@ -2,3 +2,4 @@
 /db/dbcredentials.php
 /firebase/token.php
 /firebase/ds-messenger-f7c23-firebase-adminsdk-*.json
+.htpasswd

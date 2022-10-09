@@ -1,1 +1,7 @@
 Allow from all
+AddType application/x-httpd-php81 .php
+
+AuthType Basic
+AuthName "Protected Content"
+AuthUserFile /mnt/web509/d1/55/592655/htdocs/dsmessenger/.htpasswd
+Require valid-user

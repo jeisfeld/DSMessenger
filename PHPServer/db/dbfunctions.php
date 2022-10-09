@@ -1,6 +1,13 @@
 <?php
 require_once 'dbcredentials.php';
 
+function getDbConnection() {
+    $dbConnection = new mysqli(getDbServer(), getDbUser(), getDbPassword(), getDbName());
+    setDbSchema($dbConnection);
+    header('Content-Type: text/json');
+    return $dbConnection;
+}
+
 function printError($errorCode, $errorMessage) {
     $result = [
         'status' => 'error',
@@ -75,7 +82,6 @@ WHERE u.id = r.master_id AND r.slave_id = ? AND r.id = ?");
     }
     return $token;
 }
-
 
 function getVerifiedTokenFromRequestData() {
     // Create connection

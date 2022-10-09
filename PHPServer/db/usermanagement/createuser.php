@@ -28,7 +28,7 @@ $stmt->bind_param("s", $username);
 $stmt->execute();
 
 if ($stmt->get_result()->num_rows) {
-    printError(104, "Username " . $username . " already exists ");
+    printError(104, "Username " . $username . " already exists");
 }
 $stmt->close();
 
