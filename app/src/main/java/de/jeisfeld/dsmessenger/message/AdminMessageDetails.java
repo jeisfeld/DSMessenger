@@ -109,7 +109,11 @@ public class AdminMessageDetails extends MessageDetails {
 		/**
 		 * Message acknowledged.
 		 */
-		MESSAGE_ACKNOWLEDGED;
+		MESSAGE_ACKNOWLEDGED,
+		/**
+		 * Message acknowledged by oneself.
+		 */
+		MESSAGE_SELF_ACKNOWLEDGED;
 
 		private static AdminType fromName(final String name) {
 			if (name == null) {

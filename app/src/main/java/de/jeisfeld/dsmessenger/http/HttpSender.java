@@ -88,7 +88,6 @@ public class HttpSender {
 				byte[] postDataBytes = getPostData(addCredentials, contact, messageId, parameters).getBytes(StandardCharsets.UTF_8);
 				urlConnection.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
 				urlConnection.getOutputStream().write(postDataBytes);
-
 				in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8));
 				StringBuilder result = new StringBuilder();
 				for (int c; (c = in.read()) >= 0; ) {
@@ -142,6 +141,18 @@ public class HttpSender {
 	}
 
 	/**
+	 * Send a POST message to Server, including credentials.
+	 *
+	 * @param messageId  The messageId.
+	 * @param listener   The response listener.
+	 * @param parameters The POST parameters.
+	 */
+	public void sendSelfMessage(final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
+		sendMessage("firebase/sendselfmessage.php", new Contact(-1, null, null, 0, false, null, null),
+				messageId, listener, parameters);
+	}
+
+	/**
 	 * Send a POST message to Server, including credentials but without contact.
 	 *
 	 * @param urlPostfix The postfix of the URL.
@@ -188,14 +199,20 @@ public class HttpSender {
 			postData.append(URLEncoder.encode(PreferenceUtil.getSharedPreferenceString(R.string.key_pref_password), StandardCharsets.UTF_8.name()));
 		}
 		if (contact != null) {
-			postData.append("&relationId=");
-			postData.append(contact.getRelationId());
-			postData.append("&contactId=");
-			postData.append(contact.getContactId());
-			postData.append("&isSlave=");
-			postData.append(contact.isSlave() ? "1" : "");
-			postData.append("&isConnected=");
-			postData.append(contact.getStatus() == ContactStatus.CONNECTED ? "1" : "");
+			if (contact.getRelationId() > 0) {
+				postData.append("&relationId=");
+				postData.append(contact.getRelationId());
+				postData.append("&contactId=");
+				postData.append(contact.getContactId());
+				postData.append("&isSlave=");
+				postData.append(contact.isSlave() ? "1" : "");
+				postData.append("&isConnected=");
+				postData.append(contact.getStatus() == ContactStatus.CONNECTED ? "1" : "");
+			}
+			else { // self sending
+				postData.append("&deviceId=");
+				postData.append(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1));
+			}
 		}
 		return postData.toString();
 	}

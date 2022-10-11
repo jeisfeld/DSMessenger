@@ -75,6 +75,9 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			case MESSAGE_ACKNOWLEDGED:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId());
 				break;
+			case MESSAGE_SELF_ACKNOWLEDGED:
+				MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId());
+				break;
 			case UNKNOWN:
 			default:
 				break;

@@ -92,8 +92,26 @@ WHERE d.user_id = r.master_id AND r.slave_id = ? AND r.id = ?");
     return $tokens;
 }
 
+function getSelfTokens($conn, $username, $password, $deviceId) {
+    $userId = verifyCredentials($conn, $username, $password);
+    
+        $stmt = $conn->prepare("SELECT token FROM dsm_device
+WHERE user_id = ? AND id <> ?");
+    
+    $token = null;
+    $stmt->bind_param("ii", $userId, $deviceId);
+    $stmt->execute();
+    $stmt->bind_result($token);
+    
+    $tokens = array();
+    while ($stmt->fetch()) {
+        $tokens[] = $token;
+    }
+    
+    return $tokens;
+}
+
 function getVerifiedTokensFromRequestData() {
-    // Create connection
     $conn = getDbConnection();
     
     // Check connection

@@ -1,7 +1,9 @@
 package de.jeisfeld.dsmessenger.message;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -13,6 +15,7 @@ import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.Contact;
@@ -23,6 +26,10 @@ import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
  * Activity to display messages.
  */
 public class MessageActivity extends AppCompatActivity {
+	/**
+	 * The intent action for broadcast to this fragment.
+	 */
+	private static final String BROADCAST_ACTION = "de.jeisfeld.dsmessenger.message.MessageActivity";
 	/**
 	 * The resource key for the message.
 	 */
@@ -47,6 +54,60 @@ public class MessageActivity extends AppCompatActivity {
 	 * The message vibration.
 	 */
 	private MessageVibration messageVibration = null;
+	/**
+	 * The last received messageId.
+	 */
+	private TextMessageDetails lastTextMessageDetails;
+
+	/**
+	 * The local broadcast receiver to do actions sent to this fragment.
+	 */
+	private final BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(final Context context, final Intent intent) {
+			if (intent != null) {
+				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
+				switch (actionType) {
+				case MESSAGE_ACKNOWLEDGED:
+					UUID messageId = (UUID) intent.getSerializableExtra("messageId");
+					if (messageId != null && lastTextMessageDetails != null && messageId.equals(lastTextMessageDetails.getMessageId())) {
+						cancelLastIntentEffects();
+						binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	};
+	/**
+	 * Broadcastmanager to update fragment from external.
+	 */
+	private LocalBroadcastManager broadcastManager;
+
+	/**
+	 * Send a broadcast to this fragment.
+	 *
+	 * @param context    The context.
+	 * @param actionType The action type.
+	 * @param messageId  The messageId.
+	 * @param parameters The parameters.
+	 */
+	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final String... parameters) {
+		Intent intent = new Intent(BROADCAST_ACTION);
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("actionType", actionType);
+		bundle.putSerializable("messageId", messageId);
+		int i = 0;
+		while (i < parameters.length - 1) {
+			String key = parameters[i++];
+			String value = parameters[i++];
+			bundle.putString(key, value);
+		}
+		intent.putExtras(bundle);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+	}
 
 	/**
 	 * Static helper method to create an intent for this activity.
@@ -83,6 +144,23 @@ public class MessageActivity extends AppCompatActivity {
 		}
 
 		handleIntentData(getIntent());
+
+		broadcastManager = LocalBroadcastManager.getInstance(this);
+		IntentFilter actionReceiver = new IntentFilter();
+		actionReceiver.addAction(BROADCAST_ACTION);
+		broadcastManager.registerReceiver(localBroadcastReceiver, actionReceiver);
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		broadcastManager.unregisterReceiver(localBroadcastReceiver);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
 
 	@Override
@@ -118,6 +196,7 @@ public class MessageActivity extends AppCompatActivity {
 	 * @param intent The intent.
 	 */
 	private void handleIntentData(final Intent intent) {
+		cancelLastIntentEffects();
 		binding.textviewMessage.setText(messageText);
 
 		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
@@ -128,7 +207,7 @@ public class MessageActivity extends AppCompatActivity {
 			messageVibration.vibrate(textMessageDetails);
 		}
 		if (textMessageDetails.isDisplayOnLockScreen()) {
-			displayOnLockScreen();
+			displayOnLockScreen(true);
 		}
 		if (textMessageDetails.isLockMessage()) {
 			startLockTask();
@@ -144,8 +223,34 @@ public class MessageActivity extends AppCompatActivity {
 				messageVibration.cancelVibration();
 			}
 			sendConfirmation(AdminType.MESSAGE_ACKNOWLEDGED, textMessageDetails.getMessageId(), textMessageDetails.getContact());
+			new HttpSender(this).sendSelfMessage(textMessageDetails.getMessageId(), null,
+					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_SELF_ACKNOWLEDGED.name());
 			binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
 		});
+
+		lastTextMessageDetails = textMessageDetails;
+	}
+
+	/**
+	 * Cancel the effects of the last text message
+	 */
+	private void cancelLastIntentEffects() {
+		if (lastTextMessageDetails != null) {
+			if (lastTextMessageDetails.isVibrate()) {
+				if (messageVibration != null) {
+					messageVibration.cancelVibration();
+				}
+			}
+			if (lastTextMessageDetails.isDisplayOnLockScreen()) {
+				displayOnLockScreen(false);
+			}
+			if (lastTextMessageDetails.isLockMessage()) {
+				stopLockTask();
+			}
+			if (lastTextMessageDetails.isKeepScreenOn()) {
+				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			}
+		}
 	}
 
 	/**
@@ -161,17 +266,34 @@ public class MessageActivity extends AppCompatActivity {
 
 	/**
 	 * Ensure that the message is displayed on top of lock screen.
+	 *
+	 * @param displayOnLockScreen Flag indicating if the effect should be added or removed.
 	 */
-	private void displayOnLockScreen() {
+	private void displayOnLockScreen(boolean displayOnLockScreen) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-			setTurnScreenOn(true);
-			setShowWhenLocked(true);
+			setTurnScreenOn(displayOnLockScreen);
+			setShowWhenLocked(displayOnLockScreen);
 		}
 		else {
 			Window window = getWindow();
-			window.addFlags(LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-			window.addFlags(LayoutParams.FLAG_TURN_SCREEN_ON);
+			if (displayOnLockScreen) {
+				window.addFlags(LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+				window.addFlags(LayoutParams.FLAG_TURN_SCREEN_ON);
+			}
+			else {
+				window.clearFlags(LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+				window.clearFlags(LayoutParams.FLAG_TURN_SCREEN_ON);
+			}
 		}
 	}
 
+	/**
+	 * Action that can be sent to this fragment.
+	 */
+	public enum ActionType {
+		/**
+		 * Inform about message acknowledged.
+		 */
+		MESSAGE_ACKNOWLEDGED
+	}
 }

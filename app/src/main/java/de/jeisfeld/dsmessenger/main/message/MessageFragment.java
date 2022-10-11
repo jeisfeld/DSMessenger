@@ -31,7 +31,7 @@ public class MessageFragment extends Fragment {
 	/**
 	 * The intent action for broadcast to this fragment.
 	 */
-	private static final String BROADCAST_ACTION = "de.jeisfeld.dsmessenger.account.MessageFragment";
+	private static final String BROADCAST_ACTION = "de.jeisfeld.dsmessenger.main.message.MessageFragment";
 	/**
 	 * The view binding.
 	 */

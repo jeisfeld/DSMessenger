@@ -327,11 +327,13 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Handle the response of login dialog.
 	 *
-	 * @param dialog   The dialog.
-	 * @param username The username.
-	 * @param password The password.
+	 * @param dialog     The dialog.
+	 * @param username   The username.
+	 * @param password   The password.
+	 * @param deviceName The device name.
 	 */
-	protected void handleLoginDialogResponse(final LoginDialogFragment dialog, final String username, final String password) {
+	protected void handleLoginDialogResponse(final LoginDialogFragment dialog, final String username, final String password,
+											 final String deviceName) {
 		new HttpSender(getContext()).sendMessage("db/usermanagement/login.php", false, null, null, (response, responseData) -> {
 					if (responseData == null) {
 						Log.e(Application.TAG, "Error in server communication: " + response);
@@ -366,10 +368,15 @@ public class AccountFragment extends Fragment {
 					else {
 						Activity activity = getActivity();
 						if (activity != null) {
-							activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
+							activity.runOnUiThread(() -> {
+								dialog.displayError(responseData.getMappedErrorMessage(getContext()));
+								if (responseData.getErrorCode() == 115) { // user is logged in on another device.
+									dialog.getBinding().layoutDeviceName.setVisibility(View.VISIBLE);
+								}
+							});
 						}
 					}
-				}, "username", username, "password", password,
+				}, "username", username, "password", password, "deviceName", deviceName,
 				"token", PreferenceUtil.getSharedPreferenceString(R.string.key_pref_messaging_token));
 	}
 

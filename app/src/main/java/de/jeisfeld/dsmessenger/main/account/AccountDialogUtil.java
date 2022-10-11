@@ -232,6 +232,10 @@ public final class AccountDialogUtil {
 		 */
 		private DialogLoginBinding binding;
 
+		protected DialogLoginBinding getBinding() {
+			return binding;
+		}
+
 		/**
 		 * Display an error in the dialog.
 		 *
@@ -273,7 +277,8 @@ public final class AccountDialogUtil {
 					return;
 				}
 				((AccountFragment) requireParentFragment()).handleLoginDialogResponse(this,
-						binding.editTextUsername.getText().toString().trim(), binding.editTextPassword.getText().toString());
+						binding.editTextUsername.getText().toString().trim(), binding.editTextPassword.getText().toString(),
+						binding.editTextDeviceName.getText() == null ? "" : binding.editTextDeviceName.getText().toString());
 			});
 
 			return builder.create();
