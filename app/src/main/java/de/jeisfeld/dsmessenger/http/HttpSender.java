@@ -19,8 +19,10 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,6 +32,7 @@ import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
+import de.jeisfeld.dsmessenger.main.account.Device;
 import de.jeisfeld.dsmessenger.util.DateUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
@@ -294,6 +297,18 @@ public class HttpSender {
 								contacts.put(relationId, contact);
 							}
 							data.put(key, contacts);
+						}
+						else if ("devices".equals(key)) {
+							List<Device> devices = new ArrayList<>();
+							JSONArray jsonArray = jsonObject.getJSONArray(key);
+							for (int i = 0; i < jsonArray.length(); i++) {
+								JSONObject jsonContact = jsonArray.getJSONObject(i);
+								int deviceId = jsonContact.getInt("deviceId");
+								String deviceName = jsonContact.getString("deviceName");
+								Device device = new Device(deviceId, deviceName);
+								devices.add(device);
+							}
+							data.put(key, devices);
 						}
 						else if (jsonObject.get(key) instanceof Integer) {
 							data.put(key, jsonObject.getInt(key));

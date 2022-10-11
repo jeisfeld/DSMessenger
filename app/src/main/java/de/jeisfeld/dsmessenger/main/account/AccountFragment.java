@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -28,6 +30,7 @@ import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.EditContactDialogF
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.LoginDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.util.DialogUtil;
+import de.jeisfeld.dsmessenger.util.Logger;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -118,6 +121,8 @@ public class AccountFragment extends Fragment {
 		for (Contact contact : ContactRegistry.getInstance().getContacts()) {
 			addContactToView(contact);
 		}
+
+		updateDeviceInfo();
 
 		return binding.getRoot();
 	}
@@ -250,6 +255,30 @@ public class AccountFragment extends Fragment {
 		if (activity != null) {
 			((MainActivity) activity).updateNavigationDrawer();
 		}
+	}
+
+	/**
+	 * Update the device information from the DB.
+	 */
+	private void updateDeviceInfo() {
+		new Thread(() -> new HttpSender(getContext()).sendMessage("db/usermanagement/querydevices.php", (response, responseData) -> {
+			if (responseData.isSuccess()) {
+				List<Device> devices = (List<Device>) responseData.getData().get("devices");
+				Logger.log("Found " + devices.size() + " devices");
+				if (devices.size() == 1) {
+					// Update stored deviceId. This helps when switching DBs during test phase.
+					int storedDeviceId = PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1);
+					if (storedDeviceId != devices.get(0).getId()) {
+						Log.w(Application.TAG, "Updated deviceId from " + storedDeviceId + " to " + devices.get(0).getId());
+						PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_device_id, devices.get(0).getId());
+					}
+				}
+				// TODO: display device info
+			}
+			else {
+				Log.e(Application.TAG, "Failed to retrieve device data: " + responseData.getErrorMessage());
+			}
+		})).start();
 	}
 
 	/**
