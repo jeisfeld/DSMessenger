@@ -15,6 +15,7 @@ import de.jeisfeld.dsmessenger.databinding.DialogChangePasswordBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogCreateAccountBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogCreateInvitationBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogEditContactBinding;
+import de.jeisfeld.dsmessenger.databinding.DialogEditDeviceBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogLoginBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
@@ -152,6 +153,25 @@ public final class AccountDialogUtil {
 		EditContactDialogFragment fragment = new EditContactDialogFragment();
 		Bundle bundle = new Bundle();
 		bundle.putSerializable("contact", contact);
+		fragment.setArguments(bundle);
+		try {
+			fragment.show(accountFragment.getChildFragmentManager(), fragment.getClass().toString());
+		}
+		catch (IllegalStateException e) {
+			// May appear if activity is not active any more - ignore.
+		}
+	}
+
+	/**
+	 * Display dialog for edit device.
+	 *
+	 * @param accountFragment The triggering fragment.
+	 * @param device          The device
+	 */
+	public static void displayEditDeviceDialog(final AccountFragment accountFragment, final Device device) {
+		EditDeviceDialogFragment fragment = new EditDeviceDialogFragment();
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("device", device);
 		fragment.setArguments(bundle);
 		try {
 			fragment.show(accountFragment.getChildFragmentManager(), fragment.getClass().toString());
@@ -604,6 +624,65 @@ public final class AccountDialogUtil {
 						contact.getConnectionCode(), contact.getStatus());
 				((AccountFragment) requireParentFragment()).handleEditContactDialogResponse(this, newContact);
 
+			});
+
+			return builder.create();
+		}
+	}
+
+	/**
+	 * Fragment to edit device dialog.
+	 */
+	public static class EditDeviceDialogFragment extends DialogFragment {
+		/**
+		 * The binding of the view.
+		 */
+		private DialogEditDeviceBinding binding;
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param resource The text resource.
+		 */
+		public void displayError(final int resource) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(resource);
+		}
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param message The error message.
+		 */
+		public void displayError(final String message) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(message);
+		}
+
+		@NonNull
+		@Override
+		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
+			binding = DialogEditDeviceBinding.inflate(getLayoutInflater());
+
+			assert getArguments() != null;
+			final Device device = (Device) getArguments().getSerializable("device");
+
+			binding.editTextDeviceName.setText(device.getName());
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+			builder.setTitle(R.string.title_dialog_edit_device_name).setView(binding.getRoot());
+
+			binding.buttonCancel.setOnClickListener(v -> dismiss());
+
+			binding.buttonUpdateDeviceName.setOnClickListener(v -> {
+				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
+				if (binding.editTextDeviceName.getText() == null || binding.editTextDeviceName.getText().toString().trim().length() == 0) {
+					displayError(R.string.error_missing_devicename);
+					return;
+				}
+				String deviceName = binding.editTextDeviceName.getText().toString().trim();
+				Device newDevice = new Device(device.getId(), deviceName, device.isThis());
+				((AccountFragment) requireParentFragment()).handleEditDeviceDialogResponse(this, newDevice);
 			});
 
 			return builder.create();

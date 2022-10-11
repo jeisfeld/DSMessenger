@@ -111,6 +111,20 @@ WHERE user_id = ? AND id <> ?");
     return $tokens;
 }
 
+function getDeviceToken($conn, $username, $password, $deviceId) {
+    $userId = verifyCredentials($conn, $username, $password);
+    
+    $stmt = $conn->prepare("SELECT token FROM dsm_device
+WHERE user_id = ? AND id = ?");
+    
+    $token = null;
+    $stmt->bind_param("ii", $userId, $deviceId);
+    $stmt->execute();
+    $stmt->bind_result($token);
+    $stmt->fetch();
+    return $token;
+}
+
 function getVerifiedTokensFromRequestData() {
     $conn = getDbConnection();
     

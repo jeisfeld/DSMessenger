@@ -69,6 +69,17 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			case CONTACT_UPDATED:
 				ContactRegistry.getInstance().refreshContacts(this, () -> AccountFragment.sendBroadcast(this, ActionType.CONTACTS_CHANGED));
 				break;
+			case DEVICE_ADDED:
+			case DEVICE_DELETED:
+			case DEVICE_UPDATED:
+				AccountFragment.sendBroadcast(this, ActionType.DEVICES_CHANGED);
+				break;
+			case DEVICE_LOGGED_OUT:
+				PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
+				PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
+				PreferenceUtil.removeSharedPreference(R.string.key_pref_device_id);
+				AccountFragment.sendBroadcast(this, ActionType.DEVICE_LOGGED_OUT);
+				break;
 			case MESSAGE_RECEIVED:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId());
 				break;

@@ -1,5 +1,5 @@
 <?php
-require_once '../dbfunctions.php';
+require_once '../../firebase/firebasefunctions.php';
 
 // Create connection
 $conn = getDbConnection();
@@ -15,6 +15,7 @@ $userId = verifyCredentials($conn, $username, $password);
 
 $token = @$_POST['token'];
 $deviceName = @$_POST['deviceName'];
+$messageTime = @$_POST['messageTime'];
 
 if ($deviceName) {
     $deviceId = null;
@@ -64,6 +65,16 @@ if ($stmt->execute()) {
     }
         
     printSuccess("User " . $username . " successfully logged in.", ['userId' => $userId, 'deviceId' => $deviceId]);
+    
+    $tokens = getSelfTokens($conn, $username, $password, $deviceId);
+    $data = [
+        'messageType' => 'ADMIN',
+        'adminType' => 'DEVICE_ADDED',
+        'messageTime' => $messageTime
+    ];
+    foreach ($tokens as $token) {
+        sendFirebaseMessage($token, $data);
+    }
 }
 else {
     $stmt->close();

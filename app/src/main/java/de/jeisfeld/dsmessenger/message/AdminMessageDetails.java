@@ -103,6 +103,22 @@ public class AdminMessageDetails extends MessageDetails {
 		 */
 		CONTACT_UPDATED,
 		/**
+		 * Device added.
+		 */
+		DEVICE_ADDED,
+		/**
+		 * Device deleted.
+		 */
+		DEVICE_DELETED,
+		/**
+		 * Device updated.
+		 */
+		DEVICE_UPDATED,
+		/**
+		 * Device logged out.
+		 */
+		DEVICE_LOGGED_OUT,
+		/**
 		 * Message received.
 		 */
 		MESSAGE_RECEIVED,

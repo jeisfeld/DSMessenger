@@ -15,39 +15,27 @@ $userId = verifyCredentials($conn, $username, $password);
 $messageTime = @$_POST['messageTime'];
 
 $deviceId = @$_POST['deviceId'];
+$deviceName = @$_POST['deviceName'];
 $clientDeviceId = @$_POST['clientDeviceId'];
-$deviceToken = getDeviceToken($conn, $username, $password, $deviceId);
 
-$stmt = $conn->prepare("DELETE FROM dsm_device WHERE id = ? and user_id = ?");
-$stmt->bind_param("ii", $deviceId, $userId);
+$stmt = $conn->prepare("update dsm_device set name = ? where id = ? and user_id = ?");
+$stmt->bind_param("sii", $deviceName, $deviceId, $userId);
 
 if ($stmt->execute()) {
-    printSuccess("User " . $username . " successfully logged out.");
+    printSuccess("Device successfully updated");
 
     $tokens = getSelfTokens($conn, $username, $password, $clientDeviceId);
     $data = [
         'messageType' => 'ADMIN',
-        'adminType' => 'DEVICE_DELETED',
+        'adminType' => 'DEVICE_UPDATED',
         'messageTime' => $messageTime
     ];
-
     foreach ($tokens as $token) {
-        if ($token != $deviceToken) {
-            sendFirebaseMessage($token, $data);
-        }
-    }
-
-    if ($deviceToken && $deviceId != $clientDeviceId) {
-        sendFirebaseMessage($deviceToken, [
-            'messageType' => 'ADMIN',
-            'adminType' => 'DEVICE_LOGGED_OUT',
-            'messageTime' => $messageTime
-        ]);
+        sendFirebaseMessage($token, $data);
     }
 }
 else {
-    $stmt->close();
-    printError(102, "Failed to logout.");
+    printError(102, "Failed to update device");
 }
 
 $conn->close();

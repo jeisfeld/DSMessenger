@@ -21,16 +21,17 @@ import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentAccountBinding;
 import de.jeisfeld.dsmessenger.databinding.ListViewContactBinding;
+import de.jeisfeld.dsmessenger.databinding.ListViewDeviceBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.ChangePasswordDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateAccountDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateInvitationDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.EditContactDialogFragment;
+import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.EditDeviceDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.LoginDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.util.DialogUtil;
-import de.jeisfeld.dsmessenger.util.Logger;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -60,6 +61,17 @@ public class AccountFragment extends Fragment {
 						refreshDisplayedContactList();
 					}
 					break;
+				case DEVICES_CHANGED:
+					if (binding != null) {
+						updateDeviceInfo();
+					}
+					break;
+				case DEVICE_LOGGED_OUT: {
+					if (binding != null) {
+						doLogoutUpdates();
+					}
+					break;
+				}
 				default:
 					break;
 				}
@@ -217,28 +229,39 @@ public class AccountFragment extends Fragment {
 
 		binding.buttonChangePassword.setOnClickListener(v -> AccountDialogUtil.displayChangePasswordDialog(this));
 
-		binding.buttonLogout.setOnClickListener(v -> new HttpSender(getContext()).sendMessage("db/usermanagement/logout.php", (response, responseData) -> {
-			PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
-			PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
-			PreferenceUtil.removeSharedPreference(R.string.key_pref_device_id);
-			ContactRegistry.getInstance().cleanContacts();
-			if (responseData != null && responseData.isSuccess()) {
-				Activity activity = getActivity();
-				if (activity != null) {
-					activity.runOnUiThread(() -> {
-						refreshDisplayedContactList();
-
-						binding.tableRowButtonsLogin.setVisibility(View.VISIBLE);
-						binding.tableRowButtonsLogout.setVisibility(View.GONE);
-						binding.tableRowUsername.setVisibility(View.GONE);
-						binding.textViewUsername.setText("");
-						binding.buttonCreateInvitation.setVisibility(View.GONE);
-						binding.buttonAcceptInvitation.setVisibility(View.GONE);
-					});
-				}
-			}
-		}, "deviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1))));
+		binding.buttonLogout.setOnClickListener(v -> new HttpSender(getContext()).sendMessage("db/usermanagement/logout.php",
+				(response, responseData) -> {
+					if (responseData != null && responseData.isSuccess()) {
+						PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
+						PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
+						PreferenceUtil.removeSharedPreference(R.string.key_pref_device_id);
+						doLogoutUpdates();
+					}
+				}, "deviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1)),
+				"clientDeviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1))));
 	}
+
+	/**
+	 * Do GUI updates on logout.
+	 */
+	private void doLogoutUpdates() {
+		Activity activity = getActivity();
+		if (activity != null) {
+			activity.runOnUiThread(() -> {
+				ContactRegistry.getInstance().cleanContacts();
+				refreshDisplayedContactList();
+
+				binding.tableRowButtonsLogin.setVisibility(View.VISIBLE);
+				binding.tableRowButtonsLogout.setVisibility(View.GONE);
+				binding.tableRowUsername.setVisibility(View.GONE);
+				binding.textViewUsername.setText("");
+				binding.buttonCreateInvitation.setVisibility(View.GONE);
+				binding.buttonAcceptInvitation.setVisibility(View.GONE);
+				binding.layoutMyDevices.setVisibility(View.GONE);
+			});
+		}
+	}
+
 
 	/**
 	 * Clean the displayed contacts in a list.
@@ -261,24 +284,89 @@ public class AccountFragment extends Fragment {
 	 * Update the device information from the DB.
 	 */
 	private void updateDeviceInfo() {
-		new Thread(() -> new HttpSender(getContext()).sendMessage("db/usermanagement/querydevices.php", (response, responseData) -> {
-			if (responseData.isSuccess()) {
-				List<Device> devices = (List<Device>) responseData.getData().get("devices");
-				Logger.log("Found " + devices.size() + " devices");
-				if (devices.size() == 1) {
-					// Update stored deviceId. This helps when switching DBs during test phase.
-					int storedDeviceId = PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1);
-					if (storedDeviceId != devices.get(0).getId()) {
-						Log.w(Application.TAG, "Updated deviceId from " + storedDeviceId + " to " + devices.get(0).getId());
-						PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_device_id, devices.get(0).getId());
+		if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) == null) {
+			Activity activity = getActivity();
+			if (activity != null) {
+				binding.layoutMyDevices.setVisibility(View.GONE);
+			}
+		}
+		else {
+			new Thread(() -> new HttpSender(getContext()).sendMessage("db/usermanagement/querydevices.php", (response, responseData) -> {
+				if (responseData.isSuccess()) {
+					List<Device> devices = (List<Device>) responseData.getData().get("devices");
+
+					// Update stored deviceId. This helps when switching DBs during testing.
+					for (Device device : devices) {
+						if (device.isThis()) {
+							int storedDeviceId = PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1);
+							if (storedDeviceId != device.getId()) {
+								Log.w(Application.TAG, "Updated deviceId from " + storedDeviceId + " to " + device.getId());
+								PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_device_id, device.getId());
+							}
+						}
+					}
+
+					Activity activity = getActivity();
+					if (activity != null) {
+						activity.runOnUiThread(() -> {
+							if (devices.size() > 1) {
+								binding.layoutMyDevices.setVisibility(View.VISIBLE);
+								// Remove device list
+								View headline = binding.layoutMyDevices.getChildAt(0);
+								binding.layoutMyDevices.removeAllViews();
+								binding.layoutMyDevices.addView(headline);
+								// Add device list
+								for (Device device : devices) {
+									addDeviceToView(device);
+								}
+							}
+							else {
+								binding.layoutMyDevices.setVisibility(View.GONE);
+							}
+						});
 					}
 				}
-				// TODO: display device info
-			}
-			else {
-				Log.e(Application.TAG, "Failed to retrieve device data: " + responseData.getErrorMessage());
-			}
-		})).start();
+				else {
+					Log.e(Application.TAG, "Failed to retrieve device data: " + responseData.getErrorMessage());
+				}
+			}, "clientToken", PreferenceUtil.getSharedPreferenceString(R.string.key_pref_messaging_token))).start();
+		}
+	}
+
+	/**
+	 * Add a device to the view.
+	 *
+	 * @param device The device to be added.
+	 */
+	private void addDeviceToView(final Device device) {
+		ListViewDeviceBinding childBinding = ListViewDeviceBinding.inflate(getLayoutInflater());
+		childBinding.textViewDeviceName.setText(device.getName());
+
+		if (device.isThis()) {
+			childBinding.buttonDelete.setVisibility(View.INVISIBLE);
+		}
+		else {
+			childBinding.buttonDelete.setVisibility(View.VISIBLE);
+			childBinding.buttonDelete.setOnClickListener(v -> DialogUtil.displayConfirmationMessage(getActivity(),
+					dialog -> new HttpSender(getContext()).sendMessage("db/usermanagement/logout.php", (response, responseData) -> {
+								if (responseData == null) {
+									Log.e(Application.TAG, "Error in server communication: " + response);
+								}
+								else if (responseData.isSuccess()) {
+									updateDeviceInfo();
+								}
+								else {
+									Log.e(Application.TAG, "Failed to disconnect device: " + responseData.getErrorMessage());
+								}
+							}, "deviceId", Integer.toString(device.getId()),
+							"clientDeviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1))),
+					R.string.title_dialog_confirm_deletion, R.string.button_cancel, R.string.button_disconnect_device,
+					R.string.dialog_confirm_disconnect_device, device.getName()));
+		}
+
+		childBinding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditDeviceDialog(this, device));
+
+		binding.layoutMyDevices.addView(childBinding.getRoot());
 	}
 
 	/**
@@ -393,6 +481,7 @@ public class AccountFragment extends Fragment {
 								activity.runOnUiThread(this::refreshDisplayedContactList);
 							}
 						});
+						updateDeviceInfo();
 					}
 					else {
 						Activity activity = getActivity();
@@ -524,12 +613,49 @@ public class AccountFragment extends Fragment {
 	}
 
 	/**
+	 * Handle the response of edit device name dialog.
+	 *
+	 * @param dialog The dialog.
+	 * @param device The new device data.
+	 */
+	protected void handleEditDeviceDialogResponse(final EditDeviceDialogFragment dialog, final Device device) {
+		new HttpSender(getContext()).sendMessage("db/usermanagement/updatedevice.php", (response, responseData) -> {
+					if (responseData == null) {
+						Log.e(Application.TAG, "Error in server communication: " + response);
+						Activity activity = getActivity();
+						if (activity != null) {
+							activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
+						}
+					}
+					else if (responseData.isSuccess()) {
+						dialog.dismiss();
+						updateDeviceInfo();
+					}
+					else {
+						Activity activity = getActivity();
+						if (activity != null) {
+							activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
+						}
+					}
+				}, "deviceName", device.getName(), "deviceId", Integer.toString(device.getId()),
+				"clientDeviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1)));
+	}
+
+	/**
 	 * Action that can be sent to this fragment.
 	 */
 	public enum ActionType {
 		/**
 		 * Inform about contacts changed.
 		 */
-		CONTACTS_CHANGED
+		CONTACTS_CHANGED,
+		/**
+		 * Inform about devices changed.
+		 */
+		DEVICES_CHANGED,
+		/**
+		 * This device has been logged out.
+		 */
+		DEVICE_LOGGED_OUT
 	}
 }

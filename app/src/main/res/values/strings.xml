@@ -8,6 +8,7 @@
     <string name="title_dialog_confirm_deletion">Confirm deletion</string>
     <string name="title_dialog_edit_contact">Edit Contact</string>
     <string name="title_dialog_info">Info</string>
+    <string name="title_dialog_edit_device_name">Edit Device Name</string>
 
     <string name="menu_account">Account</string>
     <string name="menu_message">Message</string>
@@ -28,6 +29,8 @@
     <string name="button_change_password">Change Password</string>
     <string name="button_delete_contact">Delete Contact</string>
     <string name="button_save_contact">Save Contact</string>
+    <string name="button_disconnect_device">Disconnect Device</string>
+    <string name="button_update_device_name">Update Device Name</string>
 
     <string name="text_send_message">Send Message</string>
     <string name="text_display_random_image">Display RandomImage</string>
@@ -62,6 +65,7 @@
     <string name="text_sub">Sub</string>
     <string name="text_dom">Dom</string>
     <string name="text_connection_code">Connection Code</string>
+    <string name="text_my_devices">My Devices</string>
     <string name="text_my_doms">My Doms</string>
     <string name="text_my_subs">My Subs</string>
     <string name="text_delete">Delete</string>
@@ -83,6 +87,7 @@
     <string name="error_missing_ownname">Missing own name</string>
     <string name="error_missing_contactname">Missing contact name</string>
     <string name="error_missing_connectioncode">Missing connection code</string>
+    <string name="error_missing_devicename">Missing device name</string>
     <string name="error_invalid_connectioncode">Invalid connection code</string>
     <string name="error_invalid_credentials">Username or Password is not correct</string>
     <string name="error_connection_failed">Connection failed</string>
@@ -94,6 +99,7 @@
     <string name="dialog_screen_control_permission">In the following screen, please give the app %1$s permission to make displays on top of other apps.</string>
     <string name="dialog_login_before_connect">Please login before connecting to another user.</string>
     <string name="dialog_confirm_delete_contact">Do you really want to delete contact %1$s?</string>
+    <string name="dialog_confirm_disconnect_device">Do you really want to dicsonnect device %1$s?</string>
 
     <string-array name="array_vibrate_pattern_names">
         <item>Default</item>
