@@ -2,13 +2,11 @@ package de.jeisfeld.dsmessenger.main.account;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
-import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.DialogAcceptInvitationBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogChangePasswordBinding;
@@ -487,11 +485,7 @@ public final class AccountDialogUtil {
 					return;
 				}
 				new HttpSender(getContext()).sendMessage("db/usermanagement/queryconnectioncode.php", (response, responseData) -> {
-					if (responseData == null) {
-						Log.e(Application.TAG, "Error in server communication: " + response);
-						displayError(R.string.error_technical_error);
-					}
-					else if (responseData.isSuccess()) {
+					if (responseData.isSuccess()) {
 						relationId = (int) responseData.getData().get("relationId");
 						String myName = (String) responseData.getData().get("myname");
 						String contactName = (String) responseData.getData().get("contactname");
@@ -538,11 +532,7 @@ public final class AccountDialogUtil {
 				String connectionCode = binding.editTextConnectionCode.getText().toString().trim();
 
 				new HttpSender(getContext()).sendMessage("db/usermanagement/acceptinvitation.php", (response, responseData) -> {
-							if (responseData == null) {
-								Log.e(Application.TAG, "Error in server communication: " + response);
-								requireActivity().runOnUiThread(() -> displayError(R.string.error_technical_error));
-							}
-							else if (responseData.isSuccess()) {
+							if (responseData.isSuccess()) {
 								dismiss();
 								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, ContactStatus.CONNECTED);
 								ContactRegistry.getInstance().addOrUpdate(contact);
@@ -681,7 +671,7 @@ public final class AccountDialogUtil {
 					return;
 				}
 				String deviceName = binding.editTextDeviceName.getText().toString().trim();
-				Device newDevice = new Device(device.getId(), deviceName, device.isThis());
+				Device newDevice = new Device(device.getId(), deviceName, device.muted, device.isThis());
 				((AccountFragment) requireParentFragment()).handleEditDeviceDialogResponse(this, newDevice);
 			});
 

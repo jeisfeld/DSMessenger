@@ -185,10 +185,7 @@ public class AccountFragment extends Fragment {
 			childBinding.buttonDelete.setVisibility(View.VISIBLE);
 			childBinding.buttonDelete.setOnClickListener(v -> DialogUtil.displayConfirmationMessage(getActivity(),
 					dialog -> new HttpSender(getContext()).sendMessage("db/usermanagement/deletecontact.php", (response, responseData) -> {
-								if (responseData == null) {
-									Log.e(Application.TAG, "Error in server communication: " + response);
-								}
-								else if (responseData.isSuccess()) {
+								if (responseData.isSuccess()) {
 									ContactRegistry.getInstance().refreshContacts(getContext(), () -> {
 										Activity activity = getActivity();
 										if (activity != null) {
@@ -235,6 +232,7 @@ public class AccountFragment extends Fragment {
 						PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
 						PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
 						PreferenceUtil.removeSharedPreference(R.string.key_pref_device_id);
+						ContactRegistry.getInstance().cleanContacts();
 						doLogoutUpdates();
 					}
 				}, "deviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1)),
@@ -248,7 +246,6 @@ public class AccountFragment extends Fragment {
 		Activity activity = getActivity();
 		if (activity != null) {
 			activity.runOnUiThread(() -> {
-				ContactRegistry.getInstance().cleanContacts();
 				refreshDisplayedContactList();
 
 				binding.tableRowButtonsLogin.setVisibility(View.VISIBLE);
@@ -306,6 +303,8 @@ public class AccountFragment extends Fragment {
 						}
 					}
 
+					final int numberOfUnmutedDevices = (int) devices.stream().filter(device -> !device.isMuted()).count();
+
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
@@ -317,7 +316,7 @@ public class AccountFragment extends Fragment {
 								binding.layoutMyDevices.addView(headline);
 								// Add device list
 								for (Device device : devices) {
-									addDeviceToView(device);
+									addDeviceToView(device, numberOfUnmutedDevices > 1);
 								}
 							}
 							else {
@@ -336,9 +335,10 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Add a device to the view.
 	 *
-	 * @param device The device to be added.
+	 * @param device      The device to be added.
+	 * @param allowMuting Flag indicating if muting is allowed
 	 */
-	private void addDeviceToView(final Device device) {
+	private void addDeviceToView(final Device device, final boolean allowMuting) {
 		ListViewDeviceBinding childBinding = ListViewDeviceBinding.inflate(getLayoutInflater());
 		childBinding.textViewDeviceName.setText(device.getName());
 
@@ -349,10 +349,7 @@ public class AccountFragment extends Fragment {
 			childBinding.buttonDelete.setVisibility(View.VISIBLE);
 			childBinding.buttonDelete.setOnClickListener(v -> DialogUtil.displayConfirmationMessage(getActivity(),
 					dialog -> new HttpSender(getContext()).sendMessage("db/usermanagement/logout.php", (response, responseData) -> {
-								if (responseData == null) {
-									Log.e(Application.TAG, "Error in server communication: " + response);
-								}
-								else if (responseData.isSuccess()) {
+								if (responseData.isSuccess()) {
 									updateDeviceInfo();
 								}
 								else {
@@ -363,6 +360,16 @@ public class AccountFragment extends Fragment {
 					R.string.title_dialog_confirm_deletion, R.string.button_cancel, R.string.button_disconnect_device,
 					R.string.dialog_confirm_disconnect_device, device.getName()));
 		}
+
+		childBinding.buttonEnablement.setImageResource(device.isMuted() ? R.drawable.ic_icon_message_disabled : R.drawable.ic_icon_message_enabled);
+		childBinding.buttonEnablement.setOnClickListener(v ->
+				new HttpSender(getContext()).sendMessage("db/usermanagement/updatedevice.php", (response, responseData) -> {
+							if (responseData.isSuccess()) {
+								updateDeviceInfo();
+							}
+						}, "deviceName", device.getName(), "deviceId", Integer.toString(device.getId()), "muted", device.isMuted() ? "" : "1",
+						"clientDeviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1))));
+		childBinding.buttonEnablement.setEnabled(device.isMuted() || allowMuting);
 
 		childBinding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditDeviceDialog(this, device));
 
@@ -405,15 +412,7 @@ public class AccountFragment extends Fragment {
 	 */
 	protected void handleCreateAccountDialogResponse(final CreateAccountDialogFragment dialog, final String username, final String password) {
 		new HttpSender(getContext()).sendMessage("db/usermanagement/createuser.php", false, null, null, (response, responseData) -> {
-					if (responseData == null) {
-						Log.e(Application.TAG, "Error in server communication: " + response);
-
-						Activity activity = getActivity();
-						if (activity != null) {
-							activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
-						}
-					}
-					else if (responseData.isSuccess()) {
+					if (responseData.isSuccess()) {
 						dialog.dismiss();
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
@@ -452,14 +451,7 @@ public class AccountFragment extends Fragment {
 	protected void handleLoginDialogResponse(final LoginDialogFragment dialog, final String username, final String password,
 											 final String deviceName) {
 		new HttpSender(getContext()).sendMessage("db/usermanagement/login.php", false, null, null, (response, responseData) -> {
-					if (responseData == null) {
-						Log.e(Application.TAG, "Error in server communication: " + response);
-						Activity activity = getActivity();
-						if (activity != null) {
-							activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
-						}
-					}
-					else if (responseData.isSuccess()) {
+					if (responseData.isSuccess()) {
 						dialog.dismiss();
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
@@ -506,14 +498,7 @@ public class AccountFragment extends Fragment {
 	 */
 	protected void handleChangePasswordDialogResponse(final ChangePasswordDialogFragment dialog, final String newPassword) {
 		new HttpSender(getContext()).sendMessage("db/usermanagement/changepassword.php", (response, responseData) -> {
-			if (responseData == null) {
-				Log.e(Application.TAG, "Error in server communication: " + response);
-				Activity activity = getActivity();
-				if (activity != null) {
-					activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
-				}
-			}
-			else if (responseData.isSuccess()) {
+			if (responseData.isSuccess()) {
 				PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, newPassword);
 				dialog.dismiss();
 			}
@@ -537,14 +522,7 @@ public class AccountFragment extends Fragment {
 	protected void handleCreateInvitationDialogResponse(final CreateInvitationDialogFragment dialog, final boolean amSlave,
 														final String myName, final String contactName) {
 		new HttpSender(getContext()).sendMessage("db/usermanagement/createinvitation.php", (response, responseData) -> {
-			if (responseData == null) {
-				Log.e(Application.TAG, "Error in server communication: " + response);
-				Activity activity = getActivity();
-				if (activity != null) {
-					activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
-				}
-			}
-			else if (responseData.isSuccess()) {
+			if (responseData.isSuccess()) {
 				dialog.dismiss();
 
 				String connectionCode = (String) responseData.getData().get("connectionCode");
@@ -588,14 +566,7 @@ public class AccountFragment extends Fragment {
 	 */
 	protected void handleEditContactDialogResponse(final EditContactDialogFragment dialog, final Contact contact) {
 		new HttpSender(getContext()).sendMessage("db/usermanagement/updatecontact.php", contact, null, (response, responseData) -> {
-			if (responseData == null) {
-				Log.e(Application.TAG, "Error in server communication: " + response);
-				Activity activity = getActivity();
-				if (activity != null) {
-					activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
-				}
-			}
-			else if (responseData.isSuccess()) {
+			if (responseData.isSuccess()) {
 				dialog.dismiss();
 				ContactRegistry.getInstance().addOrUpdate(contact);
 				Activity activity = getActivity();
@@ -620,14 +591,7 @@ public class AccountFragment extends Fragment {
 	 */
 	protected void handleEditDeviceDialogResponse(final EditDeviceDialogFragment dialog, final Device device) {
 		new HttpSender(getContext()).sendMessage("db/usermanagement/updatedevice.php", (response, responseData) -> {
-					if (responseData == null) {
-						Log.e(Application.TAG, "Error in server communication: " + response);
-						Activity activity = getActivity();
-						if (activity != null) {
-							activity.runOnUiThread(() -> dialog.displayError(R.string.error_technical_error));
-						}
-					}
-					else if (responseData.isSuccess()) {
+					if (responseData.isSuccess()) {
 						dialog.dismiss();
 						updateDeviceInfo();
 					}
@@ -637,7 +601,7 @@ public class AccountFragment extends Fragment {
 							activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
 						}
 					}
-				}, "deviceName", device.getName(), "deviceId", Integer.toString(device.getId()),
+				}, "deviceName", device.getName(), "deviceId", Integer.toString(device.getId()), "muted", device.isMuted() ? "1" : "",
 				"clientDeviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1)));
 	}
 

@@ -23,6 +23,39 @@ $stmt->bind_param("ii", $deviceId, $userId);
 
 if ($stmt->execute()) {
     printSuccess("User " . $username . " successfully logged out.");
+    $stmt->close();
+    
+    // If there are devices left and all are muted, then unmute one of them.
+    $deviceCount = null;
+    $stmt = $conn->prepare("select count(*) from dsm_device where user_id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $stmt->bind_result($deviceCount);
+    $stmt->fetch();
+    $stmt->close();
+    if ($deviceCount) {
+        $unmutedCount = null;
+        $stmt = $conn->prepare("select count(*) from dsm_device where user_id = ? and muted = 0");
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stmt->bind_result($unmutedCount);
+        $stmt->fetch();
+        $stmt->close();
+        if (!$unmutedCount) {
+            $newDeviceId = null;
+            $stmt = $conn->prepare("select min(id) from dsm_device where user_id = ?");
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $stmt->bind_result($newDeviceId);
+            $stmt->fetch();
+            $stmt->close();
+            if ($newDeviceId) {
+                $stmt = $conn->prepare("update dsm_device set muted = 0 where user_id = ? and id = ?");
+                $stmt->bind_param("ii", $userId, $newDeviceId);
+                $stmt->execute();
+            }
+        }
+    }
 
     $tokens = getSelfTokens($conn, $username, $password, $clientDeviceId);
     $data = [

@@ -22,6 +22,7 @@ id INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 user_id INT(8) UNSIGNED NOT NULL,
 name VARCHAR(30) NOT NULL,
 token VARCHAR(200),
+muted BOOLEAN DEFAULT false,
 FOREIGN KEY (user_id) REFERENCES dsm_user(id) ON DELETE CASCADE,
 CONSTRAINT unique_devicename UNIQUE(user_id, name)
 )";

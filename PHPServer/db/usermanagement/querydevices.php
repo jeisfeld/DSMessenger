@@ -18,17 +18,19 @@ $clientToken = @$_POST['clientToken'];
 $deviceId = null;
 $deviceName = null;
 $token = null;
-$stmt = $conn->prepare("SELECT id, name, token FROM dsm_device WHERE user_id = ?");
+$muted = null;
+$stmt = $conn->prepare("SELECT id, name, token, muted FROM dsm_device WHERE user_id = ?");
 
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($deviceId, $deviceName, $token);
+$stmt->bind_result($deviceId, $deviceName, $token, $muted);
 
 $devices = array();
 while ($stmt->fetch()) {
     $devices[] = [
         'deviceId' => $deviceId,
         'deviceName' => $deviceName,
+        'muted' => $muted ? true : false,
         'isClient' => $clientToken === $token ? true : false
     ];
 }

@@ -15,6 +15,10 @@ public class Device implements Serializable {
 	 */
 	final String name;
 	/**
+	 * The muted flag.
+	 */
+	final boolean muted;
+	/**
 	 * Flag indicating if this is current device.
 	 */
 	final boolean isThis;
@@ -24,11 +28,13 @@ public class Device implements Serializable {
 	 *
 	 * @param id     The device id.
 	 * @param name   The device name.
+	 * @param muted  The muted flag.
 	 * @param isThis The flag indicating if this is current device.
 	 */
-	public Device(final int id, final String name, final boolean isThis) {
+	public Device(final int id, final String name, final boolean muted, final boolean isThis) {
 		this.id = id;
 		this.name = name;
+		this.muted = muted;
 		this.isThis = isThis;
 	}
 
@@ -38,6 +44,10 @@ public class Device implements Serializable {
 
 	public String getName() {
 		return name;
+	}
+
+	public boolean isMuted() {
+		return muted;
 	}
 
 	public boolean isThis() {

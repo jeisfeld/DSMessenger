@@ -305,8 +305,9 @@ public class HttpSender {
 								JSONObject jsonContact = jsonArray.getJSONObject(i);
 								int deviceId = jsonContact.getInt("deviceId");
 								String deviceName = jsonContact.getString("deviceName");
+								boolean muted = jsonContact.getBoolean("muted");
 								boolean isThis = jsonContact.getBoolean("isClient");
-								Device device = new Device(deviceId, deviceName, isThis);
+								Device device = new Device(deviceId, deviceName, muted, isThis);
 								devices.add(device);
 							}
 							data.put(key, devices);

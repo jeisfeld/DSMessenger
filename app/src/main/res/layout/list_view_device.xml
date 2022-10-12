@@ -17,6 +17,17 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
+        android:id="@+id/button_enablement"
+        android:layout_width="@dimen/input_row_height"
+        android:layout_height="@dimen/input_row_height"
+        android:layout_marginEnd="@dimen/margin_small"
+        android:contentDescription="@string/text_edit"
+        android:src="@drawable/ic_icon_message_enabled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/button_delete"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
         android:id="@+id/button_edit"
         android:layout_width="@dimen/input_row_height"
         android:layout_height="@dimen/input_row_height"
@@ -24,7 +35,7 @@
         android:contentDescription="@string/text_edit"
         android:src="@drawable/ic_icon_edit"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/button_delete"
+        app:layout_constraintEnd_toStartOf="@id/button_enablement"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView

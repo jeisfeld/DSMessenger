@@ -78,7 +78,9 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
 				PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
 				PreferenceUtil.removeSharedPreference(R.string.key_pref_device_id);
+				ContactRegistry.getInstance().cleanContacts();
 				AccountFragment.sendBroadcast(this, ActionType.DEVICE_LOGGED_OUT);
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.DEVICE_LOGGED_OUT, null);
 				break;
 			case MESSAGE_RECEIVED:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId());

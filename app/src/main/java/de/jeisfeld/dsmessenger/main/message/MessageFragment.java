@@ -20,6 +20,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentMessageBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
@@ -56,6 +57,15 @@ public class MessageFragment extends Fragment {
 					if (messageId.equals(lastMessageId)) {
 						binding.textMessageResponse.setText(
 								actionType == ActionType.MESSAGE_RECEIVED ? R.string.text_message_received : R.string.text_message_acknowledged);
+					}
+					break;
+				case DEVICE_LOGGED_OUT:
+					binding.scrollViewSendMessage.setVisibility(View.GONE);
+					binding.buttonSend.setVisibility(View.GONE);
+					binding.spinnerContact.setVisibility(View.GONE);
+					Activity activity = getActivity();
+					if (activity != null) {
+						((MainActivity) activity).updateNavigationDrawer();
 					}
 					break;
 				default:
@@ -199,6 +209,10 @@ public class MessageFragment extends Fragment {
 		/**
 		 * Inform about message acknowledged.
 		 */
-		MESSAGE_ACKNOWLEDGED
+		MESSAGE_ACKNOWLEDGED,
+		/**
+		 * This device has been logged out.
+		 */
+		DEVICE_LOGGED_OUT
 	}
 }
