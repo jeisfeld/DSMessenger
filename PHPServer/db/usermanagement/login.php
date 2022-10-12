@@ -54,18 +54,27 @@ $stmt = $conn->prepare("INSERT INTO dsm_device (user_id, name, token) values (?,
 $stmt->bind_param("iss", $userId, $deviceName, $token);
 
 if ($stmt->execute()) {
-    $stmt = $conn->prepare("SELECT id FROM dsm_device WHERE user_id=? AND NAME=?");
+    $displayStrategyNormal = null;
+    $displayStrategyUrgent = null;
+    $stmt = $conn->prepare("SELECT id, displaystrategy_normal, displaystrategy_urgent FROM dsm_device WHERE user_id=? AND name=?");
     $stmt->bind_param("is", $userId, $deviceName);
     $stmt->execute();
-    $stmt->bind_result($deviceId);
+    $stmt->bind_result($deviceId, $displayStrategyNormal, $displayStrategyUrgent);
     $stmt->fetch();
     $stmt->close();
-    if (!$deviceId) {
+    if (! $deviceId) {
         printError(102, "Failed to retrieve deviceId");
     }
-        
-    printSuccess("User " . $username . " successfully logged in.", ['userId' => $userId, 'deviceId' => $deviceId]);
-    
+
+    printSuccess("User " . $username . " successfully logged in.", [
+        'userId' => $userId,
+        'deviceId' => $deviceId,
+        'deviceName' => $deviceName,
+        'muted' => false,
+        'displayStrategyNormal' => $displayStrategyNormal,
+        'displayStrategyUrgent' => $displayStrategyUrgent
+    ]);
+
     $tokens = getSelfTokens($conn, $username, $password, $deviceId);
     $data = [
         'messageType' => 'ADMIN',

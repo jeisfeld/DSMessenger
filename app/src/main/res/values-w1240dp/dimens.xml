@@ -2,5 +2,6 @@
     <dimen name="page_padding">40dp</dimen>
     <dimen name="margin_small">20dp</dimen>
     <dimen name="margin_medium">40dp</dimen>
+    <dimen name="margin_large">60dp</dimen>
     <integer name="messge_text_min_lines">15</integer>
 </resources>

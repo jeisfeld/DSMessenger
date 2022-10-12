@@ -33,6 +33,7 @@ import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.main.account.Device;
+import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy;
 import de.jeisfeld.dsmessenger.util.DateUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
@@ -307,7 +308,11 @@ public class HttpSender {
 								String deviceName = jsonContact.getString("deviceName");
 								boolean muted = jsonContact.getBoolean("muted");
 								boolean isThis = jsonContact.getBoolean("isClient");
-								Device device = new Device(deviceId, deviceName, muted, isThis);
+								MessageDisplayStrategy displayStrategyNormal =
+										MessageDisplayStrategy.fromString(jsonContact.getString("displayStrategyNormal"));
+								MessageDisplayStrategy displayStrategyUrgent =
+										MessageDisplayStrategy.fromString(jsonContact.getString("displayStrategyUrgent"));
+								Device device = new Device(deviceId, deviceName, muted, displayStrategyNormal, displayStrategyUrgent, isThis);
 								devices.add(device);
 							}
 							data.put(key, devices);

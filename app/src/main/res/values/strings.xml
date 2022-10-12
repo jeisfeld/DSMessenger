@@ -8,7 +8,7 @@
     <string name="title_dialog_confirm_deletion">Confirm deletion</string>
     <string name="title_dialog_edit_contact">Edit Contact</string>
     <string name="title_dialog_info">Info</string>
-    <string name="title_dialog_edit_device_name">Edit Device Name</string>
+    <string name="title_dialog_edit_device">Edit Device</string>
 
     <string name="menu_account">Account</string>
     <string name="menu_message">Message</string>
@@ -30,7 +30,7 @@
     <string name="button_delete_contact">Delete Contact</string>
     <string name="button_save_contact">Save Contact</string>
     <string name="button_disconnect_device">Disconnect Device</string>
-    <string name="button_update_device_name">Update Device Name</string>
+    <string name="button_update_device">Update Device</string>
 
     <string name="text_send_message">Send Message</string>
     <string name="text_display_random_image">Display RandomImage</string>
@@ -48,6 +48,8 @@
     <string name="text_origin_notification">Notification</string>
     <string name="text_notification_name">Notification Name</string>
     <string name="text_widget_name">Widget Name</string>
+    <string name="text_message_display_normal">Normal message display</string>
+    <string name="text_message_display_urgent">Urgent message display</string>
 
     <string name="text_my_account">My Account</string>
     <string name="text_username">Username</string>

@@ -16,6 +16,8 @@ $messageTime = @$_POST['messageTime'];
 
 $deviceId = @$_POST['deviceId'];
 $muted = @$_POST['muted'] ? 1 : 0;
+$displayStrategyNormal = @$_POST['displayStrategyNormal'];
+$displayStrategyUrgent = @$_POST['displayStrategyUrgent'];
 $deviceName = @$_POST['deviceName'];
 $clientDeviceId = @$_POST['clientDeviceId'];
 
@@ -32,8 +34,8 @@ if ($muted) {
     $stmt->close();
 }
 
-$stmt = $conn->prepare("update dsm_device set name = ?, muted = ? where id = ? and user_id = ?");
-$stmt->bind_param("siii", $deviceName, $muted, $deviceId, $userId);
+$stmt = $conn->prepare("update dsm_device set name = ?, muted = ?, displaystrategy_normal = ?, displaystrategy_urgent = ? where id = ? and user_id = ?");
+$stmt->bind_param("sissii", $deviceName, $muted, $displayStrategyNormal, $displayStrategyUrgent, $deviceId, $userId);
 
 if ($stmt->execute()) {
     printSuccess("Device successfully updated");

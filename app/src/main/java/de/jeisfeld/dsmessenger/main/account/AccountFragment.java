@@ -21,7 +21,8 @@ import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentAccountBinding;
 import de.jeisfeld.dsmessenger.databinding.ListViewContactBinding;
-import de.jeisfeld.dsmessenger.databinding.ListViewDeviceBinding;
+import de.jeisfeld.dsmessenger.databinding.ListViewDeviceMultiBinding;
+import de.jeisfeld.dsmessenger.databinding.ListViewDeviceSingleBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.ChangePasswordDialogFragment;
@@ -104,39 +105,15 @@ public class AccountFragment extends Fragment {
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	}
 
-	@Override
-	public final View onCreateView(@NonNull final LayoutInflater inflater,
-								   final ViewGroup container, final Bundle savedInstanceState) {
-
-		binding = FragmentAccountBinding.inflate(inflater, container, false);
-		String username = PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username);
-
-		if (username == null) {
-			binding.tableRowUsername.setVisibility(View.GONE);
-			binding.tableRowButtonsLogout.setVisibility(View.GONE);
-			binding.tableRowButtonsLogin.setVisibility(View.VISIBLE);
-			binding.buttonCreateInvitation.setVisibility(View.GONE);
-			binding.buttonAcceptInvitation.setVisibility(View.GONE);
-		}
-		else {
-			binding.tableRowUsername.setVisibility(View.VISIBLE);
-			binding.tableRowButtonsLogout.setVisibility(View.VISIBLE);
-			binding.tableRowButtonsLogin.setVisibility(View.GONE);
-			binding.textViewUsername.setText(username);
-			binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
-			binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
-		}
-
-		configureMyAccountButtons();
-		configureContactButtons();
-
-		for (Contact contact : ContactRegistry.getInstance().getContacts()) {
-			addContactToView(contact);
-		}
-
-		updateDeviceInfo();
-
-		return binding.getRoot();
+	/**
+	 * Remove the stored device information.
+	 */
+	public static void removeStoredDeviceInfo() {
+		PreferenceUtil.removeSharedPreference(R.string.key_pref_device_id);
+		PreferenceUtil.removeSharedPreference(R.string.key_pref_device_name);
+		PreferenceUtil.removeSharedPreference(R.string.key_pref_device_muted);
+		PreferenceUtil.removeSharedPreference(R.string.key_pref_device_display_strategy_normal);
+		PreferenceUtil.removeSharedPreference(R.string.key_pref_device_display_strategy_urgent);
 	}
 
 	@Override
@@ -216,6 +193,42 @@ public class AccountFragment extends Fragment {
 		}
 	}
 
+	@Override
+	public final View onCreateView(@NonNull final LayoutInflater inflater,
+								   final ViewGroup container, final Bundle savedInstanceState) {
+
+		binding = FragmentAccountBinding.inflate(inflater, container, false);
+		String username = PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username);
+
+		if (username == null) {
+			binding.tableRowUsername.setVisibility(View.GONE);
+			binding.tableRowButtonsLogout.setVisibility(View.GONE);
+			binding.tableRowButtonsLogin.setVisibility(View.VISIBLE);
+			binding.buttonCreateInvitation.setVisibility(View.GONE);
+			binding.buttonAcceptInvitation.setVisibility(View.GONE);
+		}
+		else {
+			binding.tableRowUsername.setVisibility(View.VISIBLE);
+			binding.tableRowButtonsLogout.setVisibility(View.VISIBLE);
+			binding.tableRowButtonsLogin.setVisibility(View.GONE);
+			binding.textViewUsername.setText(username);
+			binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
+			binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
+		}
+
+		configureMyAccountButtons();
+		configureContactButtons();
+
+		for (Contact contact : ContactRegistry.getInstance().getContacts()) {
+			addContactToView(contact);
+		}
+
+		displaySingleDeviceInfo(Device.getThisDevice());
+		updateDeviceInfo();
+
+		return binding.getRoot();
+	}
+
 	/**
 	 * Configure the buttons for my account.
 	 */
@@ -231,7 +244,7 @@ public class AccountFragment extends Fragment {
 					if (responseData != null && responseData.isSuccess()) {
 						PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
 						PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
-						PreferenceUtil.removeSharedPreference(R.string.key_pref_device_id);
+						removeStoredDeviceInfo();
 						ContactRegistry.getInstance().cleanContacts();
 						doLogoutUpdates();
 					}
@@ -302,6 +315,16 @@ public class AccountFragment extends Fragment {
 							}
 						}
 					}
+					for (Device device : devices) {
+						if (device.getId() == PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1)) {
+							PreferenceUtil.setSharedPreferenceString(R.string.key_pref_device_name, device.getName());
+							PreferenceUtil.setSharedPreferenceBoolean(R.string.key_pref_device_muted, device.isMuted());
+							PreferenceUtil.setSharedPreferenceString(
+									R.string.key_pref_device_display_strategy_normal, device.getDisplayStrategyNormal().toString());
+							PreferenceUtil.setSharedPreferenceString(
+									R.string.key_pref_device_display_strategy_urgent, device.getDisplayStrategyUrgent().toString());
+						}
+					}
 
 					final int numberOfUnmutedDevices = (int) devices.stream().filter(device -> !device.isMuted()).count();
 
@@ -310,14 +333,19 @@ public class AccountFragment extends Fragment {
 						activity.runOnUiThread(() -> {
 							if (devices.size() > 1) {
 								binding.layoutMyDevices.setVisibility(View.VISIBLE);
+								binding.textMyDevices.setVisibility(View.VISIBLE);
 								// Remove device list
 								View headline = binding.layoutMyDevices.getChildAt(0);
 								binding.layoutMyDevices.removeAllViews();
 								binding.layoutMyDevices.addView(headline);
 								// Add device list
+								devices.sort((d1, d2) -> Boolean.compare(d2.isThis(), d1.isThis()));
 								for (Device device : devices) {
-									addDeviceToView(device, numberOfUnmutedDevices > 1);
+									addMultiDeviceToView(device, numberOfUnmutedDevices > 1);
 								}
+							}
+							else if (devices.size() == 1) {
+								displaySingleDeviceInfo(devices.get(0));
 							}
 							else {
 								binding.layoutMyDevices.setVisibility(View.GONE);
@@ -333,13 +361,29 @@ public class AccountFragment extends Fragment {
 	}
 
 	/**
-	 * Add a device to the view.
+	 * Display device info of a single device.
+	 *
+	 * @param device The device.
+	 */
+	private void displaySingleDeviceInfo(Device device) {
+		binding.layoutMyDevices.setVisibility(View.VISIBLE);
+		binding.textMyDevices.setVisibility(View.GONE);
+		// Remove device list
+		View headline = binding.layoutMyDevices.getChildAt(0);
+		binding.layoutMyDevices.removeAllViews();
+		binding.layoutMyDevices.addView(headline);
+
+		addSingleDeviceToView(device);
+	}
+
+	/**
+	 * Add a device to the view, for multiple devices.
 	 *
 	 * @param device      The device to be added.
 	 * @param allowMuting Flag indicating if muting is allowed
 	 */
-	private void addDeviceToView(final Device device, final boolean allowMuting) {
-		ListViewDeviceBinding childBinding = ListViewDeviceBinding.inflate(getLayoutInflater());
+	private void addMultiDeviceToView(final Device device, final boolean allowMuting) {
+		ListViewDeviceMultiBinding childBinding = ListViewDeviceMultiBinding.inflate(getLayoutInflater());
 		childBinding.textViewDeviceName.setText(device.getName());
 
 		if (device.isThis()) {
@@ -368,8 +412,24 @@ public class AccountFragment extends Fragment {
 								updateDeviceInfo();
 							}
 						}, "deviceName", device.getName(), "deviceId", Integer.toString(device.getId()), "muted", device.isMuted() ? "" : "1",
+						"displayStrategyNormal", device.getDisplayStrategyNormal().toString(),
+						"displayStrategyUrgent", device.getDisplayStrategyUrgent().toString(),
 						"clientDeviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1))));
 		childBinding.buttonEnablement.setEnabled(device.isMuted() || allowMuting);
+
+		childBinding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditDeviceDialog(this, device));
+
+		binding.layoutMyDevices.addView(childBinding.getRoot());
+	}
+
+	/**
+	 * Add a device to the view, for single device.
+	 *
+	 * @param device The device to be added.
+	 */
+	private void addSingleDeviceToView(final Device device) {
+		ListViewDeviceSingleBinding childBinding = ListViewDeviceSingleBinding.inflate(getLayoutInflater());
+		childBinding.textViewDeviceName.setText(device.getName());
 
 		childBinding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditDeviceDialog(this, device));
 
@@ -416,8 +476,14 @@ public class AccountFragment extends Fragment {
 						dialog.dismiss();
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
-						int deviceId = (int) responseData.getData().get("deviceId");
-						PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_device_id, deviceId);
+						PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_device_id, (int) responseData.getData().get("deviceId"));
+						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_device_name, (String) responseData.getData().get("deviceName"));
+						PreferenceUtil.setSharedPreferenceBoolean(R.string.key_pref_device_muted, (boolean) responseData.getData().get("muted"));
+						PreferenceUtil.setSharedPreferenceString(
+								R.string.key_pref_device_display_strategy_normal, (String) responseData.getData().get("displayStrategyNormal"));
+						PreferenceUtil.setSharedPreferenceString(
+								R.string.key_pref_device_display_strategy_urgent, (String) responseData.getData().get("displayStrategyUrgent"));
+
 						Activity activity = getActivity();
 						if (activity != null) {
 							activity.runOnUiThread(() -> {
@@ -427,6 +493,7 @@ public class AccountFragment extends Fragment {
 								binding.textViewUsername.setText(username);
 								binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
 								binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
+								displaySingleDeviceInfo(Device.getThisDevice());
 							});
 						}
 					}
@@ -455,8 +522,14 @@ public class AccountFragment extends Fragment {
 						dialog.dismiss();
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_username, username);
 						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_password, password);
-						int deviceId = (int) responseData.getData().get("deviceId");
-						PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_device_id, deviceId);
+						PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_device_id, (int) responseData.getData().get("deviceId"));
+						PreferenceUtil.setSharedPreferenceString(R.string.key_pref_device_name, (String) responseData.getData().get("deviceName"));
+						PreferenceUtil.setSharedPreferenceBoolean(R.string.key_pref_device_muted, (boolean) responseData.getData().get("muted"));
+						PreferenceUtil.setSharedPreferenceString(
+								R.string.key_pref_device_display_strategy_normal, (String) responseData.getData().get("displayStrategyNormal"));
+						PreferenceUtil.setSharedPreferenceString(
+								R.string.key_pref_device_display_strategy_urgent, (String) responseData.getData().get("displayStrategyUrgent"));
+
 						final Activity activity = getActivity();
 						if (activity != null) {
 							activity.runOnUiThread(() -> {
@@ -466,6 +539,7 @@ public class AccountFragment extends Fragment {
 								binding.textViewUsername.setText(username);
 								binding.buttonCreateInvitation.setVisibility(View.VISIBLE);
 								binding.buttonAcceptInvitation.setVisibility(View.VISIBLE);
+								displaySingleDeviceInfo(Device.getThisDevice());
 							});
 						}
 						ContactRegistry.getInstance().refreshContacts(getContext(), () -> {
@@ -602,6 +676,8 @@ public class AccountFragment extends Fragment {
 						}
 					}
 				}, "deviceName", device.getName(), "deviceId", Integer.toString(device.getId()), "muted", device.isMuted() ? "1" : "",
+				"displayStrategyNormal", device.getDisplayStrategyNormal().toString(),
+				"displayStrategyUrgent", device.getDisplayStrategyUrgent().toString(),
 				"clientDeviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1)));
 	}
 

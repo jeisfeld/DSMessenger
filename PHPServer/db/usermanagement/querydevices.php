@@ -19,11 +19,13 @@ $deviceId = null;
 $deviceName = null;
 $token = null;
 $muted = null;
-$stmt = $conn->prepare("SELECT id, name, token, muted FROM dsm_device WHERE user_id = ?");
+$displayStrategyNormal = null;
+$displayStrategyUrgent = null;
+$stmt = $conn->prepare("SELECT id, name, token, muted, displaystrategy_normal, displaystrategy_urgent FROM dsm_device WHERE user_id = ?");
 
 $stmt->bind_param("i", $userid);
 $stmt->execute();
-$stmt->bind_result($deviceId, $deviceName, $token, $muted);
+$stmt->bind_result($deviceId, $deviceName, $token, $muted, $displayStrategyNormal, $displayStrategyUrgent);
 
 $devices = array();
 while ($stmt->fetch()) {
@@ -31,6 +33,8 @@ while ($stmt->fetch()) {
         'deviceId' => $deviceId,
         'deviceName' => $deviceName,
         'muted' => $muted ? true : false,
+        'displayStrategyNormal' => $displayStrategyNormal,
+        'displayStrategyUrgent' => $displayStrategyUrgent,
         'isClient' => $clientToken === $token ? true : false
     ];
 }

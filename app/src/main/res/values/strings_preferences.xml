@@ -10,12 +10,15 @@
     <string name="key_pref_dummy_battery_optimizations" translatable="false">pref_dummy_setting_battery_optimizations</string>
     <string name="key_pref_use_test_server" translatable="false">pref_use_test_server</string>
 
-    <!-- Keys for my account -->
+    <!-- Keys for my account and device -->
     <string name="key_pref_username" translatable="false">pref_username</string>
     <string name="key_pref_password" translatable="false">pref_password</string>
-    <string name="key_pref_device_id" translatable="false">pref_device_id</string>
     <string name="key_pref_messaging_token" translatable="false">pref_messaging_token</string>
-
+    <string name="key_pref_device_id" translatable="false">pref_device_id</string>
+    <string name="key_pref_device_name" translatable="false">pref_device_name</string>
+    <string name="key_pref_device_muted" translatable="false">pref_device_muted</string>
+    <string name="key_pref_device_display_strategy_normal" translatable="false">pref_device_display_strategy_normal</string>
+    <string name="key_pref_device_display_strategy_urgent" translatable="false">pref_device_display_strategy_urgent</string>
 
     <!-- Titles and defaults of preferences -->
     <string name="pref_title_language">Language</string>

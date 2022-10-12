@@ -37,8 +37,8 @@ $stmt->bind_param("ss", $username, $hashedpassword);
 if ($stmt->execute()) {
     $token = @$_POST['token'];
     $userId = verifyCredentials($conn, $username, $password);
-    
-    if (!$userId) {
+
+    if (! $userId) {
         printError(102, "Failed to retrieve userId");
     }
     if ($token) {
@@ -54,17 +54,26 @@ if ($stmt->execute()) {
         $stmt->close();
     }
     $deviceId = null;
-    $stmt = $conn->prepare("SELECT id FROM dsm_device WHERE user_id=? AND NAME='Device 1'");
+    $displayStrategyNormal = null;
+    $displayStrategyUrgent = null;
+    $stmt = $conn->prepare("SELECT id, displaystrategy_normal, displaystrategy_urgent FROM dsm_device WHERE user_id=? AND NAME='Device 1'");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
-    $stmt->bind_result($deviceId);
+    $stmt->bind_result($deviceId, $displayStrategyNormal, $displayStrategyUrgent);
     $stmt->fetch();
     $stmt->close();
-    if (!$deviceId) {
+    if (! $deviceId) {
         printError(102, "Failed to retrieve deviceId");
     }
-    
-    printSuccess("User " . $username . " successfully created.", ['userId' => $userId, 'deviceId' => $deviceId]);
+
+    printSuccess("User " . $username . " successfully created.", [
+        'userId' => $userId,
+        'deviceId' => $deviceId,
+        'deviceName' => 'Device 1',
+        'muted' => false,
+        'displayStrategyNormal' => $displayStrategyNormal,
+        'displayStrategyUrgent' => $displayStrategyUrgent
+    ]);
 }
 else {
     $stmt->close();
