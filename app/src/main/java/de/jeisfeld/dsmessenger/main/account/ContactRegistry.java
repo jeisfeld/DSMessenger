@@ -151,7 +151,7 @@ public final class ContactRegistry {
 	 * @param runnable Code to be executed after finishing the refresh.
 	 */
 	public void refreshContacts(final Context context, final Runnable runnable) {
-		if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) == null) {
+		if (!AccountFragment.isLoggedIn()) {
 			return;
 		}
 		new Thread(() -> new HttpSender(context).sendMessage("db/usermanagement/querycontacts.php", (response, responseData) -> {

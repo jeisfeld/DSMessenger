@@ -106,6 +106,15 @@ public class AccountFragment extends Fragment {
 	}
 
 	/**
+	 * Check if user is logged in.
+	 *
+	 * @return true if logged in.
+	 */
+	public static boolean isLoggedIn() {
+		return PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1) >= 0;
+	}
+
+	/**
 	 * Remove the stored device information.
 	 */
 	public static void removeStoredDeviceInfo() {
@@ -223,7 +232,9 @@ public class AccountFragment extends Fragment {
 			addContactToView(contact);
 		}
 
-		displaySingleDeviceInfo(Device.getThisDevice());
+		if (isLoggedIn()) {
+			displaySingleDeviceInfo(Device.getThisDevice());
+		}
 		updateDeviceInfo();
 
 		return binding.getRoot();
@@ -294,7 +305,7 @@ public class AccountFragment extends Fragment {
 	 * Update the device information from the DB.
 	 */
 	private void updateDeviceInfo() {
-		if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) == null) {
+		if (!isLoggedIn()) {
 			Activity activity = getActivity();
 			if (activity != null) {
 				binding.layoutMyDevices.setVisibility(View.GONE);

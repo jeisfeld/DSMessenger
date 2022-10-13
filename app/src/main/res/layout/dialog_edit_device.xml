@@ -20,23 +20,42 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/layoutDeviceName"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextDeviceName"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/input_row_height"
                     android:hint="@string/text_device_name"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:padding="0dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_large"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginBottom="@dimen/margin_small"
                 android:text="@string/text_message_display_urgent"
                 android:textSize="@dimen/text_large" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <AutoCompleteTextView
+                    android:id="@+id/dropdownMessageDisplayTypeUrgent"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_row_height_small"
+                    android:hint="@string/text_message_display_type"
+                    android:inputType="none"
+                    android:padding="0dp"
+                    android:textSize="@dimen/text_normal" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -100,8 +119,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_small"
+                android:layout_marginBottom="@dimen/margin_small"
                 android:text="@string/text_message_display_normal"
                 android:textSize="@dimen/text_large" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <AutoCompleteTextView
+                    android:id="@+id/dropdownMessageDisplayTypeNormal"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_row_height_small"
+                    android:hint="@string/text_message_display_type"
+                    android:inputType="none"
+                    android:padding="0dp"
+                    android:textSize="@dimen/text_normal" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -171,7 +207,7 @@
             android:layout_marginBottom="@dimen/margin_small"
             android:layout_weight="@integer/selector_input_width"
             android:gravity="center_vertical|start"
-            android:minHeight="@dimen/input_row_height"
+            android:minHeight="@dimen/input_row_height_small"
             android:textColor="@android:color/holo_red_dark"
             android:textSize="@dimen/text_normal"
             android:visibility="invisible"

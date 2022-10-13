@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -22,6 +23,7 @@ import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
 import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy;
+import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy.MessageDisplayType;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -624,23 +626,6 @@ public final class AccountDialogUtil {
 	}
 
 	/**
-	 * Get vibration pattern id from its name.
-	 *
-	 * @param context The context
-	 * @param name    The vibration pattern name
-	 * @return The vibration pattern id
-	 */
-	private static int getVibrationPattern(Context context, String name) {
-		String[] vibrationPatterns = context.getResources().getStringArray(R.array.array_vibrate_pattern_names);
-		for (int i = 0; i < vibrationPatterns.length; i++) {
-			if (vibrationPatterns[i].equals(name)) {
-				return i;
-			}
-		}
-		return 0;
-	}
-
-	/**
 	 * Fragment to edit device dialog.
 	 */
 	public static class EditDeviceDialogFragment extends DialogFragment {
@@ -669,6 +654,24 @@ public final class AccountDialogUtil {
 			binding.textViewErrorMessage.setText(message);
 		}
 
+		/**
+		 * Get selected dropdown id.
+		 *
+		 * @param context       The context.
+		 * @param view          The view.
+		 * @param arrayResource The array resource with the dropdown values.
+		 * @return The dropdown id
+		 */
+		private static int getDropdownSelection(Context context, AutoCompleteTextView view, int arrayResource) {
+			String[] values = context.getResources().getStringArray(arrayResource);
+			for (int i = 0; i < values.length; i++) {
+				if (values[i].equals(view.getText().toString())) {
+					return i;
+				}
+			}
+			return 0;
+		}
+
 		@NonNull
 		@Override
 		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
@@ -684,26 +687,28 @@ public final class AccountDialogUtil {
 
 			String[] vibrationPatterns = getResources().getStringArray(R.array.array_vibrate_pattern_names);
 
+			prepareDropdown(getContext(), binding.dropdownMessageDisplayTypeNormal, R.array.array_message_display_types,
+					device.displayStrategyNormal.getMessageDisplayType().ordinal());
 			binding.checkboxVibrateNormal.setChecked(device.displayStrategyNormal.isVibrate());
 			binding.checkboxRepeatVibrationNormal.setChecked(device.displayStrategyNormal.isVibrationRepeated());
 			binding.checkboxRepeatVibrationNormal.setVisibility(device.displayStrategyNormal.isVibrate() ? View.VISIBLE : View.GONE);
 			binding.checkboxDisplayOnLockScreenNormal.setChecked(device.displayStrategyNormal.isDisplayOnLockScreen());
 			binding.checkboxKeepScreenOnNormal.setChecked(device.displayStrategyNormal.isKeepScreenOn());
 			binding.checkboxLockMessageNormal.setChecked(device.displayStrategyNormal.isLockMessage());
-			ArrayAdapter<String> dataAdapterNormal = new ArrayAdapter<>(getContext(), R.layout.spinner_item, vibrationPatterns);
-			binding.dropdownVibrationStyleNormal.setAdapter(dataAdapterNormal);
-			binding.dropdownVibrationStyleNormal.setText(vibrationPatterns[device.displayStrategyNormal.getVibrationPattern()], false);
+			prepareDropdown(getContext(), binding.dropdownVibrationStyleNormal, R.array.array_vibrate_pattern_names,
+					device.displayStrategyNormal.getVibrationPattern());
 			binding.layoutVibrationStyleNormal.setVisibility(device.displayStrategyNormal.isVibrate() ? View.VISIBLE : View.GONE);
 
+			prepareDropdown(getContext(), binding.dropdownMessageDisplayTypeUrgent, R.array.array_message_display_types,
+					device.displayStrategyUrgent.getMessageDisplayType().ordinal());
 			binding.checkboxVibrateUrgent.setChecked(device.displayStrategyUrgent.isVibrate());
 			binding.checkboxRepeatVibrationUrgent.setChecked(device.displayStrategyUrgent.isVibrationRepeated());
 			binding.checkboxRepeatVibrationUrgent.setVisibility(device.displayStrategyUrgent.isVibrate() ? View.VISIBLE : View.GONE);
 			binding.checkboxDisplayOnLockScreenUrgent.setChecked(device.displayStrategyUrgent.isDisplayOnLockScreen());
 			binding.checkboxKeepScreenOnUrgent.setChecked(device.displayStrategyUrgent.isKeepScreenOn());
 			binding.checkboxLockMessageUrgent.setChecked(device.displayStrategyUrgent.isLockMessage());
-			ArrayAdapter<String> dataAdapterUrgent = new ArrayAdapter<>(getContext(), R.layout.spinner_item, vibrationPatterns);
-			binding.dropdownVibrationStyleUrgent.setAdapter(dataAdapterUrgent);
-			binding.dropdownVibrationStyleUrgent.setText(vibrationPatterns[device.displayStrategyUrgent.getVibrationPattern()], false);
+			prepareDropdown(getContext(), binding.dropdownVibrationStyleUrgent, R.array.array_vibrate_pattern_names,
+					device.displayStrategyUrgent.getVibrationPattern());
 			binding.layoutVibrationStyleUrgent.setVisibility(device.displayStrategyUrgent.isVibrate() ? View.VISIBLE : View.GONE);
 
 			binding.checkboxVibrateNormal.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -725,19 +730,38 @@ public final class AccountDialogUtil {
 				}
 				String deviceName = binding.editTextDeviceName.getText().toString().trim();
 				Device newDevice = new Device(device.getId(), deviceName, device.muted,
-						new MessageDisplayStrategy(binding.checkboxDisplayOnLockScreenNormal.isChecked(), binding.checkboxVibrateNormal.isChecked(),
+						new MessageDisplayStrategy(MessageDisplayType.fromOrdinal(
+								getDropdownSelection(getContext(), binding.dropdownMessageDisplayTypeNormal, R.array.array_message_display_types)),
+								binding.checkboxDisplayOnLockScreenNormal.isChecked(), binding.checkboxVibrateNormal.isChecked(),
 								binding.checkboxRepeatVibrationNormal.isChecked(),
-								getVibrationPattern(getContext(), binding.dropdownVibrationStyleNormal.getText().toString()),
+								getDropdownSelection(getContext(), binding.dropdownVibrationStyleNormal, R.array.array_vibrate_pattern_names),
 								binding.checkboxKeepScreenOnNormal.isChecked(), binding.checkboxLockMessageNormal.isChecked()),
-						new MessageDisplayStrategy(binding.checkboxDisplayOnLockScreenUrgent.isChecked(), binding.checkboxVibrateUrgent.isChecked(),
+						new MessageDisplayStrategy(MessageDisplayType.fromOrdinal(
+								getDropdownSelection(getContext(), binding.dropdownMessageDisplayTypeUrgent, R.array.array_message_display_types)),
+								binding.checkboxDisplayOnLockScreenUrgent.isChecked(), binding.checkboxVibrateUrgent.isChecked(),
 								binding.checkboxRepeatVibrationUrgent.isChecked(),
-								getVibrationPattern(getContext(), binding.dropdownVibrationStyleUrgent.getText().toString()),
+								getDropdownSelection(getContext(), binding.dropdownVibrationStyleUrgent, R.array.array_vibrate_pattern_names),
 								binding.checkboxKeepScreenOnUrgent.isChecked(), binding.checkboxLockMessageUrgent.isChecked()),
 						device.isThis());
 				((AccountFragment) requireParentFragment()).handleEditDeviceDialogResponse(this, newDevice);
 			});
 
 			return builder.create();
+		}
+
+		/**
+		 * Prepare a dropdown displayed via AutoCompleteTextView.
+		 *
+		 * @param context       The context.
+		 * @param view          The view.
+		 * @param arrayResource The array resource with the dropdown values.
+		 * @param initialValue  The initial value to be displayed.
+		 */
+		private void prepareDropdown(Context context, AutoCompleteTextView view, int arrayResource, int initialValue) {
+			String[] values = context.getResources().getStringArray(arrayResource);
+			ArrayAdapter<String> dataAdapterUrgent = new ArrayAdapter<>(context, R.layout.spinner_item, values);
+			view.setAdapter(dataAdapterUrgent);
+			view.setText(values[initialValue], false);
 		}
 	}
 }

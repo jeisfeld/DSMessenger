@@ -8,9 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -20,6 +18,9 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.databinding.DialogConfirmationBinding;
+import de.jeisfeld.dsmessenger.databinding.DialogInfoBinding;
+import de.jeisfeld.dsmessenger.databinding.DialogInputBinding;
 import de.jeisfeld.dsmessenger.util.DialogUtil.ConfirmDialogFragment.ConfirmDialogListener;
 import de.jeisfeld.dsmessenger.util.DialogUtil.RequestInputDialogFragment.RequestInputDialogListener;
 
@@ -208,13 +209,13 @@ public final class DialogUtil {
 			final int confirmButtonResource = getArguments().getInt(PARAM_CONFIRM_BUTTON_RESOURCE);
 			final int titleResource = getArguments().getInt(PARAM_TITLE_RESOURCE);
 
-			View view = getLayoutInflater().inflate(R.layout.dialog_info, null);
-			((TextView) view.findViewById(R.id.textViewInfoMessage)).setText(message);
+			DialogInfoBinding binding = DialogInfoBinding.inflate(getLayoutInflater());
+			binding.textViewInfoMessage.setText(message);
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setTitle(titleResource) //
 					.setIcon(R.drawable.ic_info) //
-					.setView(view) //
+					.setView(binding.getRoot()) //
 					.setPositiveButton(confirmButtonResource, (dialog, id) -> {
 						// do nothing
 					});
@@ -250,8 +251,8 @@ public final class DialogUtil {
 			final int confirmButtonResource = getArguments().getInt(PARAM_CONFIRM_BUTTON_RESOURCE);
 			final int titleResource = getArguments().getInt(PARAM_TITLE_RESOURCE);
 
-			View view = getLayoutInflater().inflate(R.layout.dialog_confirmation, null);
-			((TextView) view.findViewById(R.id.textViewConfirmationMessage)).setText(message);
+			DialogConfirmationBinding binding = DialogConfirmationBinding.inflate(getLayoutInflater());
+			binding.textViewConfirmationMessage.setText(message);
 
 			// Listeners cannot retain functionality when automatically recreated.
 			// Therefore, dialogs with listeners must be re-created by the activity on orientation change.
@@ -267,7 +268,7 @@ public final class DialogUtil {
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setTitle(titleResource) //
 					.setIcon(R.drawable.ic_warning) //
-					.setView(view) //
+					.setView(binding.getRoot()) //
 					.setPositiveButton(confirmButtonResource, (dialog, id) -> {
 						// Send the negative button event back to the host activity
 						if (mListener != null) {
@@ -349,12 +350,12 @@ public final class DialogUtil {
 		@Override
 		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
 			assert getArguments() != null;
-			View view = getLayoutInflater().inflate(R.layout.dialog_input, null);
-			final EditText input = view.findViewById(R.id.editTextDialog);
+			DialogInputBinding binding = DialogInputBinding.inflate(getLayoutInflater());
+			final EditText input = binding.editTextDialog;
 			input.setText(getArguments().getString(PARAM_TEXT_VALUE));
 			input.setInputType(getArguments().getInt(PARAM_INPUT_TYPE));
 
-			((TextView) view.findViewById(R.id.textViewInputDialog)).setText(getArguments().getCharSequence(PARAM_MESSAGE));
+			binding.textViewInputDialog.setText(getArguments().getCharSequence(PARAM_MESSAGE));
 
 			// Listeners cannot retain functionality when automatically recreated.
 			// Therefore, dialogs with listeners must be re-created by the activity on orientation change.
@@ -369,7 +370,7 @@ public final class DialogUtil {
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 			builder.setTitle(getArguments().getInt(PARAM_TITLE_RESOURCE)) //
-					.setView(view) //
+					.setView(binding.getRoot()) //
 					.setNegativeButton(R.string.button_cancel, (dialog, id) -> {
 						// Send the positive button event back to the host activity
 						if (mListener != null) {

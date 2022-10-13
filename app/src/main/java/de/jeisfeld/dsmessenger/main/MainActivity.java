@@ -20,6 +20,7 @@ import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMainBinding;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil;
+import de.jeisfeld.dsmessenger.main.account.AccountFragment;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.service.FirebaseDsMessagingService;
 import de.jeisfeld.dsmessenger.util.DialogUtil;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 	 * @return true if logged in and connected.
 	 */
 	private boolean isConnected() {
-		return PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) != null
+		return AccountFragment.isLoggedIn()
 				&& ContactRegistry.getInstance().getConnectedContacts().size() > 0;
 	}
 
@@ -138,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 			if (uri != null && "/dsmessenger/connect".equals(uri.getPath())) {
 				String connectionCode = uri.getQueryParameter("code");
 				if (connectionCode != null && connectionCode.length() == 24) {
-					if (PreferenceUtil.getSharedPreferenceString(R.string.key_pref_username) == null) {
+					if (!AccountFragment.isLoggedIn()) {
 						DialogUtil.displayInfoMessage(this, R.string.title_dialog_info, R.string.button_ok, R.string.dialog_login_before_connect);
 					}
 					else {

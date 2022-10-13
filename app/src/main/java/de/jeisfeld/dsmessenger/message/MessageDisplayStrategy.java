@@ -7,6 +7,10 @@ import androidx.annotation.NonNull;
  */
 public class MessageDisplayStrategy {
 	/**
+	 * The message display type.
+	 */
+	private final MessageDisplayType messageDisplayType;
+	/**
 	 * Flag indicating if the message should be displayed on top of lock screen.
 	 */
 	private final boolean displayOnLockScreen;
@@ -34,6 +38,7 @@ public class MessageDisplayStrategy {
 	/**
 	 * Generate message details.
 	 *
+	 * @param messageDisplayType  The message type.
 	 * @param displayOnLockScreen The display on lock screen flag.
 	 * @param vibrate             The vibration flag.
 	 * @param vibrationRepeated   The vibration repetition flag.
@@ -41,8 +46,10 @@ public class MessageDisplayStrategy {
 	 * @param keepScreenOn        The Keep screen on flag.
 	 * @param lockMessage         The lock message flag.
 	 */
-	public MessageDisplayStrategy(final boolean displayOnLockScreen, final boolean vibrate, final boolean vibrationRepeated, final int vibrationPattern,
+	public MessageDisplayStrategy(final MessageDisplayType messageDisplayType, final boolean displayOnLockScreen, final boolean vibrate,
+								  final boolean vibrationRepeated, final int vibrationPattern,
 								  final boolean keepScreenOn, final boolean lockMessage) {
+		this.messageDisplayType = messageDisplayType;
 		this.displayOnLockScreen = displayOnLockScreen;
 		this.vibrate = vibrate;
 		this.vibrationRepeated = vibrationRepeated;
@@ -58,13 +65,14 @@ public class MessageDisplayStrategy {
 	 * @return The message display strategy.
 	 */
 	public static MessageDisplayStrategy fromString(final String strategy) {
-		boolean displayOnLockScreen = charToBoolean(strategy.charAt(0));
-		boolean keepScreenOn = charToBoolean(strategy.charAt(1));
-		boolean lockMessage = charToBoolean(strategy.charAt(2));
-		boolean vibrate = charToBoolean(strategy.charAt(3));
-		boolean vibrationRequired = charToBoolean(strategy.charAt(4));
-		int vibrationPattern = Integer.parseInt(Character.toString(strategy.charAt(5)));
-		return new MessageDisplayStrategy(displayOnLockScreen, vibrate, vibrationRequired, vibrationPattern, keepScreenOn, lockMessage);
+		MessageDisplayType messageDisplayType = MessageDisplayType.fromOrdinal(Integer.parseInt(Character.toString(strategy.charAt(0))));
+		boolean displayOnLockScreen = charToBoolean(strategy.charAt(1));
+		boolean keepScreenOn = charToBoolean(strategy.charAt(2));
+		boolean lockMessage = charToBoolean(strategy.charAt(3));
+		boolean vibrate = charToBoolean(strategy.charAt(4));
+		boolean vibrationRequired = charToBoolean(strategy.charAt(5));
+		int vibrationPattern = Integer.parseInt(Character.toString(strategy.charAt(6)));
+		return new MessageDisplayStrategy(messageDisplayType, displayOnLockScreen, vibrate, vibrationRequired, vibrationPattern, keepScreenOn, lockMessage);
 	}
 
 	/**
@@ -95,7 +103,8 @@ public class MessageDisplayStrategy {
 	@NonNull
 	@Override
 	public String toString() {
-		return String.valueOf(booleanToChar(isDisplayOnLockScreen())) +
+		return getMessageDisplayType().ordinal() +
+				String.valueOf(booleanToChar(isDisplayOnLockScreen())) +
 				booleanToChar(isKeepScreenOn()) +
 				booleanToChar(isLockMessage()) +
 				booleanToChar(isVibrate()) +
@@ -127,4 +136,36 @@ public class MessageDisplayStrategy {
 		return keepScreenOn;
 	}
 
+	public final MessageDisplayType getMessageDisplayType() {
+		return messageDisplayType;
+	}
+
+	/**
+	 * The type of message display.
+	 */
+	public enum MessageDisplayType {
+		/**
+		 * Full screen action popup.
+		 */
+		ACTION,
+		/**
+		 * A notification.
+		 */
+		NOTIFICATION;
+
+		/**
+		 * Get a messageType from its ordinal value.
+		 *
+		 * @param ordinal The ordinal value.
+		 * @return The message type.
+		 */
+		public static MessageDisplayType fromOrdinal(int ordinal) {
+			for (MessageDisplayType messageDisplayType : values()) {
+				if (messageDisplayType.ordinal() == ordinal) {
+					return messageDisplayType;
+				}
+			}
+			return ACTION;
+		}
+	}
 }

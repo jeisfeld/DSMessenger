@@ -23,8 +23,8 @@ user_id INT(8) UNSIGNED NOT NULL,
 name VARCHAR(30) NOT NULL,
 token VARCHAR(200),
 muted BOOLEAN DEFAULT false,
-displaystrategy_normal VARCHAR(50) DEFAULT '000000',
-displaystrategy_urgent VARCHAR(50) DEFAULT '100100',
+displaystrategy_normal VARCHAR(50) DEFAULT '0000000',
+displaystrategy_urgent VARCHAR(50) DEFAULT '0100100',
 FOREIGN KEY (user_id) REFERENCES dsm_user(id) ON DELETE CASCADE,
 CONSTRAINT unique_devicename UNIQUE(user_id, name)
 )";
