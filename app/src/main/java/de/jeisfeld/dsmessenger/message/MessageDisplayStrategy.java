@@ -1,11 +1,19 @@
 package de.jeisfeld.dsmessenger.message;
 
+import java.io.Serializable;
+
 import androidx.annotation.NonNull;
 
 /**
  * The strategy how to display a message.
  */
-public class MessageDisplayStrategy {
+public class MessageDisplayStrategy implements Serializable {
+	/**
+	 * Dummy display strategy to be used if not logged in.
+	 */
+	public static final MessageDisplayStrategy DUMMY_DISPLAY_STRATEGY = new MessageDisplayStrategy(MessageDisplayType.NOTIFICATION,
+			false, false, false, 0, false, false);
+
 	/**
 	 * The message display type.
 	 */
@@ -59,7 +67,7 @@ public class MessageDisplayStrategy {
 	}
 
 	/**
-	 * Extract message display strategy from String
+	 * Extract message display strategy from String.
 	 *
 	 * @param strategy The strategy as String
 	 * @return The message display strategy.
@@ -68,11 +76,12 @@ public class MessageDisplayStrategy {
 		MessageDisplayType messageDisplayType = MessageDisplayType.fromOrdinal(Integer.parseInt(Character.toString(strategy.charAt(0))));
 		boolean displayOnLockScreen = charToBoolean(strategy.charAt(1));
 		boolean keepScreenOn = charToBoolean(strategy.charAt(2));
-		boolean lockMessage = charToBoolean(strategy.charAt(3));
-		boolean vibrate = charToBoolean(strategy.charAt(4));
-		boolean vibrationRequired = charToBoolean(strategy.charAt(5));
-		int vibrationPattern = Integer.parseInt(Character.toString(strategy.charAt(6)));
-		return new MessageDisplayStrategy(messageDisplayType, displayOnLockScreen, vibrate, vibrationRequired, vibrationPattern, keepScreenOn, lockMessage);
+		boolean lockMessage = charToBoolean(strategy.charAt(3)); // MAGIC_NUMBER
+		boolean vibrate = charToBoolean(strategy.charAt(4)); // MAGIC_NUMBER
+		boolean vibrationRequired = charToBoolean(strategy.charAt(5)); // MAGIC_NUMBER
+		int vibrationPattern = Integer.parseInt(Character.toString(strategy.charAt(6))); // MAGIC_NUMBER
+		return new MessageDisplayStrategy(messageDisplayType, displayOnLockScreen, vibrate, vibrationRequired, vibrationPattern, keepScreenOn,
+				lockMessage);
 	}
 
 	/**
@@ -81,7 +90,7 @@ public class MessageDisplayStrategy {
 	 * @param b The boolean
 	 * @return The char representation
 	 */
-	private static char booleanToChar(boolean b) {
+	private static char booleanToChar(final boolean b) {
 		return b ? '1' : '0';
 	}
 
@@ -91,7 +100,7 @@ public class MessageDisplayStrategy {
 	 * @param c The char representation
 	 * @return The boolean
 	 */
-	private static boolean charToBoolean(char c) {
+	private static boolean charToBoolean(final char c) {
 		return c == '1';
 	}
 
@@ -103,13 +112,13 @@ public class MessageDisplayStrategy {
 	@NonNull
 	@Override
 	public String toString() {
-		return getMessageDisplayType().ordinal() +
-				String.valueOf(booleanToChar(isDisplayOnLockScreen())) +
-				booleanToChar(isKeepScreenOn()) +
-				booleanToChar(isLockMessage()) +
-				booleanToChar(isVibrate()) +
-				booleanToChar(isVibrationRepeated()) +
-				getVibrationPattern();
+		return getMessageDisplayType().ordinal()
+				+ String.valueOf(booleanToChar(isDisplayOnLockScreen()))
+				+ booleanToChar(isKeepScreenOn())
+				+ booleanToChar(isLockMessage())
+				+ booleanToChar(isVibrate())
+				+ booleanToChar(isVibrationRepeated())
+				+ getVibrationPattern();
 	}
 
 	public final boolean isDisplayOnLockScreen() {
@@ -159,7 +168,7 @@ public class MessageDisplayStrategy {
 		 * @param ordinal The ordinal value.
 		 * @return The message type.
 		 */
-		public static MessageDisplayType fromOrdinal(int ordinal) {
+		public static MessageDisplayType fromOrdinal(final int ordinal) {
 			for (MessageDisplayType messageDisplayType : values()) {
 				if (messageDisplayType.ordinal() == ordinal) {
 					return messageDisplayType;

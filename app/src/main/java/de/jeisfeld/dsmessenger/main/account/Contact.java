@@ -112,7 +112,7 @@ public class Contact implements Serializable {
 	}
 
 	/**
-	 * Get detailed String representation
+	 * Get detailed String representation.
 	 *
 	 * @return A detailed String representation.
 	 */

@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
 			Uri uri = getIntent().getData();
 			if (uri != null && "/dsmessenger/connect".equals(uri.getPath())) {
 				String connectionCode = uri.getQueryParameter("code");
-				if (connectionCode != null && connectionCode.length() == 24) {
+				if (connectionCode != null && connectionCode.length() == 24) { // MAGIC_NUMBER
 					if (!AccountFragment.isLoggedIn()) {
 						DialogUtil.displayInfoMessage(this, R.string.title_dialog_info, R.string.button_ok, R.string.dialog_login_before_connect);
 					}

@@ -13,27 +13,27 @@ public class Device implements Serializable {
 	/**
 	 * The device id.
 	 */
-	final int id;
+	private final int id;
 	/**
 	 * The device name.
 	 */
-	final String name;
+	private final String name;
 	/**
 	 * The muted flag.
 	 */
-	final boolean muted;
+	private final boolean muted;
 	/**
 	 * The display strategy for normal messages.
 	 */
-	final MessageDisplayStrategy displayStrategyNormal;
+	private final MessageDisplayStrategy displayStrategyNormal;
 	/**
 	 * The display strategy for urgent messages.
 	 */
-	final MessageDisplayStrategy displayStrategyUrgent;
+	private final MessageDisplayStrategy displayStrategyUrgent;
 	/**
 	 * Flag indicating if this is current device.
 	 */
-	final boolean isThis;
+	private final boolean isThis;
 
 	/**
 	 * Constructor.
@@ -61,37 +61,43 @@ public class Device implements Serializable {
 	 * @return The current device information.
 	 */
 	public static Device getThisDevice() {
-		int id = PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1);
-		String name = PreferenceUtil.getSharedPreferenceString(R.string.key_pref_device_name);
-		boolean muted = PreferenceUtil.getSharedPreferenceBoolean(R.string.key_pref_device_muted);
-		MessageDisplayStrategy displayStrategyNormal = MessageDisplayStrategy.fromString(
-				PreferenceUtil.getSharedPreferenceString(R.string.key_pref_device_display_strategy_normal));
-		MessageDisplayStrategy displayStrategyUrgent = MessageDisplayStrategy.fromString(
-				PreferenceUtil.getSharedPreferenceString(R.string.key_pref_device_display_strategy_urgent));
-		return new Device(id, name, muted, displayStrategyNormal, displayStrategyUrgent, true);
+		if (AccountFragment.isLoggedIn()) {
+			int id = PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1);
+			String name = PreferenceUtil.getSharedPreferenceString(R.string.key_pref_device_name);
+			boolean muted = PreferenceUtil.getSharedPreferenceBoolean(R.string.key_pref_device_muted);
+			MessageDisplayStrategy displayStrategyNormal = MessageDisplayStrategy.fromString(
+					PreferenceUtil.getSharedPreferenceString(R.string.key_pref_device_display_strategy_normal));
+			MessageDisplayStrategy displayStrategyUrgent = MessageDisplayStrategy.fromString(
+					PreferenceUtil.getSharedPreferenceString(R.string.key_pref_device_display_strategy_urgent));
+			return new Device(id, name, muted, displayStrategyNormal, displayStrategyUrgent, true);
+		}
+		else {
+			return new Device(-1, "None", true, MessageDisplayStrategy.DUMMY_DISPLAY_STRATEGY,
+					MessageDisplayStrategy.DUMMY_DISPLAY_STRATEGY, true);
+		}
 	}
 
-	public int getId() {
+	public final int getId() {
 		return id;
 	}
 
-	public String getName() {
+	public final String getName() {
 		return name;
 	}
 
-	public boolean isMuted() {
+	public final boolean isMuted() {
 		return muted;
 	}
 
-	public MessageDisplayStrategy getDisplayStrategyNormal() {
+	public final MessageDisplayStrategy getDisplayStrategyNormal() {
 		return displayStrategyNormal;
 	}
 
-	public MessageDisplayStrategy getDisplayStrategyUrgent() {
+	public final MessageDisplayStrategy getDisplayStrategyUrgent() {
 		return displayStrategyUrgent;
 	}
 
-	public boolean isThis() {
+	public final boolean isThis() {
 		return isThis;
 	}
 }

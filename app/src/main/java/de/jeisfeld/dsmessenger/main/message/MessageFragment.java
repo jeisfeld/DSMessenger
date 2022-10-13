@@ -23,6 +23,7 @@ import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
+import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 
 /**
@@ -88,8 +89,8 @@ public class MessageFragment extends Fragment {
 	 * @param parameters The parameters.
 	 */
 	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final String... parameters) {
-		Intent intent = new Intent(BROADCAST_ACTION);
-		Bundle bundle = new Bundle();
+		final Intent intent = new Intent(BROADCAST_ACTION);
+		final Bundle bundle = new Bundle();
 		bundle.putSerializable("actionType", actionType);
 		bundle.putSerializable("messageId", messageId);
 		int i = 0;
@@ -107,18 +108,14 @@ public class MessageFragment extends Fragment {
 								   final ViewGroup container, final Bundle savedInstanceState) {
 		binding = FragmentMessageBinding.inflate(inflater, container, false);
 
-		binding.checkboxVibrate.setOnCheckedChangeListener((buttonView, isChecked) -> {
-			binding.tableRowRepeatVibration.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-			binding.tableRowVibrationPattern.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-		});
-
-		binding.buttonSend.setOnClickListener(v -> sendMessage());
+		binding.buttonSend.setOnClickListener(v -> sendMessage(MessagePriority.NORMAL));
+		binding.buttonSendWithPriority.setOnClickListener(v -> sendMessage(MessagePriority.HIGH));
 
 		return binding.getRoot();
 	}
 
 	@Override
-	public void onResume() {
+	public final void onResume() {
 		super.onResume();
 		List<Contact> contactList = ContactRegistry.getInstance().getConnectedContacts();
 
@@ -165,15 +162,11 @@ public class MessageFragment extends Fragment {
 
 	/**
 	 * Send the message.
+	 *
+	 * @param priority The message priority.
 	 */
-	private void sendMessage() {
+	private void sendMessage(final MessagePriority priority) {
 		String messageText = binding.editTextMessageText.getText().toString();
-		boolean vibrate = binding.checkboxVibrate.isChecked();
-		boolean repeatVibration = vibrate && binding.checkboxRepeatVibration.isChecked();
-		int vibrationPattern = binding.spinnerVibrationPattern.getSelectedItemPosition();
-		boolean displayOnLockScreen = binding.checkboxDisplayOnLockScreen.isChecked();
-		boolean lockMessage = binding.checkboxLockMessage.isChecked();
-		boolean keepScreenOn = binding.checkboxKeepScreenOn.isChecked();
 		Contact contact = (Contact) binding.spinnerContact.getSelectedItem();
 		UUID messageId = UUID.randomUUID();
 		lastMessageId = messageId;
@@ -192,10 +185,7 @@ public class MessageFragment extends Fragment {
 						});
 					}
 				},
-				"messageType", MessageType.TEXT.name(), "messageText", messageText, "vibrate", Boolean.toString(vibrate),
-				"vibrationRepeated", Boolean.toString(repeatVibration), "vibrationPattern", Integer.toString(vibrationPattern),
-				"displayOnLockScreen", Boolean.toString(displayOnLockScreen), "lockMessage", Boolean.toString(lockMessage),
-				"keepScreenOn", Boolean.toString(keepScreenOn));
+				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name());
 	}
 
 	/**

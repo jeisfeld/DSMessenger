@@ -95,8 +95,8 @@ public class MessageActivity extends AppCompatActivity {
 	 * @param parameters The parameters.
 	 */
 	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final String... parameters) {
-		Intent intent = new Intent(BROADCAST_ACTION);
-		Bundle bundle = new Bundle();
+		final Intent intent = new Intent(BROADCAST_ACTION);
+		final Bundle bundle = new Bundle();
 		bundle.putSerializable("actionType", actionType);
 		bundle.putSerializable("messageId", messageId);
 		int i = 0;
@@ -152,13 +152,13 @@ public class MessageActivity extends AppCompatActivity {
 	}
 
 	@Override
-	protected void onDestroy() {
+	protected final void onDestroy() {
 		super.onDestroy();
 		broadcastManager.unregisterReceiver(localBroadcastReceiver);
 	}
 
 	@Override
-	protected void onStop() {
+	protected final void onStop() {
 		super.onStop();
 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
@@ -200,19 +200,20 @@ public class MessageActivity extends AppCompatActivity {
 		binding.textviewMessage.setText(messageText);
 
 		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
+		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
 		MessageActivity.currentTopContact = textMessageDetails.getContact();
 
-		if (textMessageDetails.isVibrate()) {
+		if (displayStrategy.isVibrate()) {
 			messageVibration = new MessageVibration(this);
-			messageVibration.vibrate(textMessageDetails);
+			messageVibration.vibrate(displayStrategy);
 		}
-		if (textMessageDetails.isDisplayOnLockScreen()) {
+		if (displayStrategy.isDisplayOnLockScreen()) {
 			displayOnLockScreen(true);
 		}
-		if (textMessageDetails.isLockMessage()) {
+		if (displayStrategy.isLockMessage()) {
 			startLockTask();
 		}
-		if (textMessageDetails.isKeepScreenOn()) {
+		if (displayStrategy.isKeepScreenOn()) {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
 
@@ -232,22 +233,23 @@ public class MessageActivity extends AppCompatActivity {
 	}
 
 	/**
-	 * Cancel the effects of the last text message
+	 * Cancel the effects of the last text message.
 	 */
 	private void cancelLastIntentEffects() {
 		if (lastTextMessageDetails != null) {
-			if (lastTextMessageDetails.isVibrate()) {
+			MessageDisplayStrategy lastDisplayStrategy = lastTextMessageDetails.getDisplayStrategy();
+			if (lastDisplayStrategy.isVibrate()) {
 				if (messageVibration != null) {
 					messageVibration.cancelVibration();
 				}
 			}
-			if (lastTextMessageDetails.isDisplayOnLockScreen()) {
+			if (lastDisplayStrategy.isDisplayOnLockScreen()) {
 				displayOnLockScreen(false);
 			}
-			if (lastTextMessageDetails.isLockMessage()) {
+			if (lastDisplayStrategy.isLockMessage()) {
 				stopLockTask();
 			}
-			if (lastTextMessageDetails.isKeepScreenOn()) {
+			if (lastDisplayStrategy.isKeepScreenOn()) {
 				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			}
 		}
@@ -258,8 +260,9 @@ public class MessageActivity extends AppCompatActivity {
 	 *
 	 * @param adminType The type of confirmation.
 	 * @param messageId The messageId.
+	 * @param contact   The contact.
 	 */
-	private void sendConfirmation(AdminType adminType, UUID messageId, Contact contact) {
+	private void sendConfirmation(final AdminType adminType, final UUID messageId, final Contact contact) {
 		new HttpSender(this).sendMessage(contact, messageId, null,
 				"messageType", MessageType.ADMIN.name(), "adminType", adminType.name());
 	}
@@ -269,7 +272,7 @@ public class MessageActivity extends AppCompatActivity {
 	 *
 	 * @param displayOnLockScreen Flag indicating if the effect should be added or removed.
 	 */
-	private void displayOnLockScreen(boolean displayOnLockScreen) {
+	private void displayOnLockScreen(final boolean displayOnLockScreen) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
 			setTurnScreenOn(displayOnLockScreen);
 			setShowWhenLocked(displayOnLockScreen);

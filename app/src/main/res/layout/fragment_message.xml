@@ -8,13 +8,26 @@
     tools:context=".main.message.MessageFragment">
 
     <Button
+        android:id="@+id/buttonSendWithPriority"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/margin_small"
+        android:padding="0dp"
+        android:text="@string/button_send_prio"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/buttonSend"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
         android:id="@+id/buttonSend"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/button_send"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="@dimen/margin_small"
+        app:layout_constraintBottom_toBottomOf="@id/buttonSendWithPriority"
+        app:layout_constraintStart_toEndOf="@id/buttonSendWithPriority"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/buttonSendWithPriority" />
 
     <Spinner
         android:id="@+id/spinnerContact"
@@ -51,185 +64,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TableRow
-                android:id="@+id/tableRowMessageText"
-                android:layout_marginTop="@dimen/margin_medium"
-                android:layout_marginBottom="@dimen/margin_medium">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_width"
-                    android:text="@string/text_message_text"
-                    android:textSize="@dimen/text_normal" />
-
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextMessageText"
-                    android:layout_width="0dp"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_marginStart="@dimen/margin_medium"
-                    android:layout_weight="@integer/selector_input_width"
-                    android:autofillHints=""
-                    android:background="@drawable/edit_text_background"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="top"
                     android:hint="@string/hint_message_text"
                     android:inputType="textMultiLine"
                     android:minLines="@integer/messge_text_min_lines"
-                    android:padding="@dimen/margin_small"
-                    android:textSize="@dimen/text_normal"
-                    tools:ignore="RtlSymmetry" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRowVibrate"
-                android:layout_marginTop="@dimen/margin_small"
-                android:layout_marginBottom="@dimen/margin_small">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_checkbox_width"
-                    android:labelFor="@id/checkboxVibrate"
-                    android:text="@string/text_vibrate"
+                    android:padding="@dimen/margin_medium"
                     android:textSize="@dimen/text_normal" />
-
-                <CheckBox
-                    android:id="@+id/checkboxVibrate"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/input_row_height"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="@integer/selector_checkbox_width"
-                    android:text=" "
-                    android:textSize="@dimen/text_normal"
-                    tools:ignore="HardcodedText" />
-
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRowRepeatVibration"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_checkbox_width"
-                    android:labelFor="@id/checkboxRepeatVibration"
-                    android:text="@string/text_repeat_vibration"
-                    android:textSize="@dimen/text_normal" />
-
-                <CheckBox
-                    android:id="@+id/checkboxRepeatVibration"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/input_row_height"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="@integer/selector_checkbox_width"
-                    android:text=" "
-                    android:textSize="@dimen/text_normal"
-                    tools:ignore="HardcodedText" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableRowVibrationPattern"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_checkbox_width"
-                    android:text="@string/text_vibration_pattern"
-                    android:textSize="@dimen/text_normal" />
-
-                <Spinner
-                    android:id="@+id/spinnerVibrationPattern"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/input_row_height"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="@integer/selector_checkbox_width"
-                    android:entries="@array/array_vibrate_pattern_names"
-                    android:textSize="@dimen/text_normal" />
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableDisplayOnLockScreen"
-                android:layout_marginBottom="@dimen/margin_small">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_checkbox_width"
-                    android:labelFor="@id/checkboxDisplayOnLockScreen"
-                    android:text="@string/text_display_on_lock_screen"
-                    android:textSize="@dimen/text_normal" />
-
-                <CheckBox
-                    android:id="@+id/checkboxDisplayOnLockScreen"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/input_row_height"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="@integer/selector_checkbox_width"
-                    android:text=" "
-                    android:textSize="@dimen/text_normal"
-                    tools:ignore="HardcodedText" />
-
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableLockMessage"
-                android:layout_marginBottom="@dimen/margin_small">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_checkbox_width"
-                    android:labelFor="@id/checkboxLockMessage"
-                    android:text="@string/text_lock_message"
-                    android:textSize="@dimen/text_normal" />
-
-                <CheckBox
-                    android:id="@+id/checkboxLockMessage"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/input_row_height"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="@integer/selector_checkbox_width"
-                    android:text=" "
-                    android:textSize="@dimen/text_normal"
-                    tools:ignore="HardcodedText" />
-
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/tableKeepScreenOn"
-                android:layout_marginBottom="@dimen/margin_small">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical|start"
-                    android:layout_weight="@integer/selector_label_checkbox_width"
-                    android:labelFor="@id/checkboxKeepScreenOn"
-                    android:text="@string/text_keep_screen_on"
-                    android:textSize="@dimen/text_normal" />
-
-                <CheckBox
-                    android:id="@+id/checkboxKeepScreenOn"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/input_row_height"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="@integer/selector_checkbox_width"
-                    android:text=" "
-                    android:textSize="@dimen/text_normal"
-                    tools:ignore="HardcodedText" />
-
-            </TableRow>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/textMessageResponse"

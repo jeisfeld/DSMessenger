@@ -30,14 +30,15 @@ public class RandomimageMessageDetails extends MessageDetails {
 	 *
 	 * @param messageId         The message id.
 	 * @param messageTime       The message time.
+	 * @param priority          The message priority.
 	 * @param contact           The contact who sent the message.
 	 * @param randomImageOrigin the random image origin.
 	 * @param notificationName  The notification name.
 	 * @param widgetName        The widget name.
 	 */
-	public RandomimageMessageDetails(final UUID messageId, final Instant messageTime, final Contact contact,
+	public RandomimageMessageDetails(final UUID messageId, final Instant messageTime, final MessagePriority priority, final Contact contact,
 									 final RandomImageOrigin randomImageOrigin, final String notificationName, final String widgetName) {
-		super(MessageType.RANDOMIMAGE, messageId, messageTime, contact);
+		super(MessageType.RANDOMIMAGE, messageId, messageTime, priority, contact);
 		this.randomImageOrigin = randomImageOrigin;
 		this.notificationName = notificationName;
 		this.widgetName = widgetName;
@@ -59,18 +60,20 @@ public class RandomimageMessageDetails extends MessageDetails {
 	 * Extract messageDetails from remote message.
 	 *
 	 * @param message     The remote message.
-	 * @param messageTime The message time.
 	 * @param messageId   The message id.
+	 * @param messageTime The message time.
+	 * @param priority    The message priority.
 	 * @param contact     The contact.
 	 * @return The message details.
 	 */
-	public static RandomimageMessageDetails fromRemoteMessage(final RemoteMessage message, UUID messageId, Instant messageTime, Contact contact) {
+	public static RandomimageMessageDetails fromRemoteMessage(final RemoteMessage message, final UUID messageId, final Instant messageTime,
+															  final MessagePriority priority, final Contact contact) {
 		Map<String, String> data = message.getData();
 
 		RandomImageOrigin randomImageOrigin = RandomImageOrigin.fromName(data.get("randomImageOrigin"));
 		String notificationName = data.get("notificationName");
 		String widgetName = data.get("widgetName");
-		return new RandomimageMessageDetails(messageId, messageTime, contact, randomImageOrigin, notificationName, widgetName);
+		return new RandomimageMessageDetails(messageId, messageTime, priority, contact, randomImageOrigin, notificationName, widgetName);
 	}
 
 	/**

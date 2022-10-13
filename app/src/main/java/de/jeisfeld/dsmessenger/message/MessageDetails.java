@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
+import de.jeisfeld.dsmessenger.main.account.Device;
 import de.jeisfeld.dsmessenger.util.DateUtil;
 
 /**
@@ -28,6 +29,10 @@ public class MessageDetails implements Serializable {
 	 */
 	private final Instant messageTime;
 	/**
+	 * The message priority.
+	 */
+	private final MessagePriority priority;
+	/**
 	 * The contact who sent the message.
 	 */
 	private final Contact contact;
@@ -38,12 +43,15 @@ public class MessageDetails implements Serializable {
 	 * @param type        The message type.
 	 * @param messageId   The message id.
 	 * @param messageTime The message time.
+	 * @param priority    The message priority.
 	 * @param contact     The contact who sent the message.
 	 */
-	public MessageDetails(final MessageType type, final UUID messageId, final Instant messageTime, final Contact contact) {
+	public MessageDetails(final MessageType type, final UUID messageId, final Instant messageTime, final MessagePriority priority,
+						  final Contact contact) {
 		this.type = type;
 		this.messageId = messageId;
 		this.messageTime = messageTime;
+		this.priority = priority;
 		this.contact = contact;
 	}
 
@@ -55,8 +63,13 @@ public class MessageDetails implements Serializable {
 	 */
 	public static MessageDetails fromRemoteMessage(final RemoteMessage message) {
 		Map<String, String> data = message.getData();
-		MessageType messageType = MessageType.fromName(data.get("messageType"));
-		Instant messageTime = DateUtil.jsonDateToInstant(data.get("messageTime"));
+		final MessageType messageType = MessageType.fromName(data.get("messageType"));
+		final Instant messageTime = DateUtil.jsonDateToInstant(data.get("messageTime"));
+		MessagePriority priority = null;
+		String priorityString = data.get("priority");
+		if (priorityString != null) {
+			priority = MessagePriority.valueOf(priorityString);
+		}
 		UUID messageId = null;
 		String messageIdString = data.get("messageId");
 		if (messageIdString != null) {
@@ -70,15 +83,15 @@ public class MessageDetails implements Serializable {
 
 		switch (messageType) {
 		case TEXT:
-			return TextMessageDetails.fromRemoteMessage(message, messageId, messageTime, contact);
+			return TextMessageDetails.fromRemoteMessage(message, messageId, messageTime, priority, contact);
 		case RANDOMIMAGE:
-			return RandomimageMessageDetails.fromRemoteMessage(message, messageId, messageTime, contact);
+			return RandomimageMessageDetails.fromRemoteMessage(message, messageId, messageTime, priority, contact);
 		case ADMIN:
-			return AdminMessageDetails.fromRemoteMessage(message, messageId, messageTime, contact);
+			return AdminMessageDetails.fromRemoteMessage(message, messageId, messageTime, priority, contact);
 		case LUT:
 		case UNKNOWN:
 		default:
-			return new MessageDetails(MessageType.UNKNOWN, messageId, messageTime, contact);
+			return new MessageDetails(MessageType.UNKNOWN, messageId, messageTime, priority, contact);
 		}
 	}
 
@@ -86,16 +99,35 @@ public class MessageDetails implements Serializable {
 		return type;
 	}
 
-	public UUID getMessageId() {
+	public final UUID getMessageId() {
 		return messageId;
 	}
 
-	public Instant getMessageTime() {
+	public final Instant getMessageTime() {
 		return messageTime;
 	}
 
-	public Contact getContact() {
+	public final MessagePriority getPriority() {
+		return priority;
+	}
+
+	public final Contact getContact() {
 		return contact;
+	}
+
+	/**
+	 * Get the display strategy for this message.
+	 *
+	 * @return The display strategy.
+	 */
+	public MessageDisplayStrategy getDisplayStrategy() {
+		switch (getPriority()) {
+		case HIGH:
+			return Device.getThisDevice().getDisplayStrategyUrgent();
+		case NORMAL:
+		default:
+			return Device.getThisDevice().getDisplayStrategyNormal();
+		}
 	}
 
 	/**
@@ -134,5 +166,19 @@ public class MessageDetails implements Serializable {
 				return UNKNOWN;
 			}
 		}
+	}
+
+	/**
+	 * Priority of a message.
+	 */
+	public enum MessagePriority {
+		/**
+		 * Normal priority.
+		 */
+		NORMAL,
+		/**
+		 * High priority.
+		 */
+		HIGH
 	}
 }

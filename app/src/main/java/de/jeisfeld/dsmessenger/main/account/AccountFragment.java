@@ -283,7 +283,6 @@ public class AccountFragment extends Fragment {
 		}
 	}
 
-
 	/**
 	 * Clean the displayed contacts in a list.
 	 *
@@ -376,7 +375,7 @@ public class AccountFragment extends Fragment {
 	 *
 	 * @param device The device.
 	 */
-	private void displaySingleDeviceInfo(Device device) {
+	private void displaySingleDeviceInfo(final Device device) {
 		binding.layoutMyDevices.setVisibility(View.VISIBLE);
 		binding.textMyDevices.setVisibility(View.GONE);
 		// Remove device list
@@ -390,7 +389,7 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Add a device to the view, for multiple devices.
 	 *
-	 * @param device      The device to be added.
+	 * @param device The device to be added.
 	 * @param allowMuting Flag indicating if muting is allowed
 	 */
 	private void addMultiDeviceToView(final Device device, final boolean allowMuting) {
@@ -417,8 +416,8 @@ public class AccountFragment extends Fragment {
 		}
 
 		childBinding.buttonEnablement.setImageResource(device.isMuted() ? R.drawable.ic_icon_message_disabled : R.drawable.ic_icon_message_enabled);
-		childBinding.buttonEnablement.setOnClickListener(v ->
-				new HttpSender(getContext()).sendMessage("db/usermanagement/updatedevice.php", (response, responseData) -> {
+		childBinding.buttonEnablement
+				.setOnClickListener(v -> new HttpSender(getContext()).sendMessage("db/usermanagement/updatedevice.php", (response, responseData) -> {
 							if (responseData.isSuccess()) {
 								updateDeviceInfo();
 							}
@@ -477,7 +476,7 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Handle the response of create account dialog.
 	 *
-	 * @param dialog   The dialog.
+	 * @param dialog The dialog.
 	 * @param username The username.
 	 * @param password The password.
 	 */
@@ -565,7 +564,7 @@ public class AccountFragment extends Fragment {
 						if (activity != null) {
 							activity.runOnUiThread(() -> {
 								dialog.displayError(responseData.getMappedErrorMessage(getContext()));
-								if (responseData.getErrorCode() == 115) { // user is logged in on another device.
+								if (responseData.getErrorCode() == 115) { // MAGIC_NUMBER user is logged in on another device.
 									dialog.getBinding().layoutDeviceName.setVisibility(View.VISIBLE);
 								}
 							});
@@ -578,7 +577,7 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Handle the response of change password dialog.
 	 *
-	 * @param dialog      The dialog.
+	 * @param dialog The dialog.
 	 * @param newPassword The new password.
 	 */
 	protected void handleChangePasswordDialogResponse(final ChangePasswordDialogFragment dialog, final String newPassword) {
@@ -646,7 +645,7 @@ public class AccountFragment extends Fragment {
 	/**
 	 * Handle the response of edit contact dialog.
 	 *
-	 * @param dialog  The dialog.
+	 * @param dialog The dialog.
 	 * @param contact The new contact data.
 	 */
 	protected void handleEditContactDialogResponse(final EditContactDialogFragment dialog, final Contact contact) {

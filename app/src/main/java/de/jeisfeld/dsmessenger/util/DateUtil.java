@@ -5,7 +5,17 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
-public class DateUtil {
+/**
+ * Utilities for date formatting and parsing.
+ */
+public final class DateUtil {
+	/**
+	 * Hide constructor.
+	 */
+	private DateUtil() {
+		throw new UnsupportedOperationException();
+	}
+
 	/**
 	 * Formatter for JSON date.
 	 */
@@ -20,7 +30,7 @@ public class DateUtil {
 	 * @param jsonDate The JSON date.
 	 * @return The instant.
 	 */
-	public static Instant jsonDateToInstant(String jsonDate) {
+	public static Instant jsonDateToInstant(final String jsonDate) {
 		return FORMATTER.parse(jsonDate, Instant::from);
 	}
 
@@ -30,7 +40,7 @@ public class DateUtil {
 	 * @param instant The instant.
 	 * @return The JSON date.
 	 */
-	public static String instantToJsonDate(Instant instant) {
+	public static String instantToJsonDate(final Instant instant) {
 		return FORMATTER.format(instant);
 	}
 }

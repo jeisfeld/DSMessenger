@@ -51,7 +51,7 @@ public class HttpSender {
 	 *
 	 * @param context The context.
 	 */
-	public HttpSender(Context context) {
+	public HttpSender(final Context context) {
 		this.context = context;
 	}
 
@@ -135,9 +135,9 @@ public class HttpSender {
 	/**
 	 * Send a POST message to Server, including credentials.
 	 *
-	 * @param contact    The contact.
-	 * @param messageId  The messageId.
-	 * @param listener   The response listener.
+	 * @param contact The contact.
+	 * @param messageId The messageId.
+	 * @param listener The response listener.
 	 * @param parameters The POST parameters.
 	 */
 	public void sendMessage(final Contact contact, final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
@@ -147,8 +147,8 @@ public class HttpSender {
 	/**
 	 * Send a POST message to Server, including credentials.
 	 *
-	 * @param messageId  The messageId.
-	 * @param listener   The response listener.
+	 * @param messageId The messageId.
+	 * @param listener The response listener.
 	 * @param parameters The POST parameters.
 	 */
 	public void sendSelfMessage(final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
@@ -160,7 +160,7 @@ public class HttpSender {
 	 * Send a POST message to Server, including credentials but without contact.
 	 *
 	 * @param urlPostfix The postfix of the URL.
-	 * @param listener   The response listener.
+	 * @param listener The response listener.
 	 * @param parameters The POST parameters.
 	 */
 	public void sendMessage(final String urlPostfix, final OnHttpResponseListener listener, final String... parameters) {
@@ -228,7 +228,7 @@ public class HttpSender {
 		/**
 		 * Handle HTTP/HTTPS response.
 		 *
-		 * @param response     The response as String.
+		 * @param response The response as String.
 		 * @param responseData The response as data.
 		 */
 		void onHttpResponse(String response, ResponseData responseData);
@@ -265,7 +265,7 @@ public class HttpSender {
 		/**
 		 * Extract response data from server response.
 		 *
-		 * @param context  The context
+		 * @param context The context
 		 * @param response The server response.
 		 * @return The response data.
 		 */
@@ -343,7 +343,7 @@ public class HttpSender {
 			}
 			catch (Exception e) {
 				Log.e(Application.TAG, "Failed to extract response data from " + response, e);
-				return new ResponseData(false, 900, "Error parsing JSON: " + e.getMessage(), new HashMap<>());
+				return new ResponseData(false, 900, "Error parsing JSON: " + e.getMessage(), new HashMap<>()); // MAGIC_NUMBER
 			}
 		}
 
@@ -366,23 +366,23 @@ public class HttpSender {
 				return getErrorMessage();
 			}
 			switch (getErrorCode()) {
-			case 101:
+			case 101: // MAGIC_NUMBER
 				return context.getString(R.string.error_connection_failed);
-			case 105:
+			case 105: // MAGIC_NUMBER
 				return context.getString(R.string.error_invalid_credentials);
-			case 106:
+			case 106: // MAGIC_NUMBER
 				return context.getString(R.string.error_contact_not_connected);
-			case 111:
+			case 111: // MAGIC_NUMBER
 				return context.getString(R.string.error_missing_username);
-			case 112:
+			case 112: // MAGIC_NUMBER
 				return context.getString(R.string.error_password_too_short);
-			case 113:
+			case 113: // MAGIC_NUMBER
 				return context.getString(R.string.error_user_already_exists, data.get("username"));
-			case 114:
+			case 114: // MAGIC_NUMBER
 				return context.getString(R.string.error_invalid_connectioncode);
-			case 115:
+			case 115: // MAGIC_NUMBER
 				return context.getString(R.string.error_user_already_logged_in, data.get("username"));
-			case 116:
+			case 116: // MAGIC_NUMBER
 				return context.getString(R.string.error_device_already_exists, data.get("deviceName"));
 			default:
 				return getErrorMessage();

@@ -28,13 +28,14 @@ public class AdminMessageDetails extends MessageDetails {
 	 *
 	 * @param messageId   The message id.
 	 * @param messageTime The message time.
+	 * @param priority    The message priority.
 	 * @param contact     The contact who sent the message.
 	 * @param adminType   The admin type
 	 * @param data        The data
 	 */
-	public AdminMessageDetails(final UUID messageId, final Instant messageTime, final Contact contact,
+	public AdminMessageDetails(final UUID messageId, final Instant messageTime, final MessagePriority priority, final Contact contact,
 							   final AdminType adminType, final Map<String, String> data) {
-		super(MessageType.ADMIN, messageId, messageTime, contact);
+		super(MessageType.ADMIN, messageId, messageTime, priority, contact);
 		this.adminType = adminType;
 		this.data = data;
 	}
@@ -43,20 +44,22 @@ public class AdminMessageDetails extends MessageDetails {
 	 * Extract messageDetails from remote message.
 	 *
 	 * @param message     The remote message.
-	 * @param messageTime The message time.
 	 * @param messageId   The message id.
+	 * @param messageTime The message time.
+	 * @param priority    The message priority.
 	 * @param contact     The contact.
 	 * @return The message details.
 	 */
-	public static AdminMessageDetails fromRemoteMessage(final RemoteMessage message, UUID messageId, Instant messageTime, Contact contact) {
+	public static AdminMessageDetails fromRemoteMessage(final RemoteMessage message, final UUID messageId, final Instant messageTime,
+														final MessagePriority priority, final Contact contact) {
 		Map<String, String> retrievedData = message.getData();
-		AdminType adminType = AdminType.fromName(retrievedData.get("adminType"));
-		Map<String, String> data = new HashMap<>(retrievedData);
+		final AdminType adminType = AdminType.fromName(retrievedData.get("adminType"));
+		final Map<String, String> data = new HashMap<>(retrievedData);
 		data.remove("messageId");
 		data.remove("messageTime");
 		data.remove("messageType");
 		data.remove("adminType");
-		return new AdminMessageDetails(messageId, messageTime, contact, adminType, data);
+		return new AdminMessageDetails(messageId, messageTime, priority, contact, adminType, data);
 	}
 
 	public final AdminType getAdminType() {

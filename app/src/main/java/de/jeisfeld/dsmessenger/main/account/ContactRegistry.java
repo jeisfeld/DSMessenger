@@ -83,7 +83,7 @@ public final class ContactRegistry {
 	 * @param relationId The relationId.
 	 * @return The contact.
 	 */
-	public Contact getContact(int relationId) {
+	public Contact getContact(final int relationId) {
 		return contacts.get(relationId);
 	}
 
@@ -147,7 +147,7 @@ public final class ContactRegistry {
 	/**
 	 * Async query for contact information. From results, update stored contacts.
 	 *
-	 * @param context  The context.
+	 * @param context The context.
 	 * @param runnable Code to be executed after finishing the refresh.
 	 */
 	public void refreshContacts(final Context context, final Runnable runnable) {

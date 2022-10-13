@@ -20,6 +20,7 @@
     <string name="button_cancel">Cancel</string>
     <string name="button_acknowledge">Acknowledge</string>
     <string name="button_send">Send</string>
+    <string name="button_send_prio">Send with priority</string>
     <string name="button_create_account">Create account</string>
     <string name="button_login">Login</string>
     <string name="button_create_invitation">Create Invitation</string>
@@ -35,7 +36,7 @@
     <string name="text_send_message">Send Message</string>
     <string name="text_display_random_image">Display RandomImage</string>
     <string name="text_message_text">Message Text</string>
-    <string name="hint_message_text">Enter message text</string>
+    <string name="hint_message_text">Message text</string>
     <string name="text_vibrate">Vibrate</string>
     <string name="text_repeat_vibration">Repeat Vibration</string>
     <string name="text_vibration_pattern">Vibration Pattern</string>
