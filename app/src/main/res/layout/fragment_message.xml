@@ -9,6 +9,8 @@
 
     <Button
         android:id="@+id/buttonSendWithPriority"
+        style="?android:attr/buttonBarButtonStyle"
+        android:textColor="?attr/colorSecondaryVariant"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_small"
@@ -20,13 +22,14 @@
 
     <Button
         android:id="@+id/buttonSend"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/button_send"
         android:layout_marginStart="@dimen/margin_small"
+        android:text="@string/button_send"
         app:layout_constraintBottom_toBottomOf="@id/buttonSendWithPriority"
-        app:layout_constraintStart_toEndOf="@id/buttonSendWithPriority"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/buttonSendWithPriority"
         app:layout_constraintTop_toTopOf="@id/buttonSendWithPriority" />
 
     <Spinner
