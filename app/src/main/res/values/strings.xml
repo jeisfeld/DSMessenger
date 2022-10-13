@@ -34,6 +34,8 @@
     <string name="button_update_device">Update Device</string>
 
     <string name="text_send_message">Send Message</string>
+    <string name="text_send_message_to">Send Message to %1$s</string>
+    <string name="text_message_from">Message from %1$s</string>
     <string name="text_display_random_image">Display RandomImage</string>
     <string name="text_message_text">Message Text</string>
     <string name="hint_message_text">Message text</string>
@@ -65,6 +67,7 @@
     <string name="text_my_name">My Name</string>
     <string name="text_my_name_m">My Name *</string>
     <string name="text_contact_name">Contact Name *</string>
+    <string name="text_contact">Contact</string>
     <string name="text_device_name">Device Name *</string>
     <string name="text_sub">Sub</string>
     <string name="text_dom">Dom</string>

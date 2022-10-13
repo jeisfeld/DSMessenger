@@ -16,6 +16,7 @@ import java.util.UUID;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.Contact;
@@ -197,9 +198,11 @@ public class MessageActivity extends AppCompatActivity {
 	 */
 	private void handleIntentData(final Intent intent) {
 		cancelLastIntentEffects();
-		binding.textviewMessage.setText(messageText);
-
 		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
+
+		binding.textviewMessage.setText(messageText);
+		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
+
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
 		MessageActivity.currentTopContact = textMessageDetails.getContact();
 

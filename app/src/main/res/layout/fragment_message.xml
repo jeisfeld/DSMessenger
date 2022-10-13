@@ -32,34 +32,44 @@
         app:layout_constraintStart_toEndOf="@id/buttonSendWithPriority"
         app:layout_constraintTop_toTopOf="@id/buttonSendWithPriority" />
 
-    <Spinner
-        android:id="@+id/spinnerContact"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@id/textSendMessage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/textSendMessage" />
-
     <TextView
         android:id="@+id/textSendMessage"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_medium"
         android:text="@string/text_send_message"
         android:textSize="@dimen/text_xlarge"
-        app:layout_constraintEnd_toStartOf="@id/spinnerContact"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutContact"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/textSendMessage">
+
+        <AutoCompleteTextView
+            android:id="@+id/dropdownContact"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_row_height_small"
+            android:hint="@string/text_contact"
+            android:inputType="none"
+            android:padding="0dp"
+            android:textSize="@dimen/text_normal" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <ScrollView
         android:id="@+id/scrollViewSendMessage"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="@dimen/margin_small"
         app:layout_constraintBottom_toTopOf="@id/buttonSend"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textSendMessage"
+        app:layout_constraintTop_toBottomOf="@id/layoutContact"
         app:layout_constraintVertical_bias="0"
         app:layout_constraintVertical_chainStyle="spread">
 
@@ -90,7 +100,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_medium"
-                android:textColor="@android:color/holo_red_dark"
+                android:textColor="?attr/colorPrimary"
                 android:textSize="@dimen/text_normal" />
         </TableLayout>
     </ScrollView>

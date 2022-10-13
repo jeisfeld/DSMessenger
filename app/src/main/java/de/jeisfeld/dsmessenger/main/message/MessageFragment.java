@@ -9,9 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
-import java.util.List;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
@@ -25,6 +23,8 @@ import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
+import de.jeisfeld.dsmessenger.util.DropdownHandler;
+import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
  * Fragment for sending messages.
@@ -42,7 +42,6 @@ public class MessageFragment extends Fragment {
 	 * The last sent messageId.
 	 */
 	private UUID lastMessageId;
-
 	/**
 	 * The local broadcast receiver to do actions sent to this fragment.
 	 */
@@ -63,7 +62,7 @@ public class MessageFragment extends Fragment {
 				case DEVICE_LOGGED_OUT:
 					binding.scrollViewSendMessage.setVisibility(View.GONE);
 					binding.buttonSend.setVisibility(View.GONE);
-					binding.spinnerContact.setVisibility(View.GONE);
+					binding.dropdownContact.setVisibility(View.GONE);
 					Activity activity = getActivity();
 					if (activity != null) {
 						((MainActivity) activity).updateNavigationDrawer();
@@ -75,6 +74,10 @@ public class MessageFragment extends Fragment {
 			}
 		}
 	};
+	/**
+	 * Dropdown handler for the contact.
+	 */
+	DropdownHandler<Contact> dropdownHandlerContact;
 	/**
 	 * Broadcastmanager to update fragment from external.
 	 */
@@ -117,25 +120,30 @@ public class MessageFragment extends Fragment {
 	@Override
 	public final void onResume() {
 		super.onResume();
-		List<Contact> contactList = ContactRegistry.getInstance().getConnectedContacts();
+		Contact[] contacts = ContactRegistry.getInstance().getConnectedContacts().toArray(new Contact[0]);
 
-		ArrayAdapter<Contact> dataAdapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item, contactList);
-		binding.spinnerContact.setAdapter(dataAdapter);
+		dropdownHandlerContact = new DropdownHandler<>(getContext(), binding.dropdownContact, contacts);
+		int lastContact = PreferenceUtil.getSharedPreferenceInt(R.string.key_last_contact, 0);
 
-		if (contactList.size() == 0) {
+		if (contacts.length == 0) {
 			binding.scrollViewSendMessage.setVisibility(View.GONE);
 			binding.buttonSend.setVisibility(View.GONE);
-			binding.spinnerContact.setVisibility(View.GONE);
+			binding.layoutContact.setVisibility(View.GONE);
+			binding.textSendMessage.setText(R.string.text_send_message);
 		}
-		else if (contactList.size() == 1) {
+		else if (contacts.length == 1) {
 			binding.scrollViewSendMessage.setVisibility(View.VISIBLE);
 			binding.buttonSend.setVisibility(View.VISIBLE);
-			binding.spinnerContact.setVisibility(View.GONE);
+			binding.layoutContact.setVisibility(View.GONE);
+			dropdownHandlerContact.selectEntry(0);
+			binding.textSendMessage.setText(getString(R.string.text_send_message_to, contacts[0].getName()));
 		}
 		else {
 			binding.scrollViewSendMessage.setVisibility(View.VISIBLE);
 			binding.buttonSend.setVisibility(View.VISIBLE);
-			binding.spinnerContact.setVisibility(View.VISIBLE);
+			binding.layoutContact.setVisibility(View.VISIBLE);
+			dropdownHandlerContact.selectEntry(Math.min(lastContact, contacts.length));
+			binding.textSendMessage.setText(R.string.text_send_message);
 		}
 	}
 
@@ -167,10 +175,11 @@ public class MessageFragment extends Fragment {
 	 */
 	private void sendMessage(final MessagePriority priority) {
 		String messageText = binding.editTextMessageText.getText().toString();
-		Contact contact = (Contact) binding.spinnerContact.getSelectedItem();
+		Contact contact = dropdownHandlerContact.getSelectedItem();
 		UUID messageId = UUID.randomUUID();
 		lastMessageId = messageId;
 		binding.textMessageResponse.setText(R.string.text_sending_message);
+		PreferenceUtil.setSharedPreferenceInt(R.string.key_last_contact, dropdownHandlerContact.getSelectedPosition());
 
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
 					Activity activity = getActivity();

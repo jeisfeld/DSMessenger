@@ -37,6 +37,7 @@
     <string name="key_contact_is_slave" translatable="false">contact_is_slave</string>
     <string name="key_contact_connection_code" translatable="false">contact_connection_code</string>
     <string name="key_contact_status" translatable="false">contact_status</string>
+    <string name="key_last_contact" translatable="false">last_contact</string>
 
     <!-- Arrays for list preferences -->
     <string-array name="pref_list_titles_language">
