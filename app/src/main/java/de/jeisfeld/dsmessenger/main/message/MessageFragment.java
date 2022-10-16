@@ -9,10 +9,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.R;
@@ -24,6 +29,7 @@ import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 import de.jeisfeld.dsmessenger.util.DropdownHandler;
+import de.jeisfeld.dsmessenger.util.Logger;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -60,7 +66,7 @@ public class MessageFragment extends Fragment {
 					}
 					break;
 				case DEVICE_LOGGED_OUT:
-					binding.scrollViewSendMessage.setVisibility(View.GONE);
+					binding.listViewMessages.setVisibility(View.GONE);
 					binding.buttonSend.setVisibility(View.GONE);
 					binding.dropdownContact.setVisibility(View.GONE);
 					Activity activity = getActivity();
@@ -75,9 +81,17 @@ public class MessageFragment extends Fragment {
 		}
 	};
 	/**
+	 * The list of displayed messages.
+	 */
+	private final List<MessageInfo> messageList = new ArrayList<>();
+	/**
 	 * Dropdown handler for the contact.
 	 */
 	DropdownHandler<Contact> dropdownHandlerContact;
+	/**
+	 * The array adapter for the list of displayed messages.
+	 */
+	private ArrayAdapter<MessageInfo> arrayAdapter;
 	/**
 	 * Broadcastmanager to update fragment from external.
 	 */
@@ -114,6 +128,32 @@ public class MessageFragment extends Fragment {
 		binding.buttonSend.setOnClickListener(v -> sendMessage(MessagePriority.NORMAL));
 		binding.buttonSendWithPriority.setOnClickListener(v -> sendMessage(MessagePriority.HIGH));
 
+		arrayAdapter = new ArrayAdapter<MessageInfo>(requireContext(), R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
+			@NonNull
+			@Override
+			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
+				final View view = super.getView(position, convertView, parent);
+
+				MessageInfo messageInfo = messageList.get(position);
+
+				switch (messageInfo.viewType) {
+				case MESSAGE_OWN:
+					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.VISIBLE);
+					view.findViewById(R.id.textViewMessageContact).setVisibility(View.GONE);
+					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(messageInfo.getMessageText());
+					break;
+				case MESSAGE_CONTACT:
+					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.GONE);
+					view.findViewById(R.id.textViewMessageContact).setVisibility(View.VISIBLE);
+					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(messageInfo.getMessageText());
+					break;
+				}
+
+				return view;
+			}
+		};
+		binding.listViewMessages.setAdapter(arrayAdapter);
+
 		return binding.getRoot();
 	}
 
@@ -126,20 +166,20 @@ public class MessageFragment extends Fragment {
 		int lastContact = PreferenceUtil.getSharedPreferenceInt(R.string.key_last_contact, 0);
 
 		if (contacts.length == 0) {
-			binding.scrollViewSendMessage.setVisibility(View.GONE);
+			binding.listViewMessages.setVisibility(View.GONE);
 			binding.buttonSend.setVisibility(View.GONE);
 			binding.layoutContact.setVisibility(View.GONE);
 			binding.textSendMessage.setText(R.string.text_send_message);
 		}
 		else if (contacts.length == 1) {
-			binding.scrollViewSendMessage.setVisibility(View.VISIBLE);
+			binding.listViewMessages.setVisibility(View.VISIBLE);
 			binding.buttonSend.setVisibility(View.VISIBLE);
 			binding.layoutContact.setVisibility(View.GONE);
 			dropdownHandlerContact.selectEntry(0);
 			binding.textSendMessage.setText(getString(R.string.text_send_message_to, contacts[0].getName()));
 		}
 		else {
-			binding.scrollViewSendMessage.setVisibility(View.VISIBLE);
+			binding.listViewMessages.setVisibility(View.VISIBLE);
 			binding.buttonSend.setVisibility(View.VISIBLE);
 			binding.layoutContact.setVisibility(View.VISIBLE);
 			dropdownHandlerContact.selectEntry(Math.min(lastContact, contacts.length));
@@ -190,12 +230,32 @@ public class MessageFragment extends Fragment {
 							}
 							else {
 								binding.textMessageResponse.setText(R.string.text_message_sent);
+								messageList.add(new MessageInfo(binding.editTextMessageText.getText().toString(), MessageViewType.MESSAGE_OWN, MessageStatus.MESSAGE_SENT));
+								Logger.log("List size: " + messageList.size());
+								arrayAdapter.notifyDataSetChanged();
+								binding.listViewMessages.setSelection(messageList.size() - 1);
+								binding.editTextMessageText.setText("");
 							}
 						});
 					}
 				},
 				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name());
 	}
+
+	/**
+	 * The view type of a message.
+	 */
+	public enum MessageViewType {
+		/**
+		 * Message of yourself.
+		 */
+		MESSAGE_OWN,
+		/**
+		 * Message of a contact.
+		 */
+		MESSAGE_CONTACT
+	}
+
 
 	/**
 	 * Action that can be sent to this fragment.
@@ -213,5 +273,63 @@ public class MessageFragment extends Fragment {
 		 * This device has been logged out.
 		 */
 		DEVICE_LOGGED_OUT
+	}
+
+	/**
+	 * The status of a message.
+	 */
+	public enum MessageStatus {
+		/**
+		 * Sent.
+		 */
+		MESSAGE_SENT,
+		/**
+		 * Received.
+		 */
+		MESSAGE_RECEIVED,
+		/**
+		 * Acknowledged.
+		 */
+		MESSAGE_ACKNOWLEDGED
+	}
+
+	private static class MessageInfo {
+		/**
+		 * The message text.
+		 */
+		private final String messageText;
+		/**
+		 * The message view type.
+		 */
+		private final MessageViewType viewType;
+		/**
+		 * The message status.
+		 */
+		private final MessageStatus status;
+
+		/**
+		 * Constructor.
+		 *
+		 * @param messageText The message text.
+		 * @param viewType    The message view type
+		 * @param status      The message status
+		 */
+		public MessageInfo(String messageText, MessageViewType viewType, MessageStatus status) {
+			this.messageText = messageText;
+			this.viewType = viewType;
+			this.status = status;
+		}
+
+		public String getMessageText() {
+			return messageText;
+		}
+
+		public MessageViewType getViewType() {
+			return viewType;
+		}
+
+		public MessageStatus getStatus() {
+			return status;
+		}
 	}
 }

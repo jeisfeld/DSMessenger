@@ -10,12 +10,12 @@
     <Button
         android:id="@+id/buttonSendWithPriority"
         style="?android:attr/buttonBarButtonStyle"
-        android:textColor="?attr/colorSecondaryVariant"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/margin_small"
         android:padding="0dp"
         android:text="@string/button_send_prio"
+        android:textColor="?attr/colorSecondaryVariant"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/buttonSend"
         app:layout_constraintStart_toStartOf="parent" />
@@ -61,48 +61,48 @@
             android:textSize="@dimen/text_normal" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <ScrollView
-        android:id="@+id/scrollViewSendMessage"
+    <ListView
+        android:id="@+id/listViewMessages"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginBottom="@dimen/margin_small"
         android:layout_marginTop="@dimen/margin_small"
-        app:layout_constraintBottom_toTopOf="@id/buttonSend"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:divider="@null"
+        android:dividerHeight="@dimen/margin_small"
+        app:layout_constraintBottom_toTopOf="@id/layoutTextInput"
+        app:layout_constraintVertical_bias="1"
         app:layout_constraintTop_toBottomOf="@id/layoutContact"
-        app:layout_constraintVertical_bias="0"
-        app:layout_constraintVertical_chainStyle="spread">
+        app:layout_constraintVertical_chainStyle="spread_inside" />
 
-        <TableLayout
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutTextInput"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:hintEnabled="false"
+        app:layout_constraintBottom_toTopOf="@id/textMessageResponse">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextMessageText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_message"
+            android:gravity="top"
+            android:hint="@string/hint_message_text"
+            android:inputType="textMultiLine"
+            android:maxLines="@integer/message_text_max_lines"
+            android:minLines="@integer/message_text_min_lines"
+            android:padding="@dimen/margin_medium"
+            android:textSize="@dimen/text_normal" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextMessageText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:hint="@string/hint_message_text"
-                    android:inputType="textMultiLine"
-                    android:minLines="@integer/messge_text_min_lines"
-                    android:padding="@dimen/margin_medium"
-                    android:textSize="@dimen/text_normal" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/textMessageResponse"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_medium"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="@dimen/text_normal" />
-        </TableLayout>
-    </ScrollView>
+    <TextView
+        android:id="@+id/textMessageResponse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="@dimen/text_normal"
+        app:layout_constraintBottom_toTopOf="@id/buttonSend" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
