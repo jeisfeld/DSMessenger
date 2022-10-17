@@ -10,7 +10,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/message_margin"
         android:background="@drawable/background_message"
-        android:padding="@dimen/margin_medium"
+        android:paddingStart="@dimen/padding_message_horizontal"
+        android:paddingTop="@dimen/padding_message_vertical"
+        android:paddingEnd="@dimen/padding_message_horizontal"
+        android:paddingBottom="@dimen/padding_message_vertical"
         android:textSize="@dimen/text_normal" />
 
     <TextView
@@ -19,7 +22,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/message_margin"
         android:background="@drawable/background_message"
-        android:padding="@dimen/margin_medium"
+        android:paddingStart="@dimen/padding_message_horizontal"
+        android:paddingTop="@dimen/padding_message_vertical"
+        android:paddingEnd="@dimen/padding_message_horizontal"
+        android:paddingBottom="@dimen/padding_message_vertical"
         android:textSize="@dimen/text_normal"
         android:visibility="gone" />
 

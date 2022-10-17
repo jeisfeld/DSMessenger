@@ -10,6 +10,8 @@
     <dimen name="input_row_height_small">30dp</dimen>
     <dimen name="input_row_height">40dp</dimen>
     <dimen name="margin_small">4dp</dimen>
+    <dimen name="padding_message_vertical">6dp</dimen>
+    <dimen name="padding_message_horizontal">12dp</dimen>
     <dimen name="margin_medium">10dp</dimen>
     <dimen name="margin_large">24dp</dimen>
     <dimen name="page_padding">10dp</dimen>

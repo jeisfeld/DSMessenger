@@ -88,18 +88,19 @@ public class MessageFragment extends Fragment {
 			}
 		}
 	};
-	/**
-	 * The list of displayed messages.
-	 */
-	private final List<MessageInfo> messageList = new ArrayList<>();
+
 	/**
 	 * The threadId.
 	 */
-	private UUID threadId;
+	private UUID conversationId;
 	/**
 	 * Dropdown handler for the contact.
 	 */
 	DropdownHandler<Contact> dropdownHandlerContact;
+	/**
+	 * The list of displayed messages.
+	 */
+	private final List<MessageInfo> messageList = new ArrayList<>();
 	/**
 	 * The array adapter for the list of displayed messages.
 	 */
@@ -153,7 +154,7 @@ public class MessageFragment extends Fragment {
 
 				MessageInfo messageInfo = messageList.get(position);
 
-				switch (messageInfo.viewType) {
+				switch (messageInfo.getViewType()) {
 				case MESSAGE_OWN:
 					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.VISIBLE);
 					view.findViewById(R.id.textViewMessageContact).setVisibility(View.GONE);
@@ -171,13 +172,9 @@ public class MessageFragment extends Fragment {
 		};
 		binding.listViewMessages.setAdapter(arrayAdapter);
 
-		binding.dropdownContact.setOnItemClickListener((parent, view, position, id) -> {
-			binding.imageViewConnectionStatus1.setImageResource(R.drawable.ic_icon_connection_uncertain);
-			binding.imageViewConnectionStatus2.setImageResource(R.drawable.ic_icon_connection_uncertain);
-			pingContact();
-		});
+		binding.dropdownContact.setOnItemClickListener((parent, view, position, id) -> pingContact());
 
-		threadId = UUID.randomUUID();
+		conversationId = UUID.randomUUID();
 
 		return binding.getRoot();
 	}
@@ -245,6 +242,8 @@ public class MessageFragment extends Fragment {
 	 * Ping the current selected contact.
 	 */
 	private void pingContact() {
+		binding.imageViewConnectionStatus1.setImageResource(R.drawable.ic_icon_connection_uncertain);
+		binding.imageViewConnectionStatus2.setImageResource(R.drawable.ic_icon_connection_uncertain);
 		Contact contact = dropdownHandlerContact.getSelectedItem();
 		UUID messageId = UUID.randomUUID();
 
@@ -261,6 +260,7 @@ public class MessageFragment extends Fragment {
 				},
 				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.PING.name());
 	}
+
 
 	/**
 	 * Send the message.
@@ -294,7 +294,7 @@ public class MessageFragment extends Fragment {
 					}
 				},
 				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name(),
-				"threadId", threadId.toString());
+				"conversationId", conversationId.toString());
 	}
 
 	/**
@@ -352,7 +352,7 @@ public class MessageFragment extends Fragment {
 		MESSAGE_ACKNOWLEDGED
 	}
 
-	private static class MessageInfo {
+	public static class MessageInfo {
 		/**
 		 * The message text.
 		 */

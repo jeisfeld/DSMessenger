@@ -8,9 +8,20 @@
 
     <Button
         android:id="@+id/button_acknowledge"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_acknowledge"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/buttonSend"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_send"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -24,14 +35,39 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textview_message"
-        android:layout_width="wrap_content"
+    <ListView
+        android:id="@+id/listViewMessages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:divider="@null"
+        android:dividerHeight="@dimen/padding_message_vertical"
+        app:layout_constraintBottom_toTopOf="@id/layoutTextInput"
+        app:layout_constraintTop_toBottomOf="@id/textMessageFrom"
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintVertical_chainStyle="spread_inside" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutTextInput"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:textSize="@dimen/text_xlarge"
-        app:layout_constraintBottom_toTopOf="@id/button_acknowledge"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textMessageFrom" />
+        android:visibility="gone"
+        app:hintEnabled="false"
+        app:layout_constraintBottom_toTopOf="@id/buttonSend">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextMessageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_message"
+            android:gravity="top"
+            android:hint="@string/hint_message_text"
+            android:inputType="textMultiLine"
+            android:maxLines="@integer/message_text_max_lines"
+            android:minLines="@integer/message_text_min_lines"
+            android:padding="@dimen/margin_medium"
+            android:textSize="@dimen/text_normal" />
+    </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

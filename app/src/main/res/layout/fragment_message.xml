@@ -91,7 +91,7 @@
         android:layout_marginTop="@dimen/margin_small"
         android:layout_marginBottom="@dimen/margin_small"
         android:divider="@null"
-        android:dividerHeight="@dimen/margin_small"
+        android:dividerHeight="@dimen/padding_message_vertical"
         app:layout_constraintBottom_toTopOf="@id/layoutTextInput"
         app:layout_constraintTop_toBottomOf="@id/layoutContact"
         app:layout_constraintVertical_bias="1"

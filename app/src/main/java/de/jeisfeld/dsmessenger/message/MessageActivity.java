@@ -7,19 +7,28 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.Contact;
+import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageInfo;
+import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
+import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageViewType;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 
@@ -48,9 +57,13 @@ public class MessageActivity extends AppCompatActivity {
 	 */
 	private ActivityMessageBinding binding;
 	/**
-	 * The message text.
+	 * The list of displayed messages.
 	 */
-	private String messageText;
+	private final List<MessageInfo> messageList = new ArrayList<>();
+	/**
+	 * The array adapter for the list of displayed messages.
+	 */
+	private ArrayAdapter<MessageInfo> arrayAdapter;
 	/**
 	 * The message vibration.
 	 */
@@ -137,12 +150,32 @@ public class MessageActivity extends AppCompatActivity {
 		binding = ActivityMessageBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
 
-		if (savedInstanceState != null && savedInstanceState.getCharSequence(STRING_MESSAGE) != null) {
-			messageText = savedInstanceState.getString(STRING_MESSAGE);
-		}
-		else {
-			messageText = extractMessageText(getIntent());
-		}
+		arrayAdapter = new ArrayAdapter<MessageInfo>(this, R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
+			@NonNull
+			@Override
+			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
+				final View view = super.getView(position, convertView, parent);
+
+				MessageInfo messageInfo = messageList.get(position);
+
+				switch (messageInfo.getViewType()) {
+				case MESSAGE_OWN:
+					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.VISIBLE);
+					view.findViewById(R.id.textViewMessageContact).setVisibility(View.GONE);
+					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(messageInfo.getMessageText());
+					break;
+				case MESSAGE_CONTACT:
+					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.GONE);
+					view.findViewById(R.id.textViewMessageContact).setVisibility(View.VISIBLE);
+					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(messageInfo.getMessageText());
+					break;
+				}
+
+				return view;
+			}
+		};
+		binding.listViewMessages.setAdapter(arrayAdapter);
+
 
 		handleIntentData(getIntent());
 
@@ -167,18 +200,8 @@ public class MessageActivity extends AppCompatActivity {
 	@Override
 	protected final void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
-		if (messageText.length() > 0 && messageText.charAt(messageText.length() - 1) != '\n') {
-			messageText += "\n";
-		}
-		messageText += extractMessageText(intent);
 		handleIntentData(intent);
 		binding.buttonAcknowledge.setVisibility(View.VISIBLE);
-	}
-
-	@Override
-	protected final void onSaveInstanceState(@NonNull final Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putString(STRING_MESSAGE, messageText);
 	}
 
 	/**
@@ -200,8 +223,9 @@ public class MessageActivity extends AppCompatActivity {
 		cancelLastIntentEffects();
 		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 
-		binding.textviewMessage.setText(messageText);
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
+		messageList.add(new MessageInfo(textMessageDetails.getMessageText(), MessageViewType.MESSAGE_CONTACT, MessageStatus.MESSAGE_RECEIVED));
+		arrayAdapter.notifyDataSetChanged();
 
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
 		MessageActivity.currentTopContact = textMessageDetails.getContact();
