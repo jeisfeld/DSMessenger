@@ -132,7 +132,15 @@ public class AdminMessageDetails extends MessageDetails {
 		/**
 		 * Message acknowledged by oneself.
 		 */
-		MESSAGE_SELF_ACKNOWLEDGED;
+		MESSAGE_SELF_ACKNOWLEDGED,
+		/**
+		 * Ping message.
+		 */
+		PING,
+		/**
+		 * Response to ping message.
+		 */
+		PONG;
 
 		private static AdminType fromName(final String name) {
 			if (name == null) {

@@ -16,8 +16,10 @@ import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails;
+import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageActivity;
 import de.jeisfeld.dsmessenger.message.MessageDetails;
+import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 import de.jeisfeld.dsmessenger.message.RandomimageMessageDetails;
 import de.jeisfeld.dsmessenger.message.TextMessageDetails;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
@@ -79,16 +81,25 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				AccountFragment.removeStoredDeviceInfo();
 				ContactRegistry.getInstance().cleanContacts();
 				AccountFragment.sendBroadcast(this, ActionType.DEVICE_LOGGED_OUT);
-				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.DEVICE_LOGGED_OUT, null);
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.DEVICE_LOGGED_OUT, null, adminDetails.getContact());
 				break;
 			case MESSAGE_RECEIVED:
-				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId());
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId(),
+						adminDetails.getContact());
 				break;
 			case MESSAGE_ACKNOWLEDGED:
-				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId());
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(),
+						adminDetails.getContact());
 				break;
 			case MESSAGE_SELF_ACKNOWLEDGED:
 				MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId());
+				break;
+			case PING:
+				new HttpSender(this).sendMessage(adminDetails.getContact(), adminDetails.getMessageId(), null,
+						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.PONG.name());
+				break;
+			case PONG:
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.PONG, adminDetails.getMessageId(), adminDetails.getContact());
 				break;
 			case UNKNOWN:
 			default:

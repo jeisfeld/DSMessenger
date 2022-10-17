@@ -26,6 +26,7 @@ import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
+import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 import de.jeisfeld.dsmessenger.util.DropdownHandler;
@@ -74,6 +75,13 @@ public class MessageFragment extends Fragment {
 						((MainActivity) activity).updateNavigationDrawer();
 					}
 					break;
+				case PONG:
+					Contact contact = (Contact) intent.getSerializableExtra("contact");
+					if (contact.getRelationId() == dropdownHandlerContact.getSelectedItem().getRelationId()) {
+						binding.imageViewConnectionStatus1.setImageResource(R.drawable.ic_icon_connected);
+						binding.imageViewConnectionStatus2.setImageResource(R.drawable.ic_icon_connected);
+					}
+					break;
 				default:
 					break;
 				}
@@ -84,6 +92,10 @@ public class MessageFragment extends Fragment {
 	 * The list of displayed messages.
 	 */
 	private final List<MessageInfo> messageList = new ArrayList<>();
+	/**
+	 * The threadId.
+	 */
+	private UUID threadId;
 	/**
 	 * Dropdown handler for the contact.
 	 */
@@ -103,13 +115,18 @@ public class MessageFragment extends Fragment {
 	 * @param context    The context.
 	 * @param actionType The action type.
 	 * @param messageId  The messageId.
+	 * @param contact    The contact.
 	 * @param parameters The parameters.
 	 */
-	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final String... parameters) {
+	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final Contact contact,
+									 final String... parameters) {
 		final Intent intent = new Intent(BROADCAST_ACTION);
 		final Bundle bundle = new Bundle();
 		bundle.putSerializable("actionType", actionType);
 		bundle.putSerializable("messageId", messageId);
+		if (contact != null) {
+			bundle.putSerializable("contact", contact);
+		}
 		int i = 0;
 		while (i < parameters.length - 1) {
 			String key = parameters[i++];
@@ -154,6 +171,14 @@ public class MessageFragment extends Fragment {
 		};
 		binding.listViewMessages.setAdapter(arrayAdapter);
 
+		binding.dropdownContact.setOnItemClickListener((parent, view, position, id) -> {
+			binding.imageViewConnectionStatus1.setImageResource(R.drawable.ic_icon_connection_uncertain);
+			binding.imageViewConnectionStatus2.setImageResource(R.drawable.ic_icon_connection_uncertain);
+			pingContact();
+		});
+
+		threadId = UUID.randomUUID();
+
 		return binding.getRoot();
 	}
 
@@ -169,12 +194,16 @@ public class MessageFragment extends Fragment {
 			binding.listViewMessages.setVisibility(View.GONE);
 			binding.buttonSend.setVisibility(View.GONE);
 			binding.layoutContact.setVisibility(View.GONE);
+			binding.imageViewConnectionStatus1.setVisibility(View.GONE);
+			binding.imageViewConnectionStatus2.setVisibility(View.GONE);
 			binding.textSendMessage.setText(R.string.text_send_message);
 		}
 		else if (contacts.length == 1) {
 			binding.listViewMessages.setVisibility(View.VISIBLE);
 			binding.buttonSend.setVisibility(View.VISIBLE);
 			binding.layoutContact.setVisibility(View.GONE);
+			binding.imageViewConnectionStatus1.setVisibility(View.VISIBLE);
+			binding.imageViewConnectionStatus2.setVisibility(View.GONE);
 			dropdownHandlerContact.selectEntry(0);
 			binding.textSendMessage.setText(getString(R.string.text_send_message_to, contacts[0].getName()));
 		}
@@ -182,9 +211,13 @@ public class MessageFragment extends Fragment {
 			binding.listViewMessages.setVisibility(View.VISIBLE);
 			binding.buttonSend.setVisibility(View.VISIBLE);
 			binding.layoutContact.setVisibility(View.VISIBLE);
+			binding.imageViewConnectionStatus1.setVisibility(View.GONE);
+			binding.imageViewConnectionStatus2.setVisibility(View.VISIBLE);
 			dropdownHandlerContact.selectEntry(Math.min(lastContact, contacts.length));
 			binding.textSendMessage.setText(R.string.text_send_message);
 		}
+
+		pingContact();
 	}
 
 	@Override
@@ -206,6 +239,27 @@ public class MessageFragment extends Fragment {
 	public final void onDetach() {
 		super.onDetach();
 		broadcastManager.unregisterReceiver(localBroadcastReceiver);
+	}
+
+	/**
+	 * Ping the current selected contact.
+	 */
+	private void pingContact() {
+		Contact contact = dropdownHandlerContact.getSelectedItem();
+		UUID messageId = UUID.randomUUID();
+
+		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
+					Activity activity = getActivity();
+					if (activity != null) {
+						activity.runOnUiThread(() -> {
+							if (responseData == null || !responseData.isSuccess()) {
+								binding.imageViewConnectionStatus1.setImageResource(R.drawable.ic_icon_connection_gone);
+								binding.imageViewConnectionStatus2.setImageResource(R.drawable.ic_icon_connection_gone);
+							}
+						});
+					}
+				},
+				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.PING.name());
 	}
 
 	/**
@@ -239,7 +293,8 @@ public class MessageFragment extends Fragment {
 						});
 					}
 				},
-				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name());
+				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name(),
+				"threadId", threadId.toString());
 	}
 
 	/**
@@ -272,7 +327,11 @@ public class MessageFragment extends Fragment {
 		/**
 		 * This device has been logged out.
 		 */
-		DEVICE_LOGGED_OUT
+		DEVICE_LOGGED_OUT,
+		/**
+		 * Response to Ping.
+		 */
+		PONG
 	}
 
 	/**
