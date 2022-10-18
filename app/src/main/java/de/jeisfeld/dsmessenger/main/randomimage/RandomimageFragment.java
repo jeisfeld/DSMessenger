@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentRandomimageBinding;
+import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.http.HttpSender;
-import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 

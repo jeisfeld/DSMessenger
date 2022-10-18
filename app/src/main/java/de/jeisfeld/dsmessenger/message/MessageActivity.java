@@ -24,11 +24,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
+import de.jeisfeld.dsmessenger.entity.Contact;
+import de.jeisfeld.dsmessenger.entity.MessageInfo;
 import de.jeisfeld.dsmessenger.http.HttpSender;
-import de.jeisfeld.dsmessenger.main.account.Contact;
-import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageInfo;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
-import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageViewType;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 
@@ -158,17 +157,15 @@ public class MessageActivity extends AppCompatActivity {
 
 				MessageInfo messageInfo = messageList.get(position);
 
-				switch (messageInfo.getViewType()) {
-				case MESSAGE_OWN:
+				if (messageInfo.isOwn()) {
 					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.VISIBLE);
 					view.findViewById(R.id.textViewMessageContact).setVisibility(View.GONE);
 					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(messageInfo.getMessageText());
-					break;
-				case MESSAGE_CONTACT:
+				}
+				else {
 					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.GONE);
 					view.findViewById(R.id.textViewMessageContact).setVisibility(View.VISIBLE);
 					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(messageInfo.getMessageText());
-					break;
 				}
 
 				return view;
@@ -224,7 +221,7 @@ public class MessageActivity extends AppCompatActivity {
 		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
-		messageList.add(new MessageInfo(textMessageDetails.getMessageText(), MessageViewType.MESSAGE_CONTACT, MessageStatus.MESSAGE_RECEIVED));
+		messageList.add(new MessageInfo(textMessageDetails.getMessageText(), false, MessageStatus.MESSAGE_RECEIVED));
 		arrayAdapter.notifyDataSetChanged();
 
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();

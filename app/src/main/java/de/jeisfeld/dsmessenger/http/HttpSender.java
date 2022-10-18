@@ -30,9 +30,9 @@ import javax.net.ssl.HttpsURLConnection;
 
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
-import de.jeisfeld.dsmessenger.main.account.Contact;
-import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
-import de.jeisfeld.dsmessenger.main.account.Device;
+import de.jeisfeld.dsmessenger.entity.Contact;
+import de.jeisfeld.dsmessenger.entity.Contact.ContactStatus;
+import de.jeisfeld.dsmessenger.entity.Device;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy;
 import de.jeisfeld.dsmessenger.util.DateUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;

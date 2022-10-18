@@ -22,9 +22,10 @@ import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentMessageBinding;
+import de.jeisfeld.dsmessenger.entity.Contact;
+import de.jeisfeld.dsmessenger.entity.MessageInfo;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
-import de.jeisfeld.dsmessenger.main.account.Contact;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
@@ -154,17 +155,15 @@ public class MessageFragment extends Fragment {
 
 				MessageInfo messageInfo = messageList.get(position);
 
-				switch (messageInfo.getViewType()) {
-				case MESSAGE_OWN:
+				if (messageInfo.isOwn()) {
 					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.VISIBLE);
 					view.findViewById(R.id.textViewMessageContact).setVisibility(View.GONE);
 					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(messageInfo.getMessageText());
-					break;
-				case MESSAGE_CONTACT:
+				}
+				else {
 					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.GONE);
 					view.findViewById(R.id.textViewMessageContact).setVisibility(View.VISIBLE);
 					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(messageInfo.getMessageText());
-					break;
 				}
 
 				return view;
@@ -284,7 +283,7 @@ public class MessageFragment extends Fragment {
 							}
 							else {
 								binding.textMessageResponse.setText(R.string.text_message_sent);
-								messageList.add(new MessageInfo(binding.editTextMessageText.getText().toString(), MessageViewType.MESSAGE_OWN, MessageStatus.MESSAGE_SENT));
+								messageList.add(new MessageInfo(binding.editTextMessageText.getText().toString(), true, MessageStatus.MESSAGE_SENT));
 								Logger.log("List size: " + messageList.size());
 								arrayAdapter.notifyDataSetChanged();
 								binding.listViewMessages.setSelection(messageList.size() - 1);
@@ -296,21 +295,6 @@ public class MessageFragment extends Fragment {
 				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name(),
 				"conversationId", conversationId.toString());
 	}
-
-	/**
-	 * The view type of a message.
-	 */
-	public enum MessageViewType {
-		/**
-		 * Message of yourself.
-		 */
-		MESSAGE_OWN,
-		/**
-		 * Message of a contact.
-		 */
-		MESSAGE_CONTACT
-	}
-
 
 	/**
 	 * Action that can be sent to this fragment.
@@ -352,43 +336,4 @@ public class MessageFragment extends Fragment {
 		MESSAGE_ACKNOWLEDGED
 	}
 
-	public static class MessageInfo {
-		/**
-		 * The message text.
-		 */
-		private final String messageText;
-		/**
-		 * The message view type.
-		 */
-		private final MessageViewType viewType;
-		/**
-		 * The message status.
-		 */
-		private final MessageStatus status;
-
-		/**
-		 * Constructor.
-		 *
-		 * @param messageText The message text.
-		 * @param viewType    The message view type
-		 * @param status      The message status
-		 */
-		public MessageInfo(String messageText, MessageViewType viewType, MessageStatus status) {
-			this.messageText = messageText;
-			this.viewType = viewType;
-			this.status = status;
-		}
-
-		public String getMessageText() {
-			return messageText;
-		}
-
-		public MessageViewType getViewType() {
-			return viewType;
-		}
-
-		public MessageStatus getStatus() {
-			return status;
-		}
-	}
 }

@@ -1,8 +1,9 @@
-package de.jeisfeld.dsmessenger.main.account;
+package de.jeisfeld.dsmessenger.entity;
 
 import java.io.Serializable;
 
 import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.main.account.AccountFragment;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 

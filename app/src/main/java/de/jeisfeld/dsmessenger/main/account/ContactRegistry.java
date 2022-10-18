@@ -9,8 +9,9 @@ import java.util.List;
 
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.entity.Contact;
+import de.jeisfeld.dsmessenger.entity.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.http.HttpSender;
-import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**

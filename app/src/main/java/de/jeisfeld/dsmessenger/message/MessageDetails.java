@@ -7,9 +7,9 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
-import de.jeisfeld.dsmessenger.main.account.Contact;
+import de.jeisfeld.dsmessenger.entity.Contact;
+import de.jeisfeld.dsmessenger.entity.Device;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
-import de.jeisfeld.dsmessenger.main.account.Device;
 import de.jeisfeld.dsmessenger.util.DateUtil;
 
 /**

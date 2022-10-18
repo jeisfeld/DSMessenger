@@ -23,6 +23,9 @@ import de.jeisfeld.dsmessenger.databinding.FragmentAccountBinding;
 import de.jeisfeld.dsmessenger.databinding.ListViewContactBinding;
 import de.jeisfeld.dsmessenger.databinding.ListViewDeviceMultiBinding;
 import de.jeisfeld.dsmessenger.databinding.ListViewDeviceSingleBinding;
+import de.jeisfeld.dsmessenger.entity.Contact;
+import de.jeisfeld.dsmessenger.entity.Contact.ContactStatus;
+import de.jeisfeld.dsmessenger.entity.Device;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.ChangePasswordDialogFragment;
@@ -31,7 +34,6 @@ import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.CreateInvitationDi
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.EditContactDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.EditDeviceDialogFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.LoginDialogFragment;
-import de.jeisfeld.dsmessenger.main.account.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.util.DialogUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 

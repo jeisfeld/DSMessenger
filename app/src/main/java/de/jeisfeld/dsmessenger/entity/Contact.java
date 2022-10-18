@@ -1,4 +1,4 @@
-package de.jeisfeld.dsmessenger.main.account;
+package de.jeisfeld.dsmessenger.entity;
 
 import java.io.Serializable;
 import java.util.List;
@@ -67,7 +67,7 @@ public class Contact implements Serializable {
 	 *
 	 * @param relationId The id.
 	 */
-	protected Contact(final int relationId) {
+	public Contact(final int relationId) {
 		this.relationId = relationId;
 		name = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_name, relationId);
 		myName = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_my_name, relationId);
