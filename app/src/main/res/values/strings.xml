@@ -11,7 +11,7 @@
     <string name="title_dialog_edit_device">Edit Device</string>
 
     <string name="menu_account">Account</string>
-    <string name="menu_message">Message</string>
+    <string name="menu_conversations">Conversations</string>
     <string name="menu_randomimage">Randomimage</string>
     <string name="menu_lut">LUT</string>
     <string name="menu_settings">Settings</string>
@@ -35,6 +35,7 @@
 
     <string name="text_send_message">Send Message</string>
     <string name="text_send_message_to">Send Message to %1$s</string>
+    <string name="text_select_conversation">Select Conversation</string>
     <string name="text_message_from">Message from %1$s</string>
     <string name="text_display_random_image">Display RandomImage</string>
     <string name="text_message_text">Message Text</string>
@@ -85,6 +86,7 @@
     <string name="text_message_sent">Message sent</string>
     <string name="text_message_received">Message received</string>
     <string name="text_message_acknowledged">Message acknowledged</string>
+    <string name="text_default_conversation_name">New conversation…</string>
 
     <string name="error_missing_username">Missing username</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>

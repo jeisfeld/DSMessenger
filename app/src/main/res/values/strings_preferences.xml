@@ -37,7 +37,20 @@
     <string name="key_contact_is_slave" translatable="false">contact_is_slave</string>
     <string name="key_contact_connection_code" translatable="false">contact_connection_code</string>
     <string name="key_contact_status" translatable="false">contact_status</string>
-    <string name="key_last_contact" translatable="false">last_contact</string>
+    <string name="key_contact_conversation_ids" translatable="false">contact_conversation_ids</string>
+
+    <!-- Conversation preferences -->
+    <string name="key_conversation_relation_id" translatable="false">conversation_relation_id</string>
+    <string name="key_conversation_subject" translatable="false">conversation_subject</string>
+    <string name="key_conversation_conversation_id" translatable="false">conversation_conversation_id</string>
+    <string name="key_conversation_message_ids" translatable="false">conversation_message_ids</string>
+
+    <!-- Message preferences -->
+    <string name="key_message_text" translatable="false">message_text</string>
+    <string name="key_message_is_own" translatable="false">message_is_own</string>
+    <string name="key_message_message_id" translatable="false">message_message_id</string>
+    <string name="key_message_status" translatable="false">message_status</string>
+
 
     <!-- Arrays for list preferences -->
     <string-array name="pref_list_titles_language">

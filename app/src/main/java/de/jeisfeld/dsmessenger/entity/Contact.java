@@ -1,9 +1,12 @@
 package de.jeisfeld.dsmessenger.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import androidx.annotation.NonNull;
+import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
@@ -136,6 +139,17 @@ public class Contact implements Serializable {
 		PreferenceUtil.setIndexedSharedPreferenceBoolean(R.string.key_contact_is_slave, getRelationId(), isSlave());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_connection_code, getRelationId(), getConnectionCode());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_status, getRelationId(), getStatus().name());
+	}
+
+	/**
+	 * Get the conversations of this contact.
+	 *
+	 * @return The conversations.
+	 */
+	public List<Conversation> getConversations() {
+		List<Conversation> result = new ArrayList<>();
+		result.add(new Conversation(getRelationId(), Application.getResourceString(R.string.text_default_conversation_name), UUID.randomUUID()));
+		return result;
 	}
 
 	/**

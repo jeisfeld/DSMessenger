@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 	/**
 	 * The id of the navigation start.
 	 */
-	private int navigationStartId = R.id.nav_message;
+	private int navigationStartId = R.id.nav_conversations;
 
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 		// Passing each menu ID as a set of Ids because each
 		// menu should be considered as top level destinations.
 		mAppBarConfiguration = new AppBarConfiguration.Builder(
-				R.id.nav_message, R.id.nav_randomimage, R.id.nav_lut, R.id.nav_account, R.id.nav_settings)
+				R.id.nav_conversations, R.id.nav_randomimage, R.id.nav_lut, R.id.nav_account, R.id.nav_settings)
 				.setOpenableLayout(drawer)
 				.build();
 
@@ -86,16 +86,16 @@ public class MainActivity extends AppCompatActivity {
 				NavOptions navOptions = new NavOptions.Builder()
 						.setPopUpTo(R.id.nav_account, true)
 						.build();
-				navController.navigate(R.id.nav_message, null, navOptions);
-				navigationStartId = R.id.nav_message;
+				navController.navigate(R.id.nav_conversations, null, navOptions);
+				navigationStartId = R.id.nav_conversations;
 			}
 			updateNavigationDrawer();
 		}
 		else {
-			if (navigationStartId == R.id.nav_message) {
+			if (navigationStartId == R.id.nav_conversations) {
 				NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
 				NavOptions navOptions = new NavOptions.Builder()
-						.setPopUpTo(R.id.nav_message, true)
+						.setPopUpTo(R.id.nav_conversations, true)
 						.build();
 				navController.navigate(R.id.nav_account, null, navOptions);
 				navigationStartId = R.id.nav_account;
@@ -111,14 +111,14 @@ public class MainActivity extends AppCompatActivity {
 		if (isConnected()) {
 			NavigationView navigationView = findViewById(R.id.nav_view);
 			Menu menuNav = navigationView.getMenu();
-			menuNav.findItem(R.id.nav_message).setEnabled(true);
+			menuNav.findItem(R.id.nav_conversations).setEnabled(true);
 			menuNav.findItem(R.id.nav_randomimage).setEnabled(true);
 			menuNav.findItem(R.id.nav_lut).setEnabled(true);
 		}
 		else {
 			NavigationView navigationView = findViewById(R.id.nav_view);
 			Menu menuNav = navigationView.getMenu();
-			menuNav.findItem(R.id.nav_message).setEnabled(false);
+			menuNav.findItem(R.id.nav_conversations).setEnabled(false);
 			menuNav.findItem(R.id.nav_randomimage).setEnabled(false);
 			menuNav.findItem(R.id.nav_lut).setEnabled(false);
 		}

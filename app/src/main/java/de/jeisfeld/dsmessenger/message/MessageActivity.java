@@ -221,7 +221,8 @@ public class MessageActivity extends AppCompatActivity {
 		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
-		messageList.add(new MessageInfo(textMessageDetails.getMessageText(), false, MessageStatus.MESSAGE_RECEIVED));
+		messageList.add(new MessageInfo(textMessageDetails.getMessageText(),
+				false, textMessageDetails.getMessageId(), MessageStatus.MESSAGE_RECEIVED));
 		arrayAdapter.notifyDataSetChanged();
 
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();

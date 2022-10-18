@@ -3,12 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_message">
+    app:startDestination="@+id/nav_conversations">
+
+    <fragment
+        android:id="@+id/nav_conversations"
+        android:name="de.jeisfeld.dsmessenger.main.message.ConversationsFragment"
+        android:label="@string/menu_conversations"
+        tools:layout="@layout/fragment_message">
+        <action
+            android:id="@+id/nav_conversations_to_message"
+            app:destination="@id/nav_message" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_message"
         android:name="de.jeisfeld.dsmessenger.main.message.MessageFragment"
-        android:label="@string/menu_message"
+        android:label="@string/menu_conversations"
         tools:layout="@layout/fragment_message" />
 
     <fragment

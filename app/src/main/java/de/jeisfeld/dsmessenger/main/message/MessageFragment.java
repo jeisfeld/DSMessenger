@@ -20,19 +20,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentMessageBinding;
 import de.jeisfeld.dsmessenger.entity.Contact;
+import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.entity.MessageInfo;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
-import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
-import de.jeisfeld.dsmessenger.util.DropdownHandler;
-import de.jeisfeld.dsmessenger.util.Logger;
-import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
  * Fragment for sending messages.
@@ -50,6 +49,14 @@ public class MessageFragment extends Fragment {
 	 * The last sent messageId.
 	 */
 	private UUID lastMessageId;
+	/**
+	 * The contact for this conversation.
+	 */
+	private Contact contact;
+	/**
+	 * The list of displayed messages.
+	 */
+	private final List<MessageInfo> messageList = new ArrayList<>();
 	/**
 	 * The local broadcast receiver to do actions sent to this fragment.
 	 */
@@ -70,17 +77,18 @@ public class MessageFragment extends Fragment {
 				case DEVICE_LOGGED_OUT:
 					binding.listViewMessages.setVisibility(View.GONE);
 					binding.buttonSend.setVisibility(View.GONE);
-					binding.dropdownContact.setVisibility(View.GONE);
 					Activity activity = getActivity();
 					if (activity != null) {
+						NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_content_main);
+						navController.popBackStack();
+						navController.navigate(R.id.nav_account);
 						((MainActivity) activity).updateNavigationDrawer();
 					}
 					break;
 				case PONG:
-					Contact contact = (Contact) intent.getSerializableExtra("contact");
-					if (contact.getRelationId() == dropdownHandlerContact.getSelectedItem().getRelationId()) {
-						binding.imageViewConnectionStatus1.setImageResource(R.drawable.ic_icon_connected);
-						binding.imageViewConnectionStatus2.setImageResource(R.drawable.ic_icon_connected);
+					Contact contactPont = (Contact) intent.getSerializableExtra("contact");
+					if (contact.getRelationId() == contactPont.getRelationId()) {
+						binding.imageViewConnectionStatus.setImageResource(R.drawable.ic_icon_connected);
 					}
 					break;
 				default:
@@ -89,19 +97,10 @@ public class MessageFragment extends Fragment {
 			}
 		}
 	};
-
 	/**
 	 * The threadId.
 	 */
-	private UUID conversationId;
-	/**
-	 * Dropdown handler for the contact.
-	 */
-	DropdownHandler<Contact> dropdownHandlerContact;
-	/**
-	 * The list of displayed messages.
-	 */
-	private final List<MessageInfo> messageList = new ArrayList<>();
+	private Conversation conversation;
 	/**
 	 * The array adapter for the list of displayed messages.
 	 */
@@ -140,12 +139,16 @@ public class MessageFragment extends Fragment {
 	}
 
 	@Override
-	public final View onCreateView(@NonNull final LayoutInflater inflater,
-								   final ViewGroup container, final Bundle savedInstanceState) {
+	public final View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		binding = FragmentMessageBinding.inflate(inflater, container, false);
 
 		binding.buttonSend.setOnClickListener(v -> sendMessage(MessagePriority.NORMAL));
 		binding.buttonSendWithPriority.setOnClickListener(v -> sendMessage(MessagePriority.HIGH));
+
+		assert getArguments() != null;
+		contact = (Contact) getArguments().getSerializable("contact");
+		conversation = (Conversation) getArguments().getSerializable("conversation");
+		binding.textSendMessage.setText(getString(R.string.text_send_message_to, contact.getName()));
 
 		arrayAdapter = new ArrayAdapter<MessageInfo>(requireContext(), R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
 			@NonNull
@@ -171,48 +174,12 @@ public class MessageFragment extends Fragment {
 		};
 		binding.listViewMessages.setAdapter(arrayAdapter);
 
-		binding.dropdownContact.setOnItemClickListener((parent, view, position, id) -> pingContact());
-
-		conversationId = UUID.randomUUID();
-
 		return binding.getRoot();
 	}
 
 	@Override
 	public final void onResume() {
 		super.onResume();
-		Contact[] contacts = ContactRegistry.getInstance().getConnectedContacts().toArray(new Contact[0]);
-
-		dropdownHandlerContact = new DropdownHandler<>(getContext(), binding.dropdownContact, contacts);
-		int lastContact = PreferenceUtil.getSharedPreferenceInt(R.string.key_last_contact, 0);
-
-		if (contacts.length == 0) {
-			binding.listViewMessages.setVisibility(View.GONE);
-			binding.buttonSend.setVisibility(View.GONE);
-			binding.layoutContact.setVisibility(View.GONE);
-			binding.imageViewConnectionStatus1.setVisibility(View.GONE);
-			binding.imageViewConnectionStatus2.setVisibility(View.GONE);
-			binding.textSendMessage.setText(R.string.text_send_message);
-		}
-		else if (contacts.length == 1) {
-			binding.listViewMessages.setVisibility(View.VISIBLE);
-			binding.buttonSend.setVisibility(View.VISIBLE);
-			binding.layoutContact.setVisibility(View.GONE);
-			binding.imageViewConnectionStatus1.setVisibility(View.VISIBLE);
-			binding.imageViewConnectionStatus2.setVisibility(View.GONE);
-			dropdownHandlerContact.selectEntry(0);
-			binding.textSendMessage.setText(getString(R.string.text_send_message_to, contacts[0].getName()));
-		}
-		else {
-			binding.listViewMessages.setVisibility(View.VISIBLE);
-			binding.buttonSend.setVisibility(View.VISIBLE);
-			binding.layoutContact.setVisibility(View.VISIBLE);
-			binding.imageViewConnectionStatus1.setVisibility(View.GONE);
-			binding.imageViewConnectionStatus2.setVisibility(View.VISIBLE);
-			dropdownHandlerContact.selectEntry(Math.min(lastContact, contacts.length));
-			binding.textSendMessage.setText(R.string.text_send_message);
-		}
-
 		pingContact();
 	}
 
@@ -241,9 +208,7 @@ public class MessageFragment extends Fragment {
 	 * Ping the current selected contact.
 	 */
 	private void pingContact() {
-		binding.imageViewConnectionStatus1.setImageResource(R.drawable.ic_icon_connection_uncertain);
-		binding.imageViewConnectionStatus2.setImageResource(R.drawable.ic_icon_connection_uncertain);
-		Contact contact = dropdownHandlerContact.getSelectedItem();
+		binding.imageViewConnectionStatus.setImageResource(R.drawable.ic_icon_connection_uncertain);
 		UUID messageId = UUID.randomUUID();
 
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
@@ -251,8 +216,7 @@ public class MessageFragment extends Fragment {
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
 							if (responseData == null || !responseData.isSuccess()) {
-								binding.imageViewConnectionStatus1.setImageResource(R.drawable.ic_icon_connection_gone);
-								binding.imageViewConnectionStatus2.setImageResource(R.drawable.ic_icon_connection_gone);
+								binding.imageViewConnectionStatus.setImageResource(R.drawable.ic_icon_connection_gone);
 							}
 						});
 					}
@@ -268,11 +232,9 @@ public class MessageFragment extends Fragment {
 	 */
 	private void sendMessage(final MessagePriority priority) {
 		String messageText = binding.editTextMessageText.getText().toString();
-		Contact contact = dropdownHandlerContact.getSelectedItem();
 		UUID messageId = UUID.randomUUID();
 		lastMessageId = messageId;
 		binding.textMessageResponse.setText(R.string.text_sending_message);
-		PreferenceUtil.setSharedPreferenceInt(R.string.key_last_contact, dropdownHandlerContact.getSelectedPosition());
 
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
 					Activity activity = getActivity();
@@ -283,8 +245,8 @@ public class MessageFragment extends Fragment {
 							}
 							else {
 								binding.textMessageResponse.setText(R.string.text_message_sent);
-								messageList.add(new MessageInfo(binding.editTextMessageText.getText().toString(), true, MessageStatus.MESSAGE_SENT));
-								Logger.log("List size: " + messageList.size());
+								messageList.add(new MessageInfo(binding.editTextMessageText.getText().toString(),
+										true, messageId, MessageStatus.MESSAGE_SENT));
 								arrayAdapter.notifyDataSetChanged();
 								binding.listViewMessages.setSelection(messageList.size() - 1);
 								binding.editTextMessageText.setText("");
@@ -293,7 +255,7 @@ public class MessageFragment extends Fragment {
 					}
 				},
 				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name(),
-				"conversationId", conversationId.toString());
+				"conversationId", conversation.getConversationId().toString());
 	}
 
 	/**

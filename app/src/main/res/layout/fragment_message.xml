@@ -39,50 +39,16 @@
         android:layout_marginBottom="@dimen/margin_medium"
         android:text="@string/text_send_message"
         android:textSize="@dimen/text_xlarge"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/imageViewConnectionStatus1"
+        android:id="@+id/imageViewConnectionStatus"
         android:layout_width="@dimen/input_row_height_small"
         android:layout_height="@dimen/input_row_height_small"
         android:src="@drawable/ic_icon_connection_uncertain"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/imageViewConnectionStatus2"
-        android:layout_width="@dimen/input_row_height_small"
-        android:layout_height="@dimen/input_row_height_small"
-        android:layout_marginTop="5dp"
-        android:src="@drawable/ic_icon_connection_uncertain"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textSendMessage"
-        tools:ignore="ContentDescription" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutContact"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/imageViewConnectionStatus2"
-        app:layout_constraintTop_toBottomOf="@id/textSendMessage">
-
-        <AutoCompleteTextView
-            android:id="@+id/dropdownContact"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/input_row_height_small"
-            android:hint="@string/text_contact"
-            android:inputType="none"
-            android:padding="0dp"
-            android:textSize="@dimen/text_normal" />
-    </com.google.android.material.textfield.TextInputLayout>
 
     <ListView
         android:id="@+id/listViewMessages"
@@ -93,7 +59,7 @@
         android:divider="@null"
         android:dividerHeight="@dimen/padding_message_vertical"
         app:layout_constraintBottom_toTopOf="@id/layoutTextInput"
-        app:layout_constraintTop_toBottomOf="@id/layoutContact"
+        app:layout_constraintTop_toBottomOf="@id/textSendMessage"
         app:layout_constraintVertical_bias="1"
         app:layout_constraintVertical_chainStyle="spread_inside" />
 
