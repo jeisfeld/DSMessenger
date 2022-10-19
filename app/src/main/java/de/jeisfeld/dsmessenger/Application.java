@@ -12,6 +12,8 @@ import android.util.Log;
 
 import java.util.Locale;
 
+import androidx.room.Room;
+import de.jeisfeld.dsmessenger.entity.AppDatabase;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -32,12 +34,18 @@ public class Application extends android.app.Application {
 	 */
 	@SuppressLint("ConstantLocale")
 	private static final Locale DEFAULT_LOCALE = Locale.getDefault();
+	/**
+	 * The application database.
+	 */
+	private static AppDatabase appDatabase;
 
-	@Override
-	public final void onCreate() {
-		super.onCreate();
-		Application.mContext = getApplicationContext();
-		Application.mContext = Application.createContextWrapperForLocale(getApplicationContext());
+	/**
+	 * Retrieve the application database.
+	 *
+	 * @return The (statically storec) application database
+	 */
+	public static AppDatabase getAppDatabase() {
+		return Application.appDatabase;
 	}
 
 	/**
@@ -47,6 +55,15 @@ public class Application extends android.app.Application {
 	 */
 	public static Context getAppContext() {
 		return Application.mContext;
+	}
+
+	@Override
+	public final void onCreate() {
+		super.onCreate();
+		Application.mContext = getApplicationContext();
+		Application.mContext = Application.createContextWrapperForLocale(getApplicationContext());
+
+		appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "dsmessenger").allowMainThreadQueries().build();
 	}
 
 	/**

@@ -147,8 +147,16 @@ public class Contact implements Serializable {
 	 * @return The conversations.
 	 */
 	public List<Conversation> getConversations() {
-		List<Conversation> result = new ArrayList<>();
-		result.add(new Conversation(getRelationId(), Application.getResourceString(R.string.text_default_conversation_name), UUID.randomUUID()));
+		ConversationDao conversationDao = Application.getAppDatabase().getConversationDao();
+		List<Conversation> result = new ArrayList<>(conversationDao.getConversationsByRelationId(getRelationId()));
+		if (result.size() == 0) {
+			Conversation mainConversation =
+					new Conversation(getRelationId(), Application.getResourceString(R.string.text_main_conversation_name), UUID.randomUUID());
+			conversationDao.insert(mainConversation);
+			result.add(mainConversation);
+		}
+
+		result.add(new Conversation(getRelationId(), Application.getResourceString(R.string.text_new_conversation_name), UUID.randomUUID()));
 		return result;
 	}
 

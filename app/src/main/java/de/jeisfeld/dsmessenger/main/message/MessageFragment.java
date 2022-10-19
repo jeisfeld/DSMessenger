@@ -26,7 +26,7 @@ import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentMessageBinding;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Conversation;
-import de.jeisfeld.dsmessenger.entity.MessageInfo;
+import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
@@ -56,7 +56,7 @@ public class MessageFragment extends Fragment {
 	/**
 	 * The list of displayed messages.
 	 */
-	private final List<MessageInfo> messageList = new ArrayList<>();
+	private final List<Message> messageList = new ArrayList<>();
 	/**
 	 * The local broadcast receiver to do actions sent to this fragment.
 	 */
@@ -104,7 +104,7 @@ public class MessageFragment extends Fragment {
 	/**
 	 * The array adapter for the list of displayed messages.
 	 */
-	private ArrayAdapter<MessageInfo> arrayAdapter;
+	private ArrayAdapter<Message> arrayAdapter;
 	/**
 	 * Broadcastmanager to update fragment from external.
 	 */
@@ -150,23 +150,23 @@ public class MessageFragment extends Fragment {
 		conversation = (Conversation) getArguments().getSerializable("conversation");
 		binding.textSendMessage.setText(getString(R.string.text_send_message_to, contact.getName()));
 
-		arrayAdapter = new ArrayAdapter<MessageInfo>(requireContext(), R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
+		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
 				final View view = super.getView(position, convertView, parent);
 
-				MessageInfo messageInfo = messageList.get(position);
+				Message message = messageList.get(position);
 
-				if (messageInfo.isOwn()) {
+				if (message.isOwn()) {
 					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.VISIBLE);
 					view.findViewById(R.id.textViewMessageContact).setVisibility(View.GONE);
-					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(messageInfo.getMessageText());
+					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(message.getMessageText());
 				}
 				else {
 					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.GONE);
 					view.findViewById(R.id.textViewMessageContact).setVisibility(View.VISIBLE);
-					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(messageInfo.getMessageText());
+					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(message.getMessageText());
 				}
 
 				return view;
@@ -245,8 +245,8 @@ public class MessageFragment extends Fragment {
 							}
 							else {
 								binding.textMessageResponse.setText(R.string.text_message_sent);
-								messageList.add(new MessageInfo(binding.editTextMessageText.getText().toString(),
-										true, messageId, MessageStatus.MESSAGE_SENT));
+								messageList.add(new Message(binding.editTextMessageText.getText().toString(),
+										true, messageId, conversation.getConversationUuid(), MessageStatus.MESSAGE_SENT));
 								arrayAdapter.notifyDataSetChanged();
 								binding.listViewMessages.setSelection(messageList.size() - 1);
 								binding.editTextMessageText.setText("");
@@ -255,7 +255,7 @@ public class MessageFragment extends Fragment {
 					}
 				},
 				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name(),
-				"conversationId", conversation.getConversationId().toString());
+				"conversationId", conversation.getConversationId());
 	}
 
 	/**

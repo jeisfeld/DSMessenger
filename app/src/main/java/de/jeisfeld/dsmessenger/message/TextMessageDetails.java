@@ -16,6 +16,10 @@ public class TextMessageDetails extends MessageDetails {
 	 * The message text.
 	 */
 	private final String messageText;
+	/**
+	 * Thd conversationId.
+	 */
+	private final UUID conversationId;
 
 	/**
 	 * Generate message details.
@@ -27,9 +31,10 @@ public class TextMessageDetails extends MessageDetails {
 	 * @param messageText The message text.
 	 */
 	public TextMessageDetails(final UUID messageId, final Instant messageTime, final MessagePriority priority, final Contact contact,
-							  final String messageText) {
+							  final String messageText, final UUID conversationId) {
 		super(MessageType.TEXT, messageId, messageTime, priority, contact);
 		this.messageText = messageText;
+		this.conversationId = conversationId;
 	}
 
 	/**
@@ -46,10 +51,15 @@ public class TextMessageDetails extends MessageDetails {
 													   final MessagePriority priority, final Contact contact) {
 		Map<String, String> data = message.getData();
 		String messageText = data.get("messageText");
-		return new TextMessageDetails(messageId, messageTime, priority, contact, messageText);
+		UUID conversationId = UUID.fromString(data.get("conversationId"));
+		return new TextMessageDetails(messageId, messageTime, priority, contact, messageText, conversationId);
 	}
 
 	public final String getMessageText() {
 		return messageText;
+	}
+
+	public UUID getConversationId() {
+		return conversationId;
 	}
 }

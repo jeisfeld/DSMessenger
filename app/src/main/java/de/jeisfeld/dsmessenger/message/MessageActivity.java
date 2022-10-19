@@ -25,7 +25,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
 import de.jeisfeld.dsmessenger.entity.Contact;
-import de.jeisfeld.dsmessenger.entity.MessageInfo;
+import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
@@ -58,11 +58,11 @@ public class MessageActivity extends AppCompatActivity {
 	/**
 	 * The list of displayed messages.
 	 */
-	private final List<MessageInfo> messageList = new ArrayList<>();
+	private final List<Message> messageList = new ArrayList<>();
 	/**
 	 * The array adapter for the list of displayed messages.
 	 */
-	private ArrayAdapter<MessageInfo> arrayAdapter;
+	private ArrayAdapter<Message> arrayAdapter;
 	/**
 	 * The message vibration.
 	 */
@@ -149,23 +149,23 @@ public class MessageActivity extends AppCompatActivity {
 		binding = ActivityMessageBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
 
-		arrayAdapter = new ArrayAdapter<MessageInfo>(this, R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
+		arrayAdapter = new ArrayAdapter<Message>(this, R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
 				final View view = super.getView(position, convertView, parent);
 
-				MessageInfo messageInfo = messageList.get(position);
+				Message message = messageList.get(position);
 
-				if (messageInfo.isOwn()) {
+				if (message.isOwn()) {
 					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.VISIBLE);
 					view.findViewById(R.id.textViewMessageContact).setVisibility(View.GONE);
-					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(messageInfo.getMessageText());
+					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(message.getMessageText());
 				}
 				else {
 					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.GONE);
 					view.findViewById(R.id.textViewMessageContact).setVisibility(View.VISIBLE);
-					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(messageInfo.getMessageText());
+					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(message.getMessageText());
 				}
 
 				return view;
@@ -221,8 +221,8 @@ public class MessageActivity extends AppCompatActivity {
 		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
-		messageList.add(new MessageInfo(textMessageDetails.getMessageText(),
-				false, textMessageDetails.getMessageId(), MessageStatus.MESSAGE_RECEIVED));
+		messageList.add(new Message(textMessageDetails.getMessageText(), false,
+				textMessageDetails.getMessageId(), textMessageDetails.getConversationId(), MessageStatus.MESSAGE_RECEIVED));
 		arrayAdapter.notifyDataSetChanged();
 
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
