@@ -89,6 +89,7 @@ public class MessageDetails implements Serializable {
 		case ADMIN:
 			return AdminMessageDetails.fromRemoteMessage(message, messageId, messageTime, priority, contact);
 		case LUT:
+			return LutMessageDetails.fromRemoteMessage(message, messageId, messageTime, priority, contact);
 		case UNKNOWN:
 		default:
 			return new MessageDetails(MessageType.UNKNOWN, messageId, messageTime, priority, contact);

@@ -58,6 +58,18 @@ public class MessageFragment extends Fragment {
 	 */
 	private final List<Message> messageList = new ArrayList<>();
 	/**
+	 * The conversation.
+	 */
+	private Conversation conversation;
+	/**
+	 * The array adapter for the list of displayed messages.
+	 */
+	private ArrayAdapter<Message> arrayAdapter;
+	/**
+	 * Broadcastmanager to update fragment from external.
+	 */
+	private LocalBroadcastManager broadcastManager;
+	/**
 	 * The local broadcast receiver to do actions sent to this fragment.
 	 */
 	private final BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
@@ -97,18 +109,6 @@ public class MessageFragment extends Fragment {
 			}
 		}
 	};
-	/**
-	 * The threadId.
-	 */
-	private Conversation conversation;
-	/**
-	 * The array adapter for the list of displayed messages.
-	 */
-	private ArrayAdapter<Message> arrayAdapter;
-	/**
-	 * Broadcastmanager to update fragment from external.
-	 */
-	private LocalBroadcastManager broadcastManager;
 
 	/**
 	 * Send a broadcast to this fragment.

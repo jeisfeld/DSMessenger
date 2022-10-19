@@ -8,16 +8,64 @@
     tools:context=".main.lut.LutFragment">
 
     <TextView
-        android:id="@+id/text_lut"
+        android:id="@+id/textMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:text="@string/text_trigger_lut"
         android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="@dimen/text_xlarge"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageViewConnectionStatus"
+        android:layout_width="@dimen/input_row_height_small"
+        android:layout_height="@dimen/input_row_height_small"
+        android:src="@drawable/ic_icon_connection_uncertain"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutContact"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/textMessage">
+
+        <AutoCompleteTextView
+            android:id="@+id/dropdownContact"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_row_height_small"
+            android:hint="@string/text_contact"
+            android:inputType="none"
+            android:padding="0dp"
+            android:textSize="@dimen/text_normal" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/buttonTriggerLut"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_small"
+        android:text="@string/button_trigger_lut"
+        app:layout_constraintBottom_toTopOf="@id/toggleButtonSetLut"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutContact" />
+
+    <ToggleButton
+        android:id="@+id/toggleButtonSetLut"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonTriggerLut" />
 </androidx.constraintlayout.widget.ConstraintLayout>

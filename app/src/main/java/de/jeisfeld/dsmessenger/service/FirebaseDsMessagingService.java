@@ -14,9 +14,11 @@ import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
+import de.jeisfeld.dsmessenger.main.lut.LutFragment;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
+import de.jeisfeld.dsmessenger.message.LutMessageDetails;
 import de.jeisfeld.dsmessenger.message.MessageActivity;
 import de.jeisfeld.dsmessenger.message.MessageDetails;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
@@ -100,6 +102,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				break;
 			case PONG:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.PONG, adminDetails.getMessageId(), adminDetails.getContact());
+				LutFragment.sendBroadcast(this, MessageFragment.ActionType.PONG, adminDetails.getMessageId(), adminDetails.getContact());
 				break;
 			case UNKNOWN:
 			default:
@@ -111,15 +114,15 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			break;
 		case RANDOMIMAGE:
 			RandomimageMessageDetails randomimageMessageDetails = (RandomimageMessageDetails) messageDetails;
-			Intent intent = new Intent("de.jeisfeld.randomimage.DISPLAY_RANDOM_IMAGE_FROM_EXTERNAL");
+			Intent randomImageIntent = new Intent("de.jeisfeld.randomimage.DISPLAY_RANDOM_IMAGE_FROM_EXTERNAL");
 			switch (randomimageMessageDetails.getRandomImageOrigin()) {
 			case NOTIFICATION:
-				intent.putExtra("de.eisfeldj.randomimage.NOTIFICATION_NAME", ((RandomimageMessageDetails) messageDetails).getNotificationName());
-				sendBroadcast(intent);
+				randomImageIntent.putExtra("de.eisfeldj.randomimage.NOTIFICATION_NAME", ((RandomimageMessageDetails) messageDetails).getNotificationName());
+				sendBroadcast(randomImageIntent);
 				break;
 			case WIDGET:
-				intent.putExtra("de.eisfeldj.randomimage.WIDGET_NAME", ((RandomimageMessageDetails) messageDetails).getWidgetName());
-				sendBroadcast(intent);
+				randomImageIntent.putExtra("de.eisfeldj.randomimage.WIDGET_NAME", ((RandomimageMessageDetails) messageDetails).getWidgetName());
+				sendBroadcast(randomImageIntent);
 				break;
 			case UNKNOWN:
 			default:
@@ -127,6 +130,13 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			}
 			break;
 		case LUT:
+			LutMessageDetails lutMessageDetails = (LutMessageDetails) messageDetails;
+			Intent lutIntent = new Intent("de.jeisfeld.dsmessenger.TRIGGER_LUT");
+			lutIntent.putExtra("de.jeisfeld.dsmessenger.lut.messageType", lutMessageDetails.getLutMessageType().name());
+			if (lutMessageDetails.getDuration() != null) {
+				lutIntent.putExtra("de.jeisfeld.dsmessenger.lut.duration", lutMessageDetails.getDuration());
+			}
+			sendBroadcast(lutIntent);
 		case UNKNOWN:
 		default:
 			break;

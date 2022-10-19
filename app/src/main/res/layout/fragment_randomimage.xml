@@ -45,8 +45,7 @@
             <Spinner
                 android:id="@+id/spinnerContact"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@id/textSendMessage" />
+                android:layout_height="wrap_content" />
 
             <TableRow
                 android:id="@+id/tableRowOrigin"

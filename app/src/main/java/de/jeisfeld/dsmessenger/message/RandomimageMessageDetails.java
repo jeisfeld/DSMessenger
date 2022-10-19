@@ -9,7 +9,7 @@ import java.util.UUID;
 import de.jeisfeld.dsmessenger.entity.Contact;
 
 /**
- * The details of a text message.
+ * The details of a RandomImage message.
  */
 public class RandomimageMessageDetails extends MessageDetails {
 	/**

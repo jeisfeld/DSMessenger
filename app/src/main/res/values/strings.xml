@@ -32,12 +32,14 @@
     <string name="button_save_contact">Save Contact</string>
     <string name="button_disconnect_device">Disconnect Device</string>
     <string name="button_update_device">Update Device</string>
+    <string name="button_trigger_lut">Send Pulse</string>
 
     <string name="text_send_message">Send Message</string>
     <string name="text_send_message_to">Send Message to %1$s</string>
     <string name="text_select_conversation">Select Conversation</string>
     <string name="text_message_from">Message from %1$s</string>
     <string name="text_display_random_image">Display RandomImage</string>
+    <string name="text_trigger_lut">Trigger Lob &amp; Tadel</string>
     <string name="text_message_text">Message Text</string>
     <string name="hint_message_text">Message text</string>
     <string name="text_vibrate">Vibrate</string>
