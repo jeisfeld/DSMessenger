@@ -88,7 +88,6 @@
     <string name="text_message_sent">Message sent</string>
     <string name="text_message_received">Message received</string>
     <string name="text_message_acknowledged">Message acknowledged</string>
-    <string name="text_main_conversation_name">Main conversation</string>
     <string name="text_new_conversation_name">New conversation…</string>
 
     <string name="error_missing_username">Missing username</string>

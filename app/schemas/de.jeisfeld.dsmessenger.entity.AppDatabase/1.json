@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fdd4e2ba9a630f5d49bcea6494e35e58",
+    "identityHash": "315c05fb5b019460ab4cf364890b55c4",
     "entities": [
       {
         "tableName": "conversation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`relationId` INTEGER NOT NULL, `subject` TEXT, `conversationId` TEXT NOT NULL, PRIMARY KEY(`conversationId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`relationId` INTEGER NOT NULL, `subject` TEXT, `conversationId` TEXT NOT NULL, `lastTimestamp` INTEGER NOT NULL, PRIMARY KEY(`conversationId`))",
         "fields": [
           {
             "fieldPath": "relationId",
@@ -25,6 +25,12 @@
             "columnName": "conversationId",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "lastTimestamp",
+            "columnName": "lastTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -38,7 +44,7 @@
       },
       {
         "tableName": "message",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageText` TEXT, `isOwn` INTEGER NOT NULL, `messageId` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `status` TEXT, PRIMARY KEY(`messageId`), FOREIGN KEY(`conversationId`) REFERENCES `conversation`(`conversationId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageText` TEXT, `isOwn` INTEGER NOT NULL, `messageId` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `status` TEXT, PRIMARY KEY(`messageId`), FOREIGN KEY(`conversationId`) REFERENCES `conversation`(`conversationId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "messageText",
@@ -62,6 +68,12 @@
             "fieldPath": "conversationId",
             "columnName": "conversationId",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -106,7 +118,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fdd4e2ba9a630f5d49bcea6494e35e58')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '315c05fb5b019460ab4cf364890b55c4')"
     ]
   }
 }

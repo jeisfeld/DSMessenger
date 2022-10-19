@@ -3,7 +3,6 @@ package de.jeisfeld.dsmessenger.entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import de.jeisfeld.dsmessenger.Application;
@@ -149,14 +148,7 @@ public class Contact implements Serializable {
 	public List<Conversation> getConversations() {
 		ConversationDao conversationDao = Application.getAppDatabase().getConversationDao();
 		List<Conversation> result = new ArrayList<>(conversationDao.getConversationsByRelationId(getRelationId()));
-		if (result.size() == 0) {
-			Conversation mainConversation =
-					new Conversation(getRelationId(), Application.getResourceString(R.string.text_main_conversation_name), UUID.randomUUID());
-			conversationDao.insert(mainConversation);
-			result.add(mainConversation);
-		}
-
-		result.add(new Conversation(getRelationId(), Application.getResourceString(R.string.text_new_conversation_name), UUID.randomUUID()));
+		result.add(Conversation.createNewConversation(this));
 		return result;
 	}
 

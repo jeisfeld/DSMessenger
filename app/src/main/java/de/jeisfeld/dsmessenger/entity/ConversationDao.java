@@ -19,6 +19,9 @@ public interface ConversationDao {
 	@Delete
 	void delete(List<Conversation> conversation);
 
-	@Query("SELECT * FROM conversation WHERE relationId = :relationId")
+	@Query("SELECT * FROM conversation WHERE relationId = :relationId ORDER BY lastTimestamp DESC")
 	List<Conversation> getConversationsByRelationId(int relationId);
+
+	@Query("SELECT * FROM conversation WHERE conversationId = :conversationId")
+	Conversation getConversationById(String conversationId);
 }

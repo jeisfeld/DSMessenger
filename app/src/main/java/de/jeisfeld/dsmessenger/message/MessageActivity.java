@@ -22,14 +22,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
 import de.jeisfeld.dsmessenger.entity.Contact;
+import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
+import de.jeisfeld.dsmessenger.util.Logger;
 
 /**
  * Activity to display messages.
@@ -173,8 +176,16 @@ public class MessageActivity extends AppCompatActivity {
 		};
 		binding.listViewMessages.setAdapter(arrayAdapter);
 
+		final TextMessageDetails textMessageDetails = (TextMessageDetails) getIntent().getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 
-		handleIntentData(getIntent());
+		new Thread(() -> {
+			List<Message> newMessageList =
+					Application.getAppDatabase().getMessageDao().getMessagesByConversationId(textMessageDetails.getConversationId().toString());
+			messageList.clear();
+			messageList.addAll(newMessageList);
+			arrayAdapter.notifyDataSetChanged();
+			runOnUiThread(() -> handleIntentData(textMessageDetails));
+		}).start();
 
 		broadcastManager = LocalBroadcastManager.getInstance(this);
 		IntentFilter actionReceiver = new IntentFilter();
@@ -197,7 +208,7 @@ public class MessageActivity extends AppCompatActivity {
 	@Override
 	protected final void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
-		handleIntentData(intent);
+		handleIntentData((TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS));
 		binding.buttonAcknowledge.setVisibility(View.VISIBLE);
 	}
 
@@ -214,16 +225,26 @@ public class MessageActivity extends AppCompatActivity {
 	/**
 	 * Handle the data of a new intent.
 	 *
-	 * @param intent The intent.
+	 * @param textMessageDetails The text message details of the new intent.
 	 */
-	private void handleIntentData(final Intent intent) {
+	private void handleIntentData(final TextMessageDetails textMessageDetails) {
 		cancelLastIntentEffects();
-		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
-		messageList.add(new Message(textMessageDetails.getMessageText(), false,
-				textMessageDetails.getMessageId(), textMessageDetails.getConversationId(), MessageStatus.MESSAGE_RECEIVED));
+
+		UUID conversationId = textMessageDetails.getConversationId();
+		Conversation conversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId.toString());
+		Logger.log("Found " + conversation);
+		if (conversation == null) {
+			conversation = Conversation.createNewConversation(textMessageDetails);
+			conversation.storeIfNew(textMessageDetails.getMessageText());
+		}
+
+		Message message = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
+				conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
+		messageList.add(message);
 		arrayAdapter.notifyDataSetChanged();
+		message.store();
 
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
 		MessageActivity.currentTopContact = textMessageDetails.getContact();
@@ -258,7 +279,7 @@ public class MessageActivity extends AppCompatActivity {
 	}
 
 	/**
-	 * Cancel the effects of the last text message.
+	 * Cancel the effects of the last text message (such as vibration).
 	 */
 	private void cancelLastIntentEffects() {
 		if (lastTextMessageDetails != null) {

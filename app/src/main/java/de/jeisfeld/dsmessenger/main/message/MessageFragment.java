@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.FragmentMessageBinding;
 import de.jeisfeld.dsmessenger.entity.Contact;
@@ -174,6 +175,14 @@ public class MessageFragment extends Fragment {
 		};
 		binding.listViewMessages.setAdapter(arrayAdapter);
 
+		new Thread(() -> {
+			List<Message> newMessageList =
+					Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversation.getConversationId());
+			messageList.clear();
+			messageList.addAll(newMessageList);
+			arrayAdapter.notifyDataSetChanged();
+		}).start();
+
 		return binding.getRoot();
 	}
 
@@ -234,9 +243,14 @@ public class MessageFragment extends Fragment {
 		String messageText = binding.editTextMessageText.getText().toString();
 		UUID messageId = UUID.randomUUID();
 		lastMessageId = messageId;
+		long timestamp = System.currentTimeMillis();
 		binding.textMessageResponse.setText(R.string.text_sending_message);
 
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
+					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
+							conversation.getConversationUuid(), timestamp, MessageStatus.MESSAGE_SENT);
+					conversation.storeIfNew(message.getMessageText());
+					message.store();
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
@@ -245,17 +259,17 @@ public class MessageFragment extends Fragment {
 							}
 							else {
 								binding.textMessageResponse.setText(R.string.text_message_sent);
-								messageList.add(new Message(binding.editTextMessageText.getText().toString(),
-										true, messageId, conversation.getConversationUuid(), MessageStatus.MESSAGE_SENT));
+								messageList.add(message);
 								arrayAdapter.notifyDataSetChanged();
 								binding.listViewMessages.setSelection(messageList.size() - 1);
 								binding.editTextMessageText.setText("");
+
 							}
 						});
 					}
 				},
 				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name(),
-				"conversationId", conversation.getConversationId());
+				"conversationId", conversation.getConversationId(), "timestamp", Long.toString(timestamp));
 	}
 
 	/**

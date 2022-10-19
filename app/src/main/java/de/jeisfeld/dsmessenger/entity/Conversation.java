@@ -8,6 +8,9 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import de.jeisfeld.dsmessenger.Application;
+import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.message.TextMessageDetails;
 
 /**
  * A conversation with a contact.
@@ -23,7 +26,7 @@ public class Conversation implements Serializable {
 	 * The subject of the conversation.
 	 */
 	@ColumnInfo(name = "subject")
-	private final String subject;
+	private String subject;
 	/**
 	 * The unique id of the conversation.
 	 */
@@ -32,17 +35,16 @@ public class Conversation implements Serializable {
 	private final String conversationId;
 
 	/**
-	 * Constructor.
-	 *
-	 * @param relationId     The relationId of the contact.
-	 * @param subject        The subject of the conversation.
-	 * @param conversationId The unique id of the conversation.
+	 * The last timestamp of this conversation.
 	 */
-	public Conversation(int relationId, String subject, @NonNull String conversationId) {
-		this.relationId = relationId;
-		this.subject = subject;
-		this.conversationId = conversationId;
-	}
+	@ColumnInfo(name = "lastTimestamp")
+	private final long lastTimestamp;
+
+	/**
+	 * Flag indicating if the conversation is already stored.
+	 */
+	@Ignore
+	private boolean isStored;
 
 	/**
 	 * Constructor.
@@ -50,10 +52,53 @@ public class Conversation implements Serializable {
 	 * @param relationId     The relationId of the contact.
 	 * @param subject        The subject of the conversation.
 	 * @param conversationId The unique id of the conversation.
+	 * @param lastTimestamp  The last timestamp of this conversation.
 	 */
-	@Ignore
-	public Conversation(int relationId, String subject, UUID conversationId) {
-		this(relationId, subject, conversationId.toString());
+	public Conversation(final int relationId, final String subject, @NonNull final String conversationId, final long lastTimestamp) {
+		this.relationId = relationId;
+		this.subject = subject;
+		this.conversationId = conversationId;
+		this.lastTimestamp = lastTimestamp;
+		this.isStored = true;
+	}
+
+	/**
+	 * Create a new conversation.
+	 *
+	 * @param contact The contact.
+	 * @return the conversation.
+	 */
+	public static Conversation createNewConversation(final Contact contact) {
+		Conversation result = new Conversation(contact.getRelationId(), Application.getResourceString(R.string.text_new_conversation_name),
+				UUID.randomUUID().toString(), System.currentTimeMillis());
+		result.isStored = false;
+		return result;
+	}
+
+	/**
+	 * Create a new conversation from received text message.
+	 *
+	 * @param textMessageDetails The received text message.
+	 * @return the conversation.
+	 */
+	public static Conversation createNewConversation(final TextMessageDetails textMessageDetails) {
+		Conversation result = new Conversation(textMessageDetails.getContact().getRelationId(), textMessageDetails.getMessageText(),
+				textMessageDetails.getConversationId().toString(), textMessageDetails.getTimestamp());
+		result.isStored = false;
+		return result;
+	}
+
+	/**
+	 * Store this conversation.
+	 */
+	public void storeIfNew(final String subject) {
+		if (!isStored) {
+			if (subject != null) {
+				this.subject = subject;
+			}
+			Application.getAppDatabase().getConversationDao().insert(this);
+			isStored = true;
+		}
 	}
 
 	public int getRelationId() {
@@ -71,5 +116,9 @@ public class Conversation implements Serializable {
 
 	public UUID getConversationUuid() {
 		return UUID.fromString(getConversationId());
+	}
+
+	public long getLastTimestamp() {
+		return lastTimestamp;
 	}
 }
