@@ -8,6 +8,9 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
+/**
+ * The DAO for accessing message table.
+ */
 @Dao
 public interface MessageDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)

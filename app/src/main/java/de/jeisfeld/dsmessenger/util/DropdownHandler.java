@@ -43,8 +43,10 @@ public class DropdownHandler<T> {
 	 * @param view            The view for the dropdown.
 	 * @param resource        The array resource with the dropdown values.
 	 * @param initialPosition The initial position;
+	 * @return The dropdown handler.
 	 */
-	public static DropdownHandler<String> fromResource(final Context context, final AutoCompleteTextView view, int resource, int initialPosition) {
+	public static DropdownHandler<String> fromResource(final Context context, final AutoCompleteTextView view, final int resource,
+													   final int initialPosition) {
 		DropdownHandler<String> result = new DropdownHandler<>(context, view, context.getResources().getStringArray(resource));
 		result.selectEntry(initialPosition);
 		return result;
@@ -55,7 +57,7 @@ public class DropdownHandler<T> {
 	 *
 	 * @param position The position.
 	 */
-	public void selectEntry(int position) {
+	public void selectEntry(final int position) {
 		AutoCompleteTextView view = viewReference.get();
 		if (view != null) {
 			view.setText(values[position].toString(), false);
@@ -82,6 +84,11 @@ public class DropdownHandler<T> {
 		return -1;
 	}
 
+	/**
+	 * Get the selected item.
+	 *
+	 * @return The selected item.
+	 */
 	public T getSelectedItem() {
 		int i = getSelectedPosition();
 		if (i < 0) {

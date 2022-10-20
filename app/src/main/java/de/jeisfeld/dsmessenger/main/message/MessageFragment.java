@@ -121,11 +121,12 @@ public class MessageFragment extends Fragment {
 	/**
 	 * Send a broadcast to this fragment.
 	 *
-	 * @param context    The context.
-	 * @param actionType The action type.
-	 * @param messageId  The messageId.
-	 * @param contact    The contact.
-	 * @param parameters The parameters.
+	 * @param context            The context.
+	 * @param actionType         The action type.
+	 * @param messageId          The messageId.
+	 * @param contact            The contact.
+	 * @param textMessageDetails The text message details.
+	 * @param parameters         The parameters.
 	 */
 	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final Contact contact,
 									 final TextMessageDetails textMessageDetails, final String... parameters) {
@@ -247,7 +248,6 @@ public class MessageFragment extends Fragment {
 				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.PING.name());
 	}
 
-
 	/**
 	 * Send the message.
 	 *
@@ -289,7 +289,7 @@ public class MessageFragment extends Fragment {
 	 *
 	 * @param message The message to be added.
 	 */
-	private void addMessage(Message message) {
+	private void addMessage(final Message message) {
 		message.store();
 		if (message.getConversationId().equals(conversation.getConversationId())) {
 			messageList.add(message);

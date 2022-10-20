@@ -28,13 +28,14 @@ public class TextMessageDetails extends MessageDetails {
 	/**
 	 * Generate message details.
 	 *
-	 * @param messageType The message type.
-	 * @param messageId   The message id.
-	 * @param messageTime The message time.
-	 * @param priority    The message priority.
-	 * @param contact     The contact who sent the message.
-	 * @param messageText The message text.
-	 * @param timestamp   The timestamp.
+	 * @param messageType    The message type.
+	 * @param messageId      The message id.
+	 * @param messageTime    The message time.
+	 * @param priority       The message priority.
+	 * @param contact        The contact who sent the message.
+	 * @param messageText    The message text.
+	 * @param conversationId The conversation id.
+	 * @param timestamp      The timestamp.
 	 */
 	public TextMessageDetails(final MessageType messageType, final UUID messageId, final Instant messageTime, final MessagePriority priority,
 							  final Contact contact, final String messageText, final UUID conversationId, final long timestamp) {
@@ -68,11 +69,11 @@ public class TextMessageDetails extends MessageDetails {
 		return messageText;
 	}
 
-	public UUID getConversationId() {
+	public final UUID getConversationId() {
 		return conversationId;
 	}
 
-	public long getTimestamp() {
+	public final long getTimestamp() {
 		return timestamp;
 	}
 }

@@ -59,7 +59,7 @@ public class Conversation implements Serializable {
 		this.subject = subject;
 		this.conversationId = conversationId;
 		this.lastTimestamp = lastTimestamp;
-		this.isStored = true;
+		isStored = true;
 	}
 
 	/**
@@ -90,35 +90,37 @@ public class Conversation implements Serializable {
 
 	/**
 	 * Store this conversation.
+	 *
+	 * @param newSubject The subject for storage.
 	 */
-	public void storeIfNew(final String subject) {
+	public void storeIfNew(final String newSubject) {
 		if (!isStored) {
-			if (subject != null) {
-				this.subject = subject;
+			if (newSubject != null) {
+				subject = newSubject;
 			}
 			Application.getAppDatabase().getConversationDao().insert(this);
 			isStored = true;
 		}
 	}
 
-	public int getRelationId() {
+	public final int getRelationId() {
 		return relationId;
 	}
 
-	public String getSubject() {
+	public final String getSubject() {
 		return subject;
 	}
 
 	@NonNull
-	public String getConversationId() {
+	public final String getConversationId() {
 		return conversationId;
 	}
 
-	public UUID getConversationUuid() {
+	public final UUID getConversationUuid() {
 		return UUID.fromString(getConversationId());
 	}
 
-	public long getLastTimestamp() {
+	public final long getLastTimestamp() {
 		return lastTimestamp;
 	}
 }

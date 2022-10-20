@@ -24,6 +24,10 @@ public class LutMessageDetails extends MessageDetails {
 	/**
 	 * Generate message details.
 	 *
+	 * @param messageId      The message id.
+	 * @param messageTime    The message time.
+	 * @param priority       The message priority.
+	 * @param contact        The contact who sent the message
 	 * @param lutMessageType The LUT message type.
 	 * @param duration       The pulse duration.
 	 */
@@ -54,11 +58,11 @@ public class LutMessageDetails extends MessageDetails {
 		return new LutMessageDetails(messageId, messageTime, priority, contact, lutMessageType, duration);
 	}
 
-	public LutMessageType getLutMessageType() {
+	public final LutMessageType getLutMessageType() {
 		return lutMessageType;
 	}
 
-	public Long getDuration() {
+	public final Long getDuration() {
 		return duration;
 	}
 

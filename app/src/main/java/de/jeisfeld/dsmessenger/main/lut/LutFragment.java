@@ -41,7 +41,7 @@ public class LutFragment extends Fragment {
 	/**
 	 * Dropdown handler for the contact.
 	 */
-	DropdownHandler<Contact> dropdownHandlerContact;
+	private DropdownHandler<Contact> dropdownHandlerContact;
 	/**
 	 * The local broadcast receiver to do actions sent to this fragment.
 	 */
@@ -121,7 +121,7 @@ public class LutFragment extends Fragment {
 	}
 
 	@Override
-	public void onResume() {
+	public final void onResume() {
 		super.onResume();
 		Contact[] contacts = ContactRegistry.getInstance().getConnectedContacts().toArray(new Contact[0]);
 		dropdownHandlerContact = new DropdownHandler<>(getContext(), binding.dropdownContact, contacts);
@@ -189,7 +189,7 @@ public class LutFragment extends Fragment {
 	 * @param lutMessageType The LUT message type.
 	 * @param duration       The duration.
 	 */
-	private void sendMessage(LutMessageType lutMessageType, long duration) {
+	private void sendMessage(final LutMessageType lutMessageType, final long duration) {
 		new HttpSender(getContext()).sendMessage(dropdownHandlerContact.getSelectedItem(), UUID.randomUUID(), null,
 				"messageType", MessageType.LUT.name(), "lutMessageType", lutMessageType.name(),
 				"duration", Long.toString(duration));
@@ -200,7 +200,7 @@ public class LutFragment extends Fragment {
 	 *
 	 * @param lutMessageType The LUT message type.
 	 */
-	private void sendMessage(LutMessageType lutMessageType) {
+	private void sendMessage(final LutMessageType lutMessageType) {
 		new HttpSender(getContext()).sendMessage(dropdownHandlerContact.getSelectedItem(), UUID.randomUUID(), null,
 				"messageType", MessageType.LUT.name(), "lutMessageType", lutMessageType.name());
 	}

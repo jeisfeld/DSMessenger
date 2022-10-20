@@ -49,7 +49,7 @@ public class RandomimageFragment extends Fragment {
 	}
 
 	@Override
-	public void onResume() {
+	public final void onResume() {
 		super.onResume();
 		List<Contact> contactList = ContactRegistry.getInstance().getConnectedContacts();
 

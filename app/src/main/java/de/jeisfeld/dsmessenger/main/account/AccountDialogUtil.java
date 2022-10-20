@@ -169,7 +169,7 @@ public final class AccountDialogUtil {
 	 * Display dialog for edit device.
 	 *
 	 * @param accountFragment The triggering fragment.
-	 * @param device          The device
+	 * @param device The device
 	 */
 	public static void displayEditDeviceDialog(final AccountFragment accountFragment, final Device device) {
 		EditDeviceDialogFragment fragment = new EditDeviceDialogFragment();
@@ -667,7 +667,7 @@ public final class AccountDialogUtil {
 			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 			builder.setTitle(R.string.title_dialog_edit_device).setView(binding.getRoot());
 
-			DropdownHandler<String> dropdownHandlerMessageDisplayTypeNormal = DropdownHandler.fromResource(getContext(),
+			final DropdownHandler<String> dropdownHandlerMessageDisplayTypeNormal = DropdownHandler.fromResource(getContext(),
 					binding.dropdownMessageDisplayTypeNormal, R.array.array_message_display_types,
 					device.getDisplayStrategyNormal().getMessageDisplayType().ordinal());
 			binding.checkboxVibrateNormal.setChecked(device.getDisplayStrategyNormal().isVibrate());
@@ -676,12 +676,12 @@ public final class AccountDialogUtil {
 			binding.checkboxDisplayOnLockScreenNormal.setChecked(device.getDisplayStrategyNormal().isDisplayOnLockScreen());
 			binding.checkboxKeepScreenOnNormal.setChecked(device.getDisplayStrategyNormal().isKeepScreenOn());
 			binding.checkboxLockMessageNormal.setChecked(device.getDisplayStrategyNormal().isLockMessage());
-			DropdownHandler<String> dropdownHandlerVibrationStyleNormal = DropdownHandler.fromResource(getContext(),
+			final DropdownHandler<String> dropdownHandlerVibrationStyleNormal = DropdownHandler.fromResource(getContext(),
 					binding.dropdownVibrationStyleNormal, R.array.array_vibrate_pattern_names,
 					device.getDisplayStrategyNormal().getVibrationPattern());
 			binding.layoutVibrationStyleNormal.setVisibility(device.getDisplayStrategyNormal().isVibrate() ? View.VISIBLE : View.GONE);
 
-			DropdownHandler<String> dropdownHandlerMessageDisplayTypeUrgent = DropdownHandler.fromResource(getContext(),
+			final DropdownHandler<String> dropdownHandlerMessageDisplayTypeUrgent = DropdownHandler.fromResource(getContext(),
 					binding.dropdownMessageDisplayTypeUrgent, R.array.array_message_display_types,
 					device.getDisplayStrategyUrgent().getMessageDisplayType().ordinal());
 			binding.checkboxVibrateUrgent.setChecked(device.getDisplayStrategyUrgent().isVibrate());
@@ -690,7 +690,7 @@ public final class AccountDialogUtil {
 			binding.checkboxDisplayOnLockScreenUrgent.setChecked(device.getDisplayStrategyUrgent().isDisplayOnLockScreen());
 			binding.checkboxKeepScreenOnUrgent.setChecked(device.getDisplayStrategyUrgent().isKeepScreenOn());
 			binding.checkboxLockMessageUrgent.setChecked(device.getDisplayStrategyUrgent().isLockMessage());
-			DropdownHandler<String> dropdownHandlerVibrationStyleUrgent = DropdownHandler.fromResource(getContext(),
+			final DropdownHandler<String> dropdownHandlerVibrationStyleUrgent = DropdownHandler.fromResource(getContext(),
 					binding.dropdownVibrationStyleUrgent, R.array.array_vibrate_pattern_names,
 					device.getDisplayStrategyUrgent().getVibrationPattern());
 			binding.layoutVibrationStyleUrgent.setVisibility(device.getDisplayStrategyUrgent().isVibrate() ? View.VISIBLE : View.GONE);
@@ -728,7 +728,6 @@ public final class AccountDialogUtil {
 
 			return builder.create();
 		}
-
 
 	}
 }

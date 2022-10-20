@@ -14,6 +14,9 @@ import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 
 import static androidx.room.ForeignKey.CASCADE;
 
+/**
+ * The data object for storing a message.
+ */
 @Entity(tableName = "message", foreignKeys = {
 		@ForeignKey(onDelete = CASCADE, entity = Conversation.class, parentColumns = "conversationId", childColumns = "conversationId")},
 		indices = {@Index("conversationId")})
@@ -94,37 +97,37 @@ public class Message {
 		Application.getAppDatabase().getMessageDao().insert(this);
 	}
 
-	public String getMessageText() {
+	public final String getMessageText() {
 		return messageText;
 	}
 
-	public boolean isOwn() {
+	public final boolean isOwn() {
 		return isOwn;
 	}
 
 	@NonNull
-	public String getMessageId() {
+	public final String getMessageId() {
 		return messageId;
 	}
 
-	public UUID getMessageUuid() {
+	public final UUID getMessageUuid() {
 		return UUID.fromString(getMessageId());
 	}
 
 	@NonNull
-	public String getConversationId() {
+	public final String getConversationId() {
 		return conversationId;
 	}
 
-	public UUID getConversationUuid() {
+	public final UUID getConversationUuid() {
 		return UUID.fromString(getConversationId());
 	}
 
-	public long getTimestamp() {
+	public final long getTimestamp() {
 		return timestamp;
 	}
 
-	public MessageStatus getStatus() {
+	public final MessageStatus getStatus() {
 		return status;
 	}
 }
