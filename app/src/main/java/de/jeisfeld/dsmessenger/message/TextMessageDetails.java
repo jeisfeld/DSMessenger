@@ -28,6 +28,7 @@ public class TextMessageDetails extends MessageDetails {
 	/**
 	 * Generate message details.
 	 *
+	 * @param messageType The message type.
 	 * @param messageId   The message id.
 	 * @param messageTime The message time.
 	 * @param priority    The message priority.
@@ -35,9 +36,9 @@ public class TextMessageDetails extends MessageDetails {
 	 * @param messageText The message text.
 	 * @param timestamp   The timestamp.
 	 */
-	public TextMessageDetails(final UUID messageId, final Instant messageTime, final MessagePriority priority, final Contact contact,
-							  final String messageText, final UUID conversationId, final long timestamp) {
-		super(MessageType.TEXT, messageId, messageTime, priority, contact);
+	public TextMessageDetails(final MessageType messageType, final UUID messageId, final Instant messageTime, final MessagePriority priority,
+							  final Contact contact, final String messageText, final UUID conversationId, final long timestamp) {
+		super(messageType, messageId, messageTime, priority, contact);
 		this.messageText = messageText;
 		this.conversationId = conversationId;
 		this.timestamp = timestamp;
@@ -51,15 +52,16 @@ public class TextMessageDetails extends MessageDetails {
 	 * @param messageTime The message time.
 	 * @param priority    The message priority.
 	 * @param contact     The contact.
+	 * @param messageType The message type.
 	 * @return The message details.
 	 */
 	public static TextMessageDetails fromRemoteMessage(final RemoteMessage message, final UUID messageId, final Instant messageTime,
-													   final MessagePriority priority, final Contact contact) {
+													   final MessagePriority priority, final Contact contact, final MessageType messageType) {
 		Map<String, String> data = message.getData();
 		String messageText = data.get("messageText");
 		UUID conversationId = UUID.fromString(data.get("conversationId"));
 		long timestamp = Long.parseLong(data.get("timestamp"));
-		return new TextMessageDetails(messageId, messageTime, priority, contact, messageText, conversationId, timestamp);
+		return new TextMessageDetails(messageType, messageId, messageTime, priority, contact, messageText, conversationId, timestamp);
 	}
 
 	public final String getMessageText() {

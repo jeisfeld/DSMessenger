@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#E65100</color>
-    <color name="purple_500">#B71C1C</color>
-    <color name="purple_700">#850000</color>
-    <color name="teal_200">#0288D1</color>
-    <color name="teal_700">#303F9F</color>
+    <color name="red_100">#F6D0D0</color>
+    <color name="red_200">#FD6C3E</color>
+    <color name="red_500">#B71C1C</color>
+    <color name="red_700">#850000</color>
+    <color name="red_900">#470101</color>
+    <color name="blue_200">#0288D1</color>
+    <color name="blue_700">#303F9F</color>
     <color name="black">#000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="ic_launcher_background">#FFFFFF</color>
+
+    <color name="background_contact">@color/red_100</color>
 </resources>

@@ -41,7 +41,7 @@
     <string name="text_display_random_image">Display RandomImage</string>
     <string name="text_trigger_lut">Trigger Lob &amp; Tadel</string>
     <string name="text_message_text">Message Text</string>
-    <string name="hint_message_text">Message text</string>
+    <string name="hint_message_text">New message…</string>
     <string name="text_vibrate">Vibrate</string>
     <string name="text_repeat_vibration">Repeat Vibration</string>
     <string name="text_vibration_pattern">Vibration Pattern</string>

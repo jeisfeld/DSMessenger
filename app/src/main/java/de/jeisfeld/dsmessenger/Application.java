@@ -12,6 +12,7 @@ import android.util.Log;
 
 import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 import de.jeisfeld.dsmessenger.entity.AppDatabase;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
@@ -62,6 +63,9 @@ public class Application extends android.app.Application {
 		super.onCreate();
 		Application.mContext = getApplicationContext();
 		Application.mContext = Application.createContextWrapperForLocale(getApplicationContext());
+
+		AppCompatDelegate.setDefaultNightMode(
+				PreferenceUtil.getSharedPreferenceIntString(R.string.key_pref_night_mode, R.string.pref_default_night_mode));
 
 		appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "dsmessenger").allowMainThreadQueries().build();
 	}

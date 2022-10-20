@@ -33,6 +33,7 @@ import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
+import de.jeisfeld.dsmessenger.message.TextMessageDetails;
 
 /**
  * Fragment for sending messages.
@@ -87,6 +88,12 @@ public class MessageFragment extends Fragment {
 								actionType == ActionType.MESSAGE_RECEIVED ? R.string.text_message_received : R.string.text_message_acknowledged);
 					}
 					break;
+				case TEXT_ACKNOWLEDGE:
+					TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra("textMessageDetails");
+					Message message = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
+							textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
+					addMessage(message);
+					break;
 				case DEVICE_LOGGED_OUT:
 					binding.listViewMessages.setVisibility(View.GONE);
 					binding.buttonSend.setVisibility(View.GONE);
@@ -121,13 +128,16 @@ public class MessageFragment extends Fragment {
 	 * @param parameters The parameters.
 	 */
 	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final Contact contact,
-									 final String... parameters) {
+									 final TextMessageDetails textMessageDetails, final String... parameters) {
 		final Intent intent = new Intent(BROADCAST_ACTION);
 		final Bundle bundle = new Bundle();
 		bundle.putSerializable("actionType", actionType);
 		bundle.putSerializable("messageId", messageId);
 		if (contact != null) {
 			bundle.putSerializable("contact", contact);
+		}
+		if (textMessageDetails != null) {
+			bundle.putSerializable("textMessageDetails", textMessageDetails);
 		}
 		int i = 0;
 		while (i < parameters.length - 1) {
@@ -181,6 +191,10 @@ public class MessageFragment extends Fragment {
 			messageList.clear();
 			messageList.addAll(newMessageList);
 			arrayAdapter.notifyDataSetChanged();
+			Activity activity = getActivity();
+			if (activity != null) {
+				activity.runOnUiThread(() -> binding.listViewMessages.setSelection(messageList.size() - 1));
+			}
 		}).start();
 
 		return binding.getRoot();
@@ -250,7 +264,6 @@ public class MessageFragment extends Fragment {
 					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
 							conversation.getConversationUuid(), timestamp, MessageStatus.MESSAGE_SENT);
 					conversation.storeIfNew(message.getMessageText());
-					message.store();
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
@@ -259,17 +272,30 @@ public class MessageFragment extends Fragment {
 							}
 							else {
 								binding.textMessageResponse.setText(R.string.text_message_sent);
-								messageList.add(message);
-								arrayAdapter.notifyDataSetChanged();
-								binding.listViewMessages.setSelection(messageList.size() - 1);
+								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
+									addMessage(message);
+								}
 								binding.editTextMessageText.setText("");
-
 							}
 						});
 					}
 				},
 				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name(),
 				"conversationId", conversation.getConversationId(), "timestamp", Long.toString(timestamp));
+	}
+
+	/**
+	 * Add a message to the displayed list.
+	 *
+	 * @param message The message to be added.
+	 */
+	private void addMessage(Message message) {
+		message.store();
+		if (message.getConversationId().equals(conversation.getConversationId())) {
+			messageList.add(message);
+			arrayAdapter.notifyDataSetChanged();
+			binding.listViewMessages.setSelection(messageList.size() - 1);
+		}
 	}
 
 	/**
@@ -284,6 +310,10 @@ public class MessageFragment extends Fragment {
 		 * Inform about message acknowledged.
 		 */
 		MESSAGE_ACKNOWLEDGED,
+		/**
+		 * Text message as acknowledgement.
+		 */
+		TEXT_ACKNOWLEDGE,
 		/**
 		 * This device has been logged out.
 		 */

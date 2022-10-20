@@ -83,15 +83,16 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				AccountFragment.removeStoredDeviceInfo();
 				ContactRegistry.getInstance().cleanContacts();
 				AccountFragment.sendBroadcast(this, ActionType.DEVICE_LOGGED_OUT);
-				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.DEVICE_LOGGED_OUT, null, adminDetails.getContact());
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.DEVICE_LOGGED_OUT, null,
+						adminDetails.getContact(), null);
 				break;
 			case MESSAGE_RECEIVED:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId(),
-						adminDetails.getContact());
+						adminDetails.getContact(), null);
 				break;
 			case MESSAGE_ACKNOWLEDGED:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(),
-						adminDetails.getContact());
+						adminDetails.getContact(), null);
 				break;
 			case MESSAGE_SELF_ACKNOWLEDGED:
 				MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId());
@@ -101,7 +102,8 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.PONG.name());
 				break;
 			case PONG:
-				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.PONG, adminDetails.getMessageId(), adminDetails.getContact());
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.PONG, adminDetails.getMessageId(),
+						adminDetails.getContact(), null);
 				LutFragment.sendBroadcast(this, MessageFragment.ActionType.PONG, adminDetails.getMessageId(), adminDetails.getContact());
 				break;
 			case UNKNOWN:
@@ -111,6 +113,10 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			break;
 		case TEXT:
 			startActivity(MessageActivity.createIntent(this, (TextMessageDetails) messageDetails));
+			break;
+		case TEXT_ACKNOWLEDGE:
+			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_ACKNOWLEDGE, messageDetails.getMessageId(),
+					messageDetails.getContact(), (TextMessageDetails) messageDetails);
 			break;
 		case RANDOMIMAGE:
 			RandomimageMessageDetails randomimageMessageDetails = (RandomimageMessageDetails) messageDetails;

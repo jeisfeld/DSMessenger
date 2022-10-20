@@ -31,8 +31,8 @@ import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
+import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
-import de.jeisfeld.dsmessenger.util.Logger;
 
 /**
  * Activity to display messages.
@@ -51,9 +51,9 @@ public class MessageActivity extends AppCompatActivity {
 	 */
 	private static final String STRING_MESSAGE = "MESSAGE";
 	/**
-	 * The contact currently on top.
+	 * The conversation currently on top.
 	 */
-	private static Contact currentTopContact = null;
+	private static Conversation currentTopConversation = null;
 	/**
 	 * The binding of the activity.
 	 */
@@ -66,6 +66,10 @@ public class MessageActivity extends AppCompatActivity {
 	 * The array adapter for the list of displayed messages.
 	 */
 	private ArrayAdapter<Message> arrayAdapter;
+	/**
+	 * The conversation.
+	 */
+	private Conversation conversation;
 	/**
 	 * The message vibration.
 	 */
@@ -135,8 +139,8 @@ public class MessageActivity extends AppCompatActivity {
 	public static Intent createIntent(final Context context, final TextMessageDetails textMessageDetails) {
 		Intent intent = new Intent(context, MessageActivity.class);
 		intent.putExtra(STRING_EXTRA_MESSAGE_DETAILS, textMessageDetails);
-		if (textMessageDetails.getContact() != null && currentTopContact != null
-				&& textMessageDetails.getContact().getRelationId() != currentTopContact.getRelationId()) {
+		if (textMessageDetails.getConversationId() != null && currentTopConversation != null
+				&& !currentTopConversation.getConversationUuid().equals(textMessageDetails.getConversationId())) {
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
 		}
 		else {
@@ -184,7 +188,10 @@ public class MessageActivity extends AppCompatActivity {
 			messageList.clear();
 			messageList.addAll(newMessageList);
 			arrayAdapter.notifyDataSetChanged();
-			runOnUiThread(() -> handleIntentData(textMessageDetails));
+			runOnUiThread(() -> {
+				binding.listViewMessages.setSelection(messageList.size() - 1);
+				handleIntentData(textMessageDetails);
+			});
 		}).start();
 
 		broadcastManager = LocalBroadcastManager.getInstance(this);
@@ -210,16 +217,7 @@ public class MessageActivity extends AppCompatActivity {
 		super.onNewIntent(intent);
 		handleIntentData((TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS));
 		binding.buttonAcknowledge.setVisibility(View.VISIBLE);
-	}
-
-	/**
-	 * Extract the message text form an intent.
-	 *
-	 * @param intent The intent.
-	 * @return The message text.
-	 */
-	private String extractMessageText(final Intent intent) {
-		return ((TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS)).getMessageText();
+		binding.editTextMessageText.setVisibility(View.VISIBLE);
 	}
 
 	/**
@@ -233,21 +231,24 @@ public class MessageActivity extends AppCompatActivity {
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
 
 		UUID conversationId = textMessageDetails.getConversationId();
-		Conversation conversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId.toString());
-		Logger.log("Found " + conversation);
-		if (conversation == null) {
-			conversation = Conversation.createNewConversation(textMessageDetails);
-			conversation.storeIfNew(textMessageDetails.getMessageText());
+		Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId.toString());
+		if (messageConversation == null) {
+			messageConversation = Conversation.createNewConversation(textMessageDetails);
+			messageConversation.storeIfNew(textMessageDetails.getMessageText());
 		}
+		MessageActivity.currentTopConversation = messageConversation;
+		conversation = messageConversation;
 
 		Message message = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
 				conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
-		messageList.add(message);
-		arrayAdapter.notifyDataSetChanged();
-		message.store();
+		if (message.getMessageText() != null && message.getMessageText().length() > 0) {
+			message.store();
+			messageList.add(message);
+			arrayAdapter.notifyDataSetChanged();
+			binding.listViewMessages.setSelection(messageList.size() - 1);
+		}
 
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
-		MessageActivity.currentTopContact = textMessageDetails.getContact();
 
 		if (displayStrategy.isVibrate()) {
 			messageVibration = new MessageVibration(this);
@@ -272,7 +273,8 @@ public class MessageActivity extends AppCompatActivity {
 			sendConfirmation(AdminType.MESSAGE_ACKNOWLEDGED, textMessageDetails.getMessageId(), textMessageDetails.getContact());
 			new HttpSender(this).sendSelfMessage(textMessageDetails.getMessageId(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_SELF_ACKNOWLEDGED.name());
-			binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
+			binding.buttonAcknowledge.setVisibility(View.GONE);
+			binding.editTextMessageText.setVisibility(View.GONE);
 		});
 
 		lastTextMessageDetails = textMessageDetails;
@@ -309,8 +311,32 @@ public class MessageActivity extends AppCompatActivity {
 	 * @param contact   The contact.
 	 */
 	private void sendConfirmation(final AdminType adminType, final UUID messageId, final Contact contact) {
-		new HttpSender(this).sendMessage(contact, messageId, null,
-				"messageType", MessageType.ADMIN.name(), "adminType", adminType.name());
+		String messageText = binding.editTextMessageText.getText().toString();
+		if (adminType == AdminType.MESSAGE_ACKNOWLEDGED && messageText.length() > 0) {
+			final long timestamp = System.currentTimeMillis();
+			UUID newMessageId = UUID.randomUUID();
+			new HttpSender(this).sendMessage(contact, newMessageId, (response, responseData) -> {
+						Message message = new Message(messageText, true, newMessageId,
+								conversation.getConversationUuid(), timestamp, MessageStatus.MESSAGE_SENT);
+						conversation.storeIfNew(message.getMessageText());
+						runOnUiThread(() -> {
+							if (responseData != null && responseData.isSuccess()) {
+								message.store();
+								messageList.add(message);
+								arrayAdapter.notifyDataSetChanged();
+								binding.listViewMessages.setSelection(messageList.size() - 1);
+								binding.editTextMessageText.setText("");
+							}
+						});
+					},
+					"messageType", MessageType.TEXT_ACKNOWLEDGE.name(), "messageText", messageText,
+					"priority", MessagePriority.NORMAL.name(), "conversationId", conversation.getConversationId(),
+					"timestamp", Long.toString(timestamp));
+		}
+		else {
+			new HttpSender(this).sendMessage(contact, messageId, null,
+					"messageType", MessageType.ADMIN.name(), "adminType", adminType.name());
+		}
 	}
 
 	/**
