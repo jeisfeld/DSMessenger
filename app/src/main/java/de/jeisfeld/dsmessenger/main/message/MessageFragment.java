@@ -89,9 +89,16 @@ public class MessageFragment extends Fragment {
 								actionType == ActionType.MESSAGE_RECEIVED ? R.string.text_message_received : R.string.text_message_acknowledged);
 					}
 					break;
+				case CONVERSATION_EDITED:
+					Conversation editedConversation = (Conversation) intent.getSerializableExtra("conversation");
+					if (editedConversation != null && editedConversation.getConversationId().equals(conversation.getConversationId())) {
+						binding.textSubject.setText(getString(R.string.text_subject, editedConversation.getSubject()));
+					}
+					break;
 				case CONVERSATION_DELETED:
-					String conversationId = intent.getStringExtra("conversationId");
-					if (conversationId != null && conversationId.equals(conversation.getConversationId()) && activity != null) {
+					Conversation deletedConversation = (Conversation) intent.getSerializableExtra("conversation");
+					if (deletedConversation != null && deletedConversation.getConversationId().equals(conversation.getConversationId())
+							&& activity != null) {
 						NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_content_main);
 						navController.popBackStack();
 					}
@@ -132,11 +139,12 @@ public class MessageFragment extends Fragment {
 	 * @param actionType         The action type.
 	 * @param messageId          The messageId.
 	 * @param contact            The contact.
+	 * @param conversation       The conversation.
 	 * @param textMessageDetails The text message details.
 	 * @param parameters         The parameters.
 	 */
 	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final Contact contact,
-									 final TextMessageDetails textMessageDetails, final String... parameters) {
+									 final Conversation conversation, final TextMessageDetails textMessageDetails, final String... parameters) {
 		final Intent intent = new Intent(BROADCAST_ACTION);
 		final Bundle bundle = new Bundle();
 		bundle.putSerializable("actionType", actionType);
@@ -146,6 +154,9 @@ public class MessageFragment extends Fragment {
 		}
 		if (textMessageDetails != null) {
 			bundle.putSerializable("textMessageDetails", textMessageDetails);
+		}
+		if (conversation != null) {
+			bundle.putSerializable("conversation", conversation);
 		}
 		int i = 0;
 		while (i < parameters.length - 1) {
@@ -168,6 +179,7 @@ public class MessageFragment extends Fragment {
 		contact = (Contact) getArguments().getSerializable("contact");
 		conversation = (Conversation) getArguments().getSerializable("conversation");
 		binding.textSendMessage.setText(getString(R.string.text_send_message_to, contact.getName()));
+		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 
 		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
 			@NonNull
@@ -317,6 +329,10 @@ public class MessageFragment extends Fragment {
 		 * Inform about message acknowledged.
 		 */
 		MESSAGE_ACKNOWLEDGED,
+		/**
+		 * Conversation edited.
+		 */
+		CONVERSATION_EDITED,
 		/**
 		 * Conversation deleted.
 		 */

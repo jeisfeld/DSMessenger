@@ -86,7 +86,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				ContactRegistry.getInstance().cleanContacts();
 				AccountFragment.sendBroadcast(this, ActionType.DEVICE_LOGGED_OUT);
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.DEVICE_LOGGED_OUT, null,
-						adminDetails.getContact(), null);
+						adminDetails.getContact(), null, null);
 				break;
 			case CONVERSATION_EDITED:
 				Conversation editedConversation =
@@ -95,6 +95,9 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 					editedConversation.setSubject(adminDetails.getValue("subject"));
 					editedConversation.update();
 					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, editedConversation);
+					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.CONVERSATION_EDITED,
+							null, null, editedConversation, null);
+					MessageActivity.sendBroadcast(this, MessageActivity.ActionType.CONVERSATION_EDITED, null, editedConversation);
 				}
 				break;
 			case CONVERSATION_DELETED:
@@ -104,19 +107,20 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 					Application.getAppDatabase().getConversationDao().delete(deletedConversation);
 					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_DELETED, deletedConversation);
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.CONVERSATION_DELETED,
-							null, null, null, "conversationId", deletedConversation.getConversationId());
+							null, null, deletedConversation, null);
+					MessageActivity.sendBroadcast(this, MessageActivity.ActionType.CONVERSATION_DELETED, null, deletedConversation);
 				}
 				break;
 			case MESSAGE_RECEIVED:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId(),
-						adminDetails.getContact(), null);
+						adminDetails.getContact(), null, null);
 				break;
 			case MESSAGE_ACKNOWLEDGED:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(),
-						adminDetails.getContact(), null);
+						adminDetails.getContact(), null, null);
 				break;
 			case MESSAGE_SELF_ACKNOWLEDGED:
-				MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId());
+				MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(), null);
 				break;
 			case PING:
 				new HttpSender(this).sendMessage(adminDetails.getContact(), adminDetails.getMessageId(), null,
@@ -124,7 +128,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				break;
 			case PONG:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.PONG, adminDetails.getMessageId(),
-						adminDetails.getContact(), null);
+						adminDetails.getContact(), null, null);
 				LutFragment.sendBroadcast(this, MessageFragment.ActionType.PONG, adminDetails.getMessageId(), adminDetails.getContact());
 				break;
 			case UNKNOWN:
@@ -137,7 +141,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			break;
 		case TEXT_ACKNOWLEDGE:
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_ACKNOWLEDGE, messageDetails.getMessageId(),
-					messageDetails.getContact(), (TextMessageDetails) messageDetails);
+					messageDetails.getContact(), null, (TextMessageDetails) messageDetails);
 			break;
 		case RANDOMIMAGE:
 			RandomimageMessageDetails randomimageMessageDetails = (RandomimageMessageDetails) messageDetails;

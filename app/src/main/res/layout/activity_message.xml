@@ -25,6 +25,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/textSubject"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:textSize="@dimen/text_large"
+        app:layout_constraintTop_toBottomOf="@id/textMessageFrom" />
+
     <ListView
         android:id="@+id/listViewMessages"
         android:layout_width="match_parent"
@@ -34,7 +42,7 @@
         android:divider="@null"
         android:dividerHeight="@dimen/padding_message_vertical"
         app:layout_constraintBottom_toTopOf="@id/layoutTextInput"
-        app:layout_constraintTop_toBottomOf="@id/textMessageFrom"
+        app:layout_constraintTop_toBottomOf="@id/textSubject"
         app:layout_constraintVertical_bias="1"
         app:layout_constraintVertical_chainStyle="spread_inside" />
 

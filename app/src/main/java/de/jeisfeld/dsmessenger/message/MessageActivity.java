@@ -96,6 +96,20 @@ public class MessageActivity extends AppCompatActivity {
 						binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
 					}
 					break;
+				case CONVERSATION_EDITED:
+					Conversation editedConversation = (Conversation) intent.getSerializableExtra("conversation");
+					if (editedConversation != null && conversation != null
+							&& editedConversation.getConversationId().equals(conversation.getConversationId())) {
+						binding.textSubject.setText(getString(R.string.text_subject, editedConversation.getSubject()));
+					}
+					break;
+				case CONVERSATION_DELETED:
+					Conversation deletedConversation = (Conversation) intent.getSerializableExtra("conversation");
+					if (deletedConversation != null && conversation != null
+							&& deletedConversation.getConversationId().equals(conversation.getConversationId())) {
+						finish();
+					}
+					break;
 				default:
 					break;
 				}
@@ -110,16 +124,23 @@ public class MessageActivity extends AppCompatActivity {
 	/**
 	 * Send a broadcast to this fragment.
 	 *
-	 * @param context    The context.
-	 * @param actionType The action type.
-	 * @param messageId  The messageId.
-	 * @param parameters The parameters.
+	 * @param context      The context.
+	 * @param actionType   The action type.
+	 * @param messageId    The messageId.
+	 * @param conversation The conversation.
+	 * @param parameters   The parameters.
 	 */
-	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final String... parameters) {
+	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final Conversation conversation,
+									 final String... parameters) {
 		final Intent intent = new Intent(BROADCAST_ACTION);
 		final Bundle bundle = new Bundle();
 		bundle.putSerializable("actionType", actionType);
-		bundle.putSerializable("messageId", messageId);
+		if (messageId != null) {
+			bundle.putSerializable("messageId", conversation);
+		}
+		if (conversation != null) {
+			bundle.putSerializable("conversation", conversation);
+		}
 		int i = 0;
 		while (i < parameters.length - 1) {
 			String key = parameters[i++];
@@ -240,6 +261,7 @@ public class MessageActivity extends AppCompatActivity {
 		}
 		MessageActivity.currentTopConversation = messageConversation;
 		conversation = messageConversation;
+		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 
 		Message message = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
 				conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
@@ -372,6 +394,14 @@ public class MessageActivity extends AppCompatActivity {
 		/**
 		 * Inform about message acknowledged.
 		 */
-		MESSAGE_ACKNOWLEDGED
+		MESSAGE_ACKNOWLEDGED,
+		/**
+		 * Conversation edited.
+		 */
+		CONVERSATION_EDITED,
+		/**
+		 * Conversation deleted.
+		 */
+		CONVERSATION_DELETED
 	}
 }
