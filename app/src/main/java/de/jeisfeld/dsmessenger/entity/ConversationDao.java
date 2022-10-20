@@ -5,16 +5,19 @@ import java.util.List;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 /**
  * The DAO for accessing conversation table.
  */
 @Dao
 public interface ConversationDao {
-	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	@Insert
 	void insert(Conversation conversation);
+
+	@Update
+	void update(Conversation conversation);
 
 	@Delete
 	void delete(Conversation conversation);

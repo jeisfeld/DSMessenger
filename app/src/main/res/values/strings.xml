@@ -9,6 +9,7 @@
     <string name="title_dialog_edit_contact">Edit Contact</string>
     <string name="title_dialog_info">Info</string>
     <string name="title_dialog_edit_device">Edit Device</string>
+    <string name="title_dialog_edit_conversation_subject">Edit Conversation Subject</string>
 
     <string name="menu_account">Account</string>
     <string name="menu_conversations">Conversations</string>
@@ -29,6 +30,7 @@
     <string name="button_logout">Logout</string>
     <string name="button_change_password">Change Password</string>
     <string name="button_delete_contact">Delete Contact</string>
+    <string name="button_delete_conversation">Delete Conversation</string>
     <string name="button_save_contact">Save Contact</string>
     <string name="button_disconnect_device">Disconnect Device</string>
     <string name="button_update_device">Update Device</string>
@@ -111,6 +113,8 @@
     <string name="dialog_login_before_connect">Please login before connecting to another user.</string>
     <string name="dialog_confirm_delete_contact">Do you really want to delete contact %1$s?</string>
     <string name="dialog_confirm_disconnect_device">Do you really want to dicsonnect device %1$s?</string>
+    <string name="dialog_confirm_delete_conversation">Do you really want to delete conversation %1$s?</string>
+    <string name="dialog_edit_conversation_subject">Please enter the new subject of the conversation.</string>
 
     <string-array name="array_vibrate_pattern_names">
         <item>Default</item>

@@ -29,6 +29,7 @@ import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.message.ConversationsFragment;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
@@ -234,7 +235,8 @@ public class MessageActivity extends AppCompatActivity {
 		Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId.toString());
 		if (messageConversation == null) {
 			messageConversation = Conversation.createNewConversation(textMessageDetails);
-			messageConversation.storeIfNew(textMessageDetails.getMessageText());
+			messageConversation.insertIfNew(textMessageDetails.getMessageText());
+			ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, messageConversation);
 		}
 		MessageActivity.currentTopConversation = messageConversation;
 		conversation = messageConversation;
@@ -242,9 +244,10 @@ public class MessageActivity extends AppCompatActivity {
 		Message message = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
 				conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
 		if (message.getMessageText() != null && message.getMessageText().length() > 0) {
-			message.store();
+			message.store(conversation);
 			messageList.add(message);
 			arrayAdapter.notifyDataSetChanged();
+			ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, conversation);
 			binding.listViewMessages.setSelection(messageList.size() - 1);
 		}
 
@@ -318,12 +321,12 @@ public class MessageActivity extends AppCompatActivity {
 			new HttpSender(this).sendMessage(contact, newMessageId, (response, responseData) -> {
 						Message message = new Message(messageText, true, newMessageId,
 								conversation.getConversationUuid(), timestamp, MessageStatus.MESSAGE_SENT);
-						conversation.storeIfNew(message.getMessageText());
 						runOnUiThread(() -> {
 							if (responseData != null && responseData.isSuccess()) {
-								message.store();
+								message.store(conversation);
 								messageList.add(message);
 								arrayAdapter.notifyDataSetChanged();
+								ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, conversation);
 								binding.listViewMessages.setSelection(messageList.size() - 1);
 								binding.editTextMessageText.setText("");
 							}

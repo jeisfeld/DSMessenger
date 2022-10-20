@@ -79,6 +79,7 @@ public class MessageFragment extends Fragment {
 		public void onReceive(final Context context, final Intent intent) {
 			if (intent != null) {
 				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
+				Activity activity = getActivity();
 				switch (actionType) {
 				case MESSAGE_RECEIVED:
 				case MESSAGE_ACKNOWLEDGED:
@@ -86,6 +87,13 @@ public class MessageFragment extends Fragment {
 					if (messageId.equals(lastMessageId)) {
 						binding.textMessageResponse.setText(
 								actionType == ActionType.MESSAGE_RECEIVED ? R.string.text_message_received : R.string.text_message_acknowledged);
+					}
+					break;
+				case CONVERSATION_DELETED:
+					String conversationId = intent.getStringExtra("conversationId");
+					if (conversationId != null && conversationId.equals(conversation.getConversationId()) && activity != null) {
+						NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_content_main);
+						navController.popBackStack();
 					}
 					break;
 				case TEXT_ACKNOWLEDGE:
@@ -97,7 +105,6 @@ public class MessageFragment extends Fragment {
 				case DEVICE_LOGGED_OUT:
 					binding.listViewMessages.setVisibility(View.GONE);
 					binding.buttonSend.setVisibility(View.GONE);
-					Activity activity = getActivity();
 					if (activity != null) {
 						NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_content_main);
 						navController.popBackStack();
@@ -263,7 +270,7 @@ public class MessageFragment extends Fragment {
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
 					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
 							conversation.getConversationUuid(), timestamp, MessageStatus.MESSAGE_SENT);
-					conversation.storeIfNew(message.getMessageText());
+					conversation.insertIfNew(message.getMessageText());
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
@@ -290,7 +297,7 @@ public class MessageFragment extends Fragment {
 	 * @param message The message to be added.
 	 */
 	private void addMessage(final Message message) {
-		message.store();
+		message.store(conversation);
 		if (message.getConversationId().equals(conversation.getConversationId())) {
 			messageList.add(message);
 			arrayAdapter.notifyDataSetChanged();
@@ -310,6 +317,10 @@ public class MessageFragment extends Fragment {
 		 * Inform about message acknowledged.
 		 */
 		MESSAGE_ACKNOWLEDGED,
+		/**
+		 * Conversation deleted.
+		 */
+		CONVERSATION_DELETED,
 		/**
 		 * Text message as acknowledgement.
 		 */

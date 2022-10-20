@@ -92,9 +92,15 @@ public class Message {
 
 	/**
 	 * Store this message.
+	 *
+	 * @param conversation Conversation where timestamp should be updated.
 	 */
-	public void store() {
+	public void store(final Conversation conversation) {
 		Application.getAppDatabase().getMessageDao().insert(this);
+		if (conversation != null) {
+			conversation.setLastTimestamp(getTimestamp());
+			conversation.update();
+		}
 	}
 
 	public final String getMessageText() {

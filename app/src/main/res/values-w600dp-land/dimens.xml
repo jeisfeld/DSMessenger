@@ -1,7 +1,7 @@
 <resources>
     <dimen name="margin_small">4dp</dimen>
     <dimen name="margin_medium">10dp</dimen>
-    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_large">20dp</dimen>
     <dimen name="input_row_height_small">30dp</dimen>
 
     <integer name="selector_label_width">30</integer>

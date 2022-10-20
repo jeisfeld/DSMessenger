@@ -38,7 +38,7 @@ public class Conversation implements Serializable {
 	 * The last timestamp of this conversation.
 	 */
 	@ColumnInfo(name = "lastTimestamp")
-	private final long lastTimestamp;
+	private long lastTimestamp;
 
 	/**
 	 * Flag indicating if the conversation is already stored.
@@ -93,14 +93,21 @@ public class Conversation implements Serializable {
 	 *
 	 * @param newSubject The subject for storage.
 	 */
-	public void storeIfNew(final String newSubject) {
+	public void insertIfNew(final String newSubject) {
 		if (!isStored) {
 			if (newSubject != null) {
-				subject = newSubject;
+				setSubject(newSubject);
 			}
 			Application.getAppDatabase().getConversationDao().insert(this);
-			isStored = true;
 		}
+	}
+
+	/**
+	 * Store the conversation in DB.
+	 */
+	public void update() {
+		Application.getAppDatabase().getConversationDao().update(this);
+		isStored = true;
 	}
 
 	public final int getRelationId() {
@@ -109,6 +116,10 @@ public class Conversation implements Serializable {
 
 	public final String getSubject() {
 		return subject;
+	}
+
+	public final void setSubject(final String subject) {
+		this.subject = subject;
 	}
 
 	@NonNull
@@ -122,5 +133,13 @@ public class Conversation implements Serializable {
 
 	public final long getLastTimestamp() {
 		return lastTimestamp;
+	}
+
+	public final void setLastTimestamp(final long lastTimestamp) {
+		this.lastTimestamp = lastTimestamp;
+	}
+
+	public final boolean isStored() {
+		return isStored;
 	}
 }

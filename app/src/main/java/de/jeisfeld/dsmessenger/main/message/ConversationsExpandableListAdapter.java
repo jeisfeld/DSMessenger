@@ -3,6 +3,7 @@ package de.jeisfeld.dsmessenger.main.message;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,13 +11,20 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
 import java.util.List;
+import java.util.UUID;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Conversation;
+import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
+import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
+import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
+import de.jeisfeld.dsmessenger.util.DialogUtil;
 
 /**
  * Adapter for the expandable list of conversations.
@@ -103,17 +111,21 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 	@Override
 	public final View getChildView(final int groupPosition, final int childPosition, final boolean isLastChild, final View convertView,
 								   final ViewGroup parent) {
-		TextView view = (TextView) convertView;
+		View view = convertView;
 		if (convertView == null) {
 			LayoutInflater layoutInflater = (LayoutInflater) fragment.requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			assert layoutInflater != null;
-			view = (TextView) layoutInflater.inflate(R.layout.list_view_conversation, parent, false);
+			view = layoutInflater.inflate(R.layout.list_view_conversation, parent, false);
 		}
 		Contact contact = contacts.get(groupPosition);
 		Conversation conversation = contact.getConversations().get(childPosition);
-		view.setText(conversation.getSubject());
 
-		view.setOnClickListener(v -> {
+		TextView textViewSubject = view.findViewById(R.id.textViewSubject);
+		textViewSubject.setText(conversation.getSubject());
+
+		prepareConversationButtons(view, conversation);
+
+		textViewSubject.setOnClickListener(v -> {
 			Activity activity = fragment.getActivity();
 			if (activity != null) {
 				NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_content_main);
@@ -126,6 +138,61 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 
 		return view;
 	}
+
+	/**
+	 * Prepare the buttons of the conversation.
+	 *
+	 * @param view         the conversation view.
+	 * @param conversation the conversation.
+	 */
+	private void prepareConversationButtons(final View view, final Conversation conversation) {
+		View buttonDelete = view.findViewById(R.id.button_delete);
+		View buttonEdit = view.findViewById(R.id.button_edit);
+		if (conversation.isStored()) {
+			buttonDelete.setVisibility(View.VISIBLE);
+			buttonEdit.setVisibility(View.VISIBLE);
+			buttonEdit.setOnClickListener(v -> {
+				FragmentActivity activity = fragment.getActivity();
+				if (activity != null) {
+					DialogUtil.displayInputDialog(activity, (dialog, text) -> {
+								conversation.setSubject(text);
+								conversation.update();
+								notifyDataSetChanged();
+								Contact contact = ContactRegistry.getInstance().getContact(conversation.getRelationId());
+								if (contact != null) {
+									new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
+											"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_EDITED.name(),
+											"conversationId", conversation.getConversationId(), "subject", conversation.getSubject());
+								}
+							}, R.string.title_dialog_edit_conversation_subject, R.string.button_ok, conversation.getSubject(),
+							InputType.TYPE_CLASS_TEXT, R.string.dialog_edit_conversation_subject);
+				}
+			});
+			buttonDelete.setOnClickListener(v -> {
+				FragmentActivity activity = fragment.getActivity();
+				if (conversation.isStored() && activity != null) {
+					DialogUtil.displayConfirmationMessage(activity, dialog -> {
+								String conversationId = conversation.getConversationId();
+								Application.getAppDatabase().getConversationDao().delete(conversation);
+								notifyDataSetChanged();
+								Contact contact = ContactRegistry.getInstance().getContact(conversation.getRelationId());
+								if (contact != null) {
+									new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
+											"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_DELETED.name(),
+											"conversationId", conversationId);
+								}
+							},
+							R.string.title_dialog_confirm_deletion, R.string.button_cancel, R.string.button_delete_conversation,
+							R.string.dialog_confirm_delete_conversation, conversation.getSubject());
+				}
+			});
+		}
+		else {
+			buttonDelete.setVisibility(View.GONE);
+			buttonEdit.setVisibility(View.GONE);
+		}
+	}
+
 
 	@Override
 	public final boolean isChildSelectable(final int groupPosition, final int childPosition) {

@@ -122,6 +122,14 @@ public class AdminMessageDetails extends MessageDetails {
 		 */
 		DEVICE_LOGGED_OUT,
 		/**
+		 * Conversation edited.
+		 */
+		CONVERSATION_EDITED,
+		/**
+		 * Conversation deleted.
+		 */
+		CONVERSATION_DELETED,
+		/**
 		 * Message received.
 		 */
 		MESSAGE_RECEIVED,

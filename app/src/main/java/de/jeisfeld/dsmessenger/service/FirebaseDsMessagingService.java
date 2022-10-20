@@ -10,11 +10,13 @@ import com.google.firebase.messaging.RemoteMessage;
 import androidx.annotation.NonNull;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.main.lut.LutFragment;
+import de.jeisfeld.dsmessenger.main.message.ConversationsFragment;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
@@ -85,6 +87,25 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				AccountFragment.sendBroadcast(this, ActionType.DEVICE_LOGGED_OUT);
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.DEVICE_LOGGED_OUT, null,
 						adminDetails.getContact(), null);
+				break;
+			case CONVERSATION_EDITED:
+				Conversation editedConversation =
+						Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId"));
+				if (editedConversation != null) {
+					editedConversation.setSubject(adminDetails.getValue("subject"));
+					editedConversation.update();
+					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, editedConversation);
+				}
+				break;
+			case CONVERSATION_DELETED:
+				Conversation deletedConversation =
+						Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId"));
+				if (deletedConversation != null) {
+					Application.getAppDatabase().getConversationDao().delete(deletedConversation);
+					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_DELETED, deletedConversation);
+					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.CONVERSATION_DELETED,
+							null, null, null, "conversationId", deletedConversation.getConversationId());
+				}
 				break;
 			case MESSAGE_RECEIVED:
 				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId(),
