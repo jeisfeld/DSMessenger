@@ -4,15 +4,19 @@ require_once 'firebasefunctions.php';
 $tokens = getVerifiedTokensFromRequestData();
 
 $data = [];
+$ttl = null;
 
 foreach ($_POST as $key => $value) {
-    if ($key !== 'username' && $key !== 'password' && $key !== 'contactId' && $key !== 'isSlave' && $key !== 'isConnected') {
+    if ($key == 'ttl') {
+        $ttl = $value;
+    }
+    elseif ($key !== 'username' && $key !== 'password' && $key !== 'contactId' && $key !== 'isSlave' && $key !== 'isConnected') {
         $data[$key] = $value;
     }
 }
 
 foreach ($tokens as $token) {
-    sendFirebaseMessage($token, $data);
+    sendFirebaseMessage($token, $data, $ttl);
 }
 
 printSuccess("Message successfully sent");

@@ -3,6 +3,7 @@ package de.jeisfeld.dsmessenger.client;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -25,10 +26,14 @@ public class DSMessengerClient {
 			FirebaseApp.initializeApp(options);
 
 			Message message = Message.builder()
-					.putData("messageType", "RANDOMIMAGE")
-					.putData("randomImageOrigin", "WIDGET")
-					.putData("notificationName", "Special")
-					.putData("widgetName", "SchnurpSy")
+					.putData("relationId", "3")
+					.putData("messageType", "TEXT")
+					.putData("messageText", "Test")
+					.putData("priority", "HIGH")
+					.putData("conversationId", UUID.randomUUID().toString())
+					.putData("messageId", UUID.randomUUID().toString())
+					.putData("messageTime", "2022-10-21T22:38:51.266Z")
+					.putData("timestamp", "" + System.currentTimeMillis())
 					.setToken(TestKeys.CLIENT_TOKEN)
 					.build();
 

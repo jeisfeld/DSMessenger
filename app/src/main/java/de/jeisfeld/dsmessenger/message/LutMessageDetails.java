@@ -20,6 +20,10 @@ public class LutMessageDetails extends MessageDetails {
 	 * The pulse duration.
 	 */
 	private final Long duration;
+	/**
+	 * The power factor.
+	 */
+	private final Double powerFactor;
 
 	/**
 	 * Generate message details.
@@ -32,10 +36,11 @@ public class LutMessageDetails extends MessageDetails {
 	 * @param duration       The pulse duration.
 	 */
 	public LutMessageDetails(final UUID messageId, final Instant messageTime, final MessagePriority priority, final Contact contact,
-							 final LutMessageType lutMessageType, final Long duration) {
+							 final LutMessageType lutMessageType, final Long duration, final Double powerFactor) {
 		super(MessageType.LUT, messageId, messageTime, priority, contact);
 		this.lutMessageType = lutMessageType;
 		this.duration = duration;
+		this.powerFactor = powerFactor;
 	}
 
 	/**
@@ -55,7 +60,9 @@ public class LutMessageDetails extends MessageDetails {
 		LutMessageType lutMessageType = LutMessageType.fromName(data.get("lutMessageType"));
 		String durationString = data.get("duration");
 		Long duration = durationString == null ? null : Long.parseLong(durationString);
-		return new LutMessageDetails(messageId, messageTime, priority, contact, lutMessageType, duration);
+		String powerFactorString = data.get("powerFactor");
+		Double powerFactor = (powerFactorString == null ? null : Double.parseDouble(powerFactorString));
+		return new LutMessageDetails(messageId, messageTime, priority, contact, lutMessageType, duration, powerFactor);
 	}
 
 	public final LutMessageType getLutMessageType() {
@@ -64,6 +71,10 @@ public class LutMessageDetails extends MessageDetails {
 
 	public final Long getDuration() {
 		return duration;
+	}
+
+	public Double getPowerFactor() {
+		return powerFactor;
 	}
 
 	/**

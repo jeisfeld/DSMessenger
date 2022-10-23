@@ -202,7 +202,7 @@ public class LutFragment extends Fragment {
 	 */
 	private void sendMessage(final LutMessageType lutMessageType) {
 		new HttpSender(getContext()).sendMessage(dropdownHandlerContact.getSelectedItem(), UUID.randomUUID(), null,
-				"messageType", MessageType.LUT.name(), "lutMessageType", lutMessageType.name());
+				"messageType", MessageType.LUT.name(), "lutMessageType", lutMessageType.name(), "ttl", "60");
 	}
 
 	/**
