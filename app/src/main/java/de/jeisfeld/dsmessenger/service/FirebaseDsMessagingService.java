@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.entity.Conversation;
+import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
@@ -18,6 +19,7 @@ import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.main.lut.LutFragment;
 import de.jeisfeld.dsmessenger.main.message.ConversationsFragment;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment;
+import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.LutMessageDetails;
@@ -112,12 +114,25 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				}
 				break;
 			case MESSAGE_RECEIVED:
-				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId(),
-						adminDetails.getContact(), null, null);
+				Message receivedMessage = Application.getAppDatabase().getMessageDao().getMessageById(adminDetails.getMessageId().toString());
+				if (receivedMessage != null) {
+					receivedMessage.setStatus(MessageStatus.MESSAGE_RECEIVED);
+					receivedMessage.update();
+					Conversation receivedConversation = Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId"));
+					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId(),
+							adminDetails.getContact(), receivedConversation, null);
+					MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_RECEIVED, null, receivedConversation);
+				}
 				break;
 			case MESSAGE_ACKNOWLEDGED:
-				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(),
-						adminDetails.getContact(), null, null);
+				Message acknowledgedMessage = Application.getAppDatabase().getMessageDao().getMessageById(adminDetails.getMessageId().toString());
+				if (acknowledgedMessage != null) {
+					acknowledgedMessage.setStatus(MessageStatus.MESSAGE_ACKNOWLEDGED);
+					acknowledgedMessage.update();
+					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(),
+							adminDetails.getContact(),
+							Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId")), null);
+				}
 				break;
 			case MESSAGE_SELF_ACKNOWLEDGED:
 				MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(), null);
@@ -140,6 +155,9 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			startActivity(MessageActivity.createIntent(this, (TextMessageDetails) messageDetails));
 			break;
 		case TEXT_ACKNOWLEDGE:
+			new HttpSender(this).sendMessage(messageDetails.getContact(), messageDetails.getMessageId(), null,
+					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(), "conversationId",
+					((TextMessageDetails) messageDetails).getConversationId().toString());
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_ACKNOWLEDGE, messageDetails.getMessageId(),
 					messageDetails.getContact(), null, (TextMessageDetails) messageDetails);
 			break;

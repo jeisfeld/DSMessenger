@@ -12,6 +12,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
+import de.jeisfeld.dsmessenger.util.DateUtil;
 
 /**
  * Activity to display messages.
@@ -47,10 +49,6 @@ public class MessageActivity extends AppCompatActivity {
 	 * The resource key for the message.
 	 */
 	private static final String STRING_EXTRA_MESSAGE_DETAILS = "de.jeisfeld.dsmessenger.MESSAGE_DETAILS";
-	/**
-	 * String for storing message in instance state.
-	 */
-	private static final String STRING_MESSAGE = "MESSAGE";
 	/**
 	 * The conversation currently on top.
 	 */
@@ -89,9 +87,15 @@ public class MessageActivity extends AppCompatActivity {
 			if (intent != null) {
 				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
 				switch (actionType) {
+				case MESSAGE_RECEIVED:
+					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
+					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())) {
+						refreshMessageList(conversation.getConversationId(), null, false);
+					}
+					break;
 				case MESSAGE_ACKNOWLEDGED:
-					UUID messageId = (UUID) intent.getSerializableExtra("messageId");
-					if (messageId != null && lastTextMessageDetails != null && messageId.equals(lastTextMessageDetails.getMessageId())) {
+					UUID acknowledgetMessageId = (UUID) intent.getSerializableExtra("messageId");
+					if (acknowledgetMessageId != null && lastTextMessageDetails != null && acknowledgetMessageId.equals(lastTextMessageDetails.getMessageId())) {
 						cancelLastIntentEffects();
 						binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
 					}
@@ -178,23 +182,41 @@ public class MessageActivity extends AppCompatActivity {
 		binding = ActivityMessageBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
 
-		arrayAdapter = new ArrayAdapter<Message>(this, R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
+		arrayAdapter = new ArrayAdapter<Message>(this, R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
 				final View view = super.getView(position, convertView, parent);
 
 				Message message = messageList.get(position);
+				TextView textViewMessage = view.findViewById(R.id.textViewMessage);
+				textViewMessage.setText(message.getMessageText());
 
 				if (message.isOwn()) {
-					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.VISIBLE);
-					view.findViewById(R.id.textViewMessageContact).setVisibility(View.GONE);
-					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(message.getMessageText());
+					view.findViewById(R.id.spaceRight).setVisibility(View.VISIBLE);
+					view.findViewById(R.id.spaceLeft).setVisibility(View.GONE);
+					textViewMessage.setBackgroundResource(R.drawable.background_message);
 				}
 				else {
-					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.GONE);
-					view.findViewById(R.id.textViewMessageContact).setVisibility(View.VISIBLE);
-					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(message.getMessageText());
+					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
+					view.findViewById(R.id.spaceLeft).setVisibility(View.VISIBLE);
+					textViewMessage.setBackgroundResource(R.drawable.background_message_contact);
+				}
+
+				((TextView) view.findViewById(R.id.textViewMessageTime)).setText(DateUtil.formatTimestamp(message.getTimestamp()));
+
+				ImageView imageViewMessageStatus = view.findViewById(R.id.imageViewMessageStatus);
+				switch (message.getStatus()) {
+				case MESSAGE_SENT:
+					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_sent);
+					break;
+				case MESSAGE_RECEIVED:
+				case MESSAGE_ACKNOWLEDGED:
+					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_received);
+					break;
+				default:
+					imageViewMessageStatus.setImageIcon(null);
+					break;
 				}
 
 				return view;
@@ -204,22 +226,36 @@ public class MessageActivity extends AppCompatActivity {
 
 		final TextMessageDetails textMessageDetails = (TextMessageDetails) getIntent().getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 
-		new Thread(() -> {
-			List<Message> newMessageList =
-					Application.getAppDatabase().getMessageDao().getMessagesByConversationId(textMessageDetails.getConversationId().toString());
-			messageList.clear();
-			messageList.addAll(newMessageList);
-			arrayAdapter.notifyDataSetChanged();
-			runOnUiThread(() -> {
-				binding.listViewMessages.setSelection(messageList.size() - 1);
-				handleIntentData(textMessageDetails);
-			});
-		}).start();
+		refreshMessageList(textMessageDetails.getConversationId().toString(), textMessageDetails, true);
 
 		broadcastManager = LocalBroadcastManager.getInstance(this);
 		IntentFilter actionReceiver = new IntentFilter();
 		actionReceiver.addAction(BROADCAST_ACTION);
 		broadcastManager.registerReceiver(localBroadcastReceiver, actionReceiver);
+	}
+
+	/**
+	 * Refresh the message list.
+	 *
+	 * @param conversationId     The conversationId.
+	 * @param textMessageDetails The text message details to be handled at the end (if applicable)
+	 * @param scrollDown         Flag indicating if view should scroll to last position.
+	 */
+	private void refreshMessageList(final String conversationId, final TextMessageDetails textMessageDetails, final boolean scrollDown) {
+		new Thread(() -> {
+			List<Message> newMessageList = Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversationId);
+			messageList.clear();
+			messageList.addAll(newMessageList);
+			runOnUiThread(() -> {
+				arrayAdapter.notifyDataSetChanged();
+				if (scrollDown) {
+					binding.listViewMessages.setSelection(messageList.size() - 1);
+				}
+				if (textMessageDetails != null) {
+					handleIntentData(textMessageDetails);
+				}
+			});
+		}).start();
 	}
 
 	@Override
@@ -360,7 +396,7 @@ public class MessageActivity extends AppCompatActivity {
 		}
 		else {
 			new HttpSender(this).sendMessage(contact, messageId, null,
-					"messageType", MessageType.ADMIN.name(), "adminType", adminType.name());
+					"messageType", MessageType.ADMIN.name(), "adminType", adminType.name(), "conversationId", conversation.getConversationId());
 		}
 	}
 
@@ -392,7 +428,11 @@ public class MessageActivity extends AppCompatActivity {
 	 */
 	public enum ActionType {
 		/**
-		 * Inform about message acknowledged.
+		 * Inform about message received.
+		 */
+		MESSAGE_RECEIVED,
+		/**
+		 * Inform about message acknowledgement sent.
 		 */
 		MESSAGE_ACKNOWLEDGED,
 		/**

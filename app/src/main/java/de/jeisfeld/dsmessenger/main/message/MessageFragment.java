@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 import de.jeisfeld.dsmessenger.message.TextMessageDetails;
+import de.jeisfeld.dsmessenger.util.DateUtil;
 
 /**
  * Fragment for sending messages.
@@ -84,9 +86,14 @@ public class MessageFragment extends Fragment {
 				case MESSAGE_RECEIVED:
 				case MESSAGE_ACKNOWLEDGED:
 					UUID messageId = (UUID) intent.getSerializableExtra("messageId");
+					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
 					if (messageId.equals(lastMessageId)) {
 						binding.textMessageResponse.setText(
 								actionType == ActionType.MESSAGE_RECEIVED ? R.string.text_message_received : R.string.text_message_acknowledged);
+					}
+					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())
+							&& activity != null) {
+						refreshMessageList(false);
 					}
 					break;
 				case CONVERSATION_EDITED:
@@ -181,23 +188,41 @@ public class MessageFragment extends Fragment {
 		binding.textSendMessage.setText(getString(R.string.text_send_message_to, contact.getName()));
 		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 
-		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessageOwn, messageList) {
+		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
 				final View view = super.getView(position, convertView, parent);
 
 				Message message = messageList.get(position);
+				TextView textViewMessage = view.findViewById(R.id.textViewMessage);
+				textViewMessage.setText(message.getMessageText());
 
 				if (message.isOwn()) {
-					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.VISIBLE);
-					view.findViewById(R.id.textViewMessageContact).setVisibility(View.GONE);
-					((TextView) view.findViewById(R.id.textViewMessageOwn)).setText(message.getMessageText());
+					view.findViewById(R.id.spaceRight).setVisibility(View.VISIBLE);
+					view.findViewById(R.id.spaceLeft).setVisibility(View.GONE);
+					textViewMessage.setBackgroundResource(R.drawable.background_message);
 				}
 				else {
-					view.findViewById(R.id.textViewMessageOwn).setVisibility(View.GONE);
-					view.findViewById(R.id.textViewMessageContact).setVisibility(View.VISIBLE);
-					((TextView) view.findViewById(R.id.textViewMessageContact)).setText(message.getMessageText());
+					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
+					view.findViewById(R.id.spaceLeft).setVisibility(View.VISIBLE);
+					textViewMessage.setBackgroundResource(R.drawable.background_message_contact);
+				}
+
+				((TextView) view.findViewById(R.id.textViewMessageTime)).setText(DateUtil.formatTimestamp(message.getTimestamp()));
+
+				ImageView imageViewMessageStatus = view.findViewById(R.id.imageViewMessageStatus);
+				switch (message.getStatus()) {
+				case MESSAGE_SENT:
+					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_sent);
+					break;
+				case MESSAGE_RECEIVED:
+				case MESSAGE_ACKNOWLEDGED:
+					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_received);
+					break;
+				default:
+					imageViewMessageStatus.setImageResource(0);
+					break;
 				}
 
 				return view;
@@ -205,19 +230,32 @@ public class MessageFragment extends Fragment {
 		};
 		binding.listViewMessages.setAdapter(arrayAdapter);
 
+		refreshMessageList(true);
+
+		return binding.getRoot();
+	}
+
+	/**
+	 * Refresh the message list.
+	 *
+	 * @param scrollDown Flag indicating if view should scroll to last position.
+	 */
+	private void refreshMessageList(final boolean scrollDown) {
 		new Thread(() -> {
 			List<Message> newMessageList =
 					Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversation.getConversationId());
 			messageList.clear();
 			messageList.addAll(newMessageList);
-			arrayAdapter.notifyDataSetChanged();
 			Activity activity = getActivity();
 			if (activity != null) {
-				activity.runOnUiThread(() -> binding.listViewMessages.setSelection(messageList.size() - 1));
+				activity.runOnUiThread(() -> {
+					arrayAdapter.notifyDataSetChanged();
+					if (scrollDown) {
+						binding.listViewMessages.setSelection(messageList.size() - 1);
+					}
+				});
 			}
 		}).start();
-
-		return binding.getRoot();
 	}
 
 	@Override
@@ -282,7 +320,6 @@ public class MessageFragment extends Fragment {
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
 					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
 							conversation.getConversationUuid(), timestamp, MessageStatus.MESSAGE_SENT);
-					conversation.insertIfNew(message.getMessageText());
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
@@ -290,6 +327,7 @@ public class MessageFragment extends Fragment {
 								binding.textMessageResponse.setText(responseData == null ? response : responseData.getMappedErrorMessage(getContext()));
 							}
 							else {
+								conversation.insertIfNew(message.getMessageText());
 								binding.textMessageResponse.setText(R.string.text_message_sent);
 								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
 									addMessage(message);

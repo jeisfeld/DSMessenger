@@ -7,6 +7,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 /**
  * The DAO for accessing message table.
@@ -15,6 +16,9 @@ import androidx.room.Query;
 public interface MessageDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	void insert(Message message);
+
+	@Update
+	void update(Message message);
 
 	@Delete
 	void delete(Message message);

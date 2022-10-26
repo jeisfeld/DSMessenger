@@ -103,7 +103,7 @@ public class Conversation implements Serializable {
 	}
 
 	/**
-	 * Store the conversation in DB.
+	 * Update the conversation in DB.
 	 */
 	public void update() {
 		Application.getAppDatabase().getConversationDao().update(this);

@@ -52,7 +52,7 @@ public class Message {
 	 * The message status.
 	 */
 	@ColumnInfo(name = "status")
-	private final MessageStatus status;
+	private MessageStatus status;
 
 	/**
 	 * Constructor.
@@ -103,6 +103,13 @@ public class Message {
 		}
 	}
 
+	/**
+	 * Update the message in DB.
+	 */
+	public void update() {
+		Application.getAppDatabase().getMessageDao().update(this);
+	}
+
 	public final String getMessageText() {
 		return messageText;
 	}
@@ -135,5 +142,9 @@ public class Message {
 
 	public final MessageStatus getStatus() {
 		return status;
+	}
+
+	public void setStatus(MessageStatus status) {
+		this.status = status;
 	}
 }

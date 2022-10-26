@@ -18,10 +18,6 @@ $relationId = @$_POST['relationId'];
 $isSlave = @$_POST['isSlave'];
 $isConnected = @$_POST['isConnected'];
 
-if ($isConnected) {
-    $tokens = getTokens($conn, $username, $password, $relationId, $isSlave);
-}
-
 if ($isSlave) {
     $stmt = $conn->prepare("delete from dsm_relation where id = ? and master_id = ?");
 }
@@ -33,7 +29,10 @@ $stmt->bind_param("ii", $relationId, $userId);
 
 if ($stmt->execute()) {
     printSuccess("Contact successfully deleted");
-    
+
+    if ($isConnected) {
+        $tokens = getTokens($conn, $username, $password, $relationId, $isSlave);
+    }
     if (sizeOf($tokens)) {
         $data = [
             'messageType' => 'ADMIN',

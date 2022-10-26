@@ -1,33 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
+
+    <Space
+        android:id="@+id/spaceLeft"
+        android:layout_width="@dimen/message_margin"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Space
+        android:id="@+id/spaceRight"
+        android:layout_width="@dimen/message_margin"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/textViewMessageOwn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/message_margin"
+        android:id="@+id/textViewMessage"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:background="@drawable/background_message"
         android:paddingStart="@dimen/padding_message_horizontal"
         android:paddingTop="@dimen/padding_message_vertical"
         android:paddingEnd="@dimen/padding_message_horizontal"
-        android:paddingBottom="@dimen/padding_message_vertical"
-        android:textSize="@dimen/text_normal" />
+        android:paddingBottom="@dimen/padding_message_bottom"
+        android:textSize="@dimen/text_normal"
+        app:layout_constraintEnd_toStartOf="@id/spaceRight"
+        app:layout_constraintStart_toEndOf="@id/spaceLeft" />
+
+    <ImageView
+        android:id="@+id/imageViewMessageStatus"
+        android:layout_width="@dimen/icon_size_message_status"
+        android:layout_height="@dimen/icon_size_message_status"
+        android:layout_marginEnd="@dimen/margin_messagestatus_end"
+        android:layout_marginBottom="@dimen/margin_messagestatus_bottom"
+        android:src="@drawable/ic_icon_message_sent"
+        app:layout_constraintBottom_toBottomOf="@id/textViewMessage"
+        app:layout_constraintEnd_toEndOf="@id/textViewMessage"
+        tools:ignore="ContentDescription" />
 
     <TextView
-        android:id="@+id/textViewMessageContact"
-        android:layout_width="match_parent"
+        android:id="@+id/textViewMessageTime"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/message_margin"
-        android:background="@drawable/background_message_contact"
-        android:paddingStart="@dimen/padding_message_horizontal"
-        android:paddingTop="@dimen/padding_message_vertical"
-        android:paddingEnd="@dimen/padding_message_horizontal"
-        android:paddingBottom="@dimen/padding_message_vertical"
-        android:textSize="@dimen/text_normal"
-        android:visibility="gone" />
-
-</LinearLayout>
+        android:layout_marginEnd="@dimen/margin_messagetime_end"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintBottom_toBottomOf="@id/imageViewMessageStatus"
+        app:layout_constraintEnd_toStartOf="@id/imageViewMessageStatus" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
