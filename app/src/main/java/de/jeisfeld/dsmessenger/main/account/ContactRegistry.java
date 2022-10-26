@@ -133,6 +133,7 @@ public final class ContactRegistry {
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_contact_id, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_is_slave, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_connection_code, relationId);
+		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_slave_permissions, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_status, relationId);
 	}
 

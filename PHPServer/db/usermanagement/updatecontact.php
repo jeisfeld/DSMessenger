@@ -19,15 +19,16 @@ $myName= @$_POST['myName'];
 $contactName = @$_POST['contactName'];
 $isConnected = @$_POST['isConnected'];
 $isSlave = @$_POST['isSlave'];
+$slavePermissions = @$_POST['slavePermissions'];
 
 if ($isSlave) {
-    $stmt = $conn->prepare("update dsm_relation set master_name = ?, slave_name = ? where id = ? and master_id = ?");
+    $stmt = $conn->prepare("update dsm_relation set master_name = ?, slave_name = ?, slave_permissions = ? where id = ? and master_id = ?");
 }
 else {
-    $stmt = $conn->prepare("update dsm_relation set slave_name = ?, master_name = ? where id = ? and slave_id = ?");
+    $stmt = $conn->prepare("update dsm_relation set slave_name = ?, master_name = ?, slave_permissions = ? where id = ? and slave_id = ?");
 }
 
-$stmt->bind_param("ssii", $myName, $contactName, $relationId, $userId);
+$stmt->bind_param("sssii", $myName, $contactName, $slavePermissions, $relationId, $userId);
 
 if ($stmt->execute()) {
     printSuccess("Contact successfully updated");

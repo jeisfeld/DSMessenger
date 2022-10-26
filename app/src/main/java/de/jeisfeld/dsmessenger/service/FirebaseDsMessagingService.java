@@ -74,7 +74,10 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			case INVITATION_ACCEPTED:
 			case CONTACT_DELETED:
 			case CONTACT_UPDATED:
-				ContactRegistry.getInstance().refreshContacts(this, () -> AccountFragment.sendBroadcast(this, ActionType.CONTACTS_CHANGED));
+				ContactRegistry.getInstance().refreshContacts(this, () -> {
+					AccountFragment.sendBroadcast(this, ActionType.CONTACTS_UPDATED);
+					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONTACTS_UPDATED, null);
+				});
 				break;
 			case DEVICE_ADDED:
 			case DEVICE_DELETED:

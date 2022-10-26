@@ -24,6 +24,7 @@ master_id INT(8) UNSIGNED,
 slave_name VARCHAR(30),
 master_name VARCHAR(30),
 connection_code VARCHAR(24),
+slave_permissions VARCHAR(50) DEFAULT '1000',
 FOREIGN KEY (slave_id) REFERENCES dsm_user(id) ON DELETE CASCADE,
 FOREIGN KEY (master_id) REFERENCES dsm_user(id) ON DELETE CASCADE,
 CONSTRAINT unique_connection UNIQUE(connection_code)

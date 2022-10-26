@@ -7,6 +7,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
+import de.jeisfeld.dsmessenger.main.account.SlavePermissions;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -38,6 +39,10 @@ public class Contact implements Serializable {
 	 */
 	private final String connectionCode;
 	/**
+	 * The slave permissions.
+	 */
+	private final SlavePermissions slavePermissions;
+	/**
 	 * The contact status.
 	 */
 	private final ContactStatus status;
@@ -54,13 +59,14 @@ public class Contact implements Serializable {
 	 * @param status         The contact status
 	 */
 	public Contact(final int relationId, final String name, final String myName, final int contactId,
-				   final boolean isSlave, final String connectionCode, final ContactStatus status) {
+				   final boolean isSlave, final String connectionCode, final SlavePermissions slavePermissions, final ContactStatus status) {
 		this.relationId = relationId;
 		this.name = name;
 		this.myName = myName;
 		this.contactId = contactId;
 		this.isSlave = isSlave;
 		this.connectionCode = connectionCode;
+		this.slavePermissions = slavePermissions;
 		this.status = status;
 	}
 
@@ -76,6 +82,8 @@ public class Contact implements Serializable {
 		contactId = PreferenceUtil.getIndexedSharedPreferenceInt(R.string.key_contact_contact_id, relationId, -1);
 		isSlave = PreferenceUtil.getIndexedSharedPreferenceBoolean(R.string.key_contact_is_slave, relationId, false);
 		connectionCode = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_connection_code, relationId);
+		slavePermissions =
+				SlavePermissions.fromString(PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_slave_permissions, relationId));
 		status = ContactStatus.valueOf(PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_status, relationId));
 	}
 
@@ -103,8 +111,26 @@ public class Contact implements Serializable {
 		return connectionCode;
 	}
 
+	public SlavePermissions getSlavePermissions() {
+		return slavePermissions;
+	}
+
 	public final ContactStatus getStatus() {
 		return status;
+	}
+
+	/**
+	 * Get my permissions for this contact.
+	 *
+	 * @return My permissions for this contact.
+	 */
+	public SlavePermissions getMyPermissions() {
+		if (isSlave() || getStatus() == ContactStatus.INVITED) {
+			return SlavePermissions.ALL_PERMISSIONS;
+		}
+		else {
+			return getSlavePermissions();
+		}
 	}
 
 	@NonNull
@@ -120,7 +146,8 @@ public class Contact implements Serializable {
 	 */
 	public final String toDetailedString() {
 		return "Contact{" + "relationId=" + relationId + ", name='" + name + '\'' + ", myName='" + myName + '\'' + ", contactId='" + contactId + '\''
-				+ ", isSlave=" + isSlave + ", connectionCode='" + connectionCode + '\'' + ", status=" + status + '}';
+				+ ", isSlave=" + isSlave + ", connectionCode='" + connectionCode + "', slavePermissions=" + slavePermissions
+				+ ", status=" + status + '}';
 	}
 
 	/**
@@ -137,6 +164,7 @@ public class Contact implements Serializable {
 		PreferenceUtil.setIndexedSharedPreferenceInt(R.string.key_contact_contact_id, getRelationId(), getContactId());
 		PreferenceUtil.setIndexedSharedPreferenceBoolean(R.string.key_contact_is_slave, getRelationId(), isSlave());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_connection_code, getRelationId(), getConnectionCode());
+		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_slave_permissions, getRelationId(), getSlavePermissions().toString());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_status, getRelationId(), getStatus().name());
 	}
 
@@ -148,7 +176,9 @@ public class Contact implements Serializable {
 	public List<Conversation> getConversations() {
 		ConversationDao conversationDao = Application.getAppDatabase().getConversationDao();
 		List<Conversation> result = new ArrayList<>(conversationDao.getConversationsByRelationId(getRelationId()));
-		result.add(Conversation.createNewConversation(this));
+		if (getMyPermissions().isManageConversations()) {
+			result.add(Conversation.createNewConversation(this));
+		}
 		return result;
 	}
 

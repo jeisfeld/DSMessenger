@@ -12,8 +12,8 @@
         android:paddingEnd="?attr/dialogPreferredPadding"
         android:paddingBottom="?attr/dialogPreferredPadding">
 
-        <TableLayout
-            android:id="@+id/table_my_account"
+        <LinearLayout
+            android:id="@+id/layout_contact_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -27,25 +27,79 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextMyName"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/input_row_height"
                     android:hint="@string/text_my_name_m"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:padding="0dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_marginTop="@dimen/margin_small"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextContactName"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/input_row_height"
                     android:hint="@string/text_contact_name"
-                    android:inputType="text" />
+                    android:inputType="text"
+                    android:padding="0dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-        </TableLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_slave_permissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/layout_contact_name">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginBottom="@dimen/margin_small"
+                android:text="@string/text_slave_permissions"
+                android:textSize="@dimen/text_large" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkboxEditSlavePermissions"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_row_height_small"
+                android:text="@string/text_edit_slave_permissions" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkboxEditRelation"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_row_height_small"
+                android:text="@string/text_edit_relation" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkboxManageConversations"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_row_height_small"
+                android:text="@string/text_manage_conversations" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <AutoCompleteTextView
+                    android:id="@+id/dropdownDefaultReplyPolicy"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_row_height_small"
+                    android:hint="@string/text_default_reply_policy"
+                    android:inputType="none"
+                    android:padding="0dp"
+                    android:textSize="@dimen/text_normal" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textViewErrorMessage"
@@ -59,7 +113,7 @@
             android:textColor="@android:color/holo_red_dark"
             android:textSize="@dimen/text_normal"
             android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@id/table_my_account" />
+            app:layout_constraintTop_toBottomOf="@id/layout_slave_permissions" />
 
         <Button
             android:id="@+id/button_save_contact"

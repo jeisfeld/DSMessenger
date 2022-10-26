@@ -37,6 +37,7 @@
     <string name="key_contact_is_slave" translatable="false">contact_is_slave</string>
     <string name="key_contact_connection_code" translatable="false">contact_connection_code</string>
     <string name="key_contact_status" translatable="false">contact_status</string>
+    <string name="key_contact_slave_permissions" translatable="false">contact_slave_permissions</string>
     <string name="key_contact_conversation_ids" translatable="false">contact_conversation_ids</string>
 
     <!-- Conversation preferences -->

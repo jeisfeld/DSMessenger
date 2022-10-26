@@ -33,6 +33,7 @@ import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.entity.Device;
+import de.jeisfeld.dsmessenger.main.account.SlavePermissions;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy;
 import de.jeisfeld.dsmessenger.util.DateUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
@@ -152,7 +153,7 @@ public class HttpSender {
 	 * @param parameters The POST parameters.
 	 */
 	public void sendSelfMessage(final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
-		sendMessage("firebase/sendselfmessage.php", new Contact(-1, null, null, 0, false, null, null),
+		sendMessage("firebase/sendselfmessage.php", new Contact(-1, null, null, 0, false, null, null, null),
 				messageId, listener, parameters);
 	}
 
@@ -293,7 +294,8 @@ public class HttpSender {
 								int contactId = jsonContact.getInt("contactId");
 								boolean isSlave = jsonContact.getBoolean("isSlave");
 								boolean isConfirmed = jsonContact.getBoolean("isConfirmed");
-								Contact contact = new Contact(relationId, contactName, myName, contactId, isSlave, connectionCode,
+								SlavePermissions slavePermissions = SlavePermissions.fromString(jsonContact.getString("slavePermissions"));
+								Contact contact = new Contact(relationId, contactName, myName, contactId, isSlave, connectionCode, slavePermissions,
 										isConfirmed ? ContactStatus.CONNECTED : ContactStatus.INVITED);
 								contacts.put(relationId, contact);
 							}

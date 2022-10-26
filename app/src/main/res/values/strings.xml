@@ -60,6 +60,11 @@
     <string name="text_message_display_normal">Normal message display</string>
     <string name="text_message_display_urgent">Urgent message display</string>
     <string name="text_message_display_type">Display Type</string>
+    <string name="text_slave_permissions">Slave permissions</string>
+    <string name="text_edit_slave_permissions">Edit slave permissions</string>
+    <string name="text_edit_relation">Edit contact name / delete contact</string>
+    <string name="text_manage_conversations">Manage conversations</string>
+    <string name="text_default_reply_policy">Default reply policy</string>
 
     <string name="text_my_account">My Account</string>
     <string name="text_username">Username</string>
@@ -127,6 +132,13 @@
     <string-array name="array_message_display_types">
         <item>Action</item>
         <item>Notification</item>
+    </string-array>
+
+    <string-array name="array_reply_policies">
+        <item>Unlimited responses</item>
+        <item>Only acknowledgement</item>
+        <item>Only one response</item>
+        <item>Acknowledge and one response</item>
     </string-array>
 
     <string-array name="array_notification_names">

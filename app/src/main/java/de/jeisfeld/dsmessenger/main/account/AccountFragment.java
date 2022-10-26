@@ -59,7 +59,7 @@ public class AccountFragment extends Fragment {
 			if (intent != null) {
 				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
 				switch (actionType) {
-				case CONTACTS_CHANGED:
+				case CONTACTS_UPDATED:
 					if (binding != null) {
 						refreshDisplayedContactList();
 					}
@@ -169,7 +169,7 @@ public class AccountFragment extends Fragment {
 			break;
 		}
 
-		if (contact.isSlave() || contact.getStatus() == ContactStatus.INVITED) {
+		if (contact.getMyPermissions().isEditRelation()) {
 			childBinding.buttonDelete.setVisibility(View.VISIBLE);
 			childBinding.buttonDelete.setOnClickListener(v -> DialogUtil.displayConfirmationMessage(getActivity(),
 					dialog -> new HttpSender(getContext()).sendMessage("db/usermanagement/deletecontact.php", (response, responseData) -> {
@@ -188,11 +188,16 @@ public class AccountFragment extends Fragment {
 							"isConnected", contact.getStatus() == ContactStatus.CONNECTED ? "1" : ""),
 					R.string.title_dialog_confirm_deletion, R.string.button_cancel, R.string.button_delete_contact,
 					R.string.dialog_confirm_delete_contact, contact.getName()));
+		}
+		else {
+			childBinding.buttonDelete.setVisibility(View.GONE);
+		}
+
+		if (contact.getMyPermissions().isEditRelation() || contact.getMyPermissions().isEditSlavePermissions()) {
 			childBinding.buttonEdit.setVisibility(View.VISIBLE);
 			childBinding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditContactDialog(this, contact));
 		}
 		else {
-			childBinding.buttonDelete.setVisibility(View.GONE);
 			childBinding.buttonEdit.setVisibility(View.GONE);
 		}
 
@@ -614,7 +619,8 @@ public class AccountFragment extends Fragment {
 				String connectionCode = (String) responseData.getData().get("connectionCode");
 				int relationId = (int) responseData.getData().get("relationId");
 
-				Contact contact = new Contact(relationId, contactName, myName, -1, !amSlave, connectionCode, ContactStatus.INVITED);
+				Contact contact = new Contact(relationId, contactName, myName, -1, !amSlave, connectionCode, SlavePermissions.DEFAULT_SLAVE_PERMISSIONS,
+						ContactStatus.INVITED);
 				ContactRegistry.getInstance().addOrUpdate(contact);
 				Activity activity = getActivity();
 				if (activity != null) {
@@ -666,7 +672,7 @@ public class AccountFragment extends Fragment {
 					activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
 				}
 			}
-		}, "myName", contact.getMyName(), "contactName", contact.getName());
+		}, "myName", contact.getMyName(), "contactName", contact.getName(), "slavePermissions", contact.getSlavePermissions().toString());
 	}
 
 	/**
@@ -700,7 +706,7 @@ public class AccountFragment extends Fragment {
 		/**
 		 * Inform about contacts changed.
 		 */
-		CONTACTS_CHANGED,
+		CONTACTS_UPDATED,
 		/**
 		 * Inform about devices changed.
 		 */

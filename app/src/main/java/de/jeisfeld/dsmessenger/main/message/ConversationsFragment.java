@@ -43,6 +43,7 @@ public class ConversationsFragment extends Fragment {
 				case CONVERSATION_EDITED:
 				case CONVERSATION_DELETED:
 				case CONVERSATION_ADDED:
+				case CONTACTS_UPDATED:
 					adapter.notifyDataSetChanged();
 					break;
 				default:
@@ -130,6 +131,10 @@ public class ConversationsFragment extends Fragment {
 		/**
 		 * Inform about conversation added.
 		 */
-		CONVERSATION_ADDED
+		CONVERSATION_ADDED,
+		/**
+		 * Inform about contact changed.
+		 */
+		CONTACTS_UPDATED
 	}
 }

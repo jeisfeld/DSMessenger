@@ -21,6 +21,7 @@ import de.jeisfeld.dsmessenger.entity.Device;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
+import de.jeisfeld.dsmessenger.main.account.SlavePermissions.ReplyPolicy;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy.MessageDisplayType;
 import de.jeisfeld.dsmessenger.util.DropdownHandler;
@@ -169,7 +170,7 @@ public final class AccountDialogUtil {
 	 * Display dialog for edit device.
 	 *
 	 * @param accountFragment The triggering fragment.
-	 * @param device The device
+	 * @param device          The device
 	 */
 	public static void displayEditDeviceDialog(final AccountFragment accountFragment, final Device device) {
 		EditDeviceDialogFragment fragment = new EditDeviceDialogFragment();
@@ -539,10 +540,11 @@ public final class AccountDialogUtil {
 				new HttpSender(getContext()).sendMessage("db/usermanagement/acceptinvitation.php", (response, responseData) -> {
 							if (responseData.isSuccess()) {
 								dismiss();
-								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, ContactStatus.CONNECTED);
+								// TODO: fill slave permissions
+								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, null, ContactStatus.CONNECTED);
 								ContactRegistry.getInstance().addOrUpdate(contact);
 
-								AccountFragment.sendBroadcast(getContext(), ActionType.CONTACTS_CHANGED);
+								AccountFragment.sendBroadcast(getContext(), ActionType.CONTACTS_UPDATED);
 							}
 							else {
 								requireActivity().runOnUiThread(() -> displayError(responseData.getMappedErrorMessage(getContext())));
@@ -593,8 +595,18 @@ public final class AccountDialogUtil {
 			assert getArguments() != null;
 			final Contact contact = (Contact) getArguments().getSerializable("contact");
 
+			binding.layoutContactName.setVisibility(contact.getMyPermissions().isEditRelation() ? View.VISIBLE : View.GONE);
+			binding.layoutSlavePermissions.setVisibility(contact.getMyPermissions().isEditSlavePermissions() ? View.VISIBLE : View.GONE);
+
 			binding.editTextMyName.setText(contact.getMyName());
 			binding.editTextContactName.setText(contact.getName());
+
+			binding.checkboxEditSlavePermissions.setChecked(contact.getSlavePermissions().isEditSlavePermissions());
+			binding.checkboxEditRelation.setChecked(contact.getSlavePermissions().isEditRelation());
+			binding.checkboxManageConversations.setChecked(contact.getSlavePermissions().isManageConversations());
+			final DropdownHandler<String> dropdownHandlerDefaultReplyPolicy = DropdownHandler.fromResource(getContext(),
+					binding.dropdownDefaultReplyPolicy, R.array.array_reply_policies,
+					contact.getSlavePermissions().getDefaultReplyPolicy().ordinal());
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 			builder.setTitle(R.string.title_dialog_edit_contact).setView(binding.getRoot());
@@ -615,8 +627,12 @@ public final class AccountDialogUtil {
 				String myName = binding.editTextMyName.getText().toString().trim();
 				String contactName = binding.editTextContactName.getText().toString().trim();
 
+				SlavePermissions newSlavePermissions = new SlavePermissions(binding.checkboxEditSlavePermissions.isChecked(),
+						binding.checkboxEditRelation.isChecked(), binding.checkboxManageConversations.isChecked(),
+						ReplyPolicy.fromOrdinal(dropdownHandlerDefaultReplyPolicy.getSelectedPosition()));
+
 				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
-						contact.getConnectionCode(), contact.getStatus());
+						contact.getConnectionCode(), newSlavePermissions, contact.getStatus());
 				((AccountFragment) requireParentFragment()).handleEditContactDialogResponse(this, newContact);
 
 			});

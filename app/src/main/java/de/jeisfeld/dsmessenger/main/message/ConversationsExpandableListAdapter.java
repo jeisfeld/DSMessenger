@@ -123,7 +123,7 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 		TextView textViewSubject = view.findViewById(R.id.textViewSubject);
 		textViewSubject.setText(conversation.getSubject());
 
-		prepareConversationButtons(view, conversation);
+		prepareConversationButtons(view, contact, conversation);
 
 		textViewSubject.setOnClickListener(v -> {
 			Activity activity = fragment.getActivity();
@@ -143,12 +143,13 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 	 * Prepare the buttons of the conversation.
 	 *
 	 * @param view         the conversation view.
+	 * @param contact      the contact.
 	 * @param conversation the conversation.
 	 */
-	private void prepareConversationButtons(final View view, final Conversation conversation) {
+	private void prepareConversationButtons(final View view, final Contact contact, final Conversation conversation) {
 		View buttonDelete = view.findViewById(R.id.button_delete);
 		View buttonEdit = view.findViewById(R.id.button_edit);
-		if (conversation.isStored()) {
+		if (conversation.isStored() && contact.getMyPermissions().isManageConversations()) {
 			buttonDelete.setVisibility(View.VISIBLE);
 			buttonEdit.setVisibility(View.VISIBLE);
 			buttonEdit.setOnClickListener(v -> {
@@ -158,12 +159,9 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 								conversation.setSubject(text);
 								conversation.update();
 								notifyDataSetChanged();
-								Contact contact = ContactRegistry.getInstance().getContact(conversation.getRelationId());
-								if (contact != null) {
-									new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
-											"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_EDITED.name(),
-											"conversationId", conversation.getConversationId(), "subject", conversation.getSubject());
-								}
+								new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
+										"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_EDITED.name(),
+										"conversationId", conversation.getConversationId(), "subject", conversation.getSubject());
 							}, R.string.title_dialog_edit_conversation_subject, R.string.button_ok, conversation.getSubject(),
 							InputType.TYPE_CLASS_TEXT, R.string.dialog_edit_conversation_subject);
 				}
@@ -175,12 +173,9 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 								String conversationId = conversation.getConversationId();
 								Application.getAppDatabase().getConversationDao().delete(conversation);
 								notifyDataSetChanged();
-								Contact contact = ContactRegistry.getInstance().getContact(conversation.getRelationId());
-								if (contact != null) {
-									new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
-											"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_DELETED.name(),
-											"conversationId", conversationId);
-								}
+								new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
+										"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_DELETED.name(),
+										"conversationId", conversationId);
 							},
 							R.string.title_dialog_confirm_deletion, R.string.button_cancel, R.string.button_delete_conversation,
 							R.string.dialog_confirm_delete_conversation, conversation.getSubject());

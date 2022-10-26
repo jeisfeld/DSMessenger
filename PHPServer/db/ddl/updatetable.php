@@ -10,7 +10,7 @@ if ($conn->connect_error) {
 }
 
 // sql to create table dsm_relation
-$sql = "UPDATE dsm_device SET displaystrategy_normal = concat( '0' , displaystrategy_normal), displaystrategy_urgent = concat ('0' , displaystrategy_urgent)";
+$sql = "ALTER TABLE dsm_relation ADD COLUMN slave_permissions VARCHAR(50) DEFAULT '1000'";
 
 if ($conn->query($sql) === TRUE) {
     printSuccess("Table dsm_device updated successfully");
