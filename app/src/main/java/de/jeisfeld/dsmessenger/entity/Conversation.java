@@ -41,6 +41,12 @@ public class Conversation implements Serializable {
 	private long lastTimestamp;
 
 	/**
+	 * Flags that can be set on a conversation.
+	 */
+	@ColumnInfo(name = "conversationFlags")
+	private String conversationFlagsString;
+
+	/**
 	 * Flag indicating if the conversation is already stored.
 	 */
 	@Ignore
@@ -137,6 +143,32 @@ public class Conversation implements Serializable {
 
 	public final void setLastTimestamp(final long lastTimestamp) {
 		this.lastTimestamp = lastTimestamp;
+	}
+
+	protected String getConversationFlagsString() {
+		return conversationFlagsString;
+	}
+
+	protected void setConversationFlagsString(String conversationFlagsString) {
+		this.conversationFlagsString = conversationFlagsString;
+	}
+
+	/**
+	 * Get the conversation flags.
+	 *
+	 * @return The conversation flags.
+	 */
+	public ConversationFlags getConversationFlags() {
+		return ConversationFlags.fromString(getConversationFlagsString());
+	}
+
+	/**
+	 * Set the conversation flags.
+	 *
+	 * @param conversationFlags The new conversation flags.
+	 */
+	public void setConversationFlags(ConversationFlags conversationFlags) {
+		this.conversationFlagsString = conversationFlags.toString();
 	}
 
 	public final boolean isStored() {

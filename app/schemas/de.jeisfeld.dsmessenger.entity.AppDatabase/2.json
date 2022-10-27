@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "315c05fb5b019460ab4cf364890b55c4",
+    "version": 2,
+    "identityHash": "1e5b155f4a4e839217c0139ff18c5370",
     "entities": [
       {
         "tableName": "conversation",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`relationId` INTEGER NOT NULL, `subject` TEXT, `conversationId` TEXT NOT NULL, `lastTimestamp` INTEGER NOT NULL, PRIMARY KEY(`conversationId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`relationId` INTEGER NOT NULL, `subject` TEXT, `conversationId` TEXT NOT NULL, `lastTimestamp` INTEGER NOT NULL, `conversationFlags` TEXT, PRIMARY KEY(`conversationId`))",
         "fields": [
           {
             "fieldPath": "relationId",
@@ -31,6 +31,12 @@
             "columnName": "lastTimestamp",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "conversationFlagsString",
+            "columnName": "conversationFlags",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -118,7 +124,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '315c05fb5b019460ab4cf364890b55c4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1e5b155f4a4e839217c0139ff18c5370')"
     ]
   }
 }
