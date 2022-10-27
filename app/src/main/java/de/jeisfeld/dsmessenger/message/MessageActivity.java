@@ -166,7 +166,7 @@ public class MessageActivity extends AppCompatActivity {
 		Intent intent = new Intent(context, MessageActivity.class);
 		intent.putExtra(STRING_EXTRA_MESSAGE_DETAILS, textMessageDetails);
 		if (textMessageDetails.getConversationId() != null && currentTopConversation != null
-				&& !currentTopConversation.getConversationUuid().equals(textMessageDetails.getConversationId())) {
+				&& !currentTopConversation.getConversationId().equals(textMessageDetails.getConversationId())) {
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
 		}
 		else {
@@ -226,7 +226,7 @@ public class MessageActivity extends AppCompatActivity {
 
 		final TextMessageDetails textMessageDetails = (TextMessageDetails) getIntent().getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
 
-		refreshMessageList(textMessageDetails.getConversationId().toString(), textMessageDetails, true);
+		refreshMessageList(textMessageDetails.getConversationId(), textMessageDetails, true);
 
 		broadcastManager = LocalBroadcastManager.getInstance(this);
 		IntentFilter actionReceiver = new IntentFilter();
@@ -241,7 +241,7 @@ public class MessageActivity extends AppCompatActivity {
 	 * @param textMessageDetails The text message details to be handled at the end (if applicable)
 	 * @param scrollDown         Flag indicating if view should scroll to last position.
 	 */
-	private void refreshMessageList(final String conversationId, final TextMessageDetails textMessageDetails, final boolean scrollDown) {
+	private void refreshMessageList(final UUID conversationId, final TextMessageDetails textMessageDetails, final boolean scrollDown) {
 		new Thread(() -> {
 			List<Message> newMessageList = Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversationId);
 			messageList.clear();
@@ -289,7 +289,7 @@ public class MessageActivity extends AppCompatActivity {
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
 
 		UUID conversationId = textMessageDetails.getConversationId();
-		Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId.toString());
+		Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId);
 		if (messageConversation == null) {
 			messageConversation = Conversation.createNewConversation(textMessageDetails);
 			messageConversation.insertIfNew(textMessageDetails.getMessageText());
@@ -378,7 +378,7 @@ public class MessageActivity extends AppCompatActivity {
 			UUID newMessageId = UUID.randomUUID();
 			new HttpSender(this).sendMessage(contact, newMessageId, (response, responseData) -> {
 						Message message = new Message(messageText, true, newMessageId,
-								conversation.getConversationUuid(), timestamp, MessageStatus.MESSAGE_SENT);
+								conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
 						runOnUiThread(() -> {
 							if (responseData != null && responseData.isSuccess()) {
 								message.store(conversation);
@@ -391,12 +391,13 @@ public class MessageActivity extends AppCompatActivity {
 						});
 					},
 					"messageType", MessageType.TEXT_ACKNOWLEDGE.name(), "messageText", messageText,
-					"priority", MessagePriority.NORMAL.name(), "conversationId", conversation.getConversationId(),
+					"priority", MessagePriority.NORMAL.name(), "conversationId", conversation.getConversationId().toString(),
 					"timestamp", Long.toString(timestamp));
 		}
 		else {
 			new HttpSender(this).sendMessage(contact, messageId, null,
-					"messageType", MessageType.ADMIN.name(), "adminType", adminType.name(), "conversationId", conversation.getConversationId());
+					"messageType", MessageType.ADMIN.name(), "adminType", adminType.name(),
+					"conversationId", conversation.getConversationId().toString());
 		}
 	}
 

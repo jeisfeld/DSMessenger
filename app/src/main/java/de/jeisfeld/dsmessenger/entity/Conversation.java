@@ -31,8 +31,9 @@ public class Conversation implements Serializable {
 	 * The unique id of the conversation.
 	 */
 	@PrimaryKey
+	@ColumnInfo(name = "conversationId")
 	@NonNull
-	private final String conversationId;
+	private final String conversationIdString;
 
 	/**
 	 * The last timestamp of this conversation.
@@ -55,16 +56,18 @@ public class Conversation implements Serializable {
 	/**
 	 * Constructor.
 	 *
-	 * @param relationId     The relationId of the contact.
-	 * @param subject        The subject of the conversation.
-	 * @param conversationId The unique id of the conversation.
-	 * @param lastTimestamp  The last timestamp of this conversation.
+	 * @param relationId           The relationId of the contact.
+	 * @param subject              The subject of the conversation.
+	 * @param conversationIdString The unique id of the conversation.
+	 * @param lastTimestamp        The last timestamp of this conversation.
 	 */
-	public Conversation(final int relationId, final String subject, @NonNull final String conversationId, final long lastTimestamp) {
+	protected Conversation(final int relationId, final String subject, @NonNull final String conversationIdString, final long lastTimestamp,
+						   final String conversationFlagsString) {
 		this.relationId = relationId;
 		this.subject = subject;
-		this.conversationId = conversationId;
+		this.conversationIdString = conversationIdString;
 		this.lastTimestamp = lastTimestamp;
+		this.conversationFlagsString = conversationFlagsString;
 		isStored = true;
 	}
 
@@ -76,7 +79,7 @@ public class Conversation implements Serializable {
 	 */
 	public static Conversation createNewConversation(final Contact contact) {
 		Conversation result = new Conversation(contact.getRelationId(), Application.getResourceString(R.string.text_new_conversation_name),
-				UUID.randomUUID().toString(), System.currentTimeMillis());
+				UUID.randomUUID().toString(), System.currentTimeMillis(), contact.getMyPermissions().getDefaultReplyPolicy().toString());
 		result.isStored = false;
 		return result;
 	}
@@ -89,7 +92,8 @@ public class Conversation implements Serializable {
 	 */
 	public static Conversation createNewConversation(final TextMessageDetails textMessageDetails) {
 		Conversation result = new Conversation(textMessageDetails.getContact().getRelationId(), textMessageDetails.getMessageText(),
-				textMessageDetails.getConversationId().toString(), textMessageDetails.getTimestamp());
+				textMessageDetails.getConversationId().toString(), textMessageDetails.getTimestamp(),
+				textMessageDetails.getContact().getMyPermissions().getDefaultReplyPolicy().toString());
 		result.isStored = false;
 		return result;
 	}
@@ -129,12 +133,12 @@ public class Conversation implements Serializable {
 	}
 
 	@NonNull
-	public final String getConversationId() {
-		return conversationId;
+	protected final String getConversationIdString() {
+		return conversationIdString;
 	}
 
-	public final UUID getConversationUuid() {
-		return UUID.fromString(getConversationId());
+	public final UUID getConversationId() {
+		return UUID.fromString(getConversationIdString());
 	}
 
 	public final long getLastTimestamp() {

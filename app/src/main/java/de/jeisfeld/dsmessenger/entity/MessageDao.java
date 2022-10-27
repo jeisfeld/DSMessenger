@@ -1,6 +1,7 @@
 package de.jeisfeld.dsmessenger.entity;
 
 import java.util.List;
+import java.util.UUID;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -25,6 +26,10 @@ public interface MessageDao {
 
 	@Query("SELECT * FROM message WHERE conversationId = :conversationId ORDER BY timestamp")
 	List<Message> getMessagesByConversationId(String conversationId);
+
+	default List<Message> getMessagesByConversationId(UUID conversationId) {
+		return getMessagesByConversationId(conversationId.toString());
+	}
 
 	@Query("SELECT * FROM message WHERE messageId = :messageId")
 	Message getMessageById(String messageId);

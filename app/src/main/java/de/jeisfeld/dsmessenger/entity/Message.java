@@ -35,14 +35,15 @@ public class Message {
 	 * The messageId.
 	 */
 	@PrimaryKey
+	@ColumnInfo(name = "messageId")
 	@NonNull
-	private final String messageId;
+	private final String messageIdString;
 	/**
 	 * The conversationId.
 	 */
 	@ColumnInfo(name = "conversationId")
 	@NonNull
-	private final String conversationId;
+	private final String conversationIdString;
 	/**
 	 * The timestamp of the message.
 	 */
@@ -57,19 +58,19 @@ public class Message {
 	/**
 	 * Constructor.
 	 *
-	 * @param messageText    The message text.
-	 * @param isOwn          Indicator if it is own message or contact's message.
-	 * @param messageId      The messageId.
-	 * @param conversationId The conversationId.
-	 * @param timestamp      The timestamp of the message.
-	 * @param status         The message status
+	 * @param messageText          The message text.
+	 * @param isOwn                Indicator if it is own message or contact's message.
+	 * @param messageIdString      The messageId.
+	 * @param conversationIdString The conversationId.
+	 * @param timestamp            The timestamp of the message.
+	 * @param status               The message status
 	 */
-	public Message(final String messageText, final boolean isOwn, @NonNull final String messageId, @NonNull final String conversationId,
-				   final long timestamp, final MessageStatus status) {
+	protected Message(final String messageText, final boolean isOwn, @NonNull final String messageIdString, @NonNull final String conversationIdString,
+					  final long timestamp, final MessageStatus status) {
 		this.messageText = messageText;
 		this.isOwn = isOwn;
-		this.messageId = messageId;
-		this.conversationId = conversationId;
+		this.messageIdString = messageIdString;
+		this.conversationIdString = conversationIdString;
 		this.timestamp = timestamp;
 		this.status = status;
 	}
@@ -119,21 +120,21 @@ public class Message {
 	}
 
 	@NonNull
-	public final String getMessageId() {
-		return messageId;
+	protected final String getMessageIdString() {
+		return messageIdString;
 	}
 
-	public final UUID getMessageUuid() {
-		return UUID.fromString(getMessageId());
+	public final UUID getMessageId() {
+		return UUID.fromString(getMessageIdString());
 	}
 
 	@NonNull
-	public final String getConversationId() {
-		return conversationId;
+	protected final String getConversationIdString() {
+		return conversationIdString;
 	}
 
-	public final UUID getConversationUuid() {
-		return UUID.fromString(getConversationId());
+	public final UUID getConversationId() {
+		return UUID.fromString(getConversationIdString());
 	}
 
 	public final long getTimestamp() {

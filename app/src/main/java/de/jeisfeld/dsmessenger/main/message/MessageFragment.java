@@ -319,7 +319,7 @@ public class MessageFragment extends Fragment {
 
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
 					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
-							conversation.getConversationUuid(), timestamp, MessageStatus.MESSAGE_SENT);
+							conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
@@ -338,7 +338,7 @@ public class MessageFragment extends Fragment {
 					}
 				},
 				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name(),
-				"conversationId", conversation.getConversationId(), "timestamp", Long.toString(timestamp));
+				"conversationId", conversation.getConversationId().toString(), "timestamp", Long.toString(timestamp));
 	}
 
 	/**

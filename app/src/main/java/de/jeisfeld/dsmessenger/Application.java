@@ -67,9 +67,7 @@ public class Application extends android.app.Application {
 		AppCompatDelegate.setDefaultNightMode(
 				PreferenceUtil.getSharedPreferenceIntString(R.string.key_pref_night_mode, R.string.pref_default_night_mode));
 
-		appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "dsmessenger")
-				.addMigrations(AppDatabase.MIGRATION_1_2)
-				.allowMainThreadQueries().build();
+		appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "dsmessenger").allowMainThreadQueries().build();
 	}
 
 	/**

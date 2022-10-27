@@ -161,7 +161,7 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 								notifyDataSetChanged();
 								new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
 										"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_EDITED.name(),
-										"conversationId", conversation.getConversationId(), "subject", conversation.getSubject());
+										"conversationId", conversation.getConversationId().toString(), "subject", conversation.getSubject());
 							}, R.string.title_dialog_edit_conversation_subject, R.string.button_ok, conversation.getSubject(),
 							InputType.TYPE_CLASS_TEXT, R.string.dialog_edit_conversation_subject);
 				}
@@ -170,12 +170,12 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 				FragmentActivity activity = fragment.getActivity();
 				if (conversation.isStored() && activity != null) {
 					DialogUtil.displayConfirmationMessage(activity, dialog -> {
-								String conversationId = conversation.getConversationId();
+								UUID conversationId = conversation.getConversationId();
 								Application.getAppDatabase().getConversationDao().delete(conversation);
 								notifyDataSetChanged();
 								new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
 										"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_DELETED.name(),
-										"conversationId", conversationId);
+										"conversationId", conversationId.toString());
 							},
 							R.string.title_dialog_confirm_deletion, R.string.button_cancel, R.string.button_delete_conversation,
 							R.string.dialog_confirm_delete_conversation, conversation.getSubject());

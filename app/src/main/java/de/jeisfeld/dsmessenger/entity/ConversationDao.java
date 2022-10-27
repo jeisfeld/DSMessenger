@@ -1,6 +1,7 @@
 package de.jeisfeld.dsmessenger.entity;
 
 import java.util.List;
+import java.util.UUID;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -30,4 +31,8 @@ public interface ConversationDao {
 
 	@Query("SELECT * FROM conversation WHERE conversationId = :conversationId")
 	Conversation getConversationById(String conversationId);
+
+	default Conversation getConversationById(UUID conversationId) {
+		return getConversationById(conversationId.toString());
+	}
 }
