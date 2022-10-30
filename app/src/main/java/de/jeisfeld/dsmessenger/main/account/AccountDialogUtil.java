@@ -13,15 +13,20 @@ import de.jeisfeld.dsmessenger.databinding.DialogChangePasswordBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogCreateAccountBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogCreateInvitationBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogEditContactBinding;
+import de.jeisfeld.dsmessenger.databinding.DialogEditConversationBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogEditDeviceBinding;
 import de.jeisfeld.dsmessenger.databinding.DialogLoginBinding;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Contact.ContactStatus;
+import de.jeisfeld.dsmessenger.entity.Conversation;
+import de.jeisfeld.dsmessenger.entity.ConversationFlags;
 import de.jeisfeld.dsmessenger.entity.Device;
+import de.jeisfeld.dsmessenger.entity.ReplyPolicy;
+import de.jeisfeld.dsmessenger.entity.SlavePermissions;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment.ActionType;
-import de.jeisfeld.dsmessenger.main.account.SlavePermissions.ReplyPolicy;
+import de.jeisfeld.dsmessenger.main.message.ConversationsFragment;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy.MessageDisplayType;
 import de.jeisfeld.dsmessenger.util.DropdownHandler;
@@ -179,6 +184,28 @@ public final class AccountDialogUtil {
 		fragment.setArguments(bundle);
 		try {
 			fragment.show(accountFragment.getChildFragmentManager(), fragment.getClass().toString());
+		}
+		catch (IllegalStateException e) {
+			// May appear if activity is not active any more - ignore.
+		}
+	}
+
+	/**
+	 * Display dialog for edit conversation.
+	 *
+	 * @param conversationsFragment The triggering fragment.
+	 * @param conversation          The conversation
+	 * @param contact               The contact
+	 */
+	public static void displayEditConversationDialog(final ConversationsFragment conversationsFragment, final Conversation conversation,
+													 final Contact contact) {
+		EditConversationDialogFragment fragment = new EditConversationDialogFragment();
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("conversation", conversation);
+		bundle.putSerializable("contact", contact);
+		fragment.setArguments(bundle);
+		try {
+			fragment.show(conversationsFragment.getChildFragmentManager(), fragment.getClass().toString());
 		}
 		catch (IllegalStateException e) {
 			// May appear if activity is not active any more - ignore.
@@ -613,7 +640,7 @@ public final class AccountDialogUtil {
 
 			binding.buttonCancel.setOnClickListener(v -> dismiss());
 
-			binding.buttonSaveContact.setOnClickListener(v -> {
+			binding.buttonUpdateContact.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
 				if (contact.getStatus() == ContactStatus.CONNECTED
 						&& (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().length() == 0)) {
@@ -740,6 +767,76 @@ public final class AccountDialogUtil {
 								binding.checkboxKeepScreenOnUrgent.isChecked(), binding.checkboxLockMessageUrgent.isChecked()),
 						device.isThis());
 				((AccountFragment) requireParentFragment()).handleEditDeviceDialogResponse(this, newDevice);
+			});
+
+			return builder.create();
+		}
+
+	}
+
+	/**
+	 * Fragment to edit conversation dialog.
+	 */
+	public static class EditConversationDialogFragment extends DialogFragment {
+		/**
+		 * The binding of the view.
+		 */
+		private DialogEditConversationBinding binding;
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param resource The text resource.
+		 */
+		public void displayError(final int resource) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(resource);
+		}
+
+		/**
+		 * Display an error in the dialog.
+		 *
+		 * @param message The error message.
+		 */
+		public void displayError(final String message) {
+			binding.textViewErrorMessage.setVisibility(View.VISIBLE);
+			binding.textViewErrorMessage.setText(message);
+		}
+
+		@NonNull
+		@Override
+		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
+			binding = DialogEditConversationBinding.inflate(getLayoutInflater());
+
+			assert getArguments() != null;
+			final Conversation conversation = (Conversation) getArguments().getSerializable("conversation");
+			final Contact contact = (Contact) getArguments().getSerializable("contact");
+
+			binding.editTextSubject.setText(conversation.getSubject());
+			final DropdownHandler<String> dropdownHandlerReplyPolicy = DropdownHandler.fromResource(getContext(),
+					binding.dropdownReplyPolicy, R.array.array_reply_policies,
+					conversation.getConversationFlags().getReplyPolicy().ordinal());
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+			builder.setTitle(R.string.title_dialog_edit_conversation).setView(binding.getRoot());
+
+			binding.buttonCancel.setOnClickListener(v -> dismiss());
+
+			binding.buttonUpdateConversation.setOnClickListener(v -> {
+				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
+				if (binding.editTextSubject.getText() == null || binding.editTextSubject.getText().toString().trim().length() == 0) {
+					displayError(R.string.error_missing_subject);
+					return;
+				}
+				String subject = binding.editTextSubject.getText().toString().trim();
+
+				ReplyPolicy replyPolicy = ReplyPolicy.fromOrdinal(dropdownHandlerReplyPolicy.getSelectedPosition());
+				Conversation newConversation = new Conversation(conversation.getRelationId(), subject, conversation.getConversationId(),
+						conversation.getLastTimestamp(),
+						new ConversationFlags(replyPolicy, replyPolicy.isExpectsAcknowledgement(),
+								replyPolicy.isExpectsResponse() && !replyPolicy.isExpectsAcknowledgement()));
+
+				((ConversationsFragment) requireParentFragment()).handleEditConversationDialogResponse(this, contact, newConversation);
 			});
 
 			return builder.create();

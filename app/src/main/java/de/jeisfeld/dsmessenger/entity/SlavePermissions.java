@@ -1,4 +1,4 @@
-package de.jeisfeld.dsmessenger.main.account;
+package de.jeisfeld.dsmessenger.entity;
 
 import java.io.Serializable;
 
@@ -114,42 +114,5 @@ public class SlavePermissions implements Serializable {
 
 	public ReplyPolicy getDefaultReplyPolicy() {
 		return defaultReplyPolicy;
-	}
-
-	/**
-	 * The reply policy.
-	 */
-	public enum ReplyPolicy {
-		/**
-		 * Allow unlimited responses.
-		 */
-		UNLIMITED,
-		/**
-		 * Allow only acknowledgement.
-		 */
-		ONLY_ACKNOWLEDGE,
-		/**
-		 * Allow one response.
-		 */
-		ONE_RESPONSE,
-		/**
-		 * Allow acknowledgement, followed by response.
-		 */
-		ACKNOWLEDGE_AND_RESPONSE;
-
-		/**
-		 * Get a messageType from its ordinal value.
-		 *
-		 * @param ordinal The ordinal value.
-		 * @return The message type.
-		 */
-		public static ReplyPolicy fromOrdinal(final int ordinal) {
-			for (ReplyPolicy replyPolicy : values()) {
-				if (replyPolicy.ordinal() == ordinal) {
-					return replyPolicy;
-				}
-			}
-			return ONLY_ACKNOWLEDGE;
-		}
 	}
 }

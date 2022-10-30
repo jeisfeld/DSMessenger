@@ -3,7 +3,6 @@ package de.jeisfeld.dsmessenger.entity;
 import java.io.Serializable;
 
 import androidx.annotation.NonNull;
-import de.jeisfeld.dsmessenger.main.account.SlavePermissions.ReplyPolicy;
 
 /**
  * The flags on a conversation.
@@ -12,19 +11,29 @@ public class ConversationFlags implements Serializable {
 	/**
 	 * Default slave permissions.
 	 */
-	public static final ConversationFlags DEFAULT_CONVERSATION_FLAGS = new ConversationFlags(ReplyPolicy.UNLIMITED);
+	public static final ConversationFlags DEFAULT_CONVERSATION_FLAGS = new ConversationFlags(ReplyPolicy.UNLIMITED, false, true);
 	/**
 	 * The reply policy.
 	 */
 	private final ReplyPolicy replyPolicy;
+	/**
+	 * Flag indicating if acknowledgement from slave is expected.
+	 */
+	private final boolean expectingAcknowledgement;
+	/**
+	 * Flag indicating if response from slave is expected.
+	 */
+	private final boolean expectingResponse;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param replyPolicy The reply policy.
 	 */
-	public ConversationFlags(final ReplyPolicy replyPolicy) {
+	public ConversationFlags(final ReplyPolicy replyPolicy, final boolean expectingAcknowledgement, final boolean expectingResponse) {
 		this.replyPolicy = replyPolicy;
+		this.expectingAcknowledgement = expectingAcknowledgement;
+		this.expectingResponse = expectingResponse;
 	}
 
 	/**
@@ -38,8 +47,32 @@ public class ConversationFlags implements Serializable {
 			return DEFAULT_CONVERSATION_FLAGS;
 		}
 		ReplyPolicy replyPolicy = ReplyPolicy.fromOrdinal(Integer.parseInt(Character.toString(conversationFlags.charAt(0))));
-		return new ConversationFlags(replyPolicy);
+
+		boolean expectingAcknowledgement = charToBoolean(conversationFlags.charAt(1));
+		boolean expectingResponse = charToBoolean(conversationFlags.charAt(2));
+		return new ConversationFlags(replyPolicy, expectingAcknowledgement, expectingResponse);
 	}
+
+	/**
+	 * Get char representation of a boolean.
+	 *
+	 * @param b The boolean
+	 * @return The char representation
+	 */
+	private static char booleanToChar(final boolean b) {
+		return b ? '1' : '0';
+	}
+
+	/**
+	 * Restore boolean from char representation.
+	 *
+	 * @param c The char representation
+	 * @return The boolean
+	 */
+	private static boolean charToBoolean(final char c) {
+		return c == '1';
+	}
+
 
 	/**
 	 * Convert conversation flags into String.
@@ -49,7 +82,7 @@ public class ConversationFlags implements Serializable {
 	@NonNull
 	@Override
 	public String toString() {
-		return "" + getReplyPolicy().ordinal();
+		return "" + getReplyPolicy().ordinal() + booleanToChar(expectingAcknowledgement) + booleanToChar(expectingResponse);
 	}
 
 	public ReplyPolicy getReplyPolicy() {

@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.main.message;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,11 +10,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.UUID;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.databinding.FragmentConversationBinding;
+import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Conversation;
+import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.EditConversationDialogFragment;
+import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
+import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 
 /**
  * Fragment for sending messages.
@@ -114,6 +122,27 @@ public class ConversationsFragment extends Fragment {
 	public final void onDetach() {
 		super.onDetach();
 		broadcastManager.unregisterReceiver(localBroadcastReceiver);
+	}
+
+	/**
+	 * Handle the response of edit conversation dialog.
+	 *
+	 * @param dialog       The dialog.
+	 * @param contact      The contact.
+	 * @param conversation The new conversation data.
+	 */
+	public void handleEditConversationDialogResponse(final EditConversationDialogFragment dialog, final Contact contact,
+													 final Conversation conversation) {
+		conversation.update();
+		adapter.notifyDataSetChanged();
+		Activity activity = getActivity();
+		if (activity != null) {
+			new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
+					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_EDITED.name(),
+					"conversationId", conversation.getConversationId().toString(), "subject", conversation.getSubject(),
+					"conversationFlags", conversation.getConversationFlags().toString());
+		}
+		dialog.dismiss();
 	}
 
 	/**

@@ -56,10 +56,11 @@ public class Conversation implements Serializable {
 	/**
 	 * Constructor.
 	 *
-	 * @param relationId           The relationId of the contact.
-	 * @param subject              The subject of the conversation.
-	 * @param conversationIdString The unique id of the conversation.
-	 * @param lastTimestamp        The last timestamp of this conversation.
+	 * @param relationId              The relationId of the contact.
+	 * @param subject                 The subject of the conversation.
+	 * @param conversationIdString    The unique id of the conversation.
+	 * @param lastTimestamp           The last timestamp of this conversation.
+	 * @param conversationFlagsString The conversation flags.
 	 */
 	protected Conversation(final int relationId, final String subject, @NonNull final String conversationIdString, final long lastTimestamp,
 						   final String conversationFlagsString) {
@@ -72,6 +73,21 @@ public class Conversation implements Serializable {
 	}
 
 	/**
+	 * Constructor.
+	 *
+	 * @param relationId        The relationId of the contact.
+	 * @param subject           The subject of the conversation.
+	 * @param conversationId    The unique id of the conversation.
+	 * @param lastTimestamp     The last timestamp of this conversation.
+	 * @param conversationFlags The conversation flags.
+	 */
+	@Ignore
+	public Conversation(final int relationId, final String subject, @NonNull final UUID conversationId, final long lastTimestamp,
+						final ConversationFlags conversationFlags) {
+		this(relationId, subject, conversationId.toString(), lastTimestamp, conversationFlags.toString());
+	}
+
+	/**
 	 * Create a new conversation.
 	 *
 	 * @param contact The contact.
@@ -79,7 +95,8 @@ public class Conversation implements Serializable {
 	 */
 	public static Conversation createNewConversation(final Contact contact) {
 		Conversation result = new Conversation(contact.getRelationId(), Application.getResourceString(R.string.text_new_conversation_name),
-				UUID.randomUUID().toString(), System.currentTimeMillis(), contact.getMyPermissions().getDefaultReplyPolicy().toString());
+				UUID.randomUUID(), System.currentTimeMillis(),
+				new ConversationFlags(contact.getSlavePermissions().getDefaultReplyPolicy(), false, false));
 		result.isStored = false;
 		return result;
 	}
@@ -91,9 +108,11 @@ public class Conversation implements Serializable {
 	 * @return the conversation.
 	 */
 	public static Conversation createNewConversation(final TextMessageDetails textMessageDetails) {
+		ReplyPolicy defaultReplyPolicy = textMessageDetails.getContact().getMyPermissions().getDefaultReplyPolicy();
 		Conversation result = new Conversation(textMessageDetails.getContact().getRelationId(), textMessageDetails.getMessageText(),
-				textMessageDetails.getConversationId().toString(), textMessageDetails.getTimestamp(),
-				textMessageDetails.getContact().getMyPermissions().getDefaultReplyPolicy().toString());
+				textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(),
+				new ConversationFlags(defaultReplyPolicy, defaultReplyPolicy.isExpectsAcknowledgement(),
+						defaultReplyPolicy.isExpectsResponse() && !defaultReplyPolicy.isExpectsAcknowledgement()));
 		result.isStored = false;
 		return result;
 	}
@@ -151,10 +170,6 @@ public class Conversation implements Serializable {
 
 	protected String getConversationFlagsString() {
 		return conversationFlagsString;
-	}
-
-	protected void setConversationFlagsString(String conversationFlagsString) {
-		this.conversationFlagsString = conversationFlagsString;
 	}
 
 	/**

@@ -116,14 +116,14 @@
             app:layout_constraintTop_toBottomOf="@id/layout_slave_permissions" />
 
         <Button
-            android:id="@+id/button_save_contact"
+            android:id="@+id/button_update_contact"
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_medium"
             android:paddingStart="@dimen/margin_small"
             android:paddingEnd="@dimen/margin_small"
-            android:text="@string/button_save_contact"
+            android:text="@string/button_update_contact"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewErrorMessage" />
 
@@ -137,7 +137,7 @@
             android:paddingStart="@dimen/margin_small"
             android:paddingEnd="@dimen/margin_small"
             android:text="@string/button_cancel"
-            app:layout_constraintEnd_toStartOf="@id/button_save_contact"
+            app:layout_constraintEnd_toStartOf="@id/button_update_contact"
             app:layout_constraintTop_toBottomOf="@id/textViewErrorMessage" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

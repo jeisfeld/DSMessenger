@@ -33,7 +33,7 @@ import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.entity.Device;
-import de.jeisfeld.dsmessenger.main.account.SlavePermissions;
+import de.jeisfeld.dsmessenger.entity.SlavePermissions;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy;
 import de.jeisfeld.dsmessenger.util.DateUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;

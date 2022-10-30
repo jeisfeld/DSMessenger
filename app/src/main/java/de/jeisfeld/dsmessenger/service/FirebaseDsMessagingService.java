@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.entity.Conversation;
+import de.jeisfeld.dsmessenger.entity.ConversationFlags;
 import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.AccountFragment;
@@ -98,6 +99,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 						Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId"));
 				if (editedConversation != null) {
 					editedConversation.setSubject(adminDetails.getValue("subject"));
+					editedConversation.setConversationFlags(ConversationFlags.fromString(adminDetails.getValue("conversationFlags")));
 					editedConversation.update();
 					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, editedConversation);
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.CONVERSATION_EDITED,

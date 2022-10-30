@@ -9,7 +9,7 @@
     <string name="title_dialog_edit_contact">Edit Contact</string>
     <string name="title_dialog_info">Info</string>
     <string name="title_dialog_edit_device">Edit Device</string>
-    <string name="title_dialog_edit_conversation_subject">Edit Conversation Subject</string>
+    <string name="title_dialog_edit_conversation">Edit Conversation</string>
 
     <string name="menu_account">Account</string>
     <string name="menu_conversations">Conversations</string>
@@ -31,9 +31,10 @@
     <string name="button_change_password">Change Password</string>
     <string name="button_delete_contact">Delete Contact</string>
     <string name="button_delete_conversation">Delete Conversation</string>
-    <string name="button_save_contact">Save Contact</string>
+    <string name="button_update_contact">Update Contact</string>
     <string name="button_disconnect_device">Disconnect Device</string>
     <string name="button_update_device">Update Device</string>
+    <string name="button_update_conversation">Update\nConversation</string>
     <string name="button_trigger_lut">Send Pulse</string>
 
     <string name="text_send_message">Send Message</string>
@@ -65,6 +66,8 @@
     <string name="text_edit_relation">Edit contact name / delete contact</string>
     <string name="text_manage_conversations">Manage conversations</string>
     <string name="text_default_reply_policy">Default reply policy</string>
+    <string name="text_reply_policy">Reply policy</string>
+    <string name="text_subject_name">Subject</string>
 
     <string name="text_my_account">My Account</string>
     <string name="text_username">Username</string>
@@ -107,6 +110,7 @@
     <string name="error_missing_contactname">Missing contact name</string>
     <string name="error_missing_connectioncode">Missing connection code</string>
     <string name="error_missing_devicename">Missing device name</string>
+    <string name="error_missing_subject">Missing subject</string>
     <string name="error_invalid_connectioncode">Invalid connection code</string>
     <string name="error_invalid_credentials">Username or Password is not correct</string>
     <string name="error_connection_failed">Connection failed</string>
@@ -120,7 +124,6 @@
     <string name="dialog_confirm_delete_contact">Do you really want to delete contact %1$s?</string>
     <string name="dialog_confirm_disconnect_device">Do you really want to dicsonnect device %1$s?</string>
     <string name="dialog_confirm_delete_conversation">Do you really want to delete conversation %1$s?</string>
-    <string name="dialog_edit_conversation_subject">Please enter the new subject of the conversation.</string>
 
     <string-array name="array_vibrate_pattern_names">
         <item>Default</item>
@@ -138,7 +141,7 @@
         <item>Unlimited responses</item>
         <item>Only acknowledgement</item>
         <item>Only one response</item>
-        <item>Acknowledge and one response</item>
+        <item>Ack and one response</item>
     </string-array>
 
     <string-array name="array_notification_names">

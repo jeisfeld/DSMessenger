@@ -26,6 +26,7 @@ import de.jeisfeld.dsmessenger.databinding.ListViewDeviceSingleBinding;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Contact.ContactStatus;
 import de.jeisfeld.dsmessenger.entity.Device;
+import de.jeisfeld.dsmessenger.entity.SlavePermissions;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.ChangePasswordDialogFragment;
@@ -676,7 +677,7 @@ public class AccountFragment extends Fragment {
 	}
 
 	/**
-	 * Handle the response of edit device name dialog.
+	 * Handle the response of edit device dialog.
 	 *
 	 * @param dialog The dialog.
 	 * @param device The new device data.

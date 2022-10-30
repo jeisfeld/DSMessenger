@@ -7,7 +7,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
-import de.jeisfeld.dsmessenger.main.account.SlavePermissions;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**

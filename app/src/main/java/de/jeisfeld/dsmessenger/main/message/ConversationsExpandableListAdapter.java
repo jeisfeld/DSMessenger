@@ -3,7 +3,6 @@ package de.jeisfeld.dsmessenger.main.message;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +20,7 @@ import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.http.HttpSender;
+import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil;
 import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
@@ -155,15 +155,7 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 			buttonEdit.setOnClickListener(v -> {
 				FragmentActivity activity = fragment.getActivity();
 				if (activity != null) {
-					DialogUtil.displayInputDialog(activity, (dialog, text) -> {
-								conversation.setSubject(text);
-								conversation.update();
-								notifyDataSetChanged();
-								new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
-										"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_EDITED.name(),
-										"conversationId", conversation.getConversationId().toString(), "subject", conversation.getSubject());
-							}, R.string.title_dialog_edit_conversation_subject, R.string.button_ok, conversation.getSubject(),
-							InputType.TYPE_CLASS_TEXT, R.string.dialog_edit_conversation_subject);
+					AccountDialogUtil.displayEditConversationDialog(fragment, conversation, contact);
 				}
 			});
 			buttonDelete.setOnClickListener(v -> {
