@@ -161,11 +161,16 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			startActivity(MessageActivity.createIntent(this, (TextMessageDetails) messageDetails));
 			break;
 		case TEXT_RESPONSE:
+			TextMessageDetails textMessageDetails = (TextMessageDetails) messageDetails;
+			Conversation conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
 			new HttpSender(this).sendMessage(messageDetails.getContact(), messageDetails.getMessageId(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(), "conversationId",
-					((TextMessageDetails) messageDetails).getConversationId().toString());
-			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_ACKNOWLEDGE, messageDetails.getMessageId(),
-					messageDetails.getContact(), null, (TextMessageDetails) messageDetails);
+					textMessageDetails.getConversationId().toString());
+			Message receivedMessage = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
+					textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
+			receivedMessage.store(conversation);
+			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_RESPONSE, messageDetails.getMessageId(),
+					messageDetails.getContact(), conversation, receivedMessage);
 			break;
 		case RANDOMIMAGE:
 			RandomimageMessageDetails randomimageMessageDetails = (RandomimageMessageDetails) messageDetails;

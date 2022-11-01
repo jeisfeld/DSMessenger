@@ -29,12 +29,12 @@ import de.jeisfeld.dsmessenger.databinding.FragmentMessageBinding;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.entity.Message;
+import de.jeisfeld.dsmessenger.entity.ReplyPolicy;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
-import de.jeisfeld.dsmessenger.message.TextMessageDetails;
 import de.jeisfeld.dsmessenger.util.DateUtil;
 
 /**
@@ -88,6 +88,7 @@ public class MessageFragment extends Fragment {
 					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())
 							&& activity != null) {
+						conversation = receivedConversation;
 						refreshMessageList(false);
 					}
 					break;
@@ -105,10 +106,8 @@ public class MessageFragment extends Fragment {
 						navController.popBackStack();
 					}
 					break;
-				case TEXT_ACKNOWLEDGE:
-					TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra("textMessageDetails");
-					Message message = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
-							textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
+				case TEXT_RESPONSE:
+					Message message = (Message) intent.getSerializableExtra("message");
 					addMessage(message);
 					break;
 				case DEVICE_LOGGED_OUT:
@@ -137,16 +136,16 @@ public class MessageFragment extends Fragment {
 	/**
 	 * Send a broadcast to this fragment.
 	 *
-	 * @param context            The context.
-	 * @param actionType         The action type.
-	 * @param messageId          The messageId.
-	 * @param contact            The contact.
-	 * @param conversation       The conversation.
-	 * @param textMessageDetails The text message details.
-	 * @param parameters         The parameters.
+	 * @param context      The context.
+	 * @param actionType   The action type.
+	 * @param messageId    The messageId.
+	 * @param contact      The contact.
+	 * @param conversation The conversation.
+	 * @param message      The message.
+	 * @param parameters   The parameters.
 	 */
 	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final Contact contact,
-									 final Conversation conversation, final TextMessageDetails textMessageDetails, final String... parameters) {
+									 final Conversation conversation, final Message message, final String... parameters) {
 		final Intent intent = new Intent(BROADCAST_ACTION);
 		final Bundle bundle = new Bundle();
 		bundle.putSerializable("actionType", actionType);
@@ -154,8 +153,8 @@ public class MessageFragment extends Fragment {
 		if (contact != null) {
 			bundle.putSerializable("contact", contact);
 		}
-		if (textMessageDetails != null) {
-			bundle.putSerializable("textMessageDetails", textMessageDetails);
+		if (message != null) {
+			bundle.putSerializable("message", message);
 		}
 		if (conversation != null) {
 			bundle.putSerializable("conversation", conversation);
@@ -246,9 +245,10 @@ public class MessageFragment extends Fragment {
 	private void setButtonVisibility() {
 		boolean enableAcknowledgement = !contact.isSlave() && conversation.getConversationFlags().isExpectingAcknowledgement();
 		boolean enableSend = contact.isSlave() || conversation.getConversationFlags().isExpectingResponse();
+		boolean enablePrioSend = contact.isSlave() || conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED;
 		binding.buttonAcknowledge.setVisibility(enableAcknowledgement ? View.VISIBLE : View.GONE);
 		binding.buttonSend.setVisibility(enableSend ? View.VISIBLE : enableAcknowledgement ? View.INVISIBLE : View.GONE);
-		binding.buttonSendWithPriority.setVisibility(enableSend ? View.VISIBLE : enableAcknowledgement ? View.INVISIBLE : View.GONE);
+		binding.buttonSendWithPriority.setVisibility(enablePrioSend ? View.VISIBLE : View.INVISIBLE);
 		binding.layoutTextInput.setVisibility(enableSend ? View.VISIBLE : View.GONE);
 	}
 
@@ -354,7 +354,9 @@ public class MessageFragment extends Fragment {
 						});
 					}
 				},
-				"messageType", MessageType.TEXT.name(), "messageText", messageText, "priority", priority.name(),
+				"messageType", !contact.isSlave() && conversation.getConversationFlags().getReplyPolicy() != ReplyPolicy.UNLIMITED
+						? MessageType.TEXT_RESPONSE.name() : MessageType.TEXT.name(),
+				"messageText", messageText, "priority", priority.name(),
 				"conversationId", conversation.getConversationId().toString(), "timestamp", Long.toString(timestamp));
 	}
 
@@ -395,7 +397,7 @@ public class MessageFragment extends Fragment {
 		/**
 		 * Text message as acknowledgement.
 		 */
-		TEXT_ACKNOWLEDGE,
+		TEXT_RESPONSE,
 		/**
 		 * This device has been logged out.
 		 */

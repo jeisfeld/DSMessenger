@@ -31,6 +31,7 @@ import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.message.ConversationsFragment;
+import de.jeisfeld.dsmessenger.main.message.MessageFragment;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
@@ -307,6 +308,8 @@ public class MessageActivity extends AppCompatActivity {
 
 			if (amSlave) {
 				conversation.updateWithNewMessage();
+				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(),
+						textMessageDetails.getContact(), conversation, message);
 			}
 
 			arrayAdapter.notifyDataSetChanged();
@@ -343,6 +346,9 @@ public class MessageActivity extends AppCompatActivity {
 				messageVibration.cancelVibration();
 			}
 			conversation.updateWithAcknowledgement();
+			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED,
+					messageList.get(messageList.size() - 1).getMessageId(),
+					textMessageDetails.getContact(), conversation, message);
 
 			binding.buttonAcknowledge.setVisibility(View.GONE);
 			binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
@@ -362,6 +368,9 @@ public class MessageActivity extends AppCompatActivity {
 			if (messageText.length() > 0) {
 				if (amSlave) {
 					conversation.updateWithResponse();
+					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED,
+							messageList.get(messageList.size() - 1).getMessageId(),
+							textMessageDetails.getContact(), conversation, null);
 				}
 				new HttpSender(this).sendMessage(textMessageDetails.getContact(), newMessageId, (response, responseData) -> {
 							Message newMessage = new Message(messageText, true, newMessageId,

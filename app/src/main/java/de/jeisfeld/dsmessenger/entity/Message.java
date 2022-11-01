@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
@@ -20,7 +21,7 @@ import static androidx.room.ForeignKey.CASCADE;
 @Entity(tableName = "message", foreignKeys = {
 		@ForeignKey(onDelete = CASCADE, entity = Conversation.class, parentColumns = "conversationId", childColumns = "conversationId")},
 		indices = {@Index("conversationId")})
-public class Message {
+public class Message implements Serializable {
 	/**
 	 * The message text.
 	 */
