@@ -139,6 +139,38 @@ public class Conversation implements Serializable {
 		isStored = true;
 	}
 
+	/**
+	 * Update flags with acknowledgement.
+	 */
+	public void updateWithAcknowledgement() {
+		ReplyPolicy replyPolicy = getConversationFlags().getReplyPolicy();
+		ConversationFlags newConversationFlags = new ConversationFlags(replyPolicy, false, replyPolicy.isExpectsResponse());
+		setConversationFlags(newConversationFlags);
+		update();
+	}
+
+	/**
+	 * Update flags with response.
+	 */
+	public void updateWithResponse() {
+		ReplyPolicy replyPolicy = getConversationFlags().getReplyPolicy();
+		ConversationFlags newConversationFlags = new ConversationFlags(replyPolicy, false, replyPolicy == ReplyPolicy.UNLIMITED);
+		setConversationFlags(newConversationFlags);
+		update();
+	}
+
+	/**
+	 * Update flags with new message.
+	 */
+	public void updateWithNewMessage() {
+		ReplyPolicy replyPolicy = getConversationFlags().getReplyPolicy();
+		ConversationFlags newConversationFlags = new ConversationFlags(replyPolicy, replyPolicy.isExpectsAcknowledgement(),
+				replyPolicy.isExpectsResponse() && !replyPolicy.isExpectsAcknowledgement());
+		setConversationFlags(newConversationFlags);
+		update();
+	}
+
+
 	public final int getRelationId() {
 		return relationId;
 	}

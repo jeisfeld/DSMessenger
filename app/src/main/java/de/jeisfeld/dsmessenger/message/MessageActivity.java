@@ -86,7 +86,7 @@ public class MessageActivity extends AppCompatActivity {
 		public void onReceive(final Context context, final Intent intent) {
 			if (intent != null) {
 				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
-				switch (actionType) {
+				switch (actionType) { // TODO: rework after implementing ReplyPolicy
 				case MESSAGE_RECEIVED:
 					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())) {
@@ -94,8 +94,8 @@ public class MessageActivity extends AppCompatActivity {
 					}
 					break;
 				case MESSAGE_ACKNOWLEDGED:
-					UUID acknowledgetMessageId = (UUID) intent.getSerializableExtra("messageId");
-					if (acknowledgetMessageId != null && lastTextMessageDetails != null && acknowledgetMessageId.equals(lastTextMessageDetails.getMessageId())) {
+					UUID acknowledgedMessageId = (UUID) intent.getSerializableExtra("messageId");
+					if (acknowledgedMessageId != null && lastTextMessageDetails != null && acknowledgedMessageId.equals(lastTextMessageDetails.getMessageId())) {
 						cancelLastIntentEffects();
 						binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
 					}
@@ -274,8 +274,6 @@ public class MessageActivity extends AppCompatActivity {
 	protected final void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
 		handleIntentData((TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS));
-		binding.buttonAcknowledge.setVisibility(View.VISIBLE);
-		binding.editTextMessageText.setVisibility(View.VISIBLE);
 	}
 
 	/**
@@ -299,11 +297,18 @@ public class MessageActivity extends AppCompatActivity {
 		conversation = messageConversation;
 		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 
+		boolean amSlave = !textMessageDetails.getContact().isSlave();
+
 		Message message = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
 				conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
 		if (message.getMessageText() != null && message.getMessageText().length() > 0) {
 			message.store(conversation);
 			messageList.add(message);
+
+			if (amSlave) {
+				conversation.updateWithNewMessage();
+			}
+
 			arrayAdapter.notifyDataSetChanged();
 			ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, conversation);
 			binding.listViewMessages.setSelection(messageList.size() - 1);
@@ -327,17 +332,61 @@ public class MessageActivity extends AppCompatActivity {
 
 		sendConfirmation(AdminType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(), textMessageDetails.getContact());
 
+		binding.buttonAcknowledge.setVisibility(
+				amSlave && conversation.getConversationFlags().isExpectingAcknowledgement() ? View.VISIBLE : View.GONE);
+		binding.buttonSend.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE :
+				conversation.getConversationFlags().isExpectingAcknowledgement() ? View.INVISIBLE : View.GONE);
+		binding.layoutTextInput.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+
 		binding.buttonAcknowledge.setOnClickListener(v -> {
 			if (messageVibration != null) {
 				messageVibration.cancelVibration();
 			}
+			conversation.updateWithAcknowledgement();
+
+			binding.buttonAcknowledge.setVisibility(View.GONE);
+			binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+			binding.layoutTextInput.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+
 			sendConfirmation(AdminType.MESSAGE_ACKNOWLEDGED, textMessageDetails.getMessageId(), textMessageDetails.getContact());
 			new HttpSender(this).sendSelfMessage(textMessageDetails.getMessageId(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_SELF_ACKNOWLEDGED.name());
-			binding.buttonAcknowledge.setVisibility(View.GONE);
-			binding.editTextMessageText.setVisibility(View.GONE);
 		});
-
+		binding.buttonSend.setOnClickListener(v -> {
+			if (messageVibration != null) {
+				messageVibration.cancelVibration();
+			}
+			final long timestamp = System.currentTimeMillis();
+			UUID newMessageId = UUID.randomUUID();
+			String messageText = binding.editTextMessageText.getText().toString().trim();
+			if (messageText.length() > 0) {
+				if (amSlave) {
+					conversation.updateWithResponse();
+				}
+				new HttpSender(this).sendMessage(textMessageDetails.getContact(), newMessageId, (response, responseData) -> {
+							Message newMessage = new Message(messageText, true, newMessageId,
+									conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
+							runOnUiThread(() -> {
+								if (responseData != null && responseData.isSuccess()) {
+									newMessage.store(conversation);
+									messageList.add(newMessage);
+									arrayAdapter.notifyDataSetChanged();
+									ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, conversation);
+									binding.listViewMessages.setSelection(messageList.size() - 1);
+									binding.editTextMessageText.setText("");
+									binding.buttonAcknowledge.setVisibility(View.GONE);
+									binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+									binding.layoutTextInput.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+								}
+							});
+						},
+						"messageType", MessageType.TEXT_RESPONSE.name(), "messageText", messageText,
+						"priority", MessagePriority.NORMAL.name(), "conversationId", conversation.getConversationId().toString(),
+						"timestamp", Long.toString(timestamp));
+				new HttpSender(this).sendSelfMessage(textMessageDetails.getMessageId(), null,
+						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_SELF_RESPONDED.name());
+			}
+		});
 		lastTextMessageDetails = textMessageDetails;
 	}
 
@@ -372,33 +421,9 @@ public class MessageActivity extends AppCompatActivity {
 	 * @param contact   The contact.
 	 */
 	private void sendConfirmation(final AdminType adminType, final UUID messageId, final Contact contact) {
-		String messageText = binding.editTextMessageText.getText().toString();
-		if (adminType == AdminType.MESSAGE_ACKNOWLEDGED && messageText.length() > 0) {
-			final long timestamp = System.currentTimeMillis();
-			UUID newMessageId = UUID.randomUUID();
-			new HttpSender(this).sendMessage(contact, newMessageId, (response, responseData) -> {
-						Message message = new Message(messageText, true, newMessageId,
-								conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
-						runOnUiThread(() -> {
-							if (responseData != null && responseData.isSuccess()) {
-								message.store(conversation);
-								messageList.add(message);
-								arrayAdapter.notifyDataSetChanged();
-								ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, conversation);
-								binding.listViewMessages.setSelection(messageList.size() - 1);
-								binding.editTextMessageText.setText("");
-							}
-						});
-					},
-					"messageType", MessageType.TEXT_ACKNOWLEDGE.name(), "messageText", messageText,
-					"priority", MessagePriority.NORMAL.name(), "conversationId", conversation.getConversationId().toString(),
-					"timestamp", Long.toString(timestamp));
-		}
-		else {
-			new HttpSender(this).sendMessage(contact, messageId, null,
-					"messageType", MessageType.ADMIN.name(), "adminType", adminType.name(),
-					"conversationId", conversation.getConversationId().toString());
-		}
+		new HttpSender(this).sendMessage(contact, messageId, null,
+				"messageType", MessageType.ADMIN.name(), "adminType", adminType.name(),
+				"conversationId", conversation.getConversationId().toString());
 	}
 
 	/**

@@ -89,4 +89,11 @@ public class ConversationFlags implements Serializable {
 		return replyPolicy;
 	}
 
+	public boolean isExpectingAcknowledgement() {
+		return expectingAcknowledgement;
+	}
+
+	public boolean isExpectingResponse() {
+		return expectingResponse;
+	}
 }

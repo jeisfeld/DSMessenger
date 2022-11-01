@@ -140,6 +140,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				}
 				break;
 			case MESSAGE_SELF_ACKNOWLEDGED:
+			case MESSAGE_SELF_RESPONDED:
 				MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(), null);
 				break;
 			case PING:
@@ -159,7 +160,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		case TEXT:
 			startActivity(MessageActivity.createIntent(this, (TextMessageDetails) messageDetails));
 			break;
-		case TEXT_ACKNOWLEDGE:
+		case TEXT_RESPONSE:
 			new HttpSender(this).sendMessage(messageDetails.getContact(), messageDetails.getMessageId(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(), "conversationId",
 					((TextMessageDetails) messageDetails).getConversationId().toString());

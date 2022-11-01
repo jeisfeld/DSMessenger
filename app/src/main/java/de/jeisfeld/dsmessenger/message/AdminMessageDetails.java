@@ -142,6 +142,10 @@ public class AdminMessageDetails extends MessageDetails {
 		 */
 		MESSAGE_SELF_ACKNOWLEDGED,
 		/**
+		 * Message responded by oneself.
+		 */
+		MESSAGE_SELF_RESPONDED,
+		/**
 		 * Ping message.
 		 */
 		PING,

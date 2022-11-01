@@ -16,6 +16,7 @@
         android:padding="0dp"
         android:text="@string/button_send_prio"
         android:textColor="?attr/colorSecondaryVariant"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/buttonSend"
         app:layout_constraintStart_toStartOf="parent" />
@@ -27,9 +28,21 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_small"
         android:text="@string/button_send"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/buttonSendWithPriority"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/buttonSendWithPriority"
+        app:layout_constraintTop_toTopOf="@id/buttonSendWithPriority" />
+
+    <Button
+        android:id="@+id/buttonAcknowledge"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_acknowledge"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/buttonSendWithPriority"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/buttonSendWithPriority" />
 
     <TextView
@@ -77,8 +90,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/message_margin"
+        android:visibility="gone"
         app:hintEnabled="false"
-        app:layout_constraintBottom_toTopOf="@id/textMessageResponse">
+        app:layout_constraintBottom_toTopOf="@id/buttonSend">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editTextMessageText"
@@ -93,14 +107,5 @@
             android:padding="@dimen/margin_medium"
             android:textSize="@dimen/text_normal" />
     </com.google.android.material.textfield.TextInputLayout>
-
-    <TextView
-        android:id="@+id/textMessageResponse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_medium"
-        android:textColor="?attr/colorPrimary"
-        android:textSize="@dimen/text_normal"
-        app:layout_constraintBottom_toTopOf="@id/buttonSend" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

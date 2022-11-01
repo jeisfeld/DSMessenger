@@ -15,6 +15,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <Button
+        android:id="@+id/buttonSend"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_send"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <TextView
         android:id="@+id/textMessageFrom"
         android:layout_width="match_parent"
@@ -51,8 +61,9 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:hintEnabled="false"
-        app:layout_constraintBottom_toTopOf="@id/buttonAcknowledge">
+        app:layout_constraintBottom_toTopOf="@id/buttonSend">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editTextMessageText"

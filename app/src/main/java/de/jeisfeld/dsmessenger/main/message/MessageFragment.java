@@ -85,12 +85,7 @@ public class MessageFragment extends Fragment {
 				switch (actionType) {
 				case MESSAGE_RECEIVED:
 				case MESSAGE_ACKNOWLEDGED:
-					UUID messageId = (UUID) intent.getSerializableExtra("messageId");
 					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
-					if (messageId.equals(lastMessageId)) {
-						binding.textMessageResponse.setText(
-								actionType == ActionType.MESSAGE_RECEIVED ? R.string.text_message_received : R.string.text_message_acknowledged);
-					}
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())
 							&& activity != null) {
 						refreshMessageList(false);
@@ -181,6 +176,16 @@ public class MessageFragment extends Fragment {
 
 		binding.buttonSend.setOnClickListener(v -> sendMessage(MessagePriority.NORMAL));
 		binding.buttonSendWithPriority.setOnClickListener(v -> sendMessage(MessagePriority.HIGH));
+		binding.buttonAcknowledge.setOnClickListener(v -> {
+			Activity activity = getActivity();
+			if (activity != null) {
+				conversation.updateWithAcknowledgement();
+				setButtonVisibility();
+				new HttpSender(activity).sendMessage(contact, messageList.get(messageList.size() - 1).getMessageId(), null,
+						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_ACKNOWLEDGED.name(),
+						"conversationId", conversation.getConversationId().toString());
+			}
+		});
 
 		assert getArguments() != null;
 		contact = (Contact) getArguments().getSerializable("contact");
@@ -236,6 +241,18 @@ public class MessageFragment extends Fragment {
 	}
 
 	/**
+	 * Set button visibility depending on conversation flags.
+	 */
+	private void setButtonVisibility() {
+		boolean enableAcknowledgement = !contact.isSlave() && conversation.getConversationFlags().isExpectingAcknowledgement();
+		boolean enableSend = contact.isSlave() || conversation.getConversationFlags().isExpectingResponse();
+		binding.buttonAcknowledge.setVisibility(enableAcknowledgement ? View.VISIBLE : View.GONE);
+		binding.buttonSend.setVisibility(enableSend ? View.VISIBLE : enableAcknowledgement ? View.INVISIBLE : View.GONE);
+		binding.buttonSendWithPriority.setVisibility(enableSend ? View.VISIBLE : enableAcknowledgement ? View.INVISIBLE : View.GONE);
+		binding.layoutTextInput.setVisibility(enableSend ? View.VISIBLE : View.GONE);
+	}
+
+	/**
 	 * Refresh the message list.
 	 *
 	 * @param scrollDown Flag indicating if view should scroll to last position.
@@ -250,6 +267,7 @@ public class MessageFragment extends Fragment {
 			if (activity != null) {
 				activity.runOnUiThread(() -> {
 					arrayAdapter.notifyDataSetChanged();
+					setButtonVisibility();
 					if (scrollDown) {
 						binding.listViewMessages.setSelection(messageList.size() - 1);
 					}
@@ -315,7 +333,6 @@ public class MessageFragment extends Fragment {
 		UUID messageId = UUID.randomUUID();
 		lastMessageId = messageId;
 		long timestamp = System.currentTimeMillis();
-		binding.textMessageResponse.setText(R.string.text_sending_message);
 
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
 					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
@@ -323,13 +340,13 @@ public class MessageFragment extends Fragment {
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
-							if (responseData == null || !responseData.isSuccess()) {
-								binding.textMessageResponse.setText(responseData == null ? response : responseData.getMappedErrorMessage(getContext()));
-							}
-							else {
+							if (responseData != null && responseData.isSuccess()) {
 								conversation.insertIfNew(message.getMessageText());
-								binding.textMessageResponse.setText(R.string.text_message_sent);
 								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
+									if (!contact.isSlave()) {
+										conversation.updateWithResponse();
+										setButtonVisibility();
+									}
 									addMessage(message);
 								}
 								binding.editTextMessageText.setText("");
