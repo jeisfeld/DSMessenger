@@ -51,12 +51,73 @@
         style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
         android:text="@string/button_trigger_lut"
         app:layout_constraintBottom_toTopOf="@id/toggleButtonSetLut"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutContact" />
+
+    <Button
+        android:id="@+id/buttonTriggerLutAdd1"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="&gt;"
+        app:layout_constraintBottom_toBottomOf="@id/buttonTriggerLut"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/buttonTriggerLut"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/buttonTriggerLutAdd2"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="&gt;&gt;"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonTriggerLutAdd1"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/buttonTriggerLutAdd3"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="&gt;&gt;&gt;"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonTriggerLutAdd2"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/buttonTriggerLutSub1"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="&lt;"
+        app:layout_constraintBottom_toBottomOf="@id/buttonTriggerLut"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/buttonTriggerLut"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/buttonTriggerLutSub2"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="&lt;&lt;"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonTriggerLutSub1"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/buttonTriggerLutSub3"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="&lt;&lt;&lt;"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonTriggerLutSub2"
+        tools:ignore="HardcodedText" />
 
     <ToggleButton
         android:id="@+id/toggleButtonSetLut"

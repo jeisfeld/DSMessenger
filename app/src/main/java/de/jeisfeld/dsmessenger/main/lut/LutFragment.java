@@ -102,11 +102,23 @@ public class LutFragment extends Fragment {
 
 		binding = FragmentLutBinding.inflate(inflater, container, false);
 
-		binding.buttonTriggerLut.setOnClickListener(v -> sendMessage(LutMessageType.PULSE));
+		binding.buttonTriggerLut.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.0));
+		binding.buttonTriggerLutAdd1.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.01));
+		binding.buttonTriggerLutAdd2.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.08));
+		binding.buttonTriggerLutAdd3.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.3));
+		binding.buttonTriggerLutSub1.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 0.99));
+		binding.buttonTriggerLutSub2.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 0.93));
+		binding.buttonTriggerLutSub3.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 0.77));
 
 		binding.toggleButtonSetLut.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			binding.buttonTriggerLut.setEnabled(!isChecked);
-			sendMessage(isChecked ? LutMessageType.ON : LutMessageType.OFF);
+			binding.buttonTriggerLutAdd1.setEnabled(!isChecked);
+			binding.buttonTriggerLutAdd2.setEnabled(!isChecked);
+			binding.buttonTriggerLutAdd3.setEnabled(!isChecked);
+			binding.buttonTriggerLutSub1.setEnabled(!isChecked);
+			binding.buttonTriggerLutSub2.setEnabled(!isChecked);
+			binding.buttonTriggerLutSub3.setEnabled(!isChecked);
+			sendMessage(isChecked ? LutMessageType.ON : LutMessageType.OFF, 1.0);
 		});
 
 		binding.dropdownContact.setOnItemClickListener((parent, view, position, id) -> pingContact());
@@ -187,22 +199,12 @@ public class LutFragment extends Fragment {
 	 * Send the message.
 	 *
 	 * @param lutMessageType The LUT message type.
-	 * @param duration       The duration.
+	 * @param powerFactor    A factor by which the power is multiplied.
 	 */
-	private void sendMessage(final LutMessageType lutMessageType, final long duration) {
+	private void sendMessage(final LutMessageType lutMessageType, final double powerFactor) {
 		new HttpSender(getContext()).sendMessage(dropdownHandlerContact.getSelectedItem(), UUID.randomUUID(), null,
-				"messageType", MessageType.LUT.name(), "lutMessageType", lutMessageType.name(),
-				"duration", Long.toString(duration));
-	}
-
-	/**
-	 * Send the message.
-	 *
-	 * @param lutMessageType The LUT message type.
-	 */
-	private void sendMessage(final LutMessageType lutMessageType) {
-		new HttpSender(getContext()).sendMessage(dropdownHandlerContact.getSelectedItem(), UUID.randomUUID(), null,
-				"messageType", MessageType.LUT.name(), "lutMessageType", lutMessageType.name(), "ttl", "60");
+				"messageType", MessageType.LUT.name(), "lutMessageType", lutMessageType.name(), "ttl", "60",
+				"powerFactor", Double.toString(powerFactor));
 	}
 
 	/**
