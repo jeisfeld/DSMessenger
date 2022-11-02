@@ -170,7 +170,6 @@ public class Conversation implements Serializable {
 		update();
 	}
 
-
 	public final int getRelationId() {
 		return relationId;
 	}
@@ -200,7 +199,7 @@ public class Conversation implements Serializable {
 		this.lastTimestamp = lastTimestamp;
 	}
 
-	protected String getConversationFlagsString() {
+	protected final String getConversationFlagsString() {
 		return conversationFlagsString;
 	}
 
@@ -218,8 +217,8 @@ public class Conversation implements Serializable {
 	 *
 	 * @param conversationFlags The new conversation flags.
 	 */
-	public void setConversationFlags(ConversationFlags conversationFlags) {
-		this.conversationFlagsString = conversationFlags.toString();
+	public void setConversationFlags(final ConversationFlags conversationFlags) {
+		conversationFlagsString = conversationFlags.toString();
 	}
 
 	public final boolean isStored() {

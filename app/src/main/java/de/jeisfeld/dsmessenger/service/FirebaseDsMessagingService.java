@@ -126,7 +126,8 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				if (receivedMessage != null) {
 					receivedMessage.setStatus(MessageStatus.MESSAGE_RECEIVED);
 					receivedMessage.update();
-					Conversation receivedConversation = Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId"));
+					Conversation receivedConversation =
+							Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId"));
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, adminDetails.getMessageId(),
 							adminDetails.getContact(), receivedConversation, null);
 					MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_RECEIVED, null, receivedConversation);
@@ -198,7 +199,8 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			Intent randomImageIntent = new Intent("de.jeisfeld.randomimage.DISPLAY_RANDOM_IMAGE_FROM_EXTERNAL");
 			switch (randomimageMessageDetails.getRandomImageOrigin()) {
 			case NOTIFICATION:
-				randomImageIntent.putExtra("de.eisfeldj.randomimage.NOTIFICATION_NAME", ((RandomimageMessageDetails) messageDetails).getNotificationName());
+				randomImageIntent.putExtra("de.eisfeldj.randomimage.NOTIFICATION_NAME",
+						((RandomimageMessageDetails) messageDetails).getNotificationName());
 				sendBroadcast(randomImageIntent);
 				break;
 			case WIDGET:
@@ -221,6 +223,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				lutIntent.putExtra("de.jeisfeld.dsmessenger.lut.powerFactor", lutMessageDetails.getPowerFactor());
 			}
 			sendBroadcast(lutIntent);
+			break;
 		case UNKNOWN:
 		default:
 			break;

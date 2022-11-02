@@ -28,7 +28,9 @@ public class ConversationFlags implements Serializable {
 	/**
 	 * Constructor.
 	 *
-	 * @param replyPolicy The reply policy.
+	 * @param replyPolicy              The reply policy.
+	 * @param expectingAcknowledgement Flag indicating if acknowledgement from slave is expected.
+	 * @param expectingResponse        Flag indicating if response from slave is expected.
 	 */
 	public ConversationFlags(final ReplyPolicy replyPolicy, final boolean expectingAcknowledgement, final boolean expectingResponse) {
 		this.replyPolicy = replyPolicy;
@@ -73,7 +75,6 @@ public class ConversationFlags implements Serializable {
 		return c == '1';
 	}
 
-
 	/**
 	 * Convert conversation flags into String.
 	 *
@@ -85,15 +86,15 @@ public class ConversationFlags implements Serializable {
 		return "" + getReplyPolicy().ordinal() + booleanToChar(expectingAcknowledgement) + booleanToChar(expectingResponse);
 	}
 
-	public ReplyPolicy getReplyPolicy() {
+	public final ReplyPolicy getReplyPolicy() {
 		return replyPolicy;
 	}
 
-	public boolean isExpectingAcknowledgement() {
+	public final boolean isExpectingAcknowledgement() {
 		return expectingAcknowledgement;
 	}
 
-	public boolean isExpectingResponse() {
+	public final boolean isExpectingResponse() {
 		return expectingResponse;
 	}
 }

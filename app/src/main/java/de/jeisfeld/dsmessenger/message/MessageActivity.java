@@ -100,7 +100,8 @@ public class MessageActivity extends AppCompatActivity {
 					break;
 				case MESSAGE_ACKNOWLEDGED:
 					UUID acknowledgedMessageId = (UUID) intent.getSerializableExtra("messageId");
-					if (acknowledgedMessageId != null && lastTextMessageDetails != null && acknowledgedMessageId.equals(lastTextMessageDetails.getMessageId())) {
+					if (acknowledgedMessageId != null && lastTextMessageDetails != null
+							&& acknowledgedMessageId.equals(lastTextMessageDetails.getMessageId())) {
 						cancelLastIntentEffects();
 						binding.buttonAcknowledge.setVisibility(View.INVISIBLE);
 					}
@@ -295,7 +296,7 @@ public class MessageActivity extends AppCompatActivity {
 	 * Handle the data of a new intent.
 	 *
 	 * @param textMessageDetails The text message details of the new intent.
-	 * @param message            The message.
+	 * @param message The message.
 	 */
 	private void handleIntentData(final TextMessageDetails textMessageDetails, final Message message) {
 		cancelLastIntentEffects();
@@ -304,8 +305,6 @@ public class MessageActivity extends AppCompatActivity {
 		conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
 		MessageActivity.currentTopConversation = conversation;
 		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
-
-		boolean amSlave = !textMessageDetails.getContact().isSlave();
 
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
 
@@ -327,10 +326,13 @@ public class MessageActivity extends AppCompatActivity {
 				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(),
 				"conversationId", conversation.getConversationId().toString());
 
+		boolean amSlave = !textMessageDetails.getContact().isSlave();
+
 		binding.buttonAcknowledge.setVisibility(
 				amSlave && conversation.getConversationFlags().isExpectingAcknowledgement() ? View.VISIBLE : View.GONE);
-		binding.buttonSend.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE :
-				conversation.getConversationFlags().isExpectingAcknowledgement() ? View.INVISIBLE : View.GONE);
+		binding.buttonSend.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse()
+				? View.VISIBLE
+				: conversation.getConversationFlags().isExpectingAcknowledgement() ? View.INVISIBLE : View.GONE);
 		binding.layoutTextInput.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 
 		binding.buttonAcknowledge.setOnClickListener(v -> {
@@ -345,7 +347,6 @@ public class MessageActivity extends AppCompatActivity {
 			binding.buttonAcknowledge.setVisibility(View.GONE);
 			binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 			binding.layoutTextInput.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
-
 
 			new HttpSender(this).sendMessage(textMessageDetails.getContact(), textMessageDetails.getMessageId(), (response, responseData) -> {
 						if (responseData != null && responseData.isSuccess()) {
@@ -393,7 +394,8 @@ public class MessageActivity extends AppCompatActivity {
 									binding.editTextMessageText.setText("");
 									binding.buttonAcknowledge.setVisibility(View.GONE);
 									binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
-									binding.layoutTextInput.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+									binding.layoutTextInput
+											.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 								});
 							}
 						},

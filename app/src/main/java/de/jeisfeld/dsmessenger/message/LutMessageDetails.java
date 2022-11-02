@@ -34,6 +34,7 @@ public class LutMessageDetails extends MessageDetails {
 	 * @param contact        The contact who sent the message
 	 * @param lutMessageType The LUT message type.
 	 * @param duration       The pulse duration.
+	 * @param powerFactor    The power factor.
 	 */
 	public LutMessageDetails(final UUID messageId, final Instant messageTime, final MessagePriority priority, final Contact contact,
 							 final LutMessageType lutMessageType, final Long duration, final Double powerFactor) {
@@ -61,7 +62,7 @@ public class LutMessageDetails extends MessageDetails {
 		String durationString = data.get("duration");
 		Long duration = durationString == null ? null : Long.parseLong(durationString);
 		String powerFactorString = data.get("powerFactor");
-		Double powerFactor = (powerFactorString == null ? null : Double.parseDouble(powerFactorString));
+		Double powerFactor = powerFactorString == null ? null : Double.parseDouble(powerFactorString);
 		return new LutMessageDetails(messageId, messageTime, priority, contact, lutMessageType, duration, powerFactor);
 	}
 
@@ -73,7 +74,7 @@ public class LutMessageDetails extends MessageDetails {
 		return duration;
 	}
 
-	public Double getPowerFactor() {
+	public final Double getPowerFactor() {
 		return powerFactor;
 	}
 

@@ -66,7 +66,8 @@ public class Message implements Serializable {
 	 * @param timestamp            The timestamp of the message.
 	 * @param status               The message status
 	 */
-	protected Message(final String messageText, final boolean isOwn, @NonNull final String messageIdString, @NonNull final String conversationIdString,
+	protected Message(final String messageText, final boolean isOwn, @NonNull final String messageIdString,
+					  @NonNull final String conversationIdString,
 					  final long timestamp, final MessageStatus status) {
 		this.messageText = messageText;
 		this.isOwn = isOwn;
@@ -146,7 +147,7 @@ public class Message implements Serializable {
 		return status;
 	}
 
-	public void setStatus(MessageStatus status) {
+	public final void setStatus(final MessageStatus status) {
 		this.status = status;
 	}
 }

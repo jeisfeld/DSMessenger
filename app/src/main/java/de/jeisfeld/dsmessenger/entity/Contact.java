@@ -49,13 +49,14 @@ public class Contact implements Serializable {
 	/**
 	 * Constructor without id.
 	 *
-	 * @param relationId     The relation id
-	 * @param name           The name
-	 * @param myName         My name for the contact
-	 * @param contactId      The contactId
-	 * @param isSlave        The flag indicating if it is slave or master
-	 * @param connectionCode The connection code
-	 * @param status         The contact status
+	 * @param relationId       The relation id
+	 * @param name             The name
+	 * @param myName           My name for the contact
+	 * @param contactId        The contactId
+	 * @param isSlave          The flag indicating if it is slave or master
+	 * @param connectionCode   The connection code
+	 * @param slavePermissions The slave permissions.
+	 * @param status           The contact status
 	 */
 	public Contact(final int relationId, final String name, final String myName, final int contactId,
 				   final boolean isSlave, final String connectionCode, final SlavePermissions slavePermissions, final ContactStatus status) {
@@ -110,7 +111,7 @@ public class Contact implements Serializable {
 		return connectionCode;
 	}
 
-	public SlavePermissions getSlavePermissions() {
+	public final SlavePermissions getSlavePermissions() {
 		return slavePermissions;
 	}
 

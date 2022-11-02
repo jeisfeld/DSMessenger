@@ -28,18 +28,23 @@ public interface MessageDao {
 	@Query("SELECT * FROM message WHERE conversationId = :conversationId ORDER BY timestamp")
 	List<Message> getMessagesByConversationId(String conversationId);
 
-	default List<Message> getMessagesByConversationId(UUID conversationId) {
+	default List<Message> getMessagesByConversationId(final UUID conversationId) {
 		return getMessagesByConversationId(conversationId.toString());
 	}
 
 	@Query("SELECT * FROM message WHERE messageId = :messageId")
 	Message getMessageById(String messageId);
 
-	default Message getMessageById(UUID messageId) {
+	default Message getMessageById(final UUID messageId) {
 		return getMessageById(messageId.toString());
 	}
 
-	default void acknowledgeMessages(String[] messageIds) {
+	/**
+	 * Set an array of messages to status "acknowledged".
+	 *
+	 * @param messageIds The ids of the messages.
+	 */
+	default void acknowledgeMessages(final String[] messageIds) {
 		for (String messageId : messageIds) {
 			Message acknowledgedMessage = getMessageById(messageId);
 			if (acknowledgedMessage != null && acknowledgedMessage.getStatus() != MessageStatus.MESSAGE_ACKNOWLEDGED) {

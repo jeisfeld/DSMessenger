@@ -86,7 +86,7 @@ public class TextMessageDetails extends MessageDetails {
 		return timestamp;
 	}
 
-	public String[] getMessageIds() {
+	public final String[] getMessageIds() {
 		return messageIds;
 	}
 }

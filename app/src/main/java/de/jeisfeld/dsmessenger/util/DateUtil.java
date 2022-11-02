@@ -53,7 +53,7 @@ public final class DateUtil {
 	 * @param timestamp The timestamp.
 	 * @return The formatted timestamp.
 	 */
-	public static String formatTimestamp(long timestamp) {
+	public static String formatTimestamp(final long timestamp) {
 		String dateString = android.text.format.DateFormat.getDateFormat(Application.getAppContext()).format(new Date(timestamp));
 		String currentDateString = android.text.format.DateFormat.getDateFormat(Application.getAppContext()).format(new Date());
 		String timeString = android.text.format.DateFormat.getTimeFormat(Application.getAppContext()).format(new Date(timestamp));

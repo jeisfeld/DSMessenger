@@ -103,12 +103,12 @@ public class LutFragment extends Fragment {
 		binding = FragmentLutBinding.inflate(inflater, container, false);
 
 		binding.buttonTriggerLut.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.0));
-		binding.buttonTriggerLutAdd1.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.01));
-		binding.buttonTriggerLutAdd2.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.08));
-		binding.buttonTriggerLutAdd3.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.3));
-		binding.buttonTriggerLutSub1.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 0.99));
-		binding.buttonTriggerLutSub2.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 0.93));
-		binding.buttonTriggerLutSub3.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 0.77));
+		binding.buttonTriggerLutAdd1.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.01)); // MAGIC_NUMBER
+		binding.buttonTriggerLutAdd2.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.08)); // MAGIC_NUMBER
+		binding.buttonTriggerLutAdd3.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 1.3)); // MAGIC_NUMBER
+		binding.buttonTriggerLutSub1.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 0.99)); // MAGIC_NUMBER
+		binding.buttonTriggerLutSub2.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 0.93)); // MAGIC_NUMBER
+		binding.buttonTriggerLutSub3.setOnClickListener(v -> sendMessage(LutMessageType.PULSE, 0.77)); // MAGIC_NUMBER
 
 		binding.toggleButtonSetLut.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			binding.buttonTriggerLut.setEnabled(!isChecked);

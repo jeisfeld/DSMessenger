@@ -100,19 +100,19 @@ public class SlavePermissions implements Serializable {
 				+ getDefaultReplyPolicy().ordinal();
 	}
 
-	public boolean isEditSlavePermissions() {
+	public final boolean isEditSlavePermissions() {
 		return editSlavePermissions;
 	}
 
-	public boolean isEditRelation() {
+	public final boolean isEditRelation() {
 		return editRelation;
 	}
 
-	public boolean isManageConversations() {
+	public final boolean isManageConversations() {
 		return manageConversations;
 	}
 
-	public ReplyPolicy getDefaultReplyPolicy() {
+	public final ReplyPolicy getDefaultReplyPolicy() {
 		return defaultReplyPolicy;
 	}
 }
