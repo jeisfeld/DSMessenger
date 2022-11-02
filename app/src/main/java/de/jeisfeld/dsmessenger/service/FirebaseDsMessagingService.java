@@ -7,6 +7,8 @@ import android.util.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.UUID;
+
 import androidx.annotation.NonNull;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
@@ -65,6 +67,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		}
 
 		MessageDetails messageDetails = MessageDetails.fromRemoteMessage(message);
+		TextMessageDetails textMessageDetails;
 		if (messageDetails.getType() == null) {
 			return;
 		}
@@ -158,10 +161,30 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			}
 			break;
 		case TEXT:
-			startActivity(MessageActivity.createIntent(this, (TextMessageDetails) messageDetails));
+			textMessageDetails = (TextMessageDetails) messageDetails;
+			UUID conversationId = textMessageDetails.getConversationId();
+			Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId);
+			if (messageConversation == null) {
+				messageConversation = Conversation.createNewConversation(textMessageDetails);
+				messageConversation.insertIfNew(textMessageDetails.getMessageText());
+				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, messageConversation);
+			}
+			Message textMessage = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
+					conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
+			if (textMessage.getMessageText() != null && textMessage.getMessageText().length() > 0) {
+				textMessage.store(messageConversation);
+				if (!textMessageDetails.getContact().isSlave()) {
+					messageConversation.updateWithNewMessage();
+					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(),
+							textMessageDetails.getContact(), messageConversation, textMessage);
+					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, messageConversation);
+				}
+			}
+
+			startActivity(MessageActivity.createIntent(this, textMessageDetails, textMessage));
 			break;
 		case TEXT_RESPONSE:
-			TextMessageDetails textMessageDetails = (TextMessageDetails) messageDetails;
+			textMessageDetails = (TextMessageDetails) messageDetails;
 			Conversation conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
 			new HttpSender(this).sendMessage(messageDetails.getContact(), messageDetails.getMessageId(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(), "conversationId",

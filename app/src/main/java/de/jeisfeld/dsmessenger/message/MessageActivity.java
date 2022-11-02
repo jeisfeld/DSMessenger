@@ -47,9 +47,13 @@ public class MessageActivity extends AppCompatActivity {
 	 */
 	private static final String BROADCAST_ACTION = "de.jeisfeld.dsmessenger.message.MessageActivity";
 	/**
-	 * The resource key for the message.
+	 * The resource key for the text message details.
 	 */
 	private static final String STRING_EXTRA_MESSAGE_DETAILS = "de.jeisfeld.dsmessenger.MESSAGE_DETAILS";
+	/**
+	 * The resource key for the message.
+	 */
+	private static final String STRING_EXTRA_MESSAGE = "de.jeisfeld.dsmessenger.MESSAGE";
 	/**
 	 * The conversation currently on top.
 	 */
@@ -87,11 +91,11 @@ public class MessageActivity extends AppCompatActivity {
 		public void onReceive(final Context context, final Intent intent) {
 			if (intent != null) {
 				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
-				switch (actionType) { // TODO: rework after implementing ReplyPolicy
+				switch (actionType) {
 				case MESSAGE_RECEIVED:
 					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())) {
-						refreshMessageList(conversation.getConversationId(), null, false);
+						refreshMessageList(conversation.getConversationId(), null, null, false);
 					}
 					break;
 				case MESSAGE_ACKNOWLEDGED:
@@ -161,11 +165,13 @@ public class MessageActivity extends AppCompatActivity {
 	 *
 	 * @param context            The context in which this activity is started.
 	 * @param textMessageDetails The details of the message to be displayed
+	 * @param message            The message to be displayed.
 	 * @return the intent.
 	 */
-	public static Intent createIntent(final Context context, final TextMessageDetails textMessageDetails) {
+	public static Intent createIntent(final Context context, final TextMessageDetails textMessageDetails, final Message message) {
 		Intent intent = new Intent(context, MessageActivity.class);
 		intent.putExtra(STRING_EXTRA_MESSAGE_DETAILS, textMessageDetails);
+		intent.putExtra(STRING_EXTRA_MESSAGE, message);
 		if (textMessageDetails.getConversationId() != null && currentTopConversation != null
 				&& !currentTopConversation.getConversationId().equals(textMessageDetails.getConversationId())) {
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
@@ -226,8 +232,9 @@ public class MessageActivity extends AppCompatActivity {
 		binding.listViewMessages.setAdapter(arrayAdapter);
 
 		final TextMessageDetails textMessageDetails = (TextMessageDetails) getIntent().getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
+		final Message message = (Message) getIntent().getSerializableExtra(STRING_EXTRA_MESSAGE);
 
-		refreshMessageList(textMessageDetails.getConversationId(), textMessageDetails, true);
+		refreshMessageList(textMessageDetails.getConversationId(), textMessageDetails, message, true);
 
 		broadcastManager = LocalBroadcastManager.getInstance(this);
 		IntentFilter actionReceiver = new IntentFilter();
@@ -240,9 +247,11 @@ public class MessageActivity extends AppCompatActivity {
 	 *
 	 * @param conversationId     The conversationId.
 	 * @param textMessageDetails The text message details to be handled at the end (if applicable)
+	 * @param message            The message to be handled at the end.
 	 * @param scrollDown         Flag indicating if view should scroll to last position.
 	 */
-	private void refreshMessageList(final UUID conversationId, final TextMessageDetails textMessageDetails, final boolean scrollDown) {
+	private void refreshMessageList(final UUID conversationId, final TextMessageDetails textMessageDetails, final Message message,
+									final boolean scrollDown) {
 		new Thread(() -> {
 			List<Message> newMessageList = Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversationId);
 			messageList.clear();
@@ -253,7 +262,7 @@ public class MessageActivity extends AppCompatActivity {
 					binding.listViewMessages.setSelection(messageList.size() - 1);
 				}
 				if (textMessageDetails != null) {
-					handleIntentData(textMessageDetails);
+					handleIntentData(textMessageDetails, message);
 				}
 			});
 		}).start();
@@ -274,48 +283,26 @@ public class MessageActivity extends AppCompatActivity {
 	@Override
 	protected final void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
-		handleIntentData((TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS));
+		TextMessageDetails textMessageDetails = (TextMessageDetails) intent.getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
+		refreshMessageList(textMessageDetails.getConversationId(), textMessageDetails,
+				(Message) intent.getSerializableExtra(STRING_EXTRA_MESSAGE), true);
 	}
 
 	/**
 	 * Handle the data of a new intent.
 	 *
 	 * @param textMessageDetails The text message details of the new intent.
+	 * @param message            The message.
 	 */
-	private void handleIntentData(final TextMessageDetails textMessageDetails) {
+	private void handleIntentData(final TextMessageDetails textMessageDetails, final Message message) {
 		cancelLastIntentEffects();
 
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
-
-		UUID conversationId = textMessageDetails.getConversationId();
-		Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId);
-		if (messageConversation == null) {
-			messageConversation = Conversation.createNewConversation(textMessageDetails);
-			messageConversation.insertIfNew(textMessageDetails.getMessageText());
-			ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, messageConversation);
-		}
-		MessageActivity.currentTopConversation = messageConversation;
-		conversation = messageConversation;
+		conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
+		MessageActivity.currentTopConversation = conversation;
 		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 
 		boolean amSlave = !textMessageDetails.getContact().isSlave();
-
-		Message message = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
-				conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
-		if (message.getMessageText() != null && message.getMessageText().length() > 0) {
-			message.store(conversation);
-			messageList.add(message);
-
-			if (amSlave) {
-				conversation.updateWithNewMessage();
-				MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(),
-						textMessageDetails.getContact(), conversation, message);
-			}
-
-			arrayAdapter.notifyDataSetChanged();
-			ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, conversation);
-			binding.listViewMessages.setSelection(messageList.size() - 1);
-		}
 
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
 
