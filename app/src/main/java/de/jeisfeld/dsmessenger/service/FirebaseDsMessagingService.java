@@ -122,7 +122,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				}
 				break;
 			case MESSAGE_RECEIVED:
-				Message receivedMessage = Application.getAppDatabase().getMessageDao().getMessageById(adminDetails.getMessageId().toString());
+				Message receivedMessage = Application.getAppDatabase().getMessageDao().getMessageById(adminDetails.getMessageId());
 				if (receivedMessage != null) {
 					receivedMessage.setStatus(MessageStatus.MESSAGE_RECEIVED);
 					receivedMessage.update();
@@ -133,10 +133,9 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				}
 				break;
 			case MESSAGE_ACKNOWLEDGED:
-				Message acknowledgedMessage = Application.getAppDatabase().getMessageDao().getMessageById(adminDetails.getMessageId().toString());
-				if (acknowledgedMessage != null) {
-					acknowledgedMessage.setStatus(MessageStatus.MESSAGE_ACKNOWLEDGED);
-					acknowledgedMessage.update();
+				String messageIdsString = adminDetails.getValue("messageIds");
+				if (messageIdsString != null && messageIdsString.length() > 0) {
+					Application.getAppDatabase().getMessageDao().acknowledgeMessages(messageIdsString.split(","));
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(),
 							adminDetails.getContact(),
 							Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId")), null);
@@ -173,14 +172,12 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 					conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
 			if (textMessage.getMessageText() != null && textMessage.getMessageText().length() > 0) {
 				textMessage.store(messageConversation);
-				if (!textMessageDetails.getContact().isSlave()) {
-					messageConversation.updateWithNewMessage();
-					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(),
-							textMessageDetails.getContact(), messageConversation, textMessage);
-					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, messageConversation);
-				}
+				messageConversation.updateWithNewMessage();
+				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, messageConversation);
 			}
-
+			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(),
+					textMessageDetails.getContact(), messageConversation, textMessage);
+			Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
 			startActivity(MessageActivity.createIntent(this, textMessageDetails, textMessage));
 			break;
 		case TEXT_RESPONSE:
@@ -192,6 +189,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			Message receivedMessage = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
 					textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
 			receivedMessage.store(conversation);
+			Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_RESPONSE, messageDetails.getMessageId(),
 					messageDetails.getContact(), conversation, receivedMessage);
 			break;

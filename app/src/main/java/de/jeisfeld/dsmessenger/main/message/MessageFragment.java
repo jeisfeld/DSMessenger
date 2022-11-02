@@ -16,6 +16,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +37,7 @@ import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 import de.jeisfeld.dsmessenger.util.DateUtil;
+import de.jeisfeld.dsmessenger.util.Logger;
 
 /**
  * Fragment for sending messages.
@@ -49,10 +51,6 @@ public class MessageFragment extends Fragment {
 	 * The view binding.
 	 */
 	private FragmentMessageBinding binding;
-	/**
-	 * The last sent messageId.
-	 */
-	private UUID lastMessageId;
 	/**
 	 * The contact for this conversation.
 	 */
@@ -85,11 +83,12 @@ public class MessageFragment extends Fragment {
 				switch (actionType) {
 				case MESSAGE_RECEIVED:
 				case MESSAGE_ACKNOWLEDGED:
+				case TEXT_RESPONSE:
 					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())
 							&& activity != null) {
 						conversation = receivedConversation;
-						refreshMessageList(false);
+						refreshMessageList(actionType == ActionType.TEXT_RESPONSE);
 					}
 					break;
 				case CONVERSATION_EDITED:
@@ -105,10 +104,6 @@ public class MessageFragment extends Fragment {
 						NavController navController = Navigation.findNavController(activity, R.id.nav_host_fragment_content_main);
 						navController.popBackStack();
 					}
-					break;
-				case TEXT_RESPONSE:
-					Message message = (Message) intent.getSerializableExtra("message");
-					addMessage(message);
 					break;
 				case DEVICE_LOGGED_OUT:
 					binding.listViewMessages.setVisibility(View.GONE);
@@ -180,9 +175,15 @@ public class MessageFragment extends Fragment {
 			if (activity != null) {
 				conversation.updateWithAcknowledgement();
 				setButtonVisibility();
+				Application.getAppDatabase().getMessageDao().acknowledgeMessages(
+						messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
+				refreshMessageList(false);
+
 				new HttpSender(activity).sendMessage(contact, messageList.get(messageList.size() - 1).getMessageId(), null,
 						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_ACKNOWLEDGED.name(),
-						"conversationId", conversation.getConversationId().toString());
+						"conversationId", conversation.getConversationId().toString(), "messageIds",
+						messageList.stream().filter(msg -> !msg.isOwn())
+								.map(message -> message.getMessageId().toString()).collect(Collectors.joining(",")));
 			}
 		});
 
@@ -221,8 +222,10 @@ public class MessageFragment extends Fragment {
 					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_sent);
 					break;
 				case MESSAGE_RECEIVED:
-				case MESSAGE_ACKNOWLEDGED:
 					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_received);
+					break;
+				case MESSAGE_ACKNOWLEDGED:
+					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_acknowledged);
 					break;
 				default:
 					imageViewMessageStatus.setImageResource(0);
@@ -258,6 +261,7 @@ public class MessageFragment extends Fragment {
 	 * @param scrollDown Flag indicating if view should scroll to last position.
 	 */
 	private void refreshMessageList(final boolean scrollDown) {
+		Logger.log("Refresh");
 		new Thread(() -> {
 			List<Message> newMessageList =
 					Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversation.getConversationId());
@@ -266,10 +270,12 @@ public class MessageFragment extends Fragment {
 			Activity activity = getActivity();
 			if (activity != null) {
 				activity.runOnUiThread(() -> {
-					arrayAdapter.notifyDataSetChanged();
 					setButtonVisibility();
+					arrayAdapter.notifyDataSetChanged();
 					if (scrollDown) {
+						Logger.log("Scrolling down");
 						binding.listViewMessages.setSelection(messageList.size() - 1);
+						binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
 					}
 				});
 			}
@@ -331,12 +337,14 @@ public class MessageFragment extends Fragment {
 	private void sendMessage(final MessagePriority priority) {
 		String messageText = binding.editTextMessageText.getText().toString();
 		UUID messageId = UUID.randomUUID();
-		lastMessageId = messageId;
 		long timestamp = System.currentTimeMillis();
 
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
 					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
 							conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
+					Application.getAppDatabase().getMessageDao().acknowledgeMessages(
+							messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
+					refreshMessageList(false);
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
@@ -357,7 +365,8 @@ public class MessageFragment extends Fragment {
 				"messageType", !contact.isSlave() && conversation.getConversationFlags().getReplyPolicy() != ReplyPolicy.UNLIMITED
 						? MessageType.TEXT_RESPONSE.name() : MessageType.TEXT.name(),
 				"messageText", messageText, "priority", priority.name(),
-				"conversationId", conversation.getConversationId().toString(), "timestamp", Long.toString(timestamp));
+				"conversationId", conversation.getConversationId().toString(), "timestamp", Long.toString(timestamp), "messageIds",
+				messageList.stream().filter(msg -> !msg.isOwn()).map(message -> message.getMessageId().toString()).collect(Collectors.joining(",")));
 	}
 
 	/**
@@ -371,6 +380,7 @@ public class MessageFragment extends Fragment {
 			messageList.add(message);
 			arrayAdapter.notifyDataSetChanged();
 			binding.listViewMessages.setSelection(messageList.size() - 1);
+			binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
 		}
 	}
 

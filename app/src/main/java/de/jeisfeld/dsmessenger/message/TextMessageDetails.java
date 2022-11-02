@@ -24,6 +24,10 @@ public class TextMessageDetails extends MessageDetails {
 	 * The timestamp.
 	 */
 	private final long timestamp;
+	/**
+	 * The message ids.
+	 */
+	private final String[] messageIds;
 
 	/**
 	 * Generate message details.
@@ -36,13 +40,16 @@ public class TextMessageDetails extends MessageDetails {
 	 * @param messageText    The message text.
 	 * @param conversationId The conversation id.
 	 * @param timestamp      The timestamp.
+	 * @param messageIds     The messageIds.
 	 */
 	public TextMessageDetails(final MessageType messageType, final UUID messageId, final Instant messageTime, final MessagePriority priority,
-							  final Contact contact, final String messageText, final UUID conversationId, final long timestamp) {
+							  final Contact contact, final String messageText, final UUID conversationId, final long timestamp,
+							  final String[] messageIds) {
 		super(messageType, messageId, messageTime, priority, contact);
 		this.messageText = messageText;
 		this.conversationId = conversationId;
 		this.timestamp = timestamp;
+		this.messageIds = messageIds;
 	}
 
 	/**
@@ -62,7 +69,9 @@ public class TextMessageDetails extends MessageDetails {
 		String messageText = data.get("messageText");
 		UUID conversationId = UUID.fromString(data.get("conversationId"));
 		long timestamp = Long.parseLong(data.get("timestamp"));
-		return new TextMessageDetails(messageType, messageId, messageTime, priority, contact, messageText, conversationId, timestamp);
+		String messageIdsString = data.get("messageIds");
+		String[] messageIds = messageIdsString == null ? new String[0] : messageIdsString.split(",");
+		return new TextMessageDetails(messageType, messageId, messageTime, priority, contact, messageText, conversationId, timestamp, messageIds);
 	}
 
 	public final String getMessageText() {
@@ -75,5 +84,9 @@ public class TextMessageDetails extends MessageDetails {
 
 	public final long getTimestamp() {
 		return timestamp;
+	}
+
+	public String[] getMessageIds() {
+		return messageIds;
 	}
 }

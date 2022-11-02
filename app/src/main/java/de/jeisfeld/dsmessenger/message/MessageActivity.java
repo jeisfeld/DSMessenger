@@ -18,6 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,7 +27,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
-import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
@@ -218,8 +218,10 @@ public class MessageActivity extends AppCompatActivity {
 					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_sent);
 					break;
 				case MESSAGE_RECEIVED:
-				case MESSAGE_ACKNOWLEDGED:
 					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_received);
+					break;
+				case MESSAGE_ACKNOWLEDGED:
+					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_acknowledged);
 					break;
 				default:
 					imageViewMessageStatus.setImageIcon(null);
@@ -260,6 +262,7 @@ public class MessageActivity extends AppCompatActivity {
 				arrayAdapter.notifyDataSetChanged();
 				if (scrollDown) {
 					binding.listViewMessages.setSelection(messageList.size() - 1);
+					binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
 				}
 				if (textMessageDetails != null) {
 					handleIntentData(textMessageDetails, message);
@@ -320,7 +323,9 @@ public class MessageActivity extends AppCompatActivity {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
 
-		sendConfirmation(AdminType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(), textMessageDetails.getContact());
+		new HttpSender(this).sendMessage(textMessageDetails.getContact(), textMessageDetails.getMessageId(), null,
+				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(),
+				"conversationId", conversation.getConversationId().toString());
 
 		binding.buttonAcknowledge.setVisibility(
 				amSlave && conversation.getConversationFlags().isExpectingAcknowledgement() ? View.VISIBLE : View.GONE);
@@ -341,9 +346,21 @@ public class MessageActivity extends AppCompatActivity {
 			binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 			binding.layoutTextInput.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 
-			sendConfirmation(AdminType.MESSAGE_ACKNOWLEDGED, textMessageDetails.getMessageId(), textMessageDetails.getContact());
+
+			new HttpSender(this).sendMessage(textMessageDetails.getContact(), textMessageDetails.getMessageId(), (response, responseData) -> {
+						if (responseData != null && responseData.isSuccess()) {
+							Application.getAppDatabase().getMessageDao().acknowledgeMessages(
+									messageList.stream().filter(msg -> !msg.isOwn())
+											.map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
+							runOnUiThread(() -> refreshMessageList(conversation.getConversationId(), null, null, false));
+						}
+					},
+					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_ACKNOWLEDGED.name(),
+					"conversationId", conversation.getConversationId().toString(), "messageIds",
+					messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).collect(Collectors.joining(",")));
 			new HttpSender(this).sendSelfMessage(textMessageDetails.getMessageId(), null,
-					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_SELF_ACKNOWLEDGED.name());
+					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_SELF_ACKNOWLEDGED.name(), "messageIds",
+					messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).collect(Collectors.joining(",")));
 		});
 		binding.buttonSend.setOnClickListener(v -> {
 			if (messageVibration != null) {
@@ -360,25 +377,30 @@ public class MessageActivity extends AppCompatActivity {
 							textMessageDetails.getContact(), conversation, null);
 				}
 				new HttpSender(this).sendMessage(textMessageDetails.getContact(), newMessageId, (response, responseData) -> {
-							Message newMessage = new Message(messageText, true, newMessageId,
-									conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
-							runOnUiThread(() -> {
-								if (responseData != null && responseData.isSuccess()) {
-									newMessage.store(conversation);
-									messageList.add(newMessage);
+							if (responseData != null && responseData.isSuccess()) {
+								Message newMessage = new Message(messageText, true, newMessageId,
+										conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
+								newMessage.store(conversation);
+								runOnUiThread(() -> {
+									Application.getAppDatabase().getMessageDao().acknowledgeMessages(
+											messageList.stream().filter(msg -> !msg.isOwn())
+													.map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
+									refreshMessageList(conversation.getConversationId(), null, null, false);
 									arrayAdapter.notifyDataSetChanged();
 									ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, conversation);
 									binding.listViewMessages.setSelection(messageList.size() - 1);
+									binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
 									binding.editTextMessageText.setText("");
 									binding.buttonAcknowledge.setVisibility(View.GONE);
 									binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 									binding.layoutTextInput.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
-								}
-							});
+								});
+							}
 						},
 						"messageType", MessageType.TEXT_RESPONSE.name(), "messageText", messageText,
 						"priority", MessagePriority.NORMAL.name(), "conversationId", conversation.getConversationId().toString(),
-						"timestamp", Long.toString(timestamp));
+						"timestamp", Long.toString(timestamp), "messageIds",
+						messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).collect(Collectors.joining(",")));
 				new HttpSender(this).sendSelfMessage(textMessageDetails.getMessageId(), null,
 						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_SELF_RESPONDED.name());
 			}
@@ -407,19 +429,6 @@ public class MessageActivity extends AppCompatActivity {
 				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			}
 		}
-	}
-
-	/**
-	 * Send confirmation for the message.
-	 *
-	 * @param adminType The type of confirmation.
-	 * @param messageId The messageId.
-	 * @param contact   The contact.
-	 */
-	private void sendConfirmation(final AdminType adminType, final UUID messageId, final Contact contact) {
-		new HttpSender(this).sendMessage(contact, messageId, null,
-				"messageType", MessageType.ADMIN.name(), "adminType", adminType.name(),
-				"conversationId", conversation.getConversationId().toString());
 	}
 
 	/**

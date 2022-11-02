@@ -9,6 +9,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 
 /**
  * The DAO for accessing message table.
@@ -34,4 +35,17 @@ public interface MessageDao {
 	@Query("SELECT * FROM message WHERE messageId = :messageId")
 	Message getMessageById(String messageId);
 
+	default Message getMessageById(UUID messageId) {
+		return getMessageById(messageId.toString());
+	}
+
+	default void acknowledgeMessages(String[] messageIds) {
+		for (String messageId : messageIds) {
+			Message acknowledgedMessage = getMessageById(messageId);
+			if (acknowledgedMessage != null && acknowledgedMessage.getStatus() != MessageStatus.MESSAGE_ACKNOWLEDGED) {
+				acknowledgedMessage.setStatus(MessageStatus.MESSAGE_ACKNOWLEDGED);
+				acknowledgedMessage.update();
+			}
+		}
+	}
 }
