@@ -21,6 +21,14 @@ public class LutMessageDetails extends MessageDetails {
 	 */
 	private final Long duration;
 	/**
+	 * The channel
+	 */
+	private final Integer channel;
+	/**
+	 * The power
+	 */
+	private final Integer power;
+	/**
 	 * The power factor.
 	 */
 	private final Double powerFactor;
@@ -34,13 +42,18 @@ public class LutMessageDetails extends MessageDetails {
 	 * @param contact        The contact who sent the message
 	 * @param lutMessageType The LUT message type.
 	 * @param duration       The pulse duration.
+	 * @param channel        The channel.
+	 * @param power          The power.
 	 * @param powerFactor    The power factor.
 	 */
 	public LutMessageDetails(final UUID messageId, final Instant messageTime, final MessagePriority priority, final Contact contact,
-							 final LutMessageType lutMessageType, final Long duration, final Double powerFactor) {
+							 final LutMessageType lutMessageType, final Long duration, final Integer channel,
+							 final Integer power, final Double powerFactor) {
 		super(MessageType.LUT, messageId, messageTime, priority, contact);
 		this.lutMessageType = lutMessageType;
 		this.duration = duration;
+		this.channel = channel;
+		this.power = power;
 		this.powerFactor = powerFactor;
 	}
 
@@ -61,9 +74,13 @@ public class LutMessageDetails extends MessageDetails {
 		LutMessageType lutMessageType = LutMessageType.fromName(data.get("lutMessageType"));
 		String durationString = data.get("duration");
 		Long duration = durationString == null ? null : Long.parseLong(durationString);
+		String channelString = data.get("channel");
+		Integer channel = channelString == null ? null : Integer.parseInt(channelString);
+		String powerString = data.get("power");
+		Integer power = powerString == null ? null : Integer.parseInt(powerString);
 		String powerFactorString = data.get("powerFactor");
 		Double powerFactor = powerFactorString == null ? null : Double.parseDouble(powerFactorString);
-		return new LutMessageDetails(messageId, messageTime, priority, contact, lutMessageType, duration, powerFactor);
+		return new LutMessageDetails(messageId, messageTime, priority, contact, lutMessageType, duration, channel, power, powerFactor);
 	}
 
 	public final LutMessageType getLutMessageType() {
@@ -72,6 +89,14 @@ public class LutMessageDetails extends MessageDetails {
 
 	public final Long getDuration() {
 		return duration;
+	}
+
+	public final Integer getChannel() {
+		return channel;
+	}
+
+	public final Integer getPower() {
+		return power;
 	}
 
 	public final Double getPowerFactor() {

@@ -219,6 +219,12 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			if (lutMessageDetails.getDuration() != null) {
 				lutIntent.putExtra("de.jeisfeld.dsmessenger.lut.duration", lutMessageDetails.getDuration());
 			}
+			if (lutMessageDetails.getChannel() != null) {
+				lutIntent.putExtra("de.jeisfeld.dsmessenger.lut.channel", lutMessageDetails.getChannel());
+			}
+			if (lutMessageDetails.getPower() != null) {
+				lutIntent.putExtra("de.jeisfeld.dsmessenger.lut.power", lutMessageDetails.getPower());
+			}
 			if (lutMessageDetails.getPowerFactor() != null) {
 				lutIntent.putExtra("de.jeisfeld.dsmessenger.lut.powerFactor", lutMessageDetails.getPowerFactor());
 			}
