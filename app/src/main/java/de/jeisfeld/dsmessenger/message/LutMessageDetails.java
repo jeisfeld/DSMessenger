@@ -32,6 +32,14 @@ public class LutMessageDetails extends MessageDetails {
 	 * The power factor.
 	 */
 	private final Double powerFactor;
+	/**
+	 * The frequency.
+	 */
+	private final Integer frequency;
+	/**
+	 * The wave name.
+	 */
+	private final String wave;
 
 	/**
 	 * Generate message details.
@@ -48,13 +56,15 @@ public class LutMessageDetails extends MessageDetails {
 	 */
 	public LutMessageDetails(final UUID messageId, final Instant messageTime, final MessagePriority priority, final Contact contact,
 							 final LutMessageType lutMessageType, final Long duration, final Integer channel,
-							 final Integer power, final Double powerFactor) {
+							 final Integer power, final Double powerFactor, final Integer frequency, final String wave) {
 		super(MessageType.LUT, messageId, messageTime, priority, contact);
 		this.lutMessageType = lutMessageType;
 		this.duration = duration;
 		this.channel = channel;
 		this.power = power;
 		this.powerFactor = powerFactor;
+		this.frequency = frequency;
+		this.wave = wave;
 	}
 
 	/**
@@ -80,7 +90,11 @@ public class LutMessageDetails extends MessageDetails {
 		Integer power = powerString == null ? null : Integer.parseInt(powerString);
 		String powerFactorString = data.get("powerFactor");
 		Double powerFactor = powerFactorString == null ? null : Double.parseDouble(powerFactorString);
-		return new LutMessageDetails(messageId, messageTime, priority, contact, lutMessageType, duration, channel, power, powerFactor);
+		String frequencyString = data.get("frequency");
+		Integer frequency = frequencyString == null ? null : Integer.parseInt(frequencyString);
+		String wave = data.get("wave");
+		return new LutMessageDetails(messageId, messageTime, priority, contact, lutMessageType, duration, channel,
+				power, powerFactor, frequency, wave);
 	}
 
 	public final LutMessageType getLutMessageType() {
@@ -101,6 +115,14 @@ public class LutMessageDetails extends MessageDetails {
 
 	public final Double getPowerFactor() {
 		return powerFactor;
+	}
+
+	public final Integer getFrequency() {
+		return frequency;
+	}
+
+	public final String getWave() {
+		return wave;
 	}
 
 	/**
