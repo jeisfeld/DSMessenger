@@ -1,0 +1,76 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+
+
+h2 {
+	font-family: sans-serif;
+}
+
+.button {
+	border-width: 2px;
+	border-radius: 5px;
+	border-color: #dddddd;
+	text-align: center;
+	padding: 10px 10px;
+	vertical-align: middle;
+	font-weight: bold;
+	font-size: large;
+}
+
+</style>
+
+<script src="js/jquery-3.6.2.min.js"></script>
+
+<script type="text/javascript">
+	let basedata = "username=iuno&password=ultralily&relationId=3&contactId=3&isSlave=1&isConnected=1&messageType=LUT&messageTime=2022-10-21T22:38:51.266Z&messageId=49cdd060-9852-4226-aeb2-2cbf91b17f5b&ttl=10";
+	
+	function sendPost(data) {
+		let xhr = new XMLHttpRequest();
+		xhr.open("POST", "firebase/sendmessage.php");
+		xhr.setRequestHeader("Content-Type",
+				"application/x-www-form-urlencoded");
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4) {
+				console.log(xhr.status);
+				console.log(xhr.responseText);
+			}
+		};
+		xhr.send(data);
+	}
+
+	function sendMessageType(channel, lutmessagetype, duration) {
+		sendPost(basedata + "&lutMessageType=" + lutmessagetype + "&channel=" + channel + "&duration=" + duration);
+	}
+
+</script>
+
+</head>
+<body>
+
+	<h2>Electro Item 1</h2>
+
+	<div id="buttons0" class="block">
+		<button class="button" onclick="sendMessageType(0, 'OFF', 9007199254740991)" style="background-color: #00ff00;">OFF</button>
+		<button class="button" onclick="sendMessageType(0, 'ON', 9007199254740991)" style="background-color: #ff0000;">ON</button>
+		<button class="button" onclick="sendMessageType(0, 'AUTO', 0)" style="background-color: #888888;">AUTO</button>
+	</div>
+
+	<hr>
+
+	<h2>Electro Item 2</h2>
+
+	<div id="buttons1" class="block">
+		<button class="button" onclick="sendMessageType(1, 'OFF', 9007199254740991)" style="background-color: #00ff00;">OFF</button>
+		<button class="button" onclick="sendMessageType(1, 'ON', 9007199254740991)" style="background-color: #ff0000;">ON</button>
+		<button class="button" onclick="sendMessageType(1, 'AUTO', 0)" style="background-color: #888888;">AUTO</button>
+	</div>
+
+	<script>
+
+</script>
+
+</body>
+</html>
