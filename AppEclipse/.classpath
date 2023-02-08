@@ -18,12 +18,12 @@
 	<classpathentry kind="lib" path="libs-local/activity-1.6.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/preference-1.2.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/recyclerview-1.2.1.jar"/>
-	<classpathentry kind="lib" path="libs-local/fragment-1.5.4.jar"/>
+	<classpathentry kind="lib" path="libs-local/fragment-1.5.5.jar"/>
 	<classpathentry kind="lib" path="libs-local/customview-1.1.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/drawerlayout-1.1.1.jar"/>
-	<classpathentry kind="lib" path="libs-local/appcompat-1.5.1.jar"/>
+	<classpathentry kind="lib" path="libs-local/appcompat-1.6.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/constraintlayout-2.1.4.jar"/>
-	<classpathentry kind="lib" path="libs-local/material-1.7.0.jar"/>
+	<classpathentry kind="lib" path="libs-local/material-1.8.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/navigation-common-2.5.3.jar"/>
 	<classpathentry kind="lib" path="libs-local/navigation-fragment-2.5.3.jar"/>
 	<classpathentry kind="lib" path="libs-local/navigation-runtime-2.5.3.jar"/>
@@ -40,12 +40,12 @@
 	<classpathentry kind="lib" path="libs-local/lifecycle-livedata-core-2.5.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/lifecycle-viewmodel-2.5.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/firebase-common-20.2.0.jar"/>
-	<classpathentry kind="lib" path="libs-local/firebase-messaging-23.1.0.jar"/>
+	<classpathentry kind="lib" path="libs-local/firebase-messaging-23.1.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/play-services-tasks-18.0.2.jar"/>
 	<classpathentry kind="lib" path="libs-local/play-services-base-18.1.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/localbroadcastmanager-1.1.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/kotlin-stdlib-1.7.21.jar"/>
-	<classpathentry kind="lib" path="libs-local/room-common-2.4.3.jar"/>
-	<classpathentry kind="lib" path="libs-local/room-runtime-2.4.3.jar"/>
+	<classpathentry kind="lib" path="libs-local/room-common-2.5.0.jar"/>
+	<classpathentry kind="lib" path="libs-local/room-runtime-2.5.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
