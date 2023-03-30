@@ -2,6 +2,9 @@ package de.jeisfeld.dsmessenger.message;
 
 import android.content.Context;
 import android.media.AudioAttributes;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
+import android.os.VibrationAttributes;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 
@@ -81,9 +84,16 @@ public class MessageVibration {
 			vibrationPattern = 0;
 		}
 
-		vibrator.vibrate(VibrationEffect.createWaveform(VIBRATION_PATTERNS[vibrationPattern], VIBRATION_AMPLITUDES[vibrationPattern],
-						displayStrategy.isVibrationRepeated() ? VIBRATION_REPEAT_POINTS[vibrationPattern] : -1),
-				new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_COMMUNICATION_INSTANT).build());
+		if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU) {
+			vibrator.vibrate(VibrationEffect.createWaveform(VIBRATION_PATTERNS[vibrationPattern], VIBRATION_AMPLITUDES[vibrationPattern],
+							displayStrategy.isVibrationRepeated() ? VIBRATION_REPEAT_POINTS[vibrationPattern] : -1),
+					new VibrationAttributes.Builder().setUsage(VibrationAttributes.USAGE_ALARM).build());
+		}
+		else {
+			vibrator.vibrate(VibrationEffect.createWaveform(VIBRATION_PATTERNS[vibrationPattern], VIBRATION_AMPLITUDES[vibrationPattern],
+							displayStrategy.isVibrationRepeated() ? VIBRATION_REPEAT_POINTS[vibrationPattern] : -1),
+					new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_COMMUNICATION_INSTANT).build());
+		}
 	}
 
 	/**
