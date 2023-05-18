@@ -15,15 +15,15 @@
 	<classpathentry kind="lib" path="libs-local/annotation-1.5.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/core-1.9.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/savedstate-1.2.0.jar"/>
-	<classpathentry kind="lib" path="libs-local/activity-1.6.1.jar"/>
+	<classpathentry kind="lib" path="libs-local/activity-1.7.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/preference-1.2.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/recyclerview-1.2.1.jar"/>
-	<classpathentry kind="lib" path="libs-local/fragment-1.5.5.jar"/>
+	<classpathentry kind="lib" path="libs-local/fragment-1.5.7.jar"/>
 	<classpathentry kind="lib" path="libs-local/customview-1.1.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/drawerlayout-1.1.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/appcompat-1.6.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/constraintlayout-2.1.4.jar"/>
-	<classpathentry kind="lib" path="libs-local/material-1.8.0.jar"/>
+	<classpathentry kind="lib" path="libs-local/material-1.9.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/navigation-common-2.5.3.jar"/>
 	<classpathentry kind="lib" path="libs-local/navigation-fragment-2.5.3.jar"/>
 	<classpathentry kind="lib" path="libs-local/navigation-runtime-2.5.3.jar"/>
@@ -36,15 +36,15 @@
 	<classpathentry kind="lib" path="libs-local/viewbinding-7.3.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/R.jar"/>
 	<classpathentry kind="lib" path="libs-local/coordinatorlayout-1.2.0.jar"/>
-	<classpathentry kind="lib" path="libs-local/lifecycle-common-2.5.1.jar"/>
-	<classpathentry kind="lib" path="libs-local/lifecycle-livedata-core-2.5.1.jar"/>
-	<classpathentry kind="lib" path="libs-local/lifecycle-viewmodel-2.5.1.jar"/>
+	<classpathentry kind="lib" path="libs-local/lifecycle-common-2.6.1.jar"/>
+	<classpathentry kind="lib" path="libs-local/lifecycle-livedata-core-2.6.1.jar"/>
+	<classpathentry kind="lib" path="libs-local/lifecycle-viewmodel-2.6.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/firebase-common-20.2.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/firebase-messaging-23.1.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/play-services-tasks-18.0.2.jar"/>
 	<classpathentry kind="lib" path="libs-local/play-services-base-18.1.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/localbroadcastmanager-1.1.0.jar"/>
-	<classpathentry kind="lib" path="libs-local/kotlin-stdlib-1.7.21.jar"/>
+	<classpathentry kind="lib" path="libs-local/kotlin-stdlib-1.8.21.jar"/>
 	<classpathentry kind="lib" path="libs-local/room-common-2.5.0.jar"/>
 	<classpathentry kind="lib" path="libs-local/room-runtime-2.5.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
