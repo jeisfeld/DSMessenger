@@ -165,7 +165,7 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 								UUID conversationId = conversation.getConversationId();
 								Application.getAppDatabase().getConversationDao().delete(conversation);
 								notifyDataSetChanged();
-								new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
+								new HttpSender(activity).sendMessage("db/conversation/deleteconversation.php", contact, UUID.randomUUID(), null,
 										"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_DELETED.name(),
 										"conversationId", conversationId.toString());
 							},

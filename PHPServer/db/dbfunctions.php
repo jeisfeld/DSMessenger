@@ -60,6 +60,39 @@ function verifyCredentials($conn, $username, $password)
     return $userid;
 }
 
+function verifyRelation($conn, $relationId, $userId, $isSlave)
+{
+    if (! $relationId) {
+        printError(111, "Missing relationId");
+    }
+    if (! $userId) {
+        printError(112, "Missing userId");
+    }
+    if ($isSlave) {
+        $stmt = $conn->prepare("SELECT id from dsm_relation where id = ? and master_id = ?");
+    }
+    else {
+        $stmt = $conn->prepare("SELECT id from dsm_relation where id = ? and slave_id = ?");
+    }
+    $stmt->bind_param("ii", $relationId, $userId);
+    $stmt->execute();
+    if (! $stmt->get_result()->num_rows) {
+        printError(106, "Insufficient privileges");
+    }
+    $stmt->close();
+}
+
+function verifyCredentialsAndRelation($conn, $post) {
+    $username = @$post['username'];
+    $password = @$post['password'];
+    $userId = verifyCredentials($conn, $username, $password);
+    
+    $relationId = @$post['relationId'];
+    $isSlave = @$post['isSlave'];
+    verifyRelation($conn, $relationId, $userId, $isSlave);
+    return $userId;
+}
+
 function getTokens($conn, $username, $password, $relationId, $isSlave) {
     $userId = verifyCredentials($conn, $username, $password);
     

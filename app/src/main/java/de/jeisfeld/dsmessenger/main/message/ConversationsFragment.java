@@ -137,7 +137,7 @@ public class ConversationsFragment extends Fragment {
 		adapter.notifyDataSetChanged();
 		Activity activity = getActivity();
 		if (activity != null) {
-			new HttpSender(activity).sendMessage(contact, UUID.randomUUID(), null,
+			new HttpSender(activity).sendMessage("db/conversation/editconversation.php", contact, UUID.randomUUID(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_EDITED.name(),
 					"conversationId", conversation.getConversationId().toString(), "subject", conversation.getSubject(),
 					"conversationFlags", conversation.getConversationFlags().toString());

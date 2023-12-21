@@ -184,7 +184,8 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		case TEXT_RESPONSE:
 			textMessageDetails = (TextMessageDetails) messageDetails;
 			Conversation conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
-			new HttpSender(this).sendMessage(messageDetails.getContact(), messageDetails.getMessageId(), null,
+			new HttpSender(this).sendMessage("db/conversation/updatemessagestatus.php",
+					messageDetails.getContact(), messageDetails.getMessageId(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(), "conversationId",
 					textMessageDetails.getConversationId().toString());
 			Message receivedMessage = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),

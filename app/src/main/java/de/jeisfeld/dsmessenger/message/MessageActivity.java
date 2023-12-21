@@ -190,7 +190,7 @@ public class MessageActivity extends AppCompatActivity {
 		binding = ActivityMessageBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
 
-		arrayAdapter = new ArrayAdapter<Message>(this, R.layout.list_view_message, R.id.textViewMessage, messageList) {
+		arrayAdapter = new ArrayAdapter<>(this, R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
@@ -296,7 +296,7 @@ public class MessageActivity extends AppCompatActivity {
 	 * Handle the data of a new intent.
 	 *
 	 * @param textMessageDetails The text message details of the new intent.
-	 * @param message The message.
+	 * @param message            The message.
 	 */
 	private void handleIntentData(final TextMessageDetails textMessageDetails, final Message message) {
 		cancelLastIntentEffects();
@@ -322,7 +322,8 @@ public class MessageActivity extends AppCompatActivity {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
 
-		new HttpSender(this).sendMessage(textMessageDetails.getContact(), textMessageDetails.getMessageId(), null,
+		new HttpSender(this).sendMessage("db/conversation/updatemessagestatus.php",
+				textMessageDetails.getContact(), textMessageDetails.getMessageId(), null,
 				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(),
 				"conversationId", conversation.getConversationId().toString());
 
@@ -348,7 +349,8 @@ public class MessageActivity extends AppCompatActivity {
 			binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 			binding.layoutTextInput.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 
-			new HttpSender(this).sendMessage(textMessageDetails.getContact(), textMessageDetails.getMessageId(), (response, responseData) -> {
+			new HttpSender(this).sendMessage("db/conversation/updatemessagestatus.php",
+					textMessageDetails.getContact(), textMessageDetails.getMessageId(), (response, responseData) -> {
 						if (responseData != null && responseData.isSuccess()) {
 							Application.getAppDatabase().getMessageDao().acknowledgeMessages(
 									messageList.stream().filter(msg -> !msg.isOwn())
@@ -377,7 +379,8 @@ public class MessageActivity extends AppCompatActivity {
 							messageList.get(messageList.size() - 1).getMessageId(),
 							textMessageDetails.getContact(), conversation, null);
 				}
-				new HttpSender(this).sendMessage(textMessageDetails.getContact(), newMessageId, (response, responseData) -> {
+				new HttpSender(this).sendMessage("db/conversation/sendmessage.php",
+						textMessageDetails.getContact(), newMessageId, (response, responseData) -> {
 							if (responseData != null && responseData.isSuccess()) {
 								Message newMessage = new Message(messageText, true, newMessageId,
 										conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
@@ -401,7 +404,7 @@ public class MessageActivity extends AppCompatActivity {
 						},
 						"messageType", MessageType.TEXT_RESPONSE.name(), "messageText", messageText,
 						"priority", MessagePriority.NORMAL.name(), "conversationId", conversation.getConversationId().toString(),
-						"timestamp", Long.toString(timestamp), "messageIds",
+						"timestamp", Long.toString(timestamp), "conversationFlags", conversation.getConversationFlags().toString(), "messageIds",
 						messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).collect(Collectors.joining(",")));
 				new HttpSender(this).sendSelfMessage(textMessageDetails.getMessageId(), null,
 						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_SELF_RESPONDED.name());

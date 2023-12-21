@@ -179,7 +179,8 @@ public class MessageFragment extends Fragment {
 						messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
 				refreshMessageList(false);
 
-				new HttpSender(activity).sendMessage(contact, messageList.get(messageList.size() - 1).getMessageId(), null,
+				new HttpSender(activity).sendMessage("db/conversation/updatemessagestatus.php",
+						contact, messageList.get(messageList.size() - 1).getMessageId(), null,
 						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_ACKNOWLEDGED.name(),
 						"conversationId", conversation.getConversationId().toString(), "messageIds",
 						messageList.stream().filter(msg -> !msg.isOwn())
@@ -193,7 +194,7 @@ public class MessageFragment extends Fragment {
 		binding.textSendMessage.setText(getString(R.string.text_send_message_to, contact.getName()));
 		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 
-		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
+		arrayAdapter = new ArrayAdapter<>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
@@ -247,7 +248,8 @@ public class MessageFragment extends Fragment {
 	 */
 	private void setButtonVisibility() {
 		boolean enableAcknowledgement = !contact.isSlave() && conversation.getConversationFlags().isExpectingAcknowledgement();
-		boolean enableSend = contact.isSlave() || conversation.getConversationFlags().isExpectingResponse();
+		boolean enableSend = contact.isSlave() || conversation.getConversationFlags().isExpectingResponse()
+				|| conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED;
 		boolean enablePrioSend = contact.isSlave() || conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED;
 		binding.buttonAcknowledge.setVisibility(enableAcknowledgement ? View.VISIBLE : View.GONE);
 		binding.buttonSend.setVisibility(enableSend ? View.VISIBLE : enableAcknowledgement ? View.INVISIBLE : View.GONE);
@@ -339,7 +341,7 @@ public class MessageFragment extends Fragment {
 		UUID messageId = UUID.randomUUID();
 		long timestamp = System.currentTimeMillis();
 
-		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
+		new HttpSender(getContext()).sendMessage("db/conversation/sendmessage.php", contact, messageId, (response, responseData) -> {
 					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
 							conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
 					Application.getAppDatabase().getMessageDao().acknowledgeMessages(
@@ -365,7 +367,8 @@ public class MessageFragment extends Fragment {
 				"messageType", !contact.isSlave() && conversation.getConversationFlags().getReplyPolicy() != ReplyPolicy.UNLIMITED
 						? MessageType.TEXT_RESPONSE.name() : MessageType.TEXT.name(),
 				"messageText", messageText, "priority", priority.name(),
-				"conversationId", conversation.getConversationId().toString(), "timestamp", Long.toString(timestamp), "messageIds",
+				"conversationId", conversation.getConversationId().toString(), "timestamp", Long.toString(timestamp),
+				"conversationFlags", conversation.getConversationFlags().toString(), "messageIds",
 				messageList.stream().filter(msg -> !msg.isOwn()).map(message -> message.getMessageId().toString()).collect(Collectors.joining(",")));
 	}
 
