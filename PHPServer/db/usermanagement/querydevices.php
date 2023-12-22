@@ -1,5 +1,6 @@
 <?php
 require_once '../dbfunctions.php';
+header('Content-Type: text/json');
 
 // Create connection
 $conn = getDbConnection();

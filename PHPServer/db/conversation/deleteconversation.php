@@ -1,5 +1,6 @@
 <?php
 require_once '../../firebase/firebasefunctions.php';
+header('Content-Type: text/json');
 
 // Create connection
 $conn = getDbConnection();
@@ -17,6 +18,7 @@ $stmt = $conn->prepare("DELETE FROM dsm_conversation WHERE id = ? and relation_i
 $stmt->bind_param("si", $conversationId, $relationId);
 $stmt->execute();
 $stmt->close();
+$conn->close();
 
 $tokens = getVerifiedTokensFromRequestData();
 

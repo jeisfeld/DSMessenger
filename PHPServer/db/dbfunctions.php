@@ -4,7 +4,6 @@ require_once 'dbcredentials.php';
 function getDbConnection() {
     $dbConnection = new mysqli(getDbServer(), getDbUser(), getDbPassword(), getDbName());
     setDbSchema($dbConnection);
-    header('Content-Type: text/json');
     return $dbConnection;
 }
 

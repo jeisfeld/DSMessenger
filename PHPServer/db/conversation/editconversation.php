@@ -1,5 +1,6 @@
 <?php
 require_once '../../firebase/firebasefunctions.php';
+header('Content-Type: text/json');
 
 // Create connection
 $conn = getDbConnection();
@@ -19,6 +20,7 @@ $stmt = $conn->prepare("UPDATE dsm_conversation SET subject = ?, flags = ? WHERE
 $stmt->bind_param("sssi", $subject, $conversationFlags, $conversationId, $relationId);
 $stmt->execute();
 $stmt->close();
+$conn->close();
 
 $tokens = getVerifiedTokensFromRequestData();
 

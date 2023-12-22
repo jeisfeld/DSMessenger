@@ -1,0 +1,98 @@
+body {
+	margin: 0px;
+	font-family: Verdana, sans-serif;
+}
+
+#chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    max-width: 800px; /* Adjust based on your design */
+    margin: auto;
+}
+
+.container {
+	width: 100%;
+	overflow: auto;
+    padding-top: 5px;
+}
+
+.right {
+	float: right;
+}
+
+#messages {
+    flex-grow: 1; /* Allows this area to grow and shrink dynamically */
+    overflow-y: auto; /* Enable scrolling for overflow */
+    padding: 10px;
+    background-color: #f9f9f9; /* Light grey background */
+}
+
+.message {
+	max-width: 80%;
+	margin-bottom: 10px;
+	padding: 10px;
+	border-radius: 20px;
+	box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.own-message {
+	background-color: #dcf8c6; /* Light green background for own messages */
+	margin-left: auto;
+	text-align: right;
+}
+
+.other-message {
+	background-color: #fff; /* White background for other messages */
+	text-align: left;
+}
+
+.text {
+	margin: 0;
+	padding: 0;
+}
+
+.time {
+	display: block;
+	font-size: 0.8em;
+	margin-top: 5px;
+	color: #666;
+}
+
+.message-form {
+    display: flex;
+    padding: 10px;
+    background-color: #f9f9f9; /* Light grey background */
+}
+
+.message-textarea {
+    flex-grow: 1;
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    resize: vertical; /* Allow vertical resizing */
+    min-height: 50px; /* Set a larger default height */
+    max-height: 200px; /* Increased max height */
+    overflow-y: auto; /* Add scroll bar when text exceeds the area */
+}
+
+.send-button {
+	background-color: #007bff;
+	color: white;
+	border: none;
+	padding: 10px 15px;
+	border-radius: 15px;
+	cursor: pointer;
+}
+
+.send-button:hover {
+	background-color: #0056b3; /* Darker shade for hover effect */
+}
+
+/* Adjust the form when the keyboard is visible on mobile devices */
+@media (max-width: 600px) {
+    .message-form {
+        position: static;
+    }
+}

@@ -1,5 +1,6 @@
 <?php
 require_once 'firebasefunctions.php';
+header('Content-Type: text/json');
 
 $conn = getDbConnection();
 

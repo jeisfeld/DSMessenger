@@ -3,6 +3,7 @@ require_once '../../firebase/firebasefunctions.php';
 
 // Create connection
 $conn = getDbConnection();
+header('Content-Type: text/json');
 
 // Check connection
 if ($conn->connect_error) {
@@ -17,7 +18,6 @@ $relationId = @$_POST['relationId'];
 $conversationFlags = @$_POST['conversationFlags'];
 $timestamp = @$_POST['timestamp'];
 $mysqltimestamp = date( 'Y-m-d H:i:s', $timestamp/1000 );
-$adminType = @$_POST['adminType'];
 $messageIds = @$_POST['messageIds'];
 
 $stmt = $conn->prepare("SELECT id FROM dsm_conversation WHERE id = ?");
@@ -73,5 +73,6 @@ foreach ($tokens as $token) {
 }
 
 printSuccess("Message successfully sent");
+$conn->close();
 
 ?>
