@@ -66,9 +66,9 @@ public class Message implements Serializable {
 	 * @param timestamp            The timestamp of the message.
 	 * @param status               The message status
 	 */
-	protected Message(final String messageText, final boolean isOwn, @NonNull final String messageIdString,
-					  @NonNull final String conversationIdString,
-					  final long timestamp, final MessageStatus status) {
+	public Message(final String messageText, final boolean isOwn, @NonNull final String messageIdString,
+				   @NonNull final String conversationIdString,
+				   final long timestamp, final MessageStatus status) {
 		this.messageText = messageText;
 		this.isOwn = isOwn;
 		this.messageIdString = messageIdString;
@@ -149,5 +149,18 @@ public class Message implements Serializable {
 
 	public final void setStatus(final MessageStatus status) {
 		this.status = status;
+	}
+
+	@NonNull
+	@Override
+	public String toString() {
+		return "Message{" +
+				"messageText='" + messageText + '\'' +
+				", isOwn=" + isOwn +
+				", messageIdString='" + messageIdString + '\'' +
+				", conversationIdString='" + conversationIdString + '\'' +
+				", timestamp=" + timestamp +
+				", status=" + status +
+				'}';
 	}
 }

@@ -19,6 +19,9 @@ public interface MessageDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	void insert(Message message);
 
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	void insert(List<Message> message);
+
 	@Update
 	void update(Message message);
 

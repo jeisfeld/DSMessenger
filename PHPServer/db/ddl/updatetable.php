@@ -11,10 +11,10 @@ if ($conn->connect_error) {
 }
 
 // sql to create table dsm_relation
-$sql = "ALTER TABLE dsm_relation ADD COLUMN slave_permissions VARCHAR(50) DEFAULT '1000'";
+$sql = "ALTER TABLE dsm_message MODIFY COLUMN timestamp TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3)";
 
 if ($conn->query($sql) === TRUE) {
-    printSuccess("Table dsm_device updated successfully");
+    printSuccess("Table dsm_message updated successfully");
 }
 else {
     printError(102, "Error updating table: " . $conn->error);

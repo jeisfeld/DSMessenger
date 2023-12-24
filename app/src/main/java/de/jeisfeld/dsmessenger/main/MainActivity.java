@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 		logMessagingToken();
 		handleAppLink();
 
-		ContactRegistry.getInstance().refreshContacts(this, null);
+		ContactRegistry.getInstance().refreshContacts(this, () -> ContactRegistry.getInstance().refreshConversations(this));
 	}
 
 	/**
@@ -102,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
 			}
 			updateNavigationDrawer();
 		}
+
+		ContactRegistry.getInstance().refreshContacts(this, () -> ContactRegistry.getInstance().refreshConversations(this));
 	}
 
 	/**

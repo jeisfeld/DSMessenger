@@ -6,6 +6,7 @@ import java.util.UUID;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -14,8 +15,11 @@ import androidx.room.Update;
  */
 @Dao
 public interface ConversationDao {
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	void insert(Conversation conversation);
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	void insert(List<Conversation> conversation);
 
 	@Update
 	void update(Conversation conversation);
@@ -23,8 +27,8 @@ public interface ConversationDao {
 	@Delete
 	void delete(Conversation conversation);
 
-	@Delete
-	void delete(List<Conversation> conversation);
+	@Query("DELETE FROM conversation WHERE relationId = :relationId")
+	void deleteConversationsByRelationId(int relationId);
 
 	@Query("SELECT * FROM conversation WHERE relationId = :relationId ORDER BY lastTimestamp DESC")
 	List<Conversation> getConversationsByRelationId(int relationId);

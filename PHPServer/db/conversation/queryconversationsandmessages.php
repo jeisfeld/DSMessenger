@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__.'/../dbfunctions.php';
 
-function queryConversationsAndMessages($username, $password, $relationId, $isSlave)
+function queryConversationsAndMessages($username, $password, $startTime)
 {
     // Create connection
     $conn = getDbConnection();
@@ -14,17 +14,18 @@ function queryConversationsAndMessages($username, $password, $relationId, $isSla
     
     $userId = verifyCredentials($conn, $username, $password);
     
-    verifyRelation($conn, $relationId, $userId, $isSlave);
-    
     $conversationId = null;
+    $relationId = null;
     $subject = null;
     $flags = null;
     $lasttimestamp = null;
-    $stmt = $conn->prepare("SELECT id, subject, flags, lasttimestamp from dsm_conversation WHERE relation_id = ? order by lasttimestamp desc");
+    $mysqltimestamp = convertJavaTimestamp($startTime);
     
-    $stmt->bind_param("s", $relationId);
+    $stmt = $conn->prepare("SELECT id, relation_id, subject, flags, lasttimestamp from dsm_conversation WHERE lasttimestamp > ? and relation_id in (select id from dsm_relation where slave_id = ? or master_id = ? ) order by lasttimestamp desc");
+    
+    $stmt->bind_param("sii", $mysqltimestamp, $userId, $userId);
     $stmt->execute();
-    $stmt->bind_result($conversationId, $subject, $flags, $lasttimestamp);
+    $stmt->bind_result($conversationId, $relationId, $subject, $flags, $lasttimestamp);
     
     $conversations = array();
     while ($stmt->fetch()) {
@@ -33,8 +34,8 @@ function queryConversationsAndMessages($username, $password, $relationId, $isSla
         $text = null;
         $timestamp = null;
         $status = null;
-        $stmt2 = $conn2->prepare("SELECT id, user_id, text, timestamp, status from dsm_message WHERE conversation_id = ? order by timestamp");
-        $stmt2->bind_param("s", $conversationId);
+        $stmt2 = $conn2->prepare("SELECT id, user_id, text, timestamp, status from dsm_message WHERE conversation_id = ? and timestamp > ? order by timestamp");
+        $stmt2->bind_param("ss", $conversationId, $mysqltimestamp);
         $stmt2->execute();
         $stmt2->bind_result($messageId, $msgUserId, $text, $timestamp, $status);
         $messages = array();
@@ -43,16 +44,17 @@ function queryConversationsAndMessages($username, $password, $relationId, $isSla
                 'messageId' => $messageId,
                 'isOwn' => $msgUserId == $userId ? 1 : 0, 
                 'text' => $text,
-                'timestamp' => $timestamp,
+                'timestamp' => convertToJavaTimestamp($timestamp),
                 'status' => $status
             ];
         }
         $stmt2->close();
         $conversations[] = [
+            'relationId' => $relationId,
             'conversationId' => $conversationId,
             'subject' => $subject,
             'flags' => $flags,
-            'lasttimestamp' => $lasttimestamp,
+            'lasttimestamp' => convertToJavaTimestamp($lasttimestamp),
             'messages' => $messages
         ];
     }
@@ -64,19 +66,13 @@ function queryConversationsAndMessages($username, $password, $relationId, $isSla
 
 $username = @$_POST['username'];
 $password = @$_POST['password'];
-$relationId = @$_POST['relationId'];
-$isSlave = @$_POST['isSlave'];
-
-$username = "jeisfeld";
-$password = "45Karte45";
-$relationId = 1;
-$isSlave = 1;
+$startTime = @$_POST['startTime'];
 
 if ($username) {
     header('Content-Type: text/json');
-    $conversations = queryConversationsAndMessages($username, $password, $relationId, $isSlave);
+    $conversations = queryConversationsAndMessages($username, $password, $startTime);
     
-    printSuccess("Conversations for relationId " . $relationId . " have been retrieved.", [
+    printSuccess("Conversations for relationId have been retrieved.", [
         'conversations' => $conversations
     ]);
 }

@@ -32,8 +32,11 @@ import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Contact.ContactStatus;
+import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.entity.Device;
+import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.entity.SlavePermissions;
+import de.jeisfeld.dsmessenger.main.message.MessageFragment.MessageStatus;
 import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy;
 import de.jeisfeld.dsmessenger.util.DateUtil;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
@@ -300,6 +303,34 @@ public class HttpSender {
 								contacts.put(relationId, contact);
 							}
 							data.put(key, contacts);
+						}
+						else if ("conversations".equals(key)) {
+							List<Conversation> conversations = new ArrayList<>();
+							List<Message> messages = new ArrayList<>();
+							JSONArray jsonArray = jsonObject.getJSONArray(key);
+							for (int i = 0; i < jsonArray.length(); i++) {
+								JSONObject jsonConversation = jsonArray.getJSONObject(i);
+								int relationId = jsonConversation.getInt("relationId");
+								String conversationIdString = jsonConversation.getString("conversationId");
+								String subject = jsonConversation.getString("subject");
+								String conversationFlags = jsonConversation.getString("flags");
+								long lasttimestamp = jsonConversation.getLong("lasttimestamp");
+								Conversation conversation = new Conversation(relationId, subject, conversationIdString, lasttimestamp, conversationFlags);
+								conversations.add(conversation);
+								JSONArray messageArray = jsonConversation.getJSONArray("messages");
+								for (int j = 0; j < messageArray.length(); j++) {
+									JSONObject jsonMessage = messageArray.getJSONObject(j);
+									String messageIdString = jsonMessage.getString("messageId");
+									long timestamp = jsonMessage.getLong("timestamp");
+									String text = jsonMessage.getString("text");
+									boolean isOwn = jsonMessage.getInt("isOwn") == 1;
+									MessageStatus status = MessageStatus.fromOrdinal(jsonMessage.getInt("status"));
+									Message message = new Message(text, isOwn, messageIdString, conversationIdString, timestamp, status);
+									messages.add(message);
+								}
+							}
+							data.put(key, conversations);
+							data.put("messages", messages);
 						}
 						else if ("devices".equals(key)) {
 							List<Device> devices = new ArrayList<>();

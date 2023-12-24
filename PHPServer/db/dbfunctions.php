@@ -203,3 +203,20 @@ function getVerifiedTokensFromRequestData() {
     return getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
 }
 
+function convertJavaTimestamp($javaTimestamp) {
+    $seconds = floor($javaTimestamp / 1000);
+    $milliseconds = $javaTimestamp % 1000;
+    $dateTime = new DateTime();
+    $dateTime->setTimestamp($seconds);
+    $mysqlTimestamp = $dateTime->format("Y-m-d H:i:s") . '.' . sprintf("%03d", $milliseconds);
+    return $mysqlTimestamp;
+}
+
+function convertToJavaTimestamp($mysqlTimestamp) {
+    $dateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
+    $seconds = $dateTime->getTimestamp();
+    $milliseconds = intval($dateTime->format("u"));
+    $javaTimestamp = ($seconds * 1000) + ($milliseconds / 1000);
+    return $javaTimestamp; 
+}
+

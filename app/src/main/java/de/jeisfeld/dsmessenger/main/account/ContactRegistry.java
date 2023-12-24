@@ -11,6 +11,9 @@ import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Contact.ContactStatus;
+import de.jeisfeld.dsmessenger.entity.Conversation;
+import de.jeisfeld.dsmessenger.entity.ConversationDao;
+import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
@@ -135,6 +138,8 @@ public final class ContactRegistry {
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_connection_code, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_slave_permissions, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_status, relationId);
+
+		Application.getAppDatabase().getConversationDao().deleteConversationsByRelationId(relationId);
 	}
 
 	/**
@@ -149,7 +154,7 @@ public final class ContactRegistry {
 	/**
 	 * Async query for contact information. From results, update stored contacts.
 	 *
-	 * @param context The context.
+	 * @param context  The context.
 	 * @param runnable Code to be executed after finishing the refresh.
 	 */
 	public void refreshContacts(final Context context, final Runnable runnable) {
@@ -182,5 +187,41 @@ public final class ContactRegistry {
 				Log.e(Application.TAG, "Failed to retrieve contact data: " + responseData.getErrorMessage());
 			}
 		})).start();
+	}
+
+	/**
+	 * Async query for conversation information. From results, update stored conversations.
+	 *
+	 * @param context The context.
+	 */
+	public void refreshConversations(final Context context) {
+		if (!AccountFragment.isLoggedIn()) {
+			return;
+		}
+		final long lastTimestamp = PreferenceUtil.getSharedPreferenceLong(R.string.key_last_conversation_timestamp, 0);
+		new Thread(() -> new HttpSender(context).sendMessage("db/conversation/queryconversationsandmessages.php", (response, responseData) -> {
+			if (responseData.isSuccess()) {
+				ConversationDao conversationDao = Application.getAppDatabase().getConversationDao();
+				List<Conversation> conversations = (List<Conversation>) responseData.getData().get("conversations");
+				long newTimestamp = lastTimestamp;
+				assert conversations != null;
+				for (Conversation conversation : conversations) {
+					Conversation oldConversation = conversationDao.getConversationById(conversation.getConversationId());
+					if (oldConversation == null) {
+						conversationDao.insert(conversation);
+					}
+					else {
+						conversationDao.update(conversation);
+					}
+					newTimestamp = Math.max(newTimestamp, conversation.getLastTimestamp());
+				}
+				List<Message> messages = (List<Message>) responseData.getData().get("messages");
+				Application.getAppDatabase().getMessageDao().insert(messages);
+				PreferenceUtil.setSharedPreferenceLong(R.string.key_last_conversation_timestamp, newTimestamp);
+			}
+			else {
+				Log.e(Application.TAG, "Failed to retrieve conversation data: " + responseData.getErrorMessage());
+			}
+		}, "startTime", Long.toString(lastTimestamp))).start();
 	}
 }

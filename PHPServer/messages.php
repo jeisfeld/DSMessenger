@@ -6,6 +6,18 @@ $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
 $subject = $_GET['subject'];
 $contactName = $_GET['contactName'];
+
+function convertTimestamp($mysqlTimestamp) {
+    $timestampDateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
+    $todayDateTime = new DateTime();
+    $todayDateTime->setTime(0, 0, 0); // Reset time part to 00:00:00 for accurate comparison
+    if ($timestampDateTime->format('Y-m-d') === $todayDateTime->format('Y-m-d')) {
+        return $timestampDateTime->format('H:i:s');
+    } else {
+        return $timestampDateTime->format('Y-m-d H:i:s');
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -34,7 +46,7 @@ $contactName = $_GET['contactName'];
                 $class = $message['userId'] == $userId ? 'own-message' : 'other-message';
                 echo "<div class='message $class'>";
                 echo "<p class='text'>" . htmlspecialchars($message['text']) . "</p>";
-                echo "<span class='time'>" . htmlspecialchars($message['timestamp']) . "</span>"; // Format time as needed
+                echo "<span class='time'>" . htmlspecialchars(convertTimestamp($message['timestamp'])) . "</span>"; // Format time as needed
                 echo "</div>";
             }
             ?>

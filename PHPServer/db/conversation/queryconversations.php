@@ -39,15 +39,3 @@ function queryConversations($username, $password, $relationId, $isSlave)
     
     return $conversations;
 }
-
-$username = @$_POST['username'];
-$password = @$_POST['password'];
-$relationId = @$_POST['relationId'];
-$isSlave = @$_POST['isSlave'];
-if ($username) {
-    $conversations = queryConversations($username, $password, $relationId, $isSlave);
-    
-    printSuccess("Conversations for relationId " . $relationId . " have been retrieved.", [
-        'conversations' => $conversations
-    ]);
-}

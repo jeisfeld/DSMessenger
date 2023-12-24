@@ -17,7 +17,7 @@ $conversationId = @$_POST['conversationId'];
 $relationId = @$_POST['relationId'];
 $conversationFlags = @$_POST['conversationFlags'];
 $timestamp = @$_POST['timestamp'];
-$mysqltimestamp = date( 'Y-m-d H:i:s', $timestamp/1000 );
+$mysqltimestamp = convertJavaTimestamp($timestamp);
 $messageIds = @$_POST['messageIds'];
 
 $stmt = $conn->prepare("SELECT id FROM dsm_conversation WHERE id = ?");
@@ -38,7 +38,6 @@ else {
     $stmt->execute();
     $stmt->close();
 }
-
 $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
 $stmt->bind_param("ssiss", $messageId, $conversationId, $userId, $messageText, $mysqltimestamp);
 $stmt->execute();

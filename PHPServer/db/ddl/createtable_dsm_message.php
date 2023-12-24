@@ -23,7 +23,7 @@ id CHAR(36) PRIMARY KEY,
 conversation_id CHAR(36),
 user_id INT(8) UNSIGNED,
 text VARCHAR(65535),
-timestamp TIMESTAMP,
+timestamp TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
 status INT(1) UNSIGNED,
 FOREIGN KEY (conversation_id) REFERENCES dsm_conversation(id) ON DELETE CASCADE,
 FOREIGN KEY (user_id) REFERENCES dsm_user(id) ON DELETE CASCADE

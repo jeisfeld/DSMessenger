@@ -42,16 +42,3 @@ function queryMessages($username, $password, $relationId, $isSlave, $conversatio
     return $messages;
 }
 
-$username = @$_POST['username'];
-$password = @$_POST['password'];
-$relationId = @$_POST['relationId'];
-$isSlave = @$_POST['isSlave'];
-$conversationId = @$_POST['conversationId'];
-if ($username) {
-    header('Content-Type: text/json');
-    $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
-    
-    printSuccess("Messages for conversationId " . $conversationId . " have been retrieved.", [
-        'messages' => $messages
-    ]);
-}

@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__.'/../dbfunctions.php';
-header('Content-Type: text/json');
 
 function queryContacts($username, $password)
 {
@@ -50,6 +49,7 @@ SELECT id, connection_code, slave_name, slave_id, master_name, true as is_slave,
 $username = @$_POST['username'];
 $password = @$_POST['password'];
 if ($username) {
+    header('Content-Type: text/json');
     $contacts = queryContacts($username, $password);
     
     printSuccess("Contacts of user " . $username . " have been retrieved.", [

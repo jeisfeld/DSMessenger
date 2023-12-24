@@ -194,7 +194,7 @@ public class MessageFragment extends Fragment {
 		binding.textSendMessage.setText(getString(R.string.text_send_message_to, contact.getName()));
 		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 
-		arrayAdapter = new ArrayAdapter<>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
+		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
@@ -365,7 +365,8 @@ public class MessageFragment extends Fragment {
 					}
 				},
 				"messageType", !contact.isSlave() && conversation.getConversationFlags().getReplyPolicy() != ReplyPolicy.UNLIMITED
-						? MessageType.TEXT_RESPONSE.name() : MessageType.TEXT.name(),
+						? MessageType.TEXT_RESPONSE.name()
+						: MessageType.TEXT.name(),
 				"messageText", messageText, "priority", priority.name(),
 				"conversationId", conversation.getConversationId().toString(), "timestamp", Long.toString(timestamp),
 				"conversationFlags", conversation.getConversationFlags().toString(), "messageIds",
@@ -436,7 +437,16 @@ public class MessageFragment extends Fragment {
 		/**
 		 * Acknowledged.
 		 */
-		MESSAGE_ACKNOWLEDGED
+		MESSAGE_ACKNOWLEDGED;
+
+		public static MessageStatus fromOrdinal(final int ordinal) {
+			for (MessageStatus messageStatus : MessageStatus.values()) {
+				if (messageStatus.ordinal() == ordinal) {
+					return messageStatus;
+				}
+			}
+			return MESSAGE_SENT;
+		}
 	}
 
 }

@@ -23,7 +23,7 @@ id CHAR(36) PRIMARY KEY,
 relation_id INT(8) UNSIGNED,
 subject VARCHAR(100),
 flags VARCHAR(20),
-lasttimestamp TIMESTAMP,
+lasttimestamp TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
 FOREIGN KEY (relation_id) REFERENCES dsm_relation(id) ON DELETE CASCADE
 )";
 

@@ -62,8 +62,8 @@ public class Conversation implements Serializable {
 	 * @param lastTimestamp           The last timestamp of this conversation.
 	 * @param conversationFlagsString The conversation flags.
 	 */
-	protected Conversation(final int relationId, final String subject, @NonNull final String conversationIdString, final long lastTimestamp,
-						   final String conversationFlagsString) {
+	public Conversation(final int relationId, final String subject, @NonNull final String conversationIdString, final long lastTimestamp,
+						final String conversationFlagsString) {
 		this.relationId = relationId;
 		this.subject = subject;
 		this.conversationIdString = conversationIdString;
@@ -223,5 +223,17 @@ public class Conversation implements Serializable {
 
 	public final boolean isStored() {
 		return isStored;
+	}
+
+	@NonNull
+	@Override
+	public String toString() {
+		return "Conversation{" +
+				"relationId=" + relationId +
+				", subject='" + subject + '\'' +
+				", conversationIdString='" + conversationIdString + '\'' +
+				", lastTimestamp=" + lastTimestamp +
+				", conversationFlagsString='" + conversationFlagsString + '\'' +
+				'}';
 	}
 }

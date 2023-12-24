@@ -190,7 +190,7 @@ public class MessageActivity extends AppCompatActivity {
 		binding = ActivityMessageBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
 
-		arrayAdapter = new ArrayAdapter<>(this, R.layout.list_view_message, R.id.textViewMessage, messageList) {
+		arrayAdapter = new ArrayAdapter<Message>(this, R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
@@ -296,7 +296,7 @@ public class MessageActivity extends AppCompatActivity {
 	 * Handle the data of a new intent.
 	 *
 	 * @param textMessageDetails The text message details of the new intent.
-	 * @param message            The message.
+	 * @param message The message.
 	 */
 	private void handleIntentData(final TextMessageDetails textMessageDetails, final Message message) {
 		cancelLastIntentEffects();
@@ -396,7 +396,8 @@ public class MessageActivity extends AppCompatActivity {
 									binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
 									binding.editTextMessageText.setText("");
 									binding.buttonAcknowledge.setVisibility(View.GONE);
-									binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+									binding.buttonSend
+											.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 									binding.layoutTextInput
 											.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 								});

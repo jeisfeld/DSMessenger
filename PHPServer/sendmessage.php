@@ -15,8 +15,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($conn->connect_error) {
         printError(101, "Connection failed: " . $conn->connect_error);
     }
-    $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, now(), 0)");
-    $stmt->bind_param("ssis", Uuid::uuid4()->toString(), $conversationId, $userId, $message);
+    
+    $currentDateTime = new DateTime();
+    $mysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);
+    
+    $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
+    $stmt->bind_param("ssiss", Uuid::uuid4()->toString(), $conversationId, $userId, $message, $mysqlTimestamp);
+    $stmt->execute();
+    $stmt->close();
+    $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ? where id = ?");
+    $stmt->bind_param("ss", $mysqlTimestamp, $conversationId);
     $stmt->execute();
     $stmt->close();
     $conn->close();
