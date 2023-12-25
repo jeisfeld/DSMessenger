@@ -84,6 +84,7 @@ public class MessageDetails implements Serializable {
 		switch (messageType) {
 		case TEXT:
 		case TEXT_RESPONSE:
+		case TEXT_OWN:
 			return TextMessageDetails.fromRemoteMessage(message, messageId, messageTime, priority, contact, messageType);
 		case RANDOMIMAGE:
 			return RandomimageMessageDetails.fromRemoteMessage(message, messageId, messageTime, priority, contact);
@@ -148,6 +149,10 @@ public class MessageDetails implements Serializable {
 		 * Acknowledgement with text message.
 		 */
 		TEXT_RESPONSE,
+		/**
+		 * Own text message from other device.
+		 */
+		TEXT_OWN,
 		/**
 		 * Admin message.
 		 */

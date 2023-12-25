@@ -6,6 +6,8 @@ $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
 $subject = $_GET['subject'];
 $contactName = $_GET['contactName'];
+$relationId = $_GET['relationId'];
+$isSlave = $_GET['isSlave'];
 
 function convertTimestamp($mysqlTimestamp) {
     $timestampDateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
@@ -30,7 +32,9 @@ function convertTimestamp($mysqlTimestamp) {
 	<div id="chat-container">
 		<div id="chat-header">
 			<div class="container">
-				<span class="left">Username: <?= $username ?></span> <span class="right"><a href="logout.php">Logout</a></span>
+				<span class="left">Username: <?= $username ?></span> <span class="right">
+				<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&isSlave=<?= $isSlave ?>">Conversations with <?= $contactName ?></a>
+				&nbsp;<a href="logout.php">Logout</a></span>
 			</div>
 			<h2>Conversation "<?= $subject ?>" with <?= $contactName ?></h2>
 		</div>
@@ -38,8 +42,6 @@ function convertTimestamp($mysqlTimestamp) {
 		<div id="messages">
             <?php
             $conversationId = $_GET['conversationId'];
-            $relationId = $_GET['relationId'];
-            $isSlave = $_GET['isSlave'];
             $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
             foreach ($messages as $message) {
                 // Assume $message['is_own'] is true if it's the user's message
@@ -58,7 +60,6 @@ function convertTimestamp($mysqlTimestamp) {
 				<input type="hidden" name="isSlave" value="<?= $isSlave ?>">
 				<input type="hidden" name="subject" value="<?= $subject ?>">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
-				<input type="hidden" name="userId" value="<?= $userId ?>">
 				<textarea name="message" placeholder="Type your message here..." class="message-textarea"></textarea>
 				<button type="submit" class="send-button">Send</button>
 			</form>

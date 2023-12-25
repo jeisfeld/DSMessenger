@@ -195,6 +195,16 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_RESPONSE, messageDetails.getMessageId(),
 					messageDetails.getContact(), conversation, receivedMessage);
 			break;
+		case TEXT_OWN:
+			textMessageDetails = (TextMessageDetails) messageDetails;
+			Conversation conversation2 = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
+			Message receivedMessage2 = new Message(textMessageDetails.getMessageText(), true, textMessageDetails.getMessageId(),
+					textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
+			receivedMessage2.store(conversation2);
+			Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
+			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_SENT, messageDetails.getMessageId(),
+					messageDetails.getContact(), conversation2, receivedMessage2);
+			break;
 		case RANDOMIMAGE:
 			RandomimageMessageDetails randomimageMessageDetails = (RandomimageMessageDetails) messageDetails;
 			Intent randomImageIntent = new Intent("de.jeisfeld.randomimage.DISPLAY_RANDOM_IMAGE_FROM_EXTERNAL");

@@ -93,6 +93,7 @@ public class MessageActivity extends AppCompatActivity {
 				ActionType actionType = (ActionType) intent.getSerializableExtra("actionType");
 				switch (actionType) {
 				case MESSAGE_RECEIVED:
+				case MESSAGE_SENT:
 					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())) {
 						refreshMessageList(conversation.getConversationId(), null, null, false);
@@ -479,6 +480,10 @@ public class MessageActivity extends AppCompatActivity {
 		/**
 		 * Conversation deleted.
 		 */
-		CONVERSATION_DELETED
+		CONVERSATION_DELETED,
+		/**
+		 * Message sent from other device.
+		 */
+		MESSAGE_SENT
 	}
 }

@@ -38,10 +38,13 @@ else {
     $stmt->execute();
     $stmt->close();
 }
-$stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
-$stmt->bind_param("ssiss", $messageId, $conversationId, $userId, $messageText, $mysqltimestamp);
-$stmt->execute();
-$stmt->close();
+
+if ($messageText) {
+    $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
+    $stmt->bind_param("ssiss", $messageId, $conversationId, $userId, $messageText, $mysqltimestamp);
+    $stmt->execute();
+    $stmt->close();
+}
 
 if ($messageIds) {
    $messageIdArr = explode(",", $messageIds);

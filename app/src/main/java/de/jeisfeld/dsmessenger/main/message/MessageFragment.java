@@ -37,7 +37,6 @@ import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessagePriority;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 import de.jeisfeld.dsmessenger.util.DateUtil;
-import de.jeisfeld.dsmessenger.util.Logger;
 
 /**
  * Fragment for sending messages.
@@ -83,12 +82,13 @@ public class MessageFragment extends Fragment {
 				switch (actionType) {
 				case MESSAGE_RECEIVED:
 				case MESSAGE_ACKNOWLEDGED:
+				case MESSAGE_SENT:
 				case TEXT_RESPONSE:
 					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())
 							&& activity != null) {
 						conversation = receivedConversation;
-						refreshMessageList(actionType == ActionType.TEXT_RESPONSE);
+						refreshMessageList(actionType == ActionType.TEXT_RESPONSE || actionType == ActionType.MESSAGE_SENT);
 					}
 					break;
 				case CONVERSATION_EDITED:
@@ -263,7 +263,6 @@ public class MessageFragment extends Fragment {
 	 * @param scrollDown Flag indicating if view should scroll to last position.
 	 */
 	private void refreshMessageList(final boolean scrollDown) {
-		Logger.log("Refresh");
 		new Thread(() -> {
 			List<Message> newMessageList =
 					Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversation.getConversationId());
@@ -275,7 +274,6 @@ public class MessageFragment extends Fragment {
 					setButtonVisibility();
 					arrayAdapter.notifyDataSetChanged();
 					if (scrollDown) {
-						Logger.log("Scrolling down");
 						binding.listViewMessages.setSelection(messageList.size() - 1);
 						binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
 					}
@@ -419,7 +417,11 @@ public class MessageFragment extends Fragment {
 		/**
 		 * Response to Ping.
 		 */
-		PONG
+		PONG,
+		/**
+		 * Message sent from other device.
+		 */
+		MESSAGE_SENT
 	}
 
 	/**

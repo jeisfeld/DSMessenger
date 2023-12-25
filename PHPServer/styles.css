@@ -1,6 +1,51 @@
 body {
-	margin: 0px;
+	margin: 0;
+	padding: 0;
 	font-family: Verdana, sans-serif;
+	background-color: #f9f9f9;
+}
+
+#login-container {
+    max-width: 300px;
+    margin: auto;
+    padding: 20px;
+    background-color: white; /* Or another color that fits your chat design */
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: for slight shadow effect */
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensures the input doesn't exceed its container */
+}
+
+.login-button {
+    background-color: #007bff; /* Button color */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.login-button:hover {
+    background-color: #0056b3; /* Darker shade for hover effect */
 }
 
 #chat-container {
@@ -88,6 +133,35 @@ body {
 
 .send-button:hover {
 	background-color: #0056b3; /* Darker shade for hover effect */
+}
+
+#contacts-container, #conversations-container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background-color: white; /* Or another color that fits your chat design */
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: for slight shadow effect */
+}
+
+#contact-list, #conversation-list {
+    list-style: none;
+    padding: 0;
+}
+
+.contact-item, .conversation-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee; /* Light line between contacts */
+}
+
+.contact-item a, .conversation-item a {
+    text-decoration: none;
+    color: #007bff; /* Link color */
+    display: block; /* Makes the entire list item clickable */
+}
+
+.contact-item a:hover, .conversation-item a:hover {
+    background-color: #f2f2f2; /* Hover effect */
 }
 
 /* Adjust the form when the keyboard is visible on mobile devices */
