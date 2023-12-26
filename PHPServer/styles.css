@@ -2,14 +2,14 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: Verdana, sans-serif;
-	background-color: #f9f9f9;
+	background-color: #fff;
 }
 
 #login-container {
     max-width: 300px;
     margin: auto;
     padding: 20px;
-    background-color: white; /* Or another color that fits your chat design */
+	background-color: #f9f9f9;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: for slight shadow effect */
     text-align: center;
@@ -54,6 +54,15 @@ body {
     height: 100vh; /* Full viewport height */
     max-width: 800px; /* Adjust based on your design */
     margin: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+	background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: for slight shadow effect */
+}
+
+#chat-container #header {
+	margin-top: 20px;
 }
 
 .container {
@@ -82,13 +91,13 @@ body {
 }
 
 .own-message {
-	background-color: #dcf8c6; /* Light green background for own messages */
+	background-color: #ffecec; 
 	margin-left: auto;
 	text-align: right;
 }
 
 .other-message {
-	background-color: #fff; /* White background for other messages */
+	background-color: #fff; 
 	text-align: left;
 }
 
@@ -139,7 +148,7 @@ body {
     max-width: 800px;
     margin: auto;
     padding: 20px;
-    background-color: white; /* Or another color that fits your chat design */
+	background-color: #f9f9f9;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: for slight shadow effect */
 }

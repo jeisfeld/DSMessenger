@@ -202,13 +202,13 @@ public class MessageActivity extends AppCompatActivity {
 				textViewMessage.setText(message.getMessageText());
 
 				if (message.isOwn()) {
-					view.findViewById(R.id.spaceRight).setVisibility(View.VISIBLE);
-					view.findViewById(R.id.spaceLeft).setVisibility(View.GONE);
-					textViewMessage.setBackgroundResource(R.drawable.background_message);
-				}
-				else {
 					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
 					view.findViewById(R.id.spaceLeft).setVisibility(View.VISIBLE);
+					textViewMessage.setBackgroundResource(R.drawable.background_message_own);
+				}
+				else {
+					view.findViewById(R.id.spaceRight).setVisibility(View.VISIBLE);
+					view.findViewById(R.id.spaceLeft).setVisibility(View.GONE);
 					textViewMessage.setBackgroundResource(R.drawable.background_message_contact);
 				}
 

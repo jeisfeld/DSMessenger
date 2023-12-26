@@ -12,7 +12,7 @@ $password = $_SESSION['password'];
 </head>
 <body>
 	<div id="contacts-container">
-		<div class="container">
+		<div id="header">
 			<span class="left">Username: <?= $username ?></span> <span class="right"><a href="logout.php">Logout</a></span>
 		</div>
 		<h1>Contacts</h1>

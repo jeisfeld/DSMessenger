@@ -30,14 +30,12 @@ function convertTimestamp($mysqlTimestamp) {
 <body>
 
 	<div id="chat-container">
-		<div id="chat-header">
-			<div class="container">
-				<span class="left">Username: <?= $username ?></span> <span class="right">
-				<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&isSlave=<?= $isSlave ?>">Conversations with <?= $contactName ?></a>
-				&nbsp;<a href="logout.php">Logout</a></span>
-			</div>
-			<h2>Conversation "<?= $subject ?>" with <?= $contactName ?></h2>
+		<div id="header">
+			<span class="left">Username: <?= $username ?></span> <span class="right">
+			<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&isSlave=<?= $isSlave ?>">Conversations with <?= $contactName ?></a>
+			&nbsp;<a href="logout.php">Logout</a></span>
 		</div>
+		<h1>Conversation "<?= $subject ?>" with <?= $contactName ?></h1>
 
 		<div id="messages">
             <?php
