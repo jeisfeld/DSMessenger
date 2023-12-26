@@ -31,11 +31,11 @@ function convertTimestamp($mysqlTimestamp) {
 
 	<div id="chat-container">
 		<div id="header">
-			<span class="left">Username: <?= $username ?></span> <span class="right">
-			<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&isSlave=<?= $isSlave ?>">Conversations with <?= $contactName ?></a>
-			&nbsp;<a href="logout.php">Logout</a></span>
+			<span class="left"><?= _("username") ?>: <?= $username ?></span> <span class="right">
+			<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&isSlave=<?= $isSlave ?>"><?= sprintf(_("conversations_with"), $_GET['contactName']) ?></a>
+			&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
-		<h1>Conversation "<?= $subject ?>" with <?= $contactName ?></h1>
+		<h1><?= sprintf(_("conversation_with"), $subject, $contactName) ?></h1>
 
 		<div id="messages">
             <?php
@@ -57,9 +57,10 @@ function convertTimestamp($mysqlTimestamp) {
 				<input type="hidden" name="relationId" value="<?= $relationId ?>"> 
 				<input type="hidden" name="isSlave" value="<?= $isSlave ?>">
 				<input type="hidden" name="subject" value="<?= $subject ?>">
+				<input type="hidden" name="replyPolicy" value="">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
-				<textarea name="message" placeholder="Type your message here..." class="message-textarea"></textarea>
-				<button type="submit" class="send-button">Send</button>
+				<textarea name="message" placeholder="<?= _("type_message") ?>" class="message-textarea"></textarea>
+				<button type="submit" class="send-button"><?= _("send") ?></button>
 			</form>
 		</div>
 

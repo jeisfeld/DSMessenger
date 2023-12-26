@@ -1,8 +1,10 @@
 package de.jeisfeld.dsmessenger;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
@@ -15,6 +17,7 @@ import java.util.Locale;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 import de.jeisfeld.dsmessenger.entity.AppDatabase;
+import de.jeisfeld.dsmessenger.main.MainActivity;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
 /**
@@ -116,6 +119,8 @@ public class Application extends android.app.Application {
 			return Application.DEFAULT_LOCALE;
 		case 1:
 			return Locale.ENGLISH;
+		case 2:
+			return Locale.GERMAN;
 		default:
 			return Application.DEFAULT_LOCALE;
 		}
@@ -138,5 +143,16 @@ public class Application extends android.app.Application {
 		configuration.setLocales(localeList);
 
 		return new ContextWrapper(context.createConfigurationContext(configuration));
+	}
+
+	/**
+	 * Start the app programmatically.
+	 *
+	 * @param triggeringActivity triggeringActivity the triggering activity.
+	 */
+	public static void startApplication(final Activity triggeringActivity) {
+		Intent intent = new Intent(triggeringActivity, MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		triggeringActivity.startActivity(intent);
 	}
 }

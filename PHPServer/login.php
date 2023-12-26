@@ -1,3 +1,6 @@
+<?php 
+include __DIR__ . '/check_language.php';
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,17 +9,17 @@
 </head>
 <body>
     <div id="login-container">
-        <h1>Login</h1>
+        <h1><?= _("login") ?></h1>
         <form action="perform_login.php" method="post">
             <div class="form-group">
-                <label for="username">Username:</label>
+                <label for="username"><?= _("username") ?>:</label>
                 <input type="text" id="username" name="username" required>
             </div>
             <div class="form-group">
-                <label for="password">Password:</label>
+                <label for="password"><?= _("password") ?>:</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit" class="login-button">Login</button>
+            <button type="submit" class="login-button"><?= _("login") ?></button>
         </form>
     </div>
 </body>

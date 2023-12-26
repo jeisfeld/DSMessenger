@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.util.DialogUtil;
 
@@ -31,6 +32,11 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
 		findPreference(getString(R.string.key_pref_night_mode)).setOnPreferenceChangeListener((preference, newValue) -> {
 			AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
+			return true;
+		});
+
+		findPreference(getString(R.string.key_pref_language)).setOnPreferenceChangeListener((preference, newValue) -> {
+			Application.startApplication(getActivity());
 			return true;
 		});
 	}

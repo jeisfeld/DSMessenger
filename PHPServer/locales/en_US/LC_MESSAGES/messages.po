@@ -1,0 +1,29 @@
+msgid "login"
+msgstr "Login"
+
+msgid "logout"
+msgstr "Logout"
+
+msgid "username"
+msgstr "Username"
+
+msgid "password"
+msgstr "Password"
+
+msgid "contacts"
+msgstr "Contacts"
+
+msgid "conversations_with"
+msgstr "Conversations with %s"
+
+msgid "conversation_with"
+msgstr "Conversation &ldquo;%s&rdquo; with %s"
+
+msgid "start_new_conversation"
+msgstr "Start a new conversation here..."
+
+msgid "type_message"
+msgstr "Type your message here..."
+
+msgid "send"
+msgstr "Send"

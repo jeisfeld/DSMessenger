@@ -24,25 +24,28 @@ $stmt = $conn->prepare("SELECT id FROM dsm_conversation WHERE id = ?");
 $stmt->bind_param("s", $conversationId);
 $stmt->execute();
 
-if ($stmt->get_result()->num_rows) {
-    $stmt->close();
-    $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ? where id = ?");
-    $stmt->bind_param("ss", $mysqltimestamp, $conversationId);
+
+if ($messageText) {
+    if ($stmt->get_result()->num_rows) {
+        $stmt->close();
+        $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ? where id = ?");
+        $stmt->bind_param("ss", $mysqltimestamp, $conversationId);
+        $stmt->execute();
+        $stmt->close();
+    }
+    else {
+        $stmt->close();
+        $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp) values (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sisss", $conversationId, $relationId, $messageText, $conversationFlags, $mysqltimestamp);
+        $stmt->execute();
+        $stmt->close();
+    }
+    $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
+    $stmt->bind_param("ssiss", $messageId, $conversationId, $userId, $messageText, $mysqltimestamp);
     $stmt->execute();
     $stmt->close();
 }
 else {
-    $stmt->close();
-    $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp) values (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sisss", $conversationId, $relationId, $messageText, $conversationFlags, $mysqltimestamp);
-    $stmt->execute();
-    $stmt->close();
-}
-
-if ($messageText) {
-    $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
-    $stmt->bind_param("ssiss", $messageId, $conversationId, $userId, $messageText, $mysqltimestamp);
-    $stmt->execute();
     $stmt->close();
 }
 

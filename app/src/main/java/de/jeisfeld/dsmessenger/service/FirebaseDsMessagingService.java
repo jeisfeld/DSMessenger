@@ -198,6 +198,12 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		case TEXT_OWN:
 			textMessageDetails = (TextMessageDetails) messageDetails;
 			Conversation conversation2 = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
+			if (conversation2 == null) {
+				conversation2 = Conversation.createNewConversation(textMessageDetails);
+				conversation2.insertIfNew(textMessageDetails.getMessageText());
+				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, conversation2);
+			}
+
 			Message receivedMessage2 = new Message(textMessageDetails.getMessageText(), true, textMessageDetails.getMessageId(),
 					textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
 			receivedMessage2.store(conversation2);

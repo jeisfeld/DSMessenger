@@ -1,5 +1,6 @@
 package de.jeisfeld.dsmessenger.main;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -130,6 +131,11 @@ public class MainActivity extends AppCompatActivity {
 	protected final void onNewIntent(final Intent intent) {
 		super.onNewIntent(intent);
 		handleAppLink();
+	}
+
+	@Override
+	protected final void attachBaseContext(final Context newBase) {
+		super.attachBaseContext(Application.createContextWrapperForLocale(newBase));
 	}
 
 	/**

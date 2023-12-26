@@ -29,6 +29,7 @@ import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
 import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.entity.Message;
+import de.jeisfeld.dsmessenger.entity.ReplyPolicy;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.message.ConversationsFragment;
 import de.jeisfeld.dsmessenger.main.message.MessageFragment;
@@ -335,8 +336,8 @@ public class MessageActivity extends AppCompatActivity {
 		binding.buttonSend.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse()
 				? View.VISIBLE
 				: conversation.getConversationFlags().isExpectingAcknowledgement() ? View.INVISIBLE : View.GONE);
-		binding.layoutTextInput.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
-
+		binding.layoutTextInput.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse()
+				|| conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED ? View.VISIBLE : View.GONE);
 		binding.buttonAcknowledge.setOnClickListener(v -> {
 			if (messageVibration != null) {
 				messageVibration.cancelVibration();

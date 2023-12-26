@@ -26,8 +26,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($isNewConversation) {
         $conversationId = Uuid::uuid4()->toString();
         $subject = $message;
-        $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp) values (?, ?, ?, '000', ?)");
-        $stmt->bind_param("siss", $conversationId, $relationId, $subject, $mysqlTimestamp);
+        $replyPolicy = $_POST['replyPolicy'];
+        $conversationFlags = $replyPolicy . "00";
+        $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp) values (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sisss", $conversationId, $relationId, $subject, $conversationFlags, $mysqlTimestamp);
         $stmt->execute();
         $stmt->close();
     }

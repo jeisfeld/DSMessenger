@@ -13,10 +13,10 @@ $password = $_SESSION['password'];
 <body>
 	<div id="conversations-container">
 		<div id="header">
-			<span class="left">Username: <?= $username ?></span> <span class="right">
-			<a href="contacts.php">Contacts</a>&nbsp;<a href="logout.php">Logout</a></span>
+			<span class="left"><?= _("username") ?>: <?= $username ?></span> <span class="right">
+			<a href="contacts.php"><?= _("contacts") ?></a>&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
-		<h1>Conversations with <?= $_GET['contactName'] ?></h1>
+		<h1><?= sprintf(_("conversations_with"), $_GET['contactName']) ?></h1>
 		<ul id="conversation-list">
             <?php
             $username = $_SESSION['username'];
@@ -41,9 +41,10 @@ $password = $_SESSION['password'];
 				<input type="hidden" name="relationId" value="<?= $relationId ?>"> 
 				<input type="hidden" name="isSlave" value="<?= $isSlave ?>">
 				<input type="hidden" name="subject" value="">
+				<input type="hidden" name="replyPolicy" value="<?= $_GET['replyPolicy'] ?>">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
-				<textarea name="message" placeholder="Start a new conversation here..." class="message-textarea"></textarea>
-				<button type="submit" class="send-button">Send</button>
+				<textarea name="message" placeholder="<?= _("start_new_conversation") ?>" class="message-textarea"></textarea>
+				<button type="submit" class="send-button"><?= _("send") ?></button>
 			</form>
 		</div>
 	</div>

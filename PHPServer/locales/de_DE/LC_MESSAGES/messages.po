@@ -1,0 +1,29 @@
+msgid "login"
+msgstr "Anmelden"
+
+msgid "logout"
+msgstr "Abmelden"
+
+msgid "username"
+msgstr "Nutzer"
+
+msgid "password"
+msgstr "Passwort"
+
+msgid "contacts"
+msgstr "Kontakte"
+
+msgid "conversations_with"
+msgstr "Unterhaltungen mit %s"
+
+msgid "conversation_with"
+msgstr "Unterhaltung &bdquo;%s&ldquo; mit %s"
+
+msgid "start_new_conversation"
+msgstr "Neue Unterhaltung beginnen..."
+
+msgid "type_message"
+msgstr "Schreiben Sie ihre Nachricht hier..."
+
+msgid "send"
+msgstr "Senden"
