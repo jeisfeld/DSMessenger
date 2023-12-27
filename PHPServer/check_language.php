@@ -16,7 +16,7 @@ function getPreferredLanguage($default = 'en_US') {
                     return 'en_US';
                     // Add more languages here as needed
                 default:
-                    continue;
+                    return $default;
             }
         }
     }

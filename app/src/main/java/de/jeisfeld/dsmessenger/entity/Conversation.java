@@ -48,6 +48,12 @@ public class Conversation implements Serializable {
 	private String conversationFlagsString;
 
 	/**
+	 * Flags that can be set on a conversation.
+	 */
+	@ColumnInfo(name = "preparedMessage")
+	private String preparedMessage;
+
+	/**
 	 * Flag indicating if the conversation is already stored.
 	 */
 	@Ignore
@@ -61,14 +67,16 @@ public class Conversation implements Serializable {
 	 * @param conversationIdString    The unique id of the conversation.
 	 * @param lastTimestamp           The last timestamp of this conversation.
 	 * @param conversationFlagsString The conversation flags.
+	 * @param preparedMessage         The prepared message.
 	 */
 	public Conversation(final int relationId, final String subject, @NonNull final String conversationIdString, final long lastTimestamp,
-						final String conversationFlagsString) {
+						final String conversationFlagsString, final String preparedMessage) {
 		this.relationId = relationId;
 		this.subject = subject;
 		this.conversationIdString = conversationIdString;
 		this.lastTimestamp = lastTimestamp;
 		this.conversationFlagsString = conversationFlagsString;
+		this.preparedMessage = preparedMessage;
 		isStored = true;
 	}
 
@@ -84,7 +92,7 @@ public class Conversation implements Serializable {
 	@Ignore
 	public Conversation(final int relationId, final String subject, @NonNull final UUID conversationId, final long lastTimestamp,
 						final ConversationFlags conversationFlags) {
-		this(relationId, subject, conversationId.toString(), lastTimestamp, conversationFlags.toString());
+		this(relationId, subject, conversationId.toString(), lastTimestamp, conversationFlags.toString(), null);
 	}
 
 	/**
@@ -221,11 +229,18 @@ public class Conversation implements Serializable {
 		conversationFlagsString = conversationFlags.toString();
 	}
 
+	public String getPreparedMessage() {
+		return preparedMessage;
+	}
+
+	public void setPreparedMessage(String preparedMessage) {
+		this.preparedMessage = preparedMessage;
+	}
+
 	public final boolean isStored() {
 		return isStored;
 	}
 
-	@NonNull
 	@Override
 	public String toString() {
 		return "Conversation{" +
@@ -234,6 +249,7 @@ public class Conversation implements Serializable {
 				", conversationIdString='" + conversationIdString + '\'' +
 				", lastTimestamp=" + lastTimestamp +
 				", conversationFlagsString='" + conversationFlagsString + '\'' +
+				", preparedMessage='" + preparedMessage + '\'' +
 				'}';
 	}
 }

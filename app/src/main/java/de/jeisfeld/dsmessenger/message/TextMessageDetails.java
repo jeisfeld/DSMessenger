@@ -24,32 +24,41 @@ public class TextMessageDetails extends MessageDetails {
 	 * The timestamp.
 	 */
 	private final long timestamp;
+
 	/**
 	 * The message ids.
 	 */
 	private final String[] messageIds;
 
 	/**
+	 * The prepared message.
+	 */
+	private final String preparedMessage;
+
+
+	/**
 	 * Generate message details.
 	 *
-	 * @param messageType    The message type.
-	 * @param messageId      The message id.
-	 * @param messageTime    The message time.
-	 * @param priority       The message priority.
-	 * @param contact        The contact who sent the message.
-	 * @param messageText    The message text.
-	 * @param conversationId The conversation id.
-	 * @param timestamp      The timestamp.
-	 * @param messageIds     The messageIds.
+	 * @param messageType     The message type.
+	 * @param messageId       The message id.
+	 * @param messageTime     The message time.
+	 * @param priority        The message priority.
+	 * @param contact         The contact who sent the message.
+	 * @param messageText     The message text.
+	 * @param conversationId  The conversation id.
+	 * @param timestamp       The timestamp.
+	 * @param messageIds      The messageIds.
+	 * @param preparedMessage The prepared message.
 	 */
 	public TextMessageDetails(final MessageType messageType, final UUID messageId, final Instant messageTime, final MessagePriority priority,
 							  final Contact contact, final String messageText, final UUID conversationId, final long timestamp,
-							  final String[] messageIds) {
+							  final String[] messageIds, final String preparedMessage) {
 		super(messageType, messageId, messageTime, priority, contact);
 		this.messageText = messageText;
 		this.conversationId = conversationId;
 		this.timestamp = timestamp;
 		this.messageIds = messageIds;
+		this.preparedMessage = preparedMessage;
 	}
 
 	/**
@@ -71,7 +80,9 @@ public class TextMessageDetails extends MessageDetails {
 		long timestamp = Long.parseLong(data.get("timestamp"));
 		String messageIdsString = data.get("messageIds");
 		String[] messageIds = messageIdsString == null ? new String[0] : messageIdsString.split(",");
-		return new TextMessageDetails(messageType, messageId, messageTime, priority, contact, messageText, conversationId, timestamp, messageIds);
+		String preparedMessage = data.get("preparedMessage");
+		return new TextMessageDetails(messageType, messageId, messageTime, priority, contact, messageText, conversationId, timestamp, messageIds,
+				preparedMessage);
 	}
 
 	public final String getMessageText() {
@@ -88,5 +99,9 @@ public class TextMessageDetails extends MessageDetails {
 
 	public final String[] getMessageIds() {
 		return messageIds;
+	}
+
+	public String getPreparedMessage() {
+		return preparedMessage;
 	}
 }

@@ -20,9 +20,10 @@ function queryContacts($username, $password)
     $myName = null;
     $isSlave = null;
     $slavePermissions = null;
-    $stmt = $conn->prepare("SELECT id, connection_code, master_name, master_id, slave_name, false as is_slave, slave_permissions FROM dsm_relation WHERE slave_id = ?
+    $stmt = $conn->prepare("SELECT id, connection_code, master_name as contact_name, master_id as contact_id, slave_name as my_name, false as is_slave, slave_permissions FROM dsm_relation WHERE slave_id = ?
 UNION
-SELECT id, connection_code, slave_name, slave_id, master_name, true as is_slave, slave_permissions FROM dsm_relation WHERE master_id = ?");
+SELECT id, connection_code, slave_name as contact_name, slave_id as contact_id, master_name as my_name, true as is_slave, slave_permissions FROM dsm_relation WHERE master_id = ?
+ORDER BY contact_name");
     
     $stmt->bind_param("ii", $userid, $userid);
     $stmt->execute();

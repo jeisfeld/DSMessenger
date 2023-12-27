@@ -24,6 +24,7 @@ relation_id INT(8) UNSIGNED,
 subject VARCHAR(100),
 flags VARCHAR(20),
 lasttimestamp TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP(3),
+prepared_message VARCHAR(65535),
 FOREIGN KEY (relation_id) REFERENCES dsm_relation(id) ON DELETE CASCADE
 )";
 

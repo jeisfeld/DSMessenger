@@ -19,13 +19,14 @@ function queryConversationsAndMessages($username, $password, $startTime)
     $subject = null;
     $flags = null;
     $lasttimestamp = null;
+    $preparedMessage = null;
     $mysqltimestamp = convertJavaTimestamp($startTime);
     
-    $stmt = $conn->prepare("SELECT id, relation_id, subject, flags, lasttimestamp from dsm_conversation WHERE lasttimestamp > ? and relation_id in (select id from dsm_relation where slave_id = ? or master_id = ? ) order by lasttimestamp desc");
+    $stmt = $conn->prepare("SELECT id, relation_id, subject, flags, lasttimestamp, prepared_message from dsm_conversation WHERE lasttimestamp > ? and relation_id in (select id from dsm_relation where slave_id = ? or master_id = ? ) order by lasttimestamp desc");
     
     $stmt->bind_param("sii", $mysqltimestamp, $userId, $userId);
     $stmt->execute();
-    $stmt->bind_result($conversationId, $relationId, $subject, $flags, $lasttimestamp);
+    $stmt->bind_result($conversationId, $relationId, $subject, $flags, $lasttimestamp, $preparedMessage);
     
     $conversations = array();
     while ($stmt->fetch()) {
@@ -55,6 +56,7 @@ function queryConversationsAndMessages($username, $password, $startTime)
             'subject' => $subject,
             'flags' => $flags,
             'lasttimestamp' => convertToJavaTimestamp($lasttimestamp),
+            'preparedMessage' => $preparedMessage,
             'messages' => $messages
         ];
     }

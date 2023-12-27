@@ -315,7 +315,9 @@ public class HttpSender {
 								String subject = jsonConversation.getString("subject");
 								String conversationFlags = jsonConversation.getString("flags");
 								long lasttimestamp = jsonConversation.getLong("lasttimestamp");
-								Conversation conversation = new Conversation(relationId, subject, conversationIdString, lasttimestamp, conversationFlags);
+								String preparedMessage = jsonConversation.getString("preparedMessage");
+								Conversation conversation = new Conversation(relationId, subject,
+										conversationIdString, lasttimestamp, conversationFlags, preparedMessage);
 								conversations.add(conversation);
 								JSONArray messageArray = jsonConversation.getJSONArray("messages");
 								for (int j = 0; j < messageArray.length(); j++) {

@@ -24,14 +24,16 @@ $password = $_SESSION['password'];
             $relationId = $_GET['relationId'];
             $isSlave = $_GET['isSlave'];
             $contactName = $_GET['contactName'];
+            $contactId = $_GET['contactId'];
             $replyPolicy = $_GET['replyPolicy'];
             
             $conversations = queryConversations($username, $password, $relationId, $isSlave);
             
             foreach ($conversations as $conversation) {
-                echo "<li><a class='conversation-item' href='messages.php?conversationId=" . $conversation['conversationId'] .
+                echo "<li class='conversation-item'><a href='messages.php?conversationId=" . $conversation['conversationId'] .
                 "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&replyPolicy=" . $replyPolicy . "&subject=" . $conversation['subject'] .
-                "&contactName=" . $contactName . "'>" . $conversation['subject'] . "</a></li>";
+                "&contactName=" . $contactName . "&contactId=" . $contactId . "&preparedMessage=" . urlencode($conversation['preparedMessage']) . 
+                "'>" . $conversation['subject'] . "</a></li>";
             }
             ?>
             
@@ -40,6 +42,7 @@ $password = $_SESSION['password'];
 			<form action="sendmessage.php" method="post" class="message-form">
 				<input type="hidden" name="conversationId" value="">
 				<input type="hidden" name="relationId" value="<?= $relationId ?>"> 
+				<input type="hidden" name="contactId" value="<?= $contactId ?>"> 
 				<input type="hidden" name="isSlave" value="<?= $isSlave ?>">
 				<input type="hidden" name="subject" value="">
 				<input type="hidden" name="replyPolicy" value="<?= $replyPolicy ?>">

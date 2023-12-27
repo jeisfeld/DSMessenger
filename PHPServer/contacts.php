@@ -22,8 +22,9 @@ $password = $_SESSION['password'];
             $contacts = queryContacts($username, $password);
             foreach ($contacts as $contact) {
                 $replyPolicy = substr($contact["slavePermissions"], 3, 1);
-                echo "<li><a class='contact-item' href='conversations.php?relationId=" . $contact['relationId'] . "&contactName=" . $contact['contactName'] 
-                . "&isSlave=" . $contact['isSlave'] . "&replyPolicy=" . $replyPolicy . "'>" . $contact['contactName'] . "</a></li>";
+                echo "<li class='contact-item'><a href='conversations.php?relationId=" . $contact['relationId'] . "&contactName=" . $contact['contactName'] 
+                . "&contactId=" . $contact['contactId']. "&isSlave=" . $contact['isSlave'] . "&replyPolicy=" . $replyPolicy . "'>" . 
+                ($contact['isSlave'] ? "" : "<b>") . $contact['contactName'] . ($contact['isSlave'] ? "" : "</b>") . "</a></li>";
             }
             ?>
         </ul>

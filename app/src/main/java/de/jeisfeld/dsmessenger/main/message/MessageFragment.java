@@ -89,6 +89,9 @@ public class MessageFragment extends Fragment {
 							&& activity != null) {
 						conversation = receivedConversation;
 						refreshMessageList(actionType == ActionType.TEXT_RESPONSE || actionType == ActionType.MESSAGE_SENT);
+						if (conversation.getPreparedMessage() != null && conversation.getPreparedMessage().length() > 0 && contact.isSlave()) {
+							binding.editTextMessageText.setText(conversation.getPreparedMessage());
+						}
 					}
 					break;
 				case CONVERSATION_EDITED:
@@ -193,6 +196,9 @@ public class MessageFragment extends Fragment {
 		conversation = (Conversation) getArguments().getSerializable("conversation");
 		binding.textSendMessage.setText(getString(R.string.text_send_message_to, contact.getName()));
 		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
+		if (contact.isSlave()) {
+			binding.editTextMessageText.setText(conversation.getPreparedMessage());
+		}
 
 		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
@@ -289,6 +295,18 @@ public class MessageFragment extends Fragment {
 	}
 
 	@Override
+	public final void onStop() {
+		super.onStop();
+		if (conversation != null && contact != null && contact.isSlave()) {
+			conversation.setPreparedMessage(binding.editTextMessageText.getText().toString());
+			conversation.update();
+			new HttpSender(getActivity()).sendMessage("db/conversation/editconversation.php", contact, UUID.randomUUID(), null,
+					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_PREPARED.name(),
+					"conversationId", conversation.getConversationId().toString(), "preparedMessage", binding.editTextMessageText.getText().toString());
+		}
+	}
+
+	@Override
 	public final void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
@@ -350,6 +368,7 @@ public class MessageFragment extends Fragment {
 						activity.runOnUiThread(() -> {
 							if (responseData != null && responseData.isSuccess()) {
 								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
+									conversation.setPreparedMessage(null);
 									conversation.insertIfNew(message.getMessageText());
 									if (!contact.isSlave()) {
 										conversation.updateWithResponse();

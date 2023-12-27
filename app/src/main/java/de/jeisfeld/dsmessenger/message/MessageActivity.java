@@ -27,6 +27,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
 import de.jeisfeld.dsmessenger.databinding.ActivityMessageBinding;
+import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.entity.Message;
 import de.jeisfeld.dsmessenger.entity.ReplyPolicy;
@@ -75,6 +76,10 @@ public class MessageActivity extends AppCompatActivity {
 	 * The conversation.
 	 */
 	private Conversation conversation;
+	/**
+	 * The contact.
+	 */
+	private Contact contact;
 	/**
 	 * The message vibration.
 	 */
@@ -284,6 +289,13 @@ public class MessageActivity extends AppCompatActivity {
 	protected final void onStop() {
 		super.onStop();
 		getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		if (conversation != null && contact != null && contact.isSlave()) {
+			conversation.setPreparedMessage(binding.editTextMessageText.getText().toString());
+			conversation.update();
+			new HttpSender(this).sendMessage("db/conversation/editconversation.php", contact, UUID.randomUUID(), null,
+					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_PREPARED.name(),
+					"conversationId", conversation.getConversationId().toString(), "preparedMessage", binding.editTextMessageText.getText().toString());
+		}
 	}
 
 	@Override
@@ -305,8 +317,8 @@ public class MessageActivity extends AppCompatActivity {
 
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
 		conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
+		contact = textMessageDetails.getContact();
 		MessageActivity.currentTopConversation = conversation;
-
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
 
 		if (displayStrategy.isVibrate()) {
@@ -325,7 +337,7 @@ public class MessageActivity extends AppCompatActivity {
 
 		if (conversation == null) {
 			binding.textSubject.setText(getString(R.string.text_subject,
-					getString(R.string.text_new_dummy_conversation, textMessageDetails.getContact().getName())));
+					getString(R.string.text_new_dummy_conversation, contact.getName())));
 			binding.buttonAcknowledge.setVisibility(View.GONE);
 			binding.buttonSend.setVisibility(View.GONE);
 			binding.layoutTextInput.setVisibility(View.GONE);
@@ -333,13 +345,16 @@ public class MessageActivity extends AppCompatActivity {
 		}
 
 		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
+		if (contact.isSlave()) {
+			binding.editTextMessageText.setText(conversation.getPreparedMessage());
+		}
 
 		new HttpSender(this).sendMessage("db/conversation/updatemessagestatus.php",
-				textMessageDetails.getContact(), textMessageDetails.getMessageId(), null,
+				contact, textMessageDetails.getMessageId(), null,
 				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(),
 				"conversationId", conversation.getConversationId().toString());
 
-		boolean amSlave = !textMessageDetails.getContact().isSlave();
+		boolean amSlave = !contact.isSlave();
 
 		binding.buttonAcknowledge.setVisibility(
 				amSlave && conversation.getConversationFlags().isExpectingAcknowledgement() ? View.VISIBLE : View.GONE);
@@ -355,14 +370,14 @@ public class MessageActivity extends AppCompatActivity {
 			conversation.updateWithAcknowledgement();
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED,
 					messageList.get(messageList.size() - 1).getMessageId(),
-					textMessageDetails.getContact(), conversation, message);
+					contact, conversation, message);
 
 			binding.buttonAcknowledge.setVisibility(View.GONE);
 			binding.buttonSend.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 			binding.layoutTextInput.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
 
 			new HttpSender(this).sendMessage("db/conversation/updatemessagestatus.php",
-					textMessageDetails.getContact(), textMessageDetails.getMessageId(), (response, responseData) -> {
+					contact, textMessageDetails.getMessageId(), (response, responseData) -> {
 						if (responseData != null && responseData.isSuccess()) {
 							Application.getAppDatabase().getMessageDao().acknowledgeMessages(
 									messageList.stream().filter(msg -> !msg.isOwn())
@@ -389,13 +404,14 @@ public class MessageActivity extends AppCompatActivity {
 					conversation.updateWithResponse();
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED,
 							messageList.get(messageList.size() - 1).getMessageId(),
-							textMessageDetails.getContact(), conversation, null);
+							contact, conversation, null);
 				}
 				new HttpSender(this).sendMessage("db/conversation/sendmessage.php",
-						textMessageDetails.getContact(), newMessageId, (response, responseData) -> {
+						contact, newMessageId, (response, responseData) -> {
 							if (responseData != null && responseData.isSuccess()) {
 								Message newMessage = new Message(messageText, true, newMessageId,
 										conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
+								conversation.setPreparedMessage(null);
 								newMessage.store(conversation);
 								runOnUiThread(() -> {
 									Application.getAppDatabase().getMessageDao().acknowledgeMessages(

@@ -6,9 +6,11 @@ $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
 $subject = $_GET['subject'];
 $contactName = $_GET['contactName'];
+$contactId = $_GET['contactId'];
 $relationId = $_GET['relationId'];
 $isSlave = $_GET['isSlave'];
 $replyPolicy = $_GET['replyPolicy'];
+$preparedMessage = $isSlave ? $_GET['preparedMessage'] : "";
 
 function convertTimestamp($mysqlTimestamp) {
     $timestampDateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
@@ -26,6 +28,7 @@ function convertTimestamp($mysqlTimestamp) {
 <html>
 <head>
 <title>DS Messenger - Messages</title>
+<meta http-equiv="refresh" content="10">
 <link rel="stylesheet" type="text/css" href="styles.css">
 </head>
 <body>
@@ -33,7 +36,7 @@ function convertTimestamp($mysqlTimestamp) {
 	<div id="chat-container">
 		<div id="header">
 			<span class="left"><?= _("username") ?>: <?= $username ?></span> <span class="right">
-			<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&isSlave=<?= $isSlave ?>&replyPolicy=<?= $replyPolicy ?>"><?= sprintf(_("conversations_with"), $_GET['contactName']) ?></a>
+			<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&contactId=<?= $contactId ?>&isSlave=<?= $isSlave ?>&replyPolicy=<?= $replyPolicy ?>"><?= sprintf(_("conversations_with"), $_GET['contactName']) ?></a>
 			&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
 		<h1><?= sprintf(_("conversation_with"), $subject, $contactName) ?></h1>
@@ -56,11 +59,12 @@ function convertTimestamp($mysqlTimestamp) {
 			<form action="sendmessage.php" method="post" class="message-form">
 				<input type="hidden" name="conversationId" value="<?= $conversationId ?>">
 				<input type="hidden" name="relationId" value="<?= $relationId ?>"> 
+				<input type="hidden" name="contactId" value="<?= $contactId ?>">
 				<input type="hidden" name="isSlave" value="<?= $isSlave ?>">
 				<input type="hidden" name="subject" value="<?= $subject ?>">
 				<input type="hidden" name="replyPolicy" value="">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
-				<textarea name="message" placeholder="<?= _("type_message") ?>" class="message-textarea"></textarea>
+				<textarea name="message" placeholder="<?= _("type_message") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
 				<button type="submit" class="send-button"><?= _("send") ?></button>
 			</form>
 		</div>

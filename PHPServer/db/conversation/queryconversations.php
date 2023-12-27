@@ -19,11 +19,12 @@ function queryConversations($username, $password, $relationId, $isSlave)
     $subject = null;
     $flags = null;
     $lasttimestamp = null;
-    $stmt = $conn->prepare("SELECT id, subject, flags, lasttimestamp from dsm_conversation WHERE relation_id = ? order by lasttimestamp desc");
+    $preparedMessage = null;
+    $stmt = $conn->prepare("SELECT id, subject, flags, lasttimestamp, prepared_message from dsm_conversation WHERE relation_id = ? order by lasttimestamp desc");
     
     $stmt->bind_param("s", $relationId);
     $stmt->execute();
-    $stmt->bind_result($conversationId, $subject, $flags, $lasttimestamp);
+    $stmt->bind_result($conversationId, $subject, $flags, $lasttimestamp, $preparedMessage);
     
     $conversations = array();
     while ($stmt->fetch()) {
@@ -31,7 +32,8 @@ function queryConversations($username, $password, $relationId, $isSlave)
             'conversationId' => $conversationId,
             'subject' => $subject,
             'flags' => $flags,
-            'lasttimestamp' => $lasttimestamp
+            'lasttimestamp' => $lasttimestamp,
+            'preparedMessage' => $preparedMessage
         ];
     }
     $stmt -> close();

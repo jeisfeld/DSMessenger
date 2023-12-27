@@ -169,6 +169,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				messageConversation.insertIfNew(textMessageDetails.getMessageText());
 				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, messageConversation);
 			}
+			messageConversation.setPreparedMessage(textMessageDetails.getPreparedMessage());
 			Message textMessage = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
 					conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
 			if (textMessage.getMessageText() != null && textMessage.getMessageText().length() > 0) {
@@ -184,6 +185,9 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		case TEXT_RESPONSE:
 			textMessageDetails = (TextMessageDetails) messageDetails;
 			Conversation conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
+			if (textMessageDetails.getPreparedMessage() != null && textMessageDetails.getPreparedMessage().length() > 0) {
+				conversation.setPreparedMessage(textMessageDetails.getPreparedMessage());
+			}
 			new HttpSender(this).sendMessage("db/conversation/updatemessagestatus.php",
 					messageDetails.getContact(), messageDetails.getMessageId(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_RECEIVED.name(), "conversationId",
@@ -207,6 +211,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			Message sentMessage = new Message(textMessageDetails.getMessageText(), true, textMessageDetails.getMessageId(),
 					textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_SENT);
 			if (sentMessage.getMessageText() != null && sentMessage.getMessageText().length() > 0) {
+				conversation2.setPreparedMessage(null);
 				sentMessage.store(conversation2);
 				conversation2.updateWithNewMessage();
 				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, conversation2);

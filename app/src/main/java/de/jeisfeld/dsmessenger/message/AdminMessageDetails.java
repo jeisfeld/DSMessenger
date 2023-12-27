@@ -146,6 +146,10 @@ public class AdminMessageDetails extends MessageDetails {
 		 */
 		MESSAGE_SELF_RESPONDED,
 		/**
+		 * Message prepared - used for storing prepared message.
+		 */
+		MESSAGE_PREPARED,
+		/**
 		 * Ping message.
 		 */
 		PING,
