@@ -27,13 +27,16 @@
     <string name="button_create_invitation">Einladung erstellen</string>
     <string name="button_accept_invitation">Einladung annehmen</string>
     <string name="button_review_invitation">Einladung überprüfen</string>
+    <string name="button_create_invitation_short">Erstellen</string>
+    <string name="button_accept_invitation_short">Annehmen</string>
+    <string name="button_review_invitation_short">Überprüfen</string>
     <string name="button_logout">Abmelden</string>
     <string name="button_change_password">Passwort ändern</string>
     <string name="button_delete_contact">Kontakt löschen</string>
     <string name="button_delete_conversation">Unterhaltung löschen</string>
-    <string name="button_update_contact">Kontakt aktualisieren</string>
+    <string name="button_update_contact">Aktualisieren</string>
     <string name="button_disconnect_device">Gerät trennen</string>
-    <string name="button_update_device">Gerät aktualisieren</string>
+    <string name="button_update_device">Aktualisieren</string>
     <string name="button_update_conversation">Unterhaltung\naktualisieren</string>
     <string name="button_trigger_lut">Impuls senden</string>
 
@@ -63,7 +66,7 @@
     <string name="text_message_display_type">Anzeigeart</string>
     <string name="text_slave_permissions">Sub-Berechtigungen</string>
     <string name="text_edit_slave_permissions">Sub-Berechtigungen bearbeiten</string>
-    <string name="text_edit_relation">Kontaktname bearbeiten / Kontakt löschen</string>
+    <string name="text_edit_relation">Name bearbeiten / Kontakt löschen</string>
     <string name="text_manage_conversations">Unterhaltungen verwalten</string>
     <string name="text_default_reply_policy">Standard-Antwortrichtlinie</string>
     <string name="text_reply_policy">Antwortrichtlinie</string>
@@ -100,6 +103,7 @@
     <string name="text_message_received">Nachricht empfangen</string>
     <string name="text_message_acknowledged">Nachricht bestätigt</string>
     <string name="text_new_conversation_name">Neue Unterhaltung</string>
+    <string name="text_new_dummy_conversation">%1$s sendet Dir eine Erinnerung</string>
 
     <string name="error_missing_username">Benutzername fehlt</string>
     <string name="error_passwords_do_not_match">Passwörter stimmen nicht überein</string>

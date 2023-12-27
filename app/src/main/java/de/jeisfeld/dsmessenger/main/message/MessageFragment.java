@@ -349,8 +349,8 @@ public class MessageFragment extends Fragment {
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
 							if (responseData != null && responseData.isSuccess()) {
-								conversation.insertIfNew(message.getMessageText());
 								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
+									conversation.insertIfNew(message.getMessageText());
 									if (!contact.isSlave()) {
 										conversation.updateWithResponse();
 										setButtonVisibility();

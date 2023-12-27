@@ -306,7 +306,6 @@ public class MessageActivity extends AppCompatActivity {
 		binding.textMessageFrom.setText(getString(R.string.text_message_from, textMessageDetails.getContact().getName()));
 		conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
 		MessageActivity.currentTopConversation = conversation;
-		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 
 		MessageDisplayStrategy displayStrategy = textMessageDetails.getDisplayStrategy();
 
@@ -323,6 +322,17 @@ public class MessageActivity extends AppCompatActivity {
 		if (displayStrategy.isKeepScreenOn()) {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
+
+		if (conversation == null) {
+			binding.textSubject.setText(getString(R.string.text_subject,
+					getString(R.string.text_new_dummy_conversation, textMessageDetails.getContact().getName())));
+			binding.buttonAcknowledge.setVisibility(View.GONE);
+			binding.buttonSend.setVisibility(View.GONE);
+			binding.layoutTextInput.setVisibility(View.GONE);
+			return;
+		}
+
+		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 
 		new HttpSender(this).sendMessage("db/conversation/updatemessagestatus.php",
 				textMessageDetails.getContact(), textMessageDetails.getMessageId(), null,

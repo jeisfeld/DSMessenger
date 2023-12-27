@@ -12,6 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $subject = $_POST['subject'];
     $contactName = $_POST['contactName'];
     $message = $_POST['message'];
+    $replyPolicy = $_POST['replyPolicy'];
     $isNewConversation = !$conversationId;
     
     $conn = getDbConnection();
@@ -23,28 +24,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $currentDateTime = new DateTime();
     $mysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);
     
+    $messageId = Uuid::uuid4()->toString();
     if ($isNewConversation) {
         $conversationId = Uuid::uuid4()->toString();
-        $subject = $message;
-        $replyPolicy = $_POST['replyPolicy'];
-        $conversationFlags = $replyPolicy . "00";
-        $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp) values (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sisss", $conversationId, $relationId, $subject, $conversationFlags, $mysqlTimestamp);
+    }
+    if ($message) {
+        if ($isNewConversation) {
+            $subject = $message;
+            $conversationFlags = $replyPolicy ? $replyPolicy . "00" : "000";
+            $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp) values (?, ?, ?, ?, ?)");
+            $stmt->bind_param("sisss", $conversationId, $relationId, $subject, $conversationFlags, $mysqlTimestamp);
+            $stmt->execute();
+            $stmt->close();
+        }
+        else {
+            $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ? where id = ?");
+            $stmt->bind_param("ss", $mysqlTimestamp, $conversationId);
+            $stmt->execute();
+            $stmt->close();
+        }
+        $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
+        $stmt->bind_param("ssiss", $messageId, $conversationId, $userId, $message, $mysqlTimestamp);
         $stmt->execute();
         $stmt->close();
     }
-    else {
-        $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ? where id = ?");
-        $stmt->bind_param("ss", $mysqlTimestamp, $conversationId);
-        $stmt->execute();
-        $stmt->close();
-    }
-
-    $messageId = Uuid::uuid4()->toString();
-    $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
-    $stmt->bind_param("ssiss", $messageId, $conversationId, $userId, $message, $mysqlTimestamp);
-    $stmt->execute();
-    $stmt->close();
     
     $tokens = getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
     
@@ -72,9 +75,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $conn->close();
     
+    
+    https://jeisfeld.de/dsmessenger/conversations.php?relationId=1&contactName=Tablet&isSlave=1&replyPolicy=
 
     // Redirect back to the chat
-    header("Location: messages.php?conversationId=" . $conversationId . "&relationId=" . $relationId . 
-        "&isSlave=" . $isSlave . "&subject=" . $subject . "&contactName=" . $contactName);
+    if ($isNewConversation && !$message) {
+        header("Location: conversations.php?relationId=" . $relationId . "&contactName=" . $contactName .
+            "&isSlave=" . $isSlave . "&replyPolicy=" . $replyPolicy);
+    }
+    else {
+        header("Location: messages.php?conversationId=" . $conversationId . "&relationId=" . $relationId .
+            "&isSlave=" . $isSlave . "&subject=" . $subject . "&contactName=" . $contactName . "&replyPolicy=" . $replyPolicy);
+    }
 }
 ?>

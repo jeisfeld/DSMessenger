@@ -164,7 +164,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			textMessageDetails = (TextMessageDetails) messageDetails;
 			UUID conversationId = textMessageDetails.getConversationId();
 			Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId);
-			if (messageConversation == null) {
+			if (messageConversation == null && textMessageDetails.getMessageText() != null && textMessageDetails.getMessageText().length() > 0) {
 				messageConversation = Conversation.createNewConversation(textMessageDetails);
 				messageConversation.insertIfNew(textMessageDetails.getMessageText());
 				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, messageConversation);
@@ -198,18 +198,22 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		case TEXT_OWN:
 			textMessageDetails = (TextMessageDetails) messageDetails;
 			Conversation conversation2 = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
-			if (conversation2 == null) {
+			if (conversation2 == null && textMessageDetails.getMessageText() != null && textMessageDetails.getMessageText().length() > 0) {
 				conversation2 = Conversation.createNewConversation(textMessageDetails);
 				conversation2.insertIfNew(textMessageDetails.getMessageText());
 				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, conversation2);
 			}
 
-			Message receivedMessage2 = new Message(textMessageDetails.getMessageText(), true, textMessageDetails.getMessageId(),
-					textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
-			receivedMessage2.store(conversation2);
+			Message sentMessage = new Message(textMessageDetails.getMessageText(), true, textMessageDetails.getMessageId(),
+					textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_SENT);
+			if (sentMessage.getMessageText() != null && sentMessage.getMessageText().length() > 0) {
+				sentMessage.store(conversation2);
+				conversation2.updateWithNewMessage();
+				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, conversation2);
+			}
 			Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_SENT, messageDetails.getMessageId(),
-					messageDetails.getContact(), conversation2, receivedMessage2);
+					messageDetails.getContact(), conversation2, sentMessage);
 			break;
 		case RANDOMIMAGE:
 			RandomimageMessageDetails randomimageMessageDetails = (RandomimageMessageDetails) messageDetails;

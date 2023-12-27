@@ -24,12 +24,13 @@ $password = $_SESSION['password'];
             $relationId = $_GET['relationId'];
             $isSlave = $_GET['isSlave'];
             $contactName = $_GET['contactName'];
+            $replyPolicy = $_GET['replyPolicy'];
             
             $conversations = queryConversations($username, $password, $relationId, $isSlave);
             
             foreach ($conversations as $conversation) {
                 echo "<li><a class='conversation-item' href='messages.php?conversationId=" . $conversation['conversationId'] .
-                "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&subject=" . $conversation['subject'] .
+                "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&replyPolicy=" . $replyPolicy . "&subject=" . $conversation['subject'] .
                 "&contactName=" . $contactName . "'>" . $conversation['subject'] . "</a></li>";
             }
             ?>
@@ -41,7 +42,7 @@ $password = $_SESSION['password'];
 				<input type="hidden" name="relationId" value="<?= $relationId ?>"> 
 				<input type="hidden" name="isSlave" value="<?= $isSlave ?>">
 				<input type="hidden" name="subject" value="">
-				<input type="hidden" name="replyPolicy" value="<?= $_GET['replyPolicy'] ?>">
+				<input type="hidden" name="replyPolicy" value="<?= $replyPolicy ?>">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
 				<textarea name="message" placeholder="<?= _("start_new_conversation") ?>" class="message-textarea"></textarea>
 				<button type="submit" class="send-button"><?= _("send") ?></button>

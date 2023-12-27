@@ -8,6 +8,7 @@ $subject = $_GET['subject'];
 $contactName = $_GET['contactName'];
 $relationId = $_GET['relationId'];
 $isSlave = $_GET['isSlave'];
+$replyPolicy = $_GET['replyPolicy'];
 
 function convertTimestamp($mysqlTimestamp) {
     $timestampDateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
@@ -32,7 +33,7 @@ function convertTimestamp($mysqlTimestamp) {
 	<div id="chat-container">
 		<div id="header">
 			<span class="left"><?= _("username") ?>: <?= $username ?></span> <span class="right">
-			<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&isSlave=<?= $isSlave ?>"><?= sprintf(_("conversations_with"), $_GET['contactName']) ?></a>
+			<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&isSlave=<?= $isSlave ?>&replyPolicy=<?= $replyPolicy ?>"><?= sprintf(_("conversations_with"), $_GET['contactName']) ?></a>
 			&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
 		<h1><?= sprintf(_("conversation_with"), $subject, $contactName) ?></h1>

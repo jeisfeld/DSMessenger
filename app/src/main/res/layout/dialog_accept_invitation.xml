@@ -121,7 +121,7 @@
             android:layout_marginTop="@dimen/margin_medium"
             android:paddingStart="@dimen/margin_small"
             android:paddingEnd="@dimen/margin_small"
-            android:text="@string/button_accept_invitation"
+            android:text="@string/button_accept_invitation_short"
             android:visibility="invisible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewErrorMessage" />
@@ -134,7 +134,7 @@
             android:layout_marginTop="@dimen/margin_medium"
             android:paddingStart="@dimen/margin_small"
             android:paddingEnd="@dimen/margin_small"
-            android:text="@string/button_review_invitation"
+            android:text="@string/button_review_invitation_short"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewErrorMessage" />
 
@@ -148,7 +148,7 @@
             android:paddingStart="@dimen/margin_small"
             android:paddingEnd="@dimen/margin_small"
             android:text="@string/button_cancel"
-            app:layout_constraintEnd_toStartOf="@id/button_accept_invitation"
+            app:layout_constraintEnd_toStartOf="@id/button_review_invitation"
             app:layout_constraintTop_toBottomOf="@id/textViewErrorMessage" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

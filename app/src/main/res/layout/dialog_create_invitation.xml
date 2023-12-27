@@ -104,7 +104,7 @@
             android:layout_marginTop="@dimen/margin_medium"
             android:paddingStart="@dimen/margin_small"
             android:paddingEnd="@dimen/margin_small"
-            android:text="@string/button_create_invitation"
+            android:text="@string/button_create_invitation_short"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/table_my_account" />
 
