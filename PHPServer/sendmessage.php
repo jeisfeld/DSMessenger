@@ -53,6 +53,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute();
         $stmt->close();
     }
+    
+    $aiPolicy = 0;
+    
+    if (! $isSlave) {
+        $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
+        if ($aiRelation) {
+            $aiPolicy = $aiRelation['aiPolicy'];
+        }
+    }
 
     session_write_close();
     ob_start();
@@ -60,6 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "Dummy response";
     if ($isNewConversation && ! $message) {
         header("Location: conversations.php?relationId=" . $relationId . "&contactName=" . $contactName . "&contactId=" . $contactId . "&isSlave=" . $isSlave . "&replyPolicy=" . $replyPolicy);
+    }
+    else if ($aiPolicy == 2 || $aiPolicy == 3) {
+        header("Location: messages2.php?conversationId=" . $conversationId . "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&subject=" . $subject . "&contactName=" . $contactName . "&contactId=" . $contactId . "&replyPolicy=" . $replyPolicy);
     }
     else {
         header("Location: messages.php?conversationId=" . $conversationId . "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&subject=" . $subject . "&contactName=" . $contactName . "&contactId=" . $contactId . "&replyPolicy=" . $replyPolicy);
@@ -76,34 +88,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $preparedMessage = "";
     $responseMessage = null;
-    $aiPolicy = 0;
 
-    if (! $isSlave) {
-        $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
-        if ($aiRelation) {
-            $aiPolicy = $aiRelation['aiPolicy'];
+    
+    if ($message && $aiPolicy == 1) {
+        $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage']);
+
+        $result = queryOpenAi($messages);
+        if ($result['success']) {
+            $responseMessage = $result['message']['content'];
         }
-        if ($aiPolicy > 0) {
-            $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage']);
-
-            $result = queryOpenAi($messages);
-            if ($result['success']) {
-                $responseMessage = $result['message']['content'];
-            }
-            else {
-                $aiPolicy = 0;
-            }
+        else {
+            $aiPolicy = 0;
         }
-    }
-
-    if ($aiPolicy == 1) {
+        
         $preparedMessage = $responseMessage;
         $stmt = $conn->prepare("UPDATE dsm_conversation SET prepared_message = ? where id = ?");
         $stmt->bind_param("ss", $responseMessage, $conversationId);
         $stmt->execute();
         $stmt->close();
     }
-    
+
     if ($aiPolicy != 3) {
         $tokens = getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
         $currentDateTime = new DateTime();
@@ -130,59 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             sendFirebaseMessage($token, $data, null);
         }
     }
-        
-    if ($aiPolicy == 2 || $aiPolicy == 3) {
-        $responseMessageId = Uuid::uuid4()->toString();
-        $currentDateTime = new DateTime();
-        $responseMysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);
-
-        $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
-        $stmt->bind_param("ssiss", $responseMessageId, $conversationId, $contactId, $responseMessage, $responseMysqlTimestamp);
-        $stmt->execute();
-        $stmt->close();
-        $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ?, prepared_message = null where id = ?");
-        $stmt->bind_param("ss", $responseMysqlTimestamp, $conversationId);
-        $stmt->execute();
-        $stmt->close();
-
-        $tokens = getSelfTokens($conn, $username, $password, - 1);
-        $currentDateTime = new DateTime();
-        $data = [
-            "messageType" => "TEXT",
-            "messageText" => $responseMessage,
-            "priority" => "NORMAL",
-            "conversationId" => $conversationId,
-            "timestamp" => convertToJavaTimestamp($responseMysqlTimestamp),
-            "messageId" => $responseMessageId,
-            "relationId" => $relationId,
-            "preparedMessage" => "",
-            "messageTime" => $currentDateTime->format("Y-m-d\TH:i:s.v") . 'Z'
-        ];
-        foreach ($tokens as $token) {
-            sendFirebaseMessage($token, $data, null);
-        }
-    }
-        
-    if ($aiPolicy == 2) {
-        $tokens = getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
-        $currentDateTime = new DateTime();
-        $data = [
-            "messageType" => "TEXT_OWN",
-            "messageText" => $responseMessage,
-            "priority" => "NORMAL",
-            "conversationId" => $conversationId,
-            "timestamp" => convertToJavaTimestamp($responseMysqlTimestamp),
-            "messageId" => $responseMessageId,
-            "relationId" => $relationId,
-            "preparedMessage" => "",
-            "messageTime" => $currentDateTime->format("Y-m-d\TH:i:s.v") . 'Z'
-        ];
-        foreach ($tokens as $token) {
-            sendFirebaseMessage($token, $data, null);
-        }
-    }
-
-
+ 
     $conn->close();
 }
 ?>

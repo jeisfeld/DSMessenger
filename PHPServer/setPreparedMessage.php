@@ -1,4 +1,5 @@
 <?php
+include __DIR__ . '/check_session.php';
 require_once 'db/dbfunctions.php';
 
 // Create connection

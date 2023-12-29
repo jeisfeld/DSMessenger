@@ -55,7 +55,7 @@ function convertTimestamp($mysqlTimestamp) {
                 echo "</div>";
             }
             ?>
-	        </div>
+	    </div>
 		<div id="message-input">
 			<form action="sendmessage.php" method="post" class="message-form">
 				<input type="hidden" name="conversationId" id="conversationId" value="<?= $conversationId ?>">

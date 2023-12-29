@@ -126,8 +126,9 @@ body {
     border-radius: 15px;
     border: 1px solid #ccc;
     resize: vertical; /* Allow vertical resizing */
+    height: 100px;
     min-height: 50px; /* Set a larger default height */
-    max-height: 200px; /* Increased max height */
+    max-height: 400px; /* Increased max height */
     overflow-y: auto; /* Add scroll bar when text exceeds the area */
 }
 
