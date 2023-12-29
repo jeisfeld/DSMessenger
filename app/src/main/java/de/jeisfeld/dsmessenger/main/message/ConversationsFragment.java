@@ -20,6 +20,7 @@ import de.jeisfeld.dsmessenger.entity.Contact;
 import de.jeisfeld.dsmessenger.entity.Conversation;
 import de.jeisfeld.dsmessenger.http.HttpSender;
 import de.jeisfeld.dsmessenger.main.account.AccountDialogUtil.EditConversationDialogFragment;
+import de.jeisfeld.dsmessenger.main.account.ContactRegistry;
 import de.jeisfeld.dsmessenger.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
 
@@ -122,6 +123,16 @@ public class ConversationsFragment extends Fragment {
 	public final void onDetach() {
 		super.onDetach();
 		broadcastManager.unregisterReceiver(localBroadcastReceiver);
+	}
+
+	@Override
+	public final void onResume() {
+		super.onResume();
+		ContactRegistry.getInstance().refreshContacts(getContext(), () -> ContactRegistry.getInstance().refreshConversations(getContext(), () -> {
+			if (adapter != null) {
+				getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+			}
+		}));
 	}
 
 	/**

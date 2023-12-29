@@ -192,9 +192,10 @@ public final class ContactRegistry {
 	/**
 	 * Async query for conversation information. From results, update stored conversations.
 	 *
-	 * @param context The context.
+	 * @param context  The context.
+	 * @param runnable Code to be executed after finishing the refresh.
 	 */
-	public void refreshConversations(final Context context) {
+	public void refreshConversations(final Context context, final Runnable runnable) {
 		if (!AccountFragment.isLoggedIn()) {
 			return;
 		}
@@ -218,6 +219,9 @@ public final class ContactRegistry {
 				List<Message> messages = (List<Message>) responseData.getData().get("messages");
 				Application.getAppDatabase().getMessageDao().insert(messages);
 				PreferenceUtil.setSharedPreferenceLong(R.string.key_last_conversation_timestamp, newTimestamp);
+				if (runnable != null) {
+					runnable.run();
+				}
 			}
 			else {
 				Log.e(Application.TAG, "Failed to retrieve conversation data: " + responseData.getErrorMessage());

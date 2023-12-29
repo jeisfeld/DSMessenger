@@ -109,23 +109,25 @@ if ($aiPolicy == 1) {
     $stmt->close();
 }
 
-$tokens = getVerifiedTokensFromRequestData();
-$data = [];
-$ttl = null;
-foreach ($_POST as $key => $value) {
-    if ($key == 'ttl') {
-        $ttl = $value;
+if ($aiPolicy != 3) {
+    $tokens = getVerifiedTokensFromRequestData();
+    $data = [];
+    $ttl = null;
+    foreach ($_POST as $key => $value) {
+        if ($key == 'ttl') {
+            $ttl = $value;
+        }
+        elseif ($key !== 'username' && $key !== 'password' && $key !== 'contactId' && $key !== 'isSlave' && $key !== 'isConnected') {
+            $data[$key] = $value;
+        }
     }
-    elseif ($key !== 'username' && $key !== 'password' && $key !== 'contactId' && $key !== 'isSlave' && $key !== 'isConnected') {
-        $data[$key] = $value;
+    $data['preparedMessage'] = $preparedMessage;
+    foreach ($tokens as $token) {
+        sendFirebaseMessage($token, $data, $ttl);
     }
-}
-$data['preparedMessage'] = $preparedMessage;
-foreach ($tokens as $token) {
-    sendFirebaseMessage($token, $data, $ttl);
 }
 
-if ($aiPolicy == 2) {
+if ($aiPolicy == 2 || $aiPolicy == 3) {
     $responseMessageId = Uuid::uuid4()->toString();
     $currentDateTime = new DateTime();
     $responseMysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);
@@ -153,8 +155,10 @@ if ($aiPolicy == 2) {
     ];
     foreach ($tokens as $token) {
         sendFirebaseMessage($token, $data, null);
-    }
-    
+    }   
+}
+
+if ($aiPolicy == 2) {
     $tokens = getVerifiedTokensFromRequestData();
     $currentDateTime = new DateTime();
     $data = [

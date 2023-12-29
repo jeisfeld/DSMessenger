@@ -104,32 +104,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
     }
     
-    $tokens = getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
-    $currentDateTime = new DateTime();
-    $data = [
-        "messageType" => "TEXT",
-        "messageText" => $message,
-        "priority" => "NORMAL",
-        "conversationId" => $conversationId,
-        "timestamp" => convertToJavaTimestamp($mysqlTimestamp),
-        "messageId" => $messageId,
-        "username" => $username,
-        "password" => $password,
-        "relationId" => $relationId,
-        "isSlave" => $isSlave,
-        "preparedMessage" => $preparedMessage,
-        "messageTime" => $currentDateTime->format("Y-m-d\TH:i:s.v") . 'Z'
-    ];
-    foreach ($tokens as $token) {
-        sendFirebaseMessage($token, $data, null);
-    }
-    $data["messageType"] = "TEXT_OWN";
-    $tokens = getSelfTokens($conn, $username, $password, - 1);
-    foreach ($tokens as $token) {
-        sendFirebaseMessage($token, $data, null);
+    if ($aiPolicy != 3) {
+        $tokens = getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
+        $currentDateTime = new DateTime();
+        $data = [
+            "messageType" => "TEXT",
+            "messageText" => $message,
+            "priority" => "NORMAL",
+            "conversationId" => $conversationId,
+            "timestamp" => convertToJavaTimestamp($mysqlTimestamp),
+            "messageId" => $messageId,
+            "username" => $username,
+            "password" => $password,
+            "relationId" => $relationId,
+            "isSlave" => $isSlave,
+            "preparedMessage" => $preparedMessage,
+            "messageTime" => $currentDateTime->format("Y-m-d\TH:i:s.v") . 'Z'
+        ];
+        foreach ($tokens as $token) {
+            sendFirebaseMessage($token, $data, null);
+        }
+        $data["messageType"] = "TEXT_OWN";
+        $tokens = getSelfTokens($conn, $username, $password, - 1);
+        foreach ($tokens as $token) {
+            sendFirebaseMessage($token, $data, null);
+        }
     }
         
-    if ($aiPolicy == 2) {
+    if ($aiPolicy == 2 || $aiPolicy == 3) {
         $responseMessageId = Uuid::uuid4()->toString();
         $currentDateTime = new DateTime();
         $responseMysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);
@@ -159,7 +161,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         foreach ($tokens as $token) {
             sendFirebaseMessage($token, $data, null);
         }
+    }
         
+    if ($aiPolicy == 2) {
         $tokens = getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
         $currentDateTime = new DateTime();
         $data = [
