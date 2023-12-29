@@ -28,15 +28,16 @@ function convertTimestamp($mysqlTimestamp) {
 <html>
 <head>
 <title>DS Messenger - Messages</title>
-<meta http-equiv="refresh" content="10">
-<link rel="stylesheet" type="text/css" href="styles.css">
+<link rel="stylesheet" type="text/css" href="css/styles.css">
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<script src="js/jquery-3.6.2.min.js"></script>
 </head>
 <body>
 
 	<div id="chat-container">
 		<div id="header">
 			<span class="left"><?= _("username") ?>: <?= $username ?></span> <span class="right">
-			<a href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&contactId=<?= $contactId ?>&isSlave=<?= $isSlave ?>&replyPolicy=<?= $replyPolicy ?>"><?= sprintf(_("conversations_with"), $_GET['contactName']) ?></a>
+			<a id="conversations-link" href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&contactId=<?= $contactId ?>&isSlave=<?= $isSlave ?>&replyPolicy=<?= $replyPolicy ?>"><?= sprintf(_("conversations_with"), $_GET['contactName']) ?></a>
 			&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
 		<h1><?= sprintf(_("conversation_with"), $subject, $contactName) ?></h1>
@@ -49,7 +50,7 @@ function convertTimestamp($mysqlTimestamp) {
                 // Assume $message['is_own'] is true if it's the user's message
                 $class = $message['userId'] == $userId ? 'own-message' : 'other-message';
                 echo "<div class='message $class'>";
-                echo "<p class='text'>" . htmlspecialchars($message['text']) . "</p>";
+                echo "<p class='text'>" . nl2br(htmlspecialchars($message['text'])) . "</p>";
                 echo "<span class='time'>" . htmlspecialchars(convertTimestamp($message['timestamp'])) . "</span>"; // Format time as needed
                 echo "</div>";
             }
@@ -57,27 +58,20 @@ function convertTimestamp($mysqlTimestamp) {
 	        </div>
 		<div id="message-input">
 			<form action="sendmessage.php" method="post" class="message-form">
-				<input type="hidden" name="conversationId" value="<?= $conversationId ?>">
-				<input type="hidden" name="relationId" value="<?= $relationId ?>"> 
+				<input type="hidden" name="conversationId" id="conversationId" value="<?= $conversationId ?>">
+				<input type="hidden" name="relationId" id="relationId" value="<?= $relationId ?>"> 
 				<input type="hidden" name="contactId" value="<?= $contactId ?>">
-				<input type="hidden" name="isSlave" value="<?= $isSlave ?>">
+				<input type="hidden" name="isSlave" id="isSlave" value="<?= $isSlave ?>">
 				<input type="hidden" name="subject" value="<?= $subject ?>">
 				<input type="hidden" name="replyPolicy" value="">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
-				<textarea name="message" placeholder="<?= _("type_message") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
+				<textarea name="message" id="message" placeholder="<?= _("type_message") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
 				<button type="submit" class="send-button"><?= _("send") ?></button>
 			</form>
 		</div>
 
 	</div>
-    <script>
-        function scrollToBottom() {
-            const messages = document.getElementById('messages');
-            messages.scrollTop = messages.scrollHeight;
-        }
-    
-        // Call scrollToBottom when the page loads and whenever new messages are loaded or sent
-        window.onload = scrollToBottom;
-    </script>
+
+    <script src="js/messages.js"></script>
 </body>
 </html>

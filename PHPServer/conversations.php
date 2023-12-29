@@ -8,7 +8,8 @@ $password = $_SESSION['password'];
 <html>
 <head>
 <title>DS Messenger - Conversations</title>
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 <body>
 	<div id="conversations-container">

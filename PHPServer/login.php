@@ -5,7 +5,8 @@ include __DIR__ . '/check_language.php';
 <html>
 <head>
 <title>DS Messenger - Login</title>
-<link rel="stylesheet" type="text/css" href="styles.css">
+<link rel="stylesheet" type="text/css" href="css/styles.css">
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 <body>
     <div id="login-container">
