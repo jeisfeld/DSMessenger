@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">DS Messenger</string>
-    <string name="nav_header_title">DS Messenger</string>
-    <string name="nav_header_subtitle">dsmessenger@jeisfeld.de</string>
+    <string name="app_name">Coachat</string>
+    <string name="nav_header_title">Coachat</string>
+    <string name="nav_header_subtitle">coachat@jeisfeld.de</string>
     <string name="nav_header_desc">Navigationskopf</string>
     <string name="title_activity_message">Nachrichten-Aktivität</string>
     <string name="title_dialog_confirmation">Bestätigung</string>

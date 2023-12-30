@@ -82,7 +82,7 @@ public class HttpSender {
 			urlBase = "https://pc-joerg:8101/";
 		}
 		else {
-			urlBase = "https://jeisfeld.de/dsmessenger/";
+			urlBase = "https://coachat.de/";
 		}
 
 		new Thread(() -> {

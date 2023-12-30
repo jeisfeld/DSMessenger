@@ -145,7 +145,7 @@ if ($message && $aiPolicy == 2) {
 header("Location: messages.php?conversationId=" . $conversationId . "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&subject=" . $subject . "&contactName=" . $contactName . "&contactId=" . $contactId . "&replyPolicy=" . $replyPolicy);
 
 echo '<script type="text/javascript">';
-echo 'window.location.href = "https://jeisfeld.de/dsmessenger/messages.php?conversationId=' . $conversationId . '&relationId=' . $relationId . 
+echo 'window.location.href = "https://coachat.de/messages.php?conversationId=' . $conversationId . '&relationId=' . $relationId .
     '&isSlave=' . $isSlave . '&subject=' . $subject . '&contactName=' . $contactName . '&contactId=' . $contactId . '&replyPolicy=' . $replyPolicy. '";';
 echo '</script>';
 

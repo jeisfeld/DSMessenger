@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 	public void handleAppLink() {
 		if ("android.intent.action.VIEW".equals(getIntent().getAction())) {
 			Uri uri = getIntent().getData();
-			if (uri != null && "/dsmessenger/connect".equals(uri.getPath())) {
+			if (uri != null && ("/dsmessenger/connect".equals(uri.getPath()) || "/connect".equals(uri.getPath()))) {
 				String connectionCode = uri.getQueryParameter("code");
 				if (connectionCode != null && connectionCode.length() == 24) { // MAGIC_NUMBER
 					if (!AccountFragment.isLoggedIn()) {

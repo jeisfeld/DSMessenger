@@ -647,7 +647,7 @@ public class AccountFragment extends Fragment {
 		Intent messageIntent = new Intent(Intent.ACTION_SEND);
 		messageIntent.setType("text/plain");
 		messageIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.text_subject_invitation));
-		messageIntent.putExtra(Intent.EXTRA_TEXT, "https://jeisfeld.de/dsmessenger/connect?code=" + connectionCode);
+		messageIntent.putExtra(Intent.EXTRA_TEXT, "https://coachat.de/connect?code=" + connectionCode);
 		startActivity(Intent.createChooser(messageIntent, null));
 	}
 
