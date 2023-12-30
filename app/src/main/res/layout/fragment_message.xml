@@ -78,6 +78,7 @@
         android:layout_marginBottom="@dimen/margin_small"
         android:divider="@null"
         android:dividerHeight="@dimen/padding_message_vertical"
+        android:transcriptMode="alwaysScroll"
         app:layout_constraintBottom_toTopOf="@id/layoutTextInput"
         app:layout_constraintTop_toBottomOf="@id/textSubject"
         app:layout_constraintVertical_bias="1"

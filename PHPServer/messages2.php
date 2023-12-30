@@ -62,7 +62,10 @@ function convertTimestamp($mysqlTimestamp) {
         </div>
 	</div>
 
-    <script src="js/messages.js"></script>
+    <script>
+	const messages = document.getElementById('messages');
+	messages.scrollTop = messages.scrollHeight;
+    </script>
     
 <?php 
 $conn = getDbConnection();
@@ -141,8 +144,6 @@ if ($message && $aiPolicy == 2) {
         sendFirebaseMessage($token, $data, null);
     }
 }
-
-header("Location: messages.php?conversationId=" . $conversationId . "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&subject=" . $subject . "&contactName=" . $contactName . "&contactId=" . $contactId . "&replyPolicy=" . $replyPolicy);
 
 echo '<script type="text/javascript">';
 echo 'window.location.href = "https://coachat.de/messages.php?conversationId=' . $conversationId . '&relationId=' . $relationId .

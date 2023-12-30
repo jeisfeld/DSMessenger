@@ -65,7 +65,7 @@ function convertTimestamp($mysqlTimestamp) {
 				<input type="hidden" name="subject" value="<?= $subject ?>">
 				<input type="hidden" name="replyPolicy" value="">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
-				<textarea name="message" id="message" placeholder="<?= _("type_message") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
+				<textarea autofocus name="message" id="message" placeholder="<?= _("type_message") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
 				<button type="submit" class="send-button"><?= _("send") ?></button>
 			</form>
 		</div>

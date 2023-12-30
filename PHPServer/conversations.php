@@ -48,7 +48,7 @@ $password = $_SESSION['password'];
 				<input type="hidden" name="subject" value="">
 				<input type="hidden" name="replyPolicy" value="<?= $replyPolicy ?>">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
-				<textarea name="message" placeholder="<?= _("start_new_conversation") ?>" class="message-textarea"></textarea>
+				<textarea autofocus name="message" placeholder="<?= _("start_new_conversation") ?>" class="message-textarea"></textarea>
 				<button type="submit" class="send-button"><?= _("send") ?></button>
 			</form>
 		</div>

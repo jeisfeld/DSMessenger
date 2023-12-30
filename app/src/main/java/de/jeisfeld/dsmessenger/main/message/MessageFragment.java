@@ -88,7 +88,7 @@ public class MessageFragment extends Fragment {
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())
 							&& activity != null) {
 						conversation = receivedConversation;
-						refreshMessageList(actionType == ActionType.TEXT_RESPONSE || actionType == ActionType.MESSAGE_SENT);
+						refreshMessageList();
 						if (conversation.getPreparedMessage() != null && conversation.getPreparedMessage().length() > 0 && contact.isSlave()) {
 							binding.editTextMessageText.setText(conversation.getPreparedMessage());
 						}
@@ -180,7 +180,7 @@ public class MessageFragment extends Fragment {
 				setButtonVisibility();
 				Application.getAppDatabase().getMessageDao().acknowledgeMessages(
 						messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
-				refreshMessageList(false);
+				refreshMessageList();
 
 				new HttpSender(activity).sendMessage("db/conversation/updatemessagestatus.php",
 						contact, messageList.get(messageList.size() - 1).getMessageId(), null,
@@ -244,7 +244,7 @@ public class MessageFragment extends Fragment {
 		};
 		binding.listViewMessages.setAdapter(arrayAdapter);
 
-		refreshMessageList(true);
+		refreshMessageList();
 
 		return binding.getRoot();
 	}
@@ -265,10 +265,8 @@ public class MessageFragment extends Fragment {
 
 	/**
 	 * Refresh the message list.
-	 *
-	 * @param scrollDown Flag indicating if view should scroll to last position.
 	 */
-	private void refreshMessageList(final boolean scrollDown) {
+	private void refreshMessageList() {
 		new Thread(() -> {
 			List<Message> newMessageList =
 					Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversation.getConversationId());
@@ -279,10 +277,6 @@ public class MessageFragment extends Fragment {
 				activity.runOnUiThread(() -> {
 					setButtonVisibility();
 					arrayAdapter.notifyDataSetChanged();
-					if (scrollDown) {
-						binding.listViewMessages.setSelection(messageList.size() - 1);
-						binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
-					}
 				});
 			}
 		}).start();
@@ -362,7 +356,7 @@ public class MessageFragment extends Fragment {
 							conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
 					Application.getAppDatabase().getMessageDao().acknowledgeMessages(
 							messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
-					refreshMessageList(false);
+					refreshMessageList();
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {

@@ -87,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $preparedMessage = "";
-    $responseMessage = null;
+    $responseMessage = "";
 
     
     if ($message && $aiPolicy == 1) {

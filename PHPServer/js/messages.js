@@ -3,7 +3,6 @@ function scrollToBottom() {
 	messages.scrollTop = messages.scrollHeight;
 }
 
-// Call scrollToBottom when the page loads and whenever new messages are loaded or sent
 window.onload = scrollToBottom;
 
 $('#conversations-link').click(function(event) {
