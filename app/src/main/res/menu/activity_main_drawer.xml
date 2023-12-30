@@ -9,10 +9,6 @@
             android:icon="@drawable/ic_menu_message"
             android:title="@string/menu_conversations" />
         <item
-            android:id="@+id/nav_randomimage"
-            android:icon="@drawable/ic_menu_randomimage"
-            android:title="@string/menu_randomimage" />
-        <item
             android:id="@+id/nav_lut"
             android:icon="@drawable/ic_menu_lut"
             android:title="@string/menu_lut" />
