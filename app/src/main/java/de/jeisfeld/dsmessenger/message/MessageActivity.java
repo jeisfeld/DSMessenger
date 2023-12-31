@@ -411,7 +411,7 @@ public class MessageActivity extends AppCompatActivity {
 							if (responseData != null && responseData.isSuccess()) {
 								Message newMessage = new Message(messageText, true, newMessageId,
 										conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
-								conversation.setPreparedMessage(null);
+								conversation.setPreparedMessage("");
 								newMessage.store(conversation);
 								runOnUiThread(() -> {
 									Application.getAppDatabase().getMessageDao().acknowledgeMessages(

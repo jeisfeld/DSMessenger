@@ -103,7 +103,7 @@ if ($message && ($aiPolicy == 2 || $aiPolicy == 3)) {
     $stmt->bind_param("ssiss", $responseMessageId, $conversationId, $contactId, $responseMessage, $responseMysqlTimestamp);
     $stmt->execute();
     $stmt->close();
-    $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ?, prepared_message = null where id = ?");
+    $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ?, prepared_message = '' where id = ?");
     $stmt->bind_param("ss", $responseMysqlTimestamp, $conversationId);
     $stmt->execute();
     $stmt->close();

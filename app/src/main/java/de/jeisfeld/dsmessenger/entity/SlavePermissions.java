@@ -11,7 +11,7 @@ public class SlavePermissions implements Serializable {
 	/**
 	 * Default slave permissions.
 	 */
-	public static final SlavePermissions DEFAULT_SLAVE_PERMISSIONS = new SlavePermissions(true, false, false, ReplyPolicy.UNLIMITED);
+	public static final SlavePermissions DEFAULT_SLAVE_PERMISSIONS = new SlavePermissions(false, false, true, ReplyPolicy.UNLIMITED);
 	/**
 	 * All permissions (used for master).
 	 */

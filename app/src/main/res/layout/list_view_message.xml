@@ -26,6 +26,7 @@
         android:paddingTop="@dimen/padding_message_vertical"
         android:paddingEnd="@dimen/padding_message_horizontal"
         android:paddingBottom="@dimen/padding_message_bottom"
+        android:textIsSelectable="true"
         android:textSize="@dimen/text_normal"
         app:layout_constraintEnd_toStartOf="@id/spaceRight"
         app:layout_constraintStart_toEndOf="@id/spaceLeft" />

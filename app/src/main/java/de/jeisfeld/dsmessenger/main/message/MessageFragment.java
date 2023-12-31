@@ -362,7 +362,7 @@ public class MessageFragment extends Fragment {
 						activity.runOnUiThread(() -> {
 							if (responseData != null && responseData.isSuccess()) {
 								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
-									conversation.setPreparedMessage(null);
+									conversation.setPreparedMessage("");
 									conversation.insertIfNew(message.getMessageText());
 									if (!contact.isSlave()) {
 										conversation.updateWithResponse();

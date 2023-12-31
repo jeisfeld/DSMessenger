@@ -37,13 +37,13 @@ $stmt->close();
 if ($messageText) {
     if ($isNewConversation) {
         $subject = substr($messageText, 0, 100);
-        $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp) values (?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp, prepared_message) values (?, ?, ?, ?, ?, '')");
         $stmt->bind_param("sisss", $conversationId, $relationId, $subject, $conversationFlags, $mysqltimestamp);
         $stmt->execute();
         $stmt->close();
     }
     else {
-        $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ?, prepared_message = null where id = ?");
+        $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ?, prepared_message = '' where id = ?");
         $stmt->bind_param("ss", $mysqltimestamp, $conversationId);
         $stmt->execute();
         $stmt->close();
@@ -136,7 +136,7 @@ if ($aiPolicy == 2 || $aiPolicy == 3) {
     $stmt->bind_param("ssiss", $responseMessageId, $conversationId, $contactId, $responseMessage, $responseMysqlTimestamp);
     $stmt->execute();
     $stmt->close();
-    $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ?, prepared_message = null where id = ?");
+    $stmt = $conn->prepare("UPDATE dsm_conversation SET lasttimestamp = ?, prepared_message = '' where id = ?");
     $stmt->bind_param("ss", $responseMysqlTimestamp, $conversationId);
     $stmt->execute();
     $stmt->close();
