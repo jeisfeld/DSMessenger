@@ -7,14 +7,15 @@ $password = $_SESSION['password'];
 <!DOCTYPE html>
 <html>
 <head>
-<title>Contacts</title>
+<title>Coachat - <?= _("contacts") ?></title>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
 <body>
 	<div id="contacts-container">
 		<div id="header">
-			<span class="left"><?= _("username") ?>: <?= $username ?></span> <span class="right"><a href="logout.php"><?= _("logout") ?></a></span>
+			<span class="left"><?= _("username") ?>: <?= $username ?></span>
+			<span class="right"><a href="change_password.php"><?= _("change_password") ?></a>&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
 		<h1><?= _("contacts") ?></h1>
 		<ul id="contact-list">

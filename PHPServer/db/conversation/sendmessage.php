@@ -36,8 +36,9 @@ $stmt->close();
 
 if ($messageText) {
     if ($isNewConversation) {
+        $subject = substr($messageText, 0, 100);
         $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp) values (?, ?, ?, ?, ?)");
-        $stmt->bind_param("sisss", $conversationId, $relationId, $messageText, $conversationFlags, $mysqltimestamp);
+        $stmt->bind_param("sisss", $conversationId, $relationId, $subject, $conversationFlags, $mysqltimestamp);
         $stmt->execute();
         $stmt->close();
     }

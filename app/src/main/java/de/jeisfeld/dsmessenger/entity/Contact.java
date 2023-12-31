@@ -84,7 +84,8 @@ public class Contact implements Serializable {
 		connectionCode = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_connection_code, relationId);
 		slavePermissions =
 				SlavePermissions.fromString(PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_slave_permissions, relationId));
-		status = ContactStatus.valueOf(PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_status, relationId));
+		String statusString = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_status, relationId);
+		status = statusString == null ? ContactStatus.INVITED : ContactStatus.valueOf(statusString);
 	}
 
 	public final int getRelationId() {

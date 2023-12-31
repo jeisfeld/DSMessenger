@@ -287,6 +287,7 @@ public class AccountFragment extends Fragment {
 				binding.buttonCreateInvitation.setVisibility(View.GONE);
 				binding.buttonAcceptInvitation.setVisibility(View.GONE);
 				binding.layoutMyDevices.setVisibility(View.GONE);
+				PreferenceUtil.removeSharedPreference(R.string.key_last_conversation_timestamp);
 			});
 		}
 	}

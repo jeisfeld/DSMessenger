@@ -7,7 +7,7 @@ $password = $_SESSION['password'];
 <!DOCTYPE html>
 <html>
 <head>
-<title>DS Messenger - Conversations</title>
+<title>Coachat - <?= sprintf(_("conversations_with"), $_GET['contactName']) ?></title>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>

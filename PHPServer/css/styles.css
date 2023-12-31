@@ -5,7 +5,11 @@ body {
 	background-color: #fff;
 }
 
-#login-container {
+h1 { 
+	white-space: nowrap;
+}
+
+#login-container, #changepassword-container {
     max-width: 300px;
     margin: auto;
     padding: 20px;
@@ -34,18 +38,33 @@ body {
     box-sizing: border-box; /* Ensures the input doesn't exceed its container */
 }
 
-.login-button {
+.login-button, .change-password-button {
     background-color: #007bff; /* Button color */
     color: white;
     border: none;
     padding: 10px 15px;
     border-radius: 4px;
     cursor: pointer;
+}
+
+.login-button {
     width: 100%;
 }
 
-.login-button:hover {
+.change-password-button {
+    width: 130px;
+}
+
+.login-button:hover, .change-password-button:hover {
     background-color: #0056b3; /* Darker shade for hover effect */
+}
+
+.errormessage {
+	color: red;
+}
+
+#changepassword-container .errormessage, #login-container .errormessage {
+	margin-bottom: 10px;
 }
 
 #chat-container {
@@ -73,6 +92,9 @@ body {
 
 .right {
 	float: right;
+}
+.left {
+	float: left;
 }
 
 #messages {

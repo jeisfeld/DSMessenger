@@ -1,10 +1,12 @@
 <?php 
 include __DIR__ . '/check_language.php';
+$error=$_GET['error'];
+$errorText = $error ? _($error) : "";
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-<title>DS Messenger - Login</title>
+<title>Coachat - <?= _("login") ?></title>
 <link rel="stylesheet" type="text/css" href="css/styles.css">
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 </head>
@@ -20,6 +22,7 @@ include __DIR__ . '/check_language.php';
                 <label for="password"><?= _("password") ?>:</label>
                 <input type="password" id="password" name="password" required>
             </div>
+			<div class="errormessage"><?= $errorText ?></div>
             <button type="submit" class="login-button"><?= _("login") ?></button>
         </form>
     </div>

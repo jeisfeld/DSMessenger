@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if ($message) {
         if ($isNewConversation) {
-            $subject = $message;
+            $subject = substr($message, 0, 100);
             $conversationFlags = $replyPolicy ? $replyPolicy . "00" : "000";
             $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp) values (?, ?, ?, ?, ?)");
             $stmt->bind_param("sisss", $conversationId, $relationId, $subject, $conversationFlags, $mysqlTimestamp);

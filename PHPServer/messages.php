@@ -27,7 +27,7 @@ function convertTimestamp($mysqlTimestamp) {
 <!DOCTYPE html>
 <html>
 <head>
-<title>DS Messenger - Messages</title>
+<title>Coachat - <?= sprintf(_("conversation_with"), $subject, $contactName) ?></title>
 <link rel="stylesheet" type="text/css" href="css/styles.css">
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 <script src="js/jquery-3.6.2.min.js"></script>
@@ -40,7 +40,7 @@ function convertTimestamp($mysqlTimestamp) {
 			<a id="conversations-link" href="conversations.php?relationId=<?= $relationId ?>&contactName=<?= $contactName ?>&contactId=<?= $contactId ?>&isSlave=<?= $isSlave ?>&replyPolicy=<?= $replyPolicy ?>"><?= sprintf(_("conversations_with"), $_GET['contactName']) ?></a>
 			&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
-		<h1><?= sprintf(_("conversation_with"), $subject, $contactName) ?></h1>
+		<h1><?= sprintf(_("conversation_with"), substr($subject, 0, 30), $contactName) ?></h1>
 
 		<div id="messages">
             <?php

@@ -27,3 +27,33 @@ msgstr "Type your message here..."
 
 msgid "send"
 msgstr "Send"
+
+msgid "change_password"
+msgstr "Change password"
+
+msgid "old_password"
+msgstr "Old password"
+
+msgid "new_password"
+msgstr "New password"
+
+msgid "confirm_new_password"
+msgstr "Confirm new password"
+
+msgid "cancel"
+msgstr "Cancel"
+
+msgid "wrong_credentials"
+msgstr "Wrong username or password"
+
+msgid "wrong_old_password"
+msgstr "Wrong old password"
+
+msgid "passwords_nomatch"
+msgstr "Passwords did not match"
+
+msgid "password_8_characters"
+msgstr "Password must have at least 8 characters"
+
+msgid "change_password_failed"
+msgstr "Change of password failed"
