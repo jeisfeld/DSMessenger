@@ -91,6 +91,8 @@
     <string name="text_my_devices">Meine Geräte</string>
     <string name="text_my_doms">Meine Doms</string>
     <string name="text_my_subs">Meine Subs</string>
+    <string name="text_my_coaches">Meine Coaches</string>
+    <string name="text_my_clients">Meine Klienten</string>
     <string name="text_delete">Löschen</string>
     <string name="text_edit">Bearbeiten</string>
     <string name="text_pending">Ausstehend</string>

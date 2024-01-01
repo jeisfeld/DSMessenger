@@ -78,6 +78,16 @@ public class MainActivity extends AppCompatActivity {
 				&& ContactRegistry.getInstance().getConnectedContacts().size() > 0;
 	}
 
+	/**
+	 * Find out if user is DS user or Coaching user.
+	 *
+	 * @return true if DS user.
+	 */
+	private boolean isDsUser() {
+		return PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_usertype, 0) == 1;
+	}
+
+
 	@Override
 	protected final void onResume() {
 		super.onResume();
@@ -113,13 +123,15 @@ public class MainActivity extends AppCompatActivity {
 			NavigationView navigationView = findViewById(R.id.nav_view);
 			Menu menuNav = navigationView.getMenu();
 			menuNav.findItem(R.id.nav_conversations).setEnabled(true);
-			menuNav.findItem(R.id.nav_lut).setEnabled(true);
+			menuNav.findItem(R.id.nav_lut).setEnabled(isDsUser());
+			menuNav.findItem(R.id.nav_lut).setVisible(isDsUser());
 		}
 		else {
 			NavigationView navigationView = findViewById(R.id.nav_view);
 			Menu menuNav = navigationView.getMenu();
 			menuNav.findItem(R.id.nav_conversations).setEnabled(false);
 			menuNav.findItem(R.id.nav_lut).setEnabled(false);
+			menuNav.findItem(R.id.nav_lut).setVisible(isDsUser());
 		}
 	}
 

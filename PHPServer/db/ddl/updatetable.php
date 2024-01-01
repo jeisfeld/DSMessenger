@@ -11,10 +11,10 @@ if ($conn->connect_error) {
 }
 
 // sql to create table dsm_relation
-$sql = "ALTER TABLE dsm_conversation ADD COLUMN prepared_message VARCHAR(65535);";
+$sql = "ALTER TABLE dsm_user ADD COLUMN usertype INT(1) UNSIGNED DEFAULT 0;";
 
 if ($conn->query($sql) === TRUE) {
-    printSuccess("Table dsm_conversation updated successfully");
+    printSuccess("Table dsm_user updated successfully");
 }
 else {
     printError(102, "Error updating table: " . $conn->error);

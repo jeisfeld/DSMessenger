@@ -13,6 +13,7 @@
     <!-- Keys for my account and device -->
     <string name="key_pref_username" translatable="false">pref_username</string>
     <string name="key_pref_password" translatable="false">pref_password</string>
+    <string name="key_pref_usertype" translatable="false">pref_usertype</string>
     <string name="key_pref_messaging_token" translatable="false">pref_messaging_token</string>
     <string name="key_pref_device_id" translatable="false">pref_device_id</string>
     <string name="key_pref_device_name" translatable="false">pref_device_name</string>

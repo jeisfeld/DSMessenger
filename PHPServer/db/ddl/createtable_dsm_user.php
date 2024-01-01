@@ -22,6 +22,7 @@ $sql = "CREATE TABLE dsm_user (
 id INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 username VARCHAR(30) NOT NULL,
 password VARCHAR(60) NOT NULL,
+usertype INT(1) UNSIGNED DEFAULT 0,
 CONSTRAINT unique_username UNIQUE(username)
 )";
 

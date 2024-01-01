@@ -236,6 +236,13 @@ public class AccountFragment extends Fragment {
 		configureMyAccountButtons();
 		configureContactButtons();
 
+		int userType = PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_usertype, 0);
+		if (userType == 1) {
+			binding.textMyDoms.setText(R.string.text_my_doms);
+			binding.textMySubs.setText(R.string.text_my_subs);
+		}
+
+
 		for (Contact contact : ContactRegistry.getInstance().getContacts()) {
 			addContactToView(contact);
 		}

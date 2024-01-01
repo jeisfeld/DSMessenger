@@ -42,9 +42,34 @@ ORDER BY contact_name");
             'slavePermissions' => $slavePermissions
         ];
     }
+    $stmt->close();
     $conn -> close();
     
     return $contacts;
+}
+
+function queryUsertype($username, $password)
+{
+    // Create connection
+    $conn = getDbConnection();
+    
+    // Check connection
+    if ($conn->connect_error) {
+        printError(101, "Connection failed: " . $conn->connect_error);
+    }
+    
+    $userid = verifyCredentials($conn, $username, $password);
+    
+    $usertype = null;
+    $stmt = $conn->prepare("SELECT usertype from dsm_user WHERE id = ?");
+    
+    $stmt->bind_param("i", $userid);
+    $stmt->execute();
+    $stmt->bind_result($usertype);
+    $stmt->fetch();    
+    $stmt->close();
+    
+    return $usertype;
 }
 
 $username = @$_POST['username'];
@@ -52,8 +77,10 @@ $password = @$_POST['password'];
 if ($username) {
     header('Content-Type: text/json');
     $contacts = queryContacts($username, $password);
+    $usertype = queryUsertype($username, $password);
     
     printSuccess("Contacts of user " . $username . " have been retrieved.", [
-        'contacts' => $contacts
+        'contacts' => $contacts,
+        'usertype' => $usertype
     ]);
 }

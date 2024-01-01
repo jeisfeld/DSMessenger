@@ -179,6 +179,8 @@ public final class ContactRegistry {
 						}
 					}
 				}
+				int usertype = (int) responseData.getData().get("usertype");
+				PreferenceUtil.setSharedPreferenceInt(R.string.key_pref_usertype, usertype);
 				if (runnable != null) {
 					runnable.run();
 				}
