@@ -133,7 +133,8 @@ public class Conversation implements Serializable {
 	public void insertIfNew(final String newSubject) {
 		if (!isStored) {
 			if (newSubject != null) {
-				setSubject(newSubject);
+				subject = newSubject.length() > 100 ? newSubject.substring(0, 100) : newSubject;
+				setSubject(subject);
 			}
 			Application.getAppDatabase().getConversationDao().insert(this);
 		}
