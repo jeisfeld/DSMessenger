@@ -57,3 +57,15 @@ msgstr "Password must have at least 8 characters"
 
 msgid "change_password_failed"
 msgstr "Change of password failed"
+
+msgid "modal_do_you_want_to_delete"
+msgstr "Do you want to delete the conversation &ldquo;%s&rdquo;?"
+
+msgid "delete"
+msgstr "Delete"
+
+msgid "modal_edit_subject"
+msgstr "Enter the new subject of the conversation &ldquo;%s&rdquo;."
+
+msgid "change_subject"
+msgstr "Change Subject"

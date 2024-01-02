@@ -5,79 +5,106 @@ body {
 	background-color: #fff;
 }
 
-h1 { 
+h1 {
 	white-space: nowrap;
 }
 
+a {
+	text-decoration: none;
+	color: #006DE2; /* Link color */
+}
+
+a:hover {
+	color: #00356E;
+}
+
 #login-container, #changepassword-container {
-    max-width: 300px;
-    margin: auto;
-    padding: 20px;
+	max-width: 300px;
+	margin: auto;
+	padding: 20px;
 	background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: for slight shadow effect */
-    text-align: center;
+	border-radius: 10px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	/* Optional: for slight shadow effect */
+	text-align: center;
 }
 
 .form-group {
-    margin-bottom: 15px;
-    text-align: left;
+	margin-bottom: 15px;
+	text-align: left;
 }
 
 .form-group label {
-    display: block;
-    margin-bottom: 5px;
+	display: block;
+	margin-bottom: 5px;
 }
 
-.form-group input[type="text"],
-.form-group input[type="password"] {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box; /* Ensures the input doesn't exceed its container */
+.icons {
+	display: flex;
+	gap: 10px;
 }
 
-.login-button, .change-password-button {
-    background-color: #007bff; /* Button color */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
+.icon {
+	width: 16px;
+	height: 16px;
+	color: #007bff;
+}
+
+.icon:hover {
+	color: #0056b3;
+}
+
+.form-group input[type="text"], .form-group input[type="password"] {
+	width: 100%;
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	box-sizing: border-box;
+	/* Ensures the input doesn't exceed its container */
+}
+
+.login-button, .change-password-button, .modal-button {
+	background-color: #007bff; /* Button color */
+	color: white;
+	border: none;
+	padding: 10px 15px;
+	border-radius: 4px;
+	cursor: pointer;
 }
 
 .login-button {
-    width: 100%;
+	width: 100%;
 }
 
-.change-password-button {
-    width: 130px;
+.change-password-button, .modal-button {
+	width: 130px;
 }
 
 .login-button:hover, .change-password-button:hover {
-    background-color: #0056b3; /* Darker shade for hover effect */
+	background-color: #0056b3; /* Darker shade for hover effect */
 }
 
 .errormessage {
 	color: red;
 }
 
-#changepassword-container .errormessage, #login-container .errormessage {
+#changepassword-container .errormessage, #login-container .errormessage
+	{
 	margin-bottom: 10px;
 }
 
 #chat-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* Full viewport height */
-    max-width: 800px; /* Adjust based on your design */
-    margin: auto;
-    padding-left: 20px;
-    padding-right: 20px;
+	display: flex;
+	flex-direction: column;
+	height: 100vh; /* Full viewport height */
+	max-width: 800px; /* Adjust based on your design */
+	margin: auto;
+	padding-left: 20px;
+	padding-right: 20px;
 	background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: for slight shadow effect */
+	border-radius: 10px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	/* Optional: for slight shadow effect */
 }
 
 #chat-container #header {
@@ -87,21 +114,22 @@ h1 {
 .container {
 	width: 100%;
 	overflow: auto;
-    padding-top: 5px;
+	padding-top: 5px;
 }
 
 .right {
 	float: right;
 }
+
 .left {
 	float: left;
 }
 
 #messages {
-    flex-grow: 1; /* Allows this area to grow and shrink dynamically */
-    overflow-y: auto; /* Enable scrolling for overflow */
-    padding: 10px;
-    background-color: #f9f9f9; /* Light grey background */
+	flex-grow: 1; /* Allows this area to grow and shrink dynamically */
+	overflow-y: auto; /* Enable scrolling for overflow */
+	padding: 10px;
+	background-color: #f9f9f9; /* Light grey background */
 }
 
 .message {
@@ -113,13 +141,13 @@ h1 {
 }
 
 .own-message {
-	background-color: #ffecec; 
+	background-color: #ffecec;
 	margin-left: auto;
 	text-align: right;
 }
 
 .other-message {
-	background-color: #fff; 
+	background-color: #fff;
 	text-align: left;
 }
 
@@ -137,22 +165,22 @@ h1 {
 }
 
 .message-form {
-    display: flex;
-    padding: 10px;
-    background-color: #f9f9f9; /* Light grey background */
+	display: flex;
+	padding: 10px;
+	background-color: #f9f9f9; /* Light grey background */
 }
 
 .message-textarea {
-    flex-grow: 1;
-    padding: 10px;
-    margin-right: 10px;
-    border-radius: 15px;
-    border: 1px solid #ccc;
-    resize: vertical; /* Allow vertical resizing */
-    height: 100px;
-    min-height: 50px; /* Set a larger default height */
-    max-height: 400px; /* Increased max height */
-    overflow-y: auto; /* Add scroll bar when text exceeds the area */
+	flex-grow: 1;
+	padding: 10px;
+	margin-right: 10px;
+	border-radius: 15px;
+	border: 1px solid #ccc;
+	resize: vertical; /* Allow vertical resizing */
+	height: 100px;
+	min-height: 50px; /* Set a larger default height */
+	max-height: 400px; /* Increased max height */
+	overflow-y: auto; /* Add scroll bar when text exceeds the area */
 }
 
 .send-button {
@@ -169,37 +197,73 @@ h1 {
 }
 
 #contacts-container, #conversations-container {
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
+	max-width: 800px;
+	margin: auto;
+	padding: 20px;
 	background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Optional: for slight shadow effect */
+	border-radius: 10px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	/* Optional: for slight shadow effect */
 }
 
 #contact-list, #conversation-list {
-    list-style: none;
-    padding: 0;
+	list-style: none;
+	padding: 0;
 }
 
 .contact-item, .conversation-item {
-    padding: 10px;
-    border-bottom: 1px solid #eee; /* Light line between contacts */
+	padding: 10px;
+	border-bottom: 1px solid #eee; /* Light line between contacts */
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
-.contact-item a, .conversation-item a {
-    text-decoration: none;
-    color: #007bff; /* Link color */
-    display: block; /* Makes the entire list item clickable */
+.modal {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	overflow: auto; /* Enable scroll if needed */
+	background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
-.contact-item a:hover, .conversation-item a:hover {
-    background-color: #f2f2f2; /* Hover effect */
+.modal-content {
+	background-color: #fefefe;
+	margin: auto;
+	padding: 20px;
+	border: 1px solid #888;
+	width: 600px; /* Fixed width of 600px */
+	position: absolute; /* Use absolute positioning */
+	top: 50%;
+	left: 50%;
+	border-radius: 20px;
+	transform: translate(-50%, -50%); /* Correct transform for centering */
 }
 
+#modalEditSubject {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.close {
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.close:hover, .close:focus {
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
+}
 /* Adjust the form when the keyboard is visible on mobile devices */
-@media (max-width: 600px) {
-    .message-form {
-        position: static;
-    }
+@media ( max-width : 600px) {
+	.message-form {
+		position: static;
+	}
 }
