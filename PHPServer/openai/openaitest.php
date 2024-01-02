@@ -6,7 +6,7 @@ $message = createOpenAiMessage(
     'Translate the following English text to an arbitrary language: Hello, how are you? Tell which language you selected.'
 );
 
-$result = queryOpenAi([$message]);
+$result = queryOpenAi([$message], 1, 0, 0);
 
 if ($result['success']) {
     $message = $result['message'];

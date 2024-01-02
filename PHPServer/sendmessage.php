@@ -55,7 +55,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     $aiPolicy = 0;
-    
     if (! $isSlave) {
         $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
         if ($aiRelation) {
@@ -91,9 +90,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     
     if ($message && $aiPolicy == 1) {
-        $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage']);
+        $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
 
-        $result = queryOpenAi($messages);
+        $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty']);
         if ($result['success']) {
             $responseMessage = $result['message']['content'];
         }

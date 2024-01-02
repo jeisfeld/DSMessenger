@@ -21,7 +21,13 @@ if ($conn->connect_error) {
 $sql = "CREATE TABLE dsm_ai_priming (
 id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 name VARCHAR(30),
-priming_text VARCHAR(8192)
+priming_text VARCHAR(8192),
+temperature FLOAT(4, 3) DEFAULT 1,
+presence_penalty FLOAT(4, 3) DEFAULT 0,
+frequency_penalty FLOAT(4, 3) DEFAULT 0,
+old_message_count INT(4) UNSIGNED DEFAULT 20,
+old_message_count_variation INT(1) UNSIGNED DEFAULT 0,
+max_characters INT(7) UNSIGNED DEFAULT 40000
 )";
 
 if ($conn->query($sql) === TRUE) {

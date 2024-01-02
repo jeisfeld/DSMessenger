@@ -77,15 +77,16 @@ verifyRelation($conn, $relationId, $userId, $isSlave);
 
 $responseMessage = null;
 $aiPolicy = 0;
+
 $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
 if ($aiRelation) {
     $aiPolicy = $aiRelation['aiPolicy'];
 }
 
 if ($message && $aiPolicy > 1) {
-    $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage']);
+    $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
     
-    $result = queryOpenAi($messages);
+    $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty']);
     if ($result['success']) {
         $responseMessage = $result['message']['content'];
     }
