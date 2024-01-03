@@ -18,7 +18,7 @@ a:hover {
 	color: #00356E;
 }
 
-#login-container, #changepassword-container {
+#login-container, #changepassword-container, #createaccount-container {
 	max-width: 300px;
 	margin: auto;
 	padding: 20px;
@@ -111,7 +111,7 @@ a:hover {
 	color: red;
 }
 
-#changepassword-container .errormessage, #login-container .errormessage
+#changepassword-container .errormessage, #login-container .errormessage, #createaccount-container .errormessage
 	{
 	margin-bottom: 10px;
 }

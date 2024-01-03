@@ -80,4 +80,4 @@ msgid "confirm_password"
 msgstr "Confirm password"
 
 msgid "username_already_exists"
-msgstr "Username &ldquo;%s&rdquo; already exists"
+msgstr "Username already exists"

@@ -43,5 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Redirect to user dashboard or another protected page
         header("Location: contacts.php");
     } 
+    
+    $conn -> close();
+    
 }
 ?>

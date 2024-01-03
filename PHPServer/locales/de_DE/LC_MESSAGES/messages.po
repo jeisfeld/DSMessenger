@@ -85,4 +85,4 @@ msgid "confirm_password"
 msgstr "Passwort best&auml;tigen"
 
 msgid "username_already_exists"
-msgstr "Benutzername &bdquo;%s&ldquo; existiert bereits"
+msgstr "Benutzername existiert bereits"
