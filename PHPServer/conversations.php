@@ -19,27 +19,12 @@ if ($conn->connect_error) {
     printError(101, "Connection failed: " . $conn->connect_error);
 }
 
-$connectionCode = null;
-$contactName = null;
-$contactId = null;
-$myName = null;
-$isSlave = null;
-$slavePermissions = null;
-$stmt = $conn->prepare("SELECT connection_code, master_name as contact_name, master_id as contact_id, slave_name as my_name, false as is_slave, slave_permissions FROM dsm_relation WHERE id = ? and slave_id = ?
-UNION
-SELECT connection_code, slave_name as contact_name, slave_id as contact_id, master_name as my_name, true as is_slave, slave_permissions FROM dsm_relation WHERE id = ? and master_id = ?");
-$stmt->bind_param("iiii", $relationId, $userId, $relationId, $userId);
-$stmt->execute();
-$stmt->bind_result($connectionCode, $contactName, $contactId, $myName, $isSlave, $slavePermissions);
-if (! $stmt->fetch()) {
-    // relation does not belong to user - logout
-    header("Location: logout.php");
-    exit(0);
-}
-$stmt->fetch();
-$stmt->close();
+$relationData = getRelationData($conn, $userId, $relationId);
+$contactName = $relationData['contactName'];
+$contactId = $relationData['contactId'];
+$isSlave = $relationData['isSlave'];
+$slavePermissions = $relationData['slavePermissions'];
 $replyPolicy = substr($slavePermissions, 3, 1);
-
 
 // Retrieve data for conversations
 

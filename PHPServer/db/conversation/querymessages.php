@@ -13,7 +13,7 @@ function queryMessages($username, $password, $relationId, $isSlave, $conversatio
     
     $userId = verifyCredentials($conn, $username, $password);
     
-    verifyRelation($conn, $relationId, $userId, $isSlave);
+    getRelationData($conn, $userId, $relationId);
     
     $messageId = null;
     $userId = null;

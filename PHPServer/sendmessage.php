@@ -7,6 +7,7 @@ require_once 'openai/queryopenai.php';
 use Ramsey\Uuid\Uuid;
 $username = $_SESSION['username'];
 $password = $_SESSION['password'];
+$userId = $_SESSION['userId'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conversationId = $_POST['conversationId'];
@@ -23,8 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($conn->connect_error) {
         printError(101, "Connection failed: " . $conn->connect_error);
     }
-    $userId = verifyCredentials($conn, $username, $password);
-    verifyRelation($conn, $relationId, $userId, $isSlave);
+    getRelationData($conn, $userId, $relationId);
 
     $currentDateTime = new DateTime();
     $mysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);

@@ -72,8 +72,7 @@ $conn = getDbConnection();
 if ($conn->connect_error) {
     printError(101, "Connection failed: " . $conn->connect_error);
 }
-$userId = verifyCredentials($conn, $username, $password);
-verifyRelation($conn, $relationId, $userId, $isSlave);
+getRelationData($conn, $userId, $relationId);
 
 $responseMessage = null;
 $aiPolicy = 0;

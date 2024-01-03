@@ -59,13 +59,16 @@ function verifyCredentials($conn, $username, $password)
     return $userid;
 }
 
-function verifyRelation($conn, $relationId, $userId, $isSlave)
-{
+function verifyCredentialsAndRelation($conn, $post) {
+    $username = @$post['username'];
+    $password = @$post['password'];
+    $userId = verifyCredentials($conn, $username, $password);
+    
+    $relationId = @$post['relationId'];
+    $isSlave = @$post['isSlave'];
+    
     if (! $relationId) {
         printError(111, "Missing relationId");
-    }
-    if (! $userId) {
-        printError(112, "Missing userId");
     }
     if ($isSlave) {
         $stmt = $conn->prepare("SELECT id from dsm_relation where id = ? and master_id = ?");
@@ -79,18 +82,39 @@ function verifyRelation($conn, $relationId, $userId, $isSlave)
         printError(106, "Insufficient privileges");
     }
     $stmt->close();
-}
-
-function verifyCredentialsAndRelation($conn, $post) {
-    $username = @$post['username'];
-    $password = @$post['password'];
-    $userId = verifyCredentials($conn, $username, $password);
-    
-    $relationId = @$post['relationId'];
-    $isSlave = @$post['isSlave'];
-    verifyRelation($conn, $relationId, $userId, $isSlave);
     return $userId;
 }
+
+function getRelationData($conn, $userId, $relationId) {
+    $connectionCode = null;
+    $contactName = null;
+    $contactId = null;
+    $myName = null;
+    $isSlave = null;
+    $slavePermissions = null;
+    $stmt = $conn->prepare("SELECT connection_code, master_name as contact_name, master_id as contact_id, slave_name as my_name, false as is_slave, slave_permissions FROM dsm_relation WHERE id = ? and slave_id = ?
+UNION
+SELECT connection_code, slave_name as contact_name, slave_id as contact_id, master_name as my_name, true as is_slave, slave_permissions FROM dsm_relation WHERE id = ? and master_id = ?");
+    $stmt->bind_param("iiii", $relationId, $userId, $relationId, $userId);
+    $stmt->execute();
+    $stmt->bind_result($connectionCode, $contactName, $contactId, $myName, $isSlave, $slavePermissions);
+    if (! $stmt->fetch()) {
+        // relation does not belong to user - logout
+        header("Location: logout.php");
+        exit(0);
+    }
+    $stmt->close();
+    return [
+        'connectionCode' => $connectionCode,
+        'contactName' => $contactName,
+        'contactId' => $contactId,
+        'myName' => $myName,
+        'isSlave' => $isSlave,
+        'slavePermissions' => $slavePermissions
+    ];
+}
+
+
 
 function getTokens($conn, $username, $password, $relationId, $isSlave) {
     $userId = verifyCredentials($conn, $username, $password);
