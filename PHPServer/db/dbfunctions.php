@@ -190,22 +190,19 @@ WHERE d.user_id = r.master_id AND r.slave_id = ? AND r.id = ?");
     return $tokens;
 }
 
-function getUnmutedTokens($conn, $username, $password, $relationId, $isSlave) {
+function getUnmutedTokens($conn, $username, $password, $relationId) {
     $userId = verifyCredentials($conn, $username, $password);
     
-    if ($isSlave) {
         $stmt = $conn->prepare("SELECT d.token
 FROM dsm_device d, dsm_relation r
-WHERE d.user_id = r.slave_id AND r.master_id = ? AND r.id = ? AND d.muted = 0");
-    }
-    else {
-        $stmt = $conn->prepare("SELECT d.token
+WHERE d.user_id = r.slave_id AND r.master_id = ? AND r.id = ? AND d.muted = 0
+UNION
+SELECT d.token
 FROM dsm_device d, dsm_relation r
 WHERE d.user_id = r.master_id AND r.slave_id = ? AND r.id = ? AND d.muted = 0");
-    }
     
     $token = null;
-    $stmt->bind_param("ii", $userId, $relationId);
+    $stmt->bind_param("iiii", $userId, $relationId, $userId, $relationId);
     $stmt->execute();
     $stmt->bind_result($token);
     
@@ -265,9 +262,8 @@ function getVerifiedTokensFromRequestData() {
     $username = @$_POST['username'];
     $password = @$_POST['password'];
     $relationId = @$_POST['relationId'];
-    $isSlave = @$_POST['isSlave'];
     
-    return getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
+    return getUnmutedTokens($conn, $username, $password, $relationId);
 }
 
 function convertJavaTimestamp($javaTimestamp) {

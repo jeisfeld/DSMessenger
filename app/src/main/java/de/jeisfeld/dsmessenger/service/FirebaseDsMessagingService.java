@@ -101,7 +101,9 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 						Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId"));
 				if (editedConversation != null) {
 					editedConversation.setSubject(adminDetails.getValue("subject"));
-					editedConversation.setConversationFlags(ConversationFlags.fromString(adminDetails.getValue("conversationFlags")));
+					if (adminDetails.getValue("conversationFlags") != null) {
+						editedConversation.setConversationFlags(ConversationFlags.fromString(adminDetails.getValue("conversationFlags")));
+					}
 					editedConversation.update();
 					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, editedConversation);
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.CONVERSATION_EDITED,

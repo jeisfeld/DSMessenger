@@ -128,7 +128,7 @@ if ($message && ($aiPolicy == 2 || $aiPolicy == 3)) {
 }
 
 if ($message && $aiPolicy == 2) {
-    $tokens = getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
+    $tokens = getUnmutedTokens($conn, $username, $password, $relationId);
     $currentDateTime = new DateTime();
     $data = [
         "messageType" => "TEXT_OWN",

@@ -19,14 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $conversationId = Uuid::uuid4()->toString();
         $relationData = getRelationData($userId, $relationId);
         $isSlave = $relationData['isSlave'];
-        $preparedMessage = "";
         $subject = substr($message, 0, 100);
         $replyPolicy = substr($relationData['slavePermissions'], 3, 1);
     }
     else {
         $conversationData = getConversationData($userId, $relationId, $conversationId);
         $isSlave = $conversationData['isSlave'];
-        $preparedMessage = $isSlave ? $conversationData['preparedMessage'] : "";
         $subject = $conversationData['subject'];
         $replyPolicy = substr($conversationData['slavePermissions'], 3, 1);
     }
@@ -91,9 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         fastcgi_finish_request();
     }
 
-    $preparedMessage = "";
     $responseMessage = "";
-
     
     if ($message && $aiPolicy == 1) {
         $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
@@ -106,7 +102,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $aiPolicy = 0;
         }
         
-        $preparedMessage = $responseMessage;
         $stmt = $conn->prepare("UPDATE dsm_conversation SET prepared_message = ? where id = ?");
         $stmt->bind_param("ss", $responseMessage, $conversationId);
         $stmt->execute();
@@ -114,26 +109,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($aiPolicy != 3) {
-        $tokens = getUnmutedTokens($conn, $username, $password, $relationId, $isSlave);
-        $currentDateTime = new DateTime();
-        $data = [
-            "messageType" => "TEXT",
-            "messageText" => $message,
-            "priority" => "NORMAL",
-            "conversationId" => $conversationId,
-            "timestamp" => convertToJavaTimestamp($mysqlTimestamp),
-            "messageId" => $messageId,
-            "username" => $username,
-            "password" => $password,
-            "relationId" => $relationId,
-            "isSlave" => $isSlave,
-            "preparedMessage" => $preparedMessage,
-            "messageTime" => $currentDateTime->format("Y-m-d\TH:i:s.v") . 'Z'
-        ];
+        $tokens = getUnmutedTokens($conn, $username, $password, $relationId);
+        
+        $data = getTextData($relationId, "TEXT", $message, $conversationId, $mysqlTimestamp, $messageId);
         foreach ($tokens as $token) {
-            sendFirebaseMessage($token, $data, null);
+            sendFirebaseMessage($token, $data);
         }
-        $data["messageType"] = "TEXT_OWN";
+        $data = getTextData($relationId, "TEXT_OWN", $message, $conversationId, $mysqlTimestamp, $messageId);
         $tokens = getSelfTokens($conn, $username, $password, - 1);
         foreach ($tokens as $token) {
             sendFirebaseMessage($token, $data, null);

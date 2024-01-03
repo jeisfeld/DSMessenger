@@ -3,6 +3,7 @@ require_once dirname(__FILE__) . '/../vendor/autoload.php';
 require_once dirname(__FILE__) . '/token.php';
 require_once dirname(__FILE__) . '/../db/dbfunctions.php';
 
+use Ramsey\Uuid\Uuid;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\AndroidConfig;
@@ -29,6 +30,39 @@ function sendFirebaseMessage($token, $data, $ttl = null)
         ->withAndroidConfig($androidConfig)
         ->withHighestPossiblePriority();
     $messaging->send($message);
+}
+
+function getTextData($relationId, $messageType, $messageText, $conversationId, $mysqlTimestamp, $messageId, $isHighPrio = FALSE, $preparedMessage = "")
+{
+    $currentDateTime = new DateTime();
+    return [
+        "messageType" => $messageType,
+        "messageText" => $messageText,
+        "priority" => $isHighPrio ? "HIGH" : "NORMAL",
+        "conversationId" => $conversationId,
+        "timestamp" => convertToJavaTimestamp($mysqlTimestamp),
+        "messageId" => $messageId,
+        "relationId" => $relationId,
+        "preparedMessage" => $preparedMessage,
+        "messageTime" => $currentDateTime->format("Y-m-d\TH:i:s.v") . 'Z'
+    ];
+}
+
+function getAdminData($relationId, $adminType, $data = [], $isHighPrio = FALSE)
+{
+    $currentDateTime = new DateTime();
+    $result = [
+        "messageType" => "ADMIN",
+        "adminType" => $adminType,
+        "priority" => $isHighPrio ? "HIGH" : "NORMAL",
+        "messageId" => Uuid::uuid4()->toString(),
+        "relationId" => $relationId,
+        "messageTime" => $currentDateTime->format("Y-m-d\TH:i:s.v") . 'Z'
+    ];
+    foreach ($data as $key => $value) {
+        $result[$key] = $value;
+    }
+    return $result;
 }
 
 ?>

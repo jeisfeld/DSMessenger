@@ -1,6 +1,8 @@
 <?php
 include __DIR__ . '/check_session.php';
-require_once 'db/dbfunctions.php';
+require_once 'firebase/firebasefunctions.php';
+$username = $_SESSION['username'];
+$password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
 
 if (isset($_POST['submit'])) {
@@ -22,6 +24,23 @@ if (isset($_POST['submit'])) {
 
     $stmt->execute();
 
+    
+    $data = getAdminData($relationId, "CONVERSATION_EDITED", [
+        'conversationId' => $conversationId,
+        'subject' => $subject
+    ]);
+    
+    $tokens = getUnmutedTokens($conn, $username, $password, $relationId);
+    foreach ($tokens as $token) {
+        sendFirebaseMessage($token, $data, null);
+    }
+    
+    $tokens = getSelfTokens($conn, $username, $password, - 1);
+    foreach ($tokens as $token) {
+        sendFirebaseMessage($token, $data, null);
+    }
+    
+    
     header("Location: conversations.php?relationId=" . $relationId);
 }
 ?>
