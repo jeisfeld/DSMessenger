@@ -3,6 +3,9 @@
     <string name="nav_header_title">Coachat</string>
     <string name="nav_header_subtitle">coachat@jeisfeld.de</string>
     <string name="nav_header_desc">Navigation header</string>
+    <string name="notification_channel_name">Coachat</string>
+    <string name="notification_channel_description">Messages from Coachat</string>
+    <string name="notification_title">Message from %1$s</string>
     <string name="title_activity_message">MessageActivity</string>
     <string name="title_dialog_confirmation">Confirmation</string>
     <string name="title_dialog_confirm_deletion">Confirm deletion</string>
@@ -98,7 +101,7 @@
     <string name="text_pending">Pending</string>
     <string name="text_confirmed">Confirmed</string>
     <string name="text_refresh">Refresh</string>
-    <string name="text_subject_invitation">Invitation to DSMessenger</string>
+    <string name="text_subject_invitation">Invitation to Coachat</string>
     <string name="text_sending_message">Sending message…</string>
     <string name="text_message_sent">Message sent</string>
     <string name="text_message_received">Message received</string>

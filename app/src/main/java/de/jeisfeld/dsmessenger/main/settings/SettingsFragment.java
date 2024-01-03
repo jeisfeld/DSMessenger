@@ -1,14 +1,19 @@
 package de.jeisfeld.dsmessenger.main.settings;
 
+import android.Manifest.permission;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import de.jeisfeld.dsmessenger.Application;
@@ -19,6 +24,19 @@ import de.jeisfeld.dsmessenger.util.DialogUtil;
  * Fragment for settings.
  */
 public class SettingsFragment extends PreferenceFragmentCompat {
+	/**
+	 * A launcher for requesting notification permission
+	 */
+	private final ActivityResultLauncher<String> requestPermissionLauncher =
+			registerForActivityResult(new RequestPermission(), isGranted -> {
+				if (isGranted) {
+					Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+					intent.putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getPackageName());
+					intent.putExtra(Settings.EXTRA_CHANNEL_ID, Application.NOTIFICATION_CHANNEL_ID);
+					startActivity(intent);
+				}
+			});
+
 	@Override
 	public final void onCreate(@Nullable final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -29,6 +47,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 		setPreferencesFromResource(R.xml.preferences, rootKey);
 		configureBatteryOptimizationButton();
 		configureScreenControlButton();
+		configureNotificationSettingsButton();
 
 		findPreference(getString(R.string.key_pref_night_mode)).setOnPreferenceChangeListener((preference, newValue) -> {
 			AppCompatDelegate.setDefaultNightMode(Integer.parseInt((String) newValue));
@@ -58,6 +77,27 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 				intent.setData(Uri.parse("package:" + getContext().getPackageName()));
 			}
 			startActivity(intent);
+			return true;
+		});
+	}
+
+	/**
+	 * Configure the button for notification settings.
+	 */
+	private void configureNotificationSettingsButton() {
+		Preference notificationSettingsPreference = findPreference(getString(R.string.key_pref_dummy_notification_settings));
+		assert notificationSettingsPreference != null;
+		notificationSettingsPreference.setOnPreferenceClickListener(preference -> {
+			if (ContextCompat.checkSelfPermission(
+					getContext(), permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+				Intent intent = new Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS);
+				intent.putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getPackageName());
+				intent.putExtra(Settings.EXTRA_CHANNEL_ID, Application.NOTIFICATION_CHANNEL_ID);
+				startActivity(intent);
+			}
+			else {
+				requestPermissionLauncher.launch(permission.POST_NOTIFICATIONS);
+			}
 			return true;
 		});
 	}

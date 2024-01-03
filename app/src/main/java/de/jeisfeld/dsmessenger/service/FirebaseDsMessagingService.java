@@ -1,7 +1,12 @@
 package de.jeisfeld.dsmessenger.service;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build.VERSION;
+import android.os.Build.VERSION_CODES;
 import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -29,6 +34,7 @@ import de.jeisfeld.dsmessenger.message.LutMessageDetails;
 import de.jeisfeld.dsmessenger.message.MessageActivity;
 import de.jeisfeld.dsmessenger.message.MessageDetails;
 import de.jeisfeld.dsmessenger.message.MessageDetails.MessageType;
+import de.jeisfeld.dsmessenger.message.MessageDisplayStrategy.MessageDisplayType;
 import de.jeisfeld.dsmessenger.message.TextMessageDetails;
 import de.jeisfeld.dsmessenger.util.PreferenceUtil;
 
@@ -163,6 +169,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			break;
 		case TEXT:
 			textMessageDetails = (TextMessageDetails) messageDetails;
+			MessageDisplayType displayType = textMessageDetails.getDisplayStrategy().getMessageDisplayType();
 			UUID conversationId = textMessageDetails.getConversationId();
 			Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId);
 			if (messageConversation == null && textMessageDetails.getMessageText() != null && textMessageDetails.getMessageText().length() > 0) {
@@ -181,7 +188,10 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(),
 					textMessageDetails.getContact(), messageConversation, textMessage);
 			Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
-			startActivity(MessageActivity.createIntent(this, textMessageDetails, textMessage));
+			if (displayType == MessageDisplayType.ACTION) {
+				startActivity(MessageActivity.createIntent(this, textMessageDetails, textMessage));
+			}
+			displayNotification(textMessageDetails, textMessage);
 			break;
 		case TEXT_RESPONSE:
 			textMessageDetails = (TextMessageDetails) messageDetails;
@@ -199,6 +209,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_RESPONSE, messageDetails.getMessageId(),
 					messageDetails.getContact(), conversation, receivedMessage);
+			displayNotification(textMessageDetails, receivedMessage);
 			break;
 		case TEXT_OWN:
 			textMessageDetails = (TextMessageDetails) messageDetails;
@@ -249,6 +260,33 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		default:
 			break;
 		}
+	}
+
+	/**
+	 * Display a notification.
+	 *
+	 * @param textMessageDetails The text message details.
+	 * @param textMessage        The text message.
+	 */
+	public void displayNotification(final TextMessageDetails textMessageDetails, final Message textMessage) {
+		String message = textMessageDetails.getMessageText();
+		String title = getString(R.string.notification_title, textMessageDetails.getContact().getName());
+
+		Notification.Builder notificationBuilder;
+		notificationBuilder = new Notification.Builder(this, "MessageNotification");
+		notificationBuilder.setSmallIcon(R.drawable.ic_notification)
+				.setContentTitle(title)
+				.setContentText(message)
+				.setChannelId(Application.NOTIFICATION_CHANNEL_ID)
+				.setStyle(new Notification.BigTextStyle().bigText(message));
+
+		Intent actionIntent = MessageActivity.createIntent(this, textMessageDetails, textMessage);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, textMessageDetails.getContact().getRelationId(), actionIntent,
+				PendingIntent.FLAG_CANCEL_CURRENT | (VERSION.SDK_INT >= VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0));
+		notificationBuilder.setContentIntent(pendingIntent);
+
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.notify(textMessageDetails.getContact().getRelationId(), notificationBuilder.build());
 	}
 
 	@Override

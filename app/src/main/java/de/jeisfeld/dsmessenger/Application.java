@@ -2,6 +2,8 @@ package de.jeisfeld.dsmessenger;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -24,6 +26,11 @@ import de.jeisfeld.dsmessenger.util.PreferenceUtil;
  * Utility class to retrieve base application resources.
  */
 public class Application extends android.app.Application {
+	/**
+	 * The notification channel id.
+	 */
+	public static final String NOTIFICATION_CHANNEL_ID = "Coachat Messages";
+
 	/**
 	 * A utility field to store a context statically.
 	 */
@@ -73,6 +80,8 @@ public class Application extends android.app.Application {
 		appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "dsmessenger")
 				.addMigrations(AppDatabase.MIGRATION_2_3)
 				.allowMainThreadQueries().build();
+
+		createNotificationChannel();
 	}
 
 	/**
@@ -156,5 +165,15 @@ public class Application extends android.app.Application {
 		Intent intent = new Intent(triggeringActivity, MainActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		triggeringActivity.startActivity(intent);
+	}
+
+	private void createNotificationChannel() {
+		CharSequence name = getString(R.string.notification_channel_name);
+		String description = getString(R.string.notification_channel_description);
+		int importance = NotificationManager.IMPORTANCE_HIGH;
+		NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+		channel.setDescription(description);
+		NotificationManager notificationManager = getSystemService(NotificationManager.class);
+		notificationManager.createNotificationChannel(channel);
 	}
 }
