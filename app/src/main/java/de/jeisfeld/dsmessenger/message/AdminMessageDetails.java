@@ -150,6 +150,10 @@ public class AdminMessageDetails extends MessageDetails {
 		 */
 		MESSAGE_PREPARED,
 		/**
+		 * Password changed.
+		 */
+		PASSWORD_CHANGED,
+		/**
 		 * Ping message.
 		 */
 		PING,

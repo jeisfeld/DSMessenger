@@ -94,6 +94,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				AccountFragment.sendBroadcast(this, ActionType.DEVICES_CHANGED);
 				break;
 			case DEVICE_LOGGED_OUT:
+			case PASSWORD_CHANGED:
 				PreferenceUtil.removeSharedPreference(R.string.key_pref_username);
 				PreferenceUtil.removeSharedPreference(R.string.key_pref_password);
 				AccountFragment.removeStoredDeviceInfo();

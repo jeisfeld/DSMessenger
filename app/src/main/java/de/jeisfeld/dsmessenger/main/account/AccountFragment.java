@@ -608,7 +608,7 @@ public class AccountFragment extends Fragment {
 					activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
 				}
 			}
-		}, "newPassword", newPassword);
+		}, "newPassword", newPassword, "clientDeviceId", Integer.toString(PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_device_id, -1)));
 	}
 
 	/**

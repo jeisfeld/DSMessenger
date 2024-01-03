@@ -10,7 +10,7 @@ msgid "logout"
 msgstr "Abmelden"
 
 msgid "username"
-msgstr "Nutzer"
+msgstr "Benutzername"
 
 msgid "password"
 msgstr "Passwort"
@@ -74,3 +74,8 @@ msgstr "Geben Sie den neuen Betreff der Unterhaltung &bdquo;%s&ldquo; ein."
 
 msgid "change_subject"
 msgstr "Betreff &auml;ndern"
+
+msgid "waiting_for_response"
+msgstr "(Warte auf Antwort...)"
+
+

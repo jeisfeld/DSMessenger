@@ -111,6 +111,10 @@ a:hover {
 	margin-top: 20px;
 }
 
+#header a {
+	margin-left: 20px;
+}
+
 .container {
 	width: 100%;
 	overflow: auto;
@@ -149,6 +153,12 @@ a:hover {
 .other-message {
 	background-color: #fff;
 	text-align: left;
+}
+
+#waiting-for-response {
+	background-color: #fff;
+	text-align: left;
+	color: #383;
 }
 
 .text {

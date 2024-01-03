@@ -69,3 +69,6 @@ msgstr "Enter the new subject of the conversation &ldquo;%s&rdquo;."
 
 msgid "change_subject"
 msgstr "Change Subject"
+
+msgid "waiting_for_response"
+msgstr "(Waiting for response...)"

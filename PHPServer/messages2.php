@@ -61,7 +61,9 @@ function convertTimestamp($mysqlTimestamp) {
                 echo "</div>";
             }
             ?>
+	        <div class="message" id="waiting-for-response"><?= _("waiting_for_response") ?></div>
         </div>
+        
 	</div>
 
     <script>
