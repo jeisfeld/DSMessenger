@@ -10,32 +10,38 @@ $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $conversationId = $_POST['conversationId'];
     $relationId = $_POST['relationId'];
-    $isSlave = $_POST['isSlave'];
-    $subject = $_POST['subject'];
-    $contactName = $_POST['contactName'];
+    $conversationId = $_POST['conversationId'];
     $message = $_POST['message'];
-    $replyPolicy = $_POST['replyPolicy'];
-    $contactId = $_POST['contactId'];
     $isNewConversation = ! $conversationId;
 
+    if ($isNewConversation) {
+        $conversationId = Uuid::uuid4()->toString();
+        $relationData = getRelationData($userId, $relationId);
+        $isSlave = $relationData['isSlave'];
+        $preparedMessage = "";
+        $subject = substr($message, 0, 100);
+        $replyPolicy = substr($relationData['slavePermissions'], 3, 1);
+    }
+    else {
+        $conversationData = getConversationData($userId, $relationId, $conversationId);
+        $isSlave = $conversationData['isSlave'];
+        $preparedMessage = $isSlave ? $conversationData['preparedMessage'] : "";
+        $subject = $conversationData['subject'];
+        $replyPolicy = substr($conversationData['slavePermissions'], 3, 1);
+    }
+    
     $conn = getDbConnection();
     if ($conn->connect_error) {
         printError(101, "Connection failed: " . $conn->connect_error);
     }
-    getRelationData($conn, $userId, $relationId);
 
     $currentDateTime = new DateTime();
     $mysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);
 
     $messageId = Uuid::uuid4()->toString();
-    if ($isNewConversation) {
-        $conversationId = Uuid::uuid4()->toString();
-    }
     if ($message) {
         if ($isNewConversation) {
-            $subject = substr($message, 0, 100);
             $conversationFlags = $replyPolicy ? $replyPolicy . "00" : "000";
             $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp, prepared_message) values (?, ?, ?, ?, ?, '')");
             $stmt->bind_param("sisss", $conversationId, $relationId, $subject, $conversationFlags, $mysqlTimestamp);
@@ -70,10 +76,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: conversations.php?relationId=" . $relationId);
     }
     else if ($aiPolicy == 2 || $aiPolicy == 3) {
-        header("Location: messages2.php?conversationId=" . $conversationId . "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&subject=" . $subject . "&contactName=" . $contactName . "&contactId=" . $contactId . "&replyPolicy=" . $replyPolicy);
+        header("Location: messages2.php?relationId=" . $relationId . "&conversationId=" . $conversationId);
     }
     else {
-        header("Location: messages.php?conversationId=" . $conversationId . "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&subject=" . $subject . "&contactName=" . $contactName . "&contactId=" . $contactId . "&replyPolicy=" . $replyPolicy);
+        header("Location: messages.php?relationId=" . $relationId . "&conversationId=" . $conversationId);
     }
     header('Connection: close');
     header('Content-Length: ' . ob_get_length());

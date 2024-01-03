@@ -31,7 +31,7 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     }
     
     $userId = verifyCredentials($conn, $username, $password);
-    getRelationData($conn, $userId, $relationId);
+    getRelationData($userId, $relationId, $conn);
     
     // first add messages of current conversation.
     

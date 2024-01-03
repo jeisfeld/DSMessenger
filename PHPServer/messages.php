@@ -4,12 +4,15 @@ require_once __DIR__ . '/db/conversation/querymessages.php';
 $username = $_SESSION['username'];
 $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
-$subject = $_GET['subject'];
-$contactName = $_GET['contactName'];
-$contactId = $_GET['contactId'];
 $relationId = $_GET['relationId'];
-$isSlave = $_GET['isSlave'];
-$preparedMessage = $isSlave ? $_GET['preparedMessage'] : "";
+$conversationId = $_GET['conversationId'];
+
+$conversationData = getConversationData($userId, $relationId, $conversationId);
+$contactName = $conversationData['contactName'];
+$contactId = $conversationData['contactId'];
+$isSlave = $conversationData['isSlave'];
+$preparedMessage = $isSlave ? $conversationData['preparedMessage'] : "";
+$subject = $conversationData['subject'];
 
 function convertTimestamp($mysqlTimestamp) {
     $timestampDateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
@@ -43,7 +46,6 @@ function convertTimestamp($mysqlTimestamp) {
 
 		<div id="messages">
             <?php
-            $conversationId = $_GET['conversationId'];
             $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
             foreach ($messages as $message) {
                 // Assume $message['is_own'] is true if it's the user's message
@@ -64,7 +66,7 @@ function convertTimestamp($mysqlTimestamp) {
 				<input type="hidden" name="subject" value="<?= $subject ?>">
 				<input type="hidden" name="replyPolicy" value="">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
-				<textarea autofocus name="message" id="message" placeholder="<?= _("type_message") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
+				<textarea autofocus name="message" id="message" maxlength="40000" placeholder="<?= _("type_message") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
 				<button type="submit" class="send-button"><?= _("send") ?></button>
 			</form>
 		</div>

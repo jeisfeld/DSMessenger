@@ -9,12 +9,14 @@ use Ramsey\Uuid\Uuid;
 $username = $_SESSION['username'];
 $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
-$subject = $_GET['subject'];
-$contactName = $_GET['contactName'];
-$contactId = $_GET['contactId'];
 $relationId = $_GET['relationId'];
-$isSlave = $_GET['isSlave'];
-$replyPolicy = $_GET['replyPolicy'];
+$conversationId = $_GET['conversationId'];
+
+$conversationData = getConversationData($userId, $relationId, $conversationId);
+$contactName = $conversationData['contactName'];
+$contactId = $conversationData['contactId'];
+$isSlave = $conversationData['isSlave'];
+$subject = $conversationData['subject'];
 
 function convertTimestamp($mysqlTimestamp) {
     $timestampDateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
@@ -72,7 +74,6 @@ $conn = getDbConnection();
 if ($conn->connect_error) {
     printError(101, "Connection failed: " . $conn->connect_error);
 }
-getRelationData($conn, $userId, $relationId);
 
 $responseMessage = null;
 $aiPolicy = 0;
@@ -146,8 +147,7 @@ if ($message && $aiPolicy == 2) {
 }
 
 echo '<script type="text/javascript">';
-echo 'window.location.href = "https://coachat.de/messages.php?conversationId=' . $conversationId . '&relationId=' . $relationId .
-    '&isSlave=' . $isSlave . '&subject=' . $subject . '&contactName=' . $contactName . '&contactId=' . $contactId . '&replyPolicy=' . $replyPolicy. '";';
+echo 'window.location.href = "https://coachat.de/messages.php?relationId=' . $relationId . '&conversationId=' . $conversationId . '";';
 echo '</script>';
 
 ?>

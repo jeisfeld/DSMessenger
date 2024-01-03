@@ -85,7 +85,17 @@ function verifyCredentialsAndRelation($conn, $post) {
     return $userId;
 }
 
-function getRelationData($conn, $userId, $relationId) {
+function getRelationData($userId, $relationId, $givenConn = null) {
+    if ($givenConn) {
+        $conn = $givenConn;
+    }
+    else {
+        $conn = getDbConnection();
+        
+        if ($conn->connect_error) {
+            printError(101, "Connection failed: " . $conn->connect_error);
+        }
+    }
     $connectionCode = null;
     $contactName = null;
     $contactId = null;
@@ -104,6 +114,9 @@ SELECT connection_code, slave_name as contact_name, slave_id as contact_id, mast
         exit(0);
     }
     $stmt->close();
+    if (!$givenConn) {
+        $conn -> close();
+    }
     return [
         'connectionCode' => $connectionCode,
         'contactName' => $contactName,
@@ -114,7 +127,37 @@ SELECT connection_code, slave_name as contact_name, slave_id as contact_id, mast
     ];
 }
 
-
+function getConversationData($userId, $relationId, $conversationId) {
+    $conn = getDbConnection();
+    
+    if ($conn->connect_error) {
+        printError(101, "Connection failed: " . $conn->connect_error);
+    }
+    
+    $data = getRelationData($userId, $relationId, $conn);
+    
+    $subject = null;
+    $flags = null;
+    $lasttimestamp = null;
+    $preparedMessage = null;
+    $stmt = $conn->prepare("SELECT subject, flags, lasttimestamp, prepared_message from dsm_conversation WHERE relation_id = ? AND id = ? order by lasttimestamp desc");
+    
+    $stmt->bind_param("ss", $relationId, $conversationId);
+    $stmt->execute();
+    $stmt->bind_result($subject, $flags, $lasttimestamp, $preparedMessage);
+    if (! $stmt->fetch()) {
+        // conversation does not belong to relation - logout
+        header("Location: logout.php");
+        exit(0);
+    }
+    $stmt->close();
+    $conn->close();
+    $data['subject'] = $subject;
+    $data['flags'] = $flags;
+    $data['lasttimestamp'] = $lasttimestamp;
+    $data['preparedMessage'] = $preparedMessage;
+    return $data;
+}
 
 function getTokens($conn, $username, $password, $relationId, $isSlave) {
     $userId = verifyCredentials($conn, $username, $password);
