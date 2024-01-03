@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Redirect back to the chat
     echo "Dummy response";
     if ($isNewConversation && ! $message) {
-        header("Location: conversations.php?relationId=" . $relationId . "&contactName=" . $contactName . "&contactId=" . $contactId . "&isSlave=" . $isSlave . "&replyPolicy=" . $replyPolicy);
+        header("Location: conversations.php?relationId=" . $relationId);
     }
     else if ($aiPolicy == 2 || $aiPolicy == 3) {
         header("Location: messages2.php?conversationId=" . $conversationId . "&relationId=" . $relationId . "&isSlave=" . $isSlave . "&subject=" . $subject . "&contactName=" . $contactName . "&contactId=" . $contactId . "&replyPolicy=" . $replyPolicy);

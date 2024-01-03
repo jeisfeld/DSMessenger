@@ -23,9 +23,7 @@ $password = $_SESSION['password'];
             // Assuming you have a function getContacts() that returns an array of contacts
             $contacts = queryContacts($username, $password);
             foreach ($contacts as $contact) {
-                $replyPolicy = substr($contact["slavePermissions"], 3, 1);
-                echo "<li class='contact-item'><a href='conversations.php?relationId=" . $contact['relationId'] . "&contactName=" . $contact['contactName'] 
-                . "&contactId=" . $contact['contactId']. "&isSlave=" . $contact['isSlave'] . "&replyPolicy=" . $replyPolicy . "'>" . 
+                echo "<li class='contact-item'><a href='conversations.php?relationId=" . $contact['relationId'] . "'>" . 
                 ($contact['isSlave'] ? "" : "<b>") . $contact['contactName'] . ($contact['isSlave'] ? "" : "</b>") . "</a></li>";
             }
             ?>

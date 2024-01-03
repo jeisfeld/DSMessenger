@@ -6,7 +6,6 @@ $userId = $_SESSION['userId'];
 if (isset($_POST['submit'])) {
     $conversationId = $_POST['conversationId'];
     $relationId = $_POST['relationId'];
-    $params = $_POST['params'];
     
     // Create connection
     $conn = getDbConnection();
@@ -22,6 +21,6 @@ if (isset($_POST['submit'])) {
 
     $stmt->execute();
 
-    header("Location: conversations.php?" . $params);
+    header("Location: conversations.php?relationId=" . $relationId);
 }
 ?>
