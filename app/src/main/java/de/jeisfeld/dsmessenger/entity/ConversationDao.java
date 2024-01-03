@@ -36,6 +36,9 @@ public interface ConversationDao {
 	@Query("SELECT * FROM conversation WHERE conversationId = :conversationId")
 	Conversation getConversationById(String conversationId);
 
+	@Query("SELECT * FROM conversation")
+	List<Conversation> getAllConversations();
+
 	default Conversation getConversationById(UUID conversationId) {
 		return getConversationById(conversationId.toString());
 	}

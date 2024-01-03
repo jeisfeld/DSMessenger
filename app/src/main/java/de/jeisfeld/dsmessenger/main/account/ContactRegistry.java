@@ -6,6 +6,7 @@ import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import de.jeisfeld.dsmessenger.Application;
 import de.jeisfeld.dsmessenger.R;
@@ -202,12 +203,13 @@ public final class ContactRegistry {
 			return;
 		}
 		final long lastTimestamp = PreferenceUtil.getSharedPreferenceLong(R.string.key_last_conversation_timestamp, 0);
+		final ConversationDao conversationDao = Application.getAppDatabase().getConversationDao();
 		new Thread(() -> new HttpSender(context).sendMessage("db/conversation/queryconversationsandmessages.php", (response, responseData) -> {
 			if (responseData.isSuccess()) {
-				ConversationDao conversationDao = Application.getAppDatabase().getConversationDao();
 				List<Conversation> conversations = (List<Conversation>) responseData.getData().get("conversations");
-				long newTimestamp = lastTimestamp;
 				assert conversations != null;
+				long newTimestamp = lastTimestamp;
+				List<UUID> keys = new ArrayList<>();
 				for (Conversation conversation : conversations) {
 					Conversation oldConversation = conversationDao.getConversationById(conversation.getConversationId());
 					if (oldConversation == null) {
@@ -217,7 +219,14 @@ public final class ContactRegistry {
 						conversationDao.update(conversation);
 					}
 					newTimestamp = Math.max(newTimestamp, conversation.getLastTimestamp());
+					keys.add(conversation.getConversationId());
 				}
+				for (Conversation conversation : conversationDao.getAllConversations()) {
+					if (!keys.contains(conversation.getConversationId())) {
+						conversationDao.delete(conversation);
+					}
+				}
+
 				List<Message> messages = (List<Message>) responseData.getData().get("messages");
 				Application.getAppDatabase().getMessageDao().insert(messages);
 				PreferenceUtil.setSharedPreferenceLong(R.string.key_last_conversation_timestamp, newTimestamp);
@@ -228,6 +237,6 @@ public final class ContactRegistry {
 			else {
 				Log.e(Application.TAG, "Failed to retrieve conversation data: " + responseData.getErrorMessage());
 			}
-		}, "startTime", Long.toString(lastTimestamp))).start();
+		})).start();
 	}
 }

@@ -139,9 +139,9 @@ public class HttpSender {
 	/**
 	 * Send a POST message to Server, including credentials.
 	 *
-	 * @param contact The contact.
-	 * @param messageId The messageId.
-	 * @param listener The response listener.
+	 * @param contact    The contact.
+	 * @param messageId  The messageId.
+	 * @param listener   The response listener.
 	 * @param parameters The POST parameters.
 	 */
 	public void sendMessage(final Contact contact, final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
@@ -151,8 +151,8 @@ public class HttpSender {
 	/**
 	 * Send a POST message to Server, including credentials.
 	 *
-	 * @param messageId The messageId.
-	 * @param listener The response listener.
+	 * @param messageId  The messageId.
+	 * @param listener   The response listener.
 	 * @param parameters The POST parameters.
 	 */
 	public void sendSelfMessage(final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
@@ -164,7 +164,7 @@ public class HttpSender {
 	 * Send a POST message to Server, including credentials but without contact.
 	 *
 	 * @param urlPostfix The postfix of the URL.
-	 * @param listener The response listener.
+	 * @param listener   The response listener.
 	 * @param parameters The POST parameters.
 	 */
 	public void sendMessage(final String urlPostfix, final OnHttpResponseListener listener, final String... parameters) {
@@ -232,7 +232,7 @@ public class HttpSender {
 		/**
 		 * Handle HTTP/HTTPS response.
 		 *
-		 * @param response The response as String.
+		 * @param response     The response as String.
 		 * @param responseData The response as data.
 		 */
 		void onHttpResponse(String response, ResponseData responseData);
@@ -269,7 +269,7 @@ public class HttpSender {
 		/**
 		 * Extract response data from server response.
 		 *
-		 * @param context The context
+		 * @param context  The context
 		 * @param response The server response.
 		 * @return The response data.
 		 */
@@ -319,16 +319,18 @@ public class HttpSender {
 								Conversation conversation = new Conversation(relationId, subject,
 										conversationIdString, lasttimestamp, conversationFlags, preparedMessage);
 								conversations.add(conversation);
-								JSONArray messageArray = jsonConversation.getJSONArray("messages");
-								for (int j = 0; j < messageArray.length(); j++) {
-									JSONObject jsonMessage = messageArray.getJSONObject(j);
-									String messageIdString = jsonMessage.getString("messageId");
-									long timestamp = jsonMessage.getLong("timestamp");
-									String text = jsonMessage.getString("text");
-									boolean isOwn = jsonMessage.getInt("isOwn") == 1;
-									MessageStatus status = MessageStatus.fromOrdinal(jsonMessage.getInt("status"));
-									Message message = new Message(text, isOwn, messageIdString, conversationIdString, timestamp, status);
-									messages.add(message);
+								if (jsonConversation.has("messages")) {
+									JSONArray messageArray = jsonConversation.getJSONArray("messages");
+									for (int j = 0; j < messageArray.length(); j++) {
+										JSONObject jsonMessage = messageArray.getJSONObject(j);
+										String messageIdString = jsonMessage.getString("messageId");
+										long timestamp = jsonMessage.getLong("timestamp");
+										String text = jsonMessage.getString("text");
+										boolean isOwn = jsonMessage.getInt("isOwn") == 1;
+										MessageStatus status = MessageStatus.fromOrdinal(jsonMessage.getInt("status"));
+										Message message = new Message(text, isOwn, messageIdString, conversationIdString, timestamp, status);
+										messages.add(message);
+									}
 								}
 							}
 							data.put(key, conversations);
