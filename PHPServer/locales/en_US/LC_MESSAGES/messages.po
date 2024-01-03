@@ -72,3 +72,12 @@ msgstr "Change Subject"
 
 msgid "waiting_for_response"
 msgstr "(Waiting for response...)"
+
+msgid "create_account"
+msgstr "Create account"
+
+msgid "confirm_password"
+msgstr "Confirm password"
+
+msgid "username_already_exists"
+msgstr "Username &ldquo;%s&rdquo; already exists"

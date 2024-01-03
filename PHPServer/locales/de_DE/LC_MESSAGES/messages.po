@@ -78,4 +78,11 @@ msgstr "Betreff &auml;ndern"
 msgid "waiting_for_response"
 msgstr "(Warte auf Antwort...)"
 
+msgid "create_account"
+msgstr "Konto erstellen"
 
+msgid "confirm_password"
+msgstr "Passwort best&auml;tigen"
+
+msgid "username_already_exists"
+msgstr "Benutzername &bdquo;%s&ldquo; existiert bereits"

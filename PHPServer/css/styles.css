@@ -63,6 +63,29 @@ a:hover {
 	/* Ensures the input doesn't exceed its container */
 }
 
+.password-container {
+	position: relative;
+}
+
+.password-container input[type="password"], .password-container input[type="text"]
+	{
+	padding-right: 30px;
+}
+
+.toggle-password {
+	position: absolute;
+	color: #007bff;
+	right: 10px;
+	top: 30px;
+	cursor: pointer;
+	height: 20px;
+	width: 20px;
+}
+
+.toggle-password:hover {
+	color: #0056b3;
+}
+
 .login-button, .change-password-button, .modal-button {
 	background-color: #007bff; /* Button color */
 	color: white;
@@ -203,7 +226,7 @@ a:hover {
 }
 
 .send-button:hover {
-	background-color: #0056b3; /* Darker shade for hover effect */
+	background-color: #0056b3; 
 }
 
 #contacts-container, #conversations-container {
