@@ -32,6 +32,7 @@ function convertTimestamp($mysqlTimestamp) {
 <title>Coachat - <?= sprintf(_("conversation_with"), $subject, $contactName) ?></title>
 <link rel="stylesheet" type="text/css" href="css/styles.css">
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="js/jquery-3.6.2.min.js"></script>
 </head>
 <body>

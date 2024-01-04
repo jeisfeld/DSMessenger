@@ -10,6 +10,7 @@ $password = $_SESSION['password'];
 <title>Coachat - <?= _("contacts") ?></title>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 	<div id="contacts-container">
