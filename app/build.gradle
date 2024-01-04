@@ -7,7 +7,7 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "de.jeisfeld.dsmessenger"
+        applicationId "de.jeisfeld.coachat"
         minSdk 26
         targetSdk 34
         versionCode 1
@@ -35,7 +35,7 @@ android {
     buildFeatures {
         viewBinding true
     }
-    namespace 'de.jeisfeld.dsmessenger'
+    namespace 'de.jeisfeld.coachat'
 }
 
 dependencies {
@@ -48,8 +48,10 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.7.6'
     implementation 'com.google.firebase:firebase-messaging:23.4.0'
     implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.test.ext:junit:1.1.5'
     testImplementation 'junit:junit:4.13.2'
 
     implementation "androidx.room:room-runtime:2.6.1"
+    androidTestImplementation 'org.testng:testng:6.9.6'
     annotationProcessor "androidx.room:room-compiler:2.6.1"
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>DSMessengerAppEclipse</name>
+	<name>CoachatAppEclipse</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -46,27 +46,27 @@
 		<link>
 			<name>AndroidManifest.xml</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Android/app/src/main/AndroidManifest.xml</locationURI>
+			<locationURI>copy_PARENT/Android/app/src/main/AndroidManifest.xml</locationURI>
 		</link>
 		<link>
 			<name>databinding</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/app/build/generated/data_binding_base_class_source_out/debug/out</locationURI>
+			<locationURI>copy_PARENT/app/build/generated/data_binding_base_class_source_out/debug/out</locationURI>
 		</link>
 		<link>
 			<name>libs</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Android/app/libs</locationURI>
+			<locationURI>copy_PARENT/Android/app/libs</locationURI>
 		</link>
 		<link>
 			<name>out</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/app/build/generated/data_binding_base_class_source_out/debug/out</locationURI>
+			<locationURI>copy_PARENT/app/build/generated/data_binding_base_class_source_out/debug/out</locationURI>
 		</link>
 		<link>
 			<name>res</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/app/src/main/res</locationURI>
+			<locationURI>copy_PARENT/app/src/main/res</locationURI>
 		</link>
 		<link>
 			<name>src</name>
@@ -76,12 +76,18 @@
 		<link>
 			<name>srcShared</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/LuT/srcShared</locationURI>
+			<locationURI>copy_PARENT/LuT/srcShared</locationURI>
 		</link>
 		<link>
 			<name>libs-local/R.jar</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/R.jar</locationURI>
+			<locationURI>copy_PARENT/app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/R.jar</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>copy_PARENT</name>
+			<value>$%7BPARENT-4-PROJECT_LOC%7D/Git/DSMessenger</value>
+		</variable>
+	</variableList>
 </projectDescription>

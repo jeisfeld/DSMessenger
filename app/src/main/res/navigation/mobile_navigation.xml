@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_conversations"
-        android:name="de.jeisfeld.dsmessenger.main.message.ConversationsFragment"
+        android:name="de.jeisfeld.coachat.main.message.ConversationsFragment"
         android:label="@string/menu_conversations"
         tools:layout="@layout/fragment_message">
         <action
@@ -17,24 +17,24 @@
 
     <fragment
         android:id="@+id/nav_message"
-        android:name="de.jeisfeld.dsmessenger.main.message.MessageFragment"
+        android:name="de.jeisfeld.coachat.main.message.MessageFragment"
         android:label="@string/menu_conversations"
         tools:layout="@layout/fragment_message" />
 
     <fragment
         android:id="@+id/nav_lut"
-        android:name="de.jeisfeld.dsmessenger.main.lut.LutFragment"
+        android:name="de.jeisfeld.coachat.main.lut.LutFragment"
         android:label="@string/menu_lut"
         tools:layout="@layout/fragment_lut" />
 
     <fragment
         android:id="@+id/nav_account"
-        android:name="de.jeisfeld.dsmessenger.main.account.AccountFragment"
+        android:name="de.jeisfeld.coachat.main.account.AccountFragment"
         android:label="@string/menu_account"
         tools:layout="@layout/fragment_account" />
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="de.jeisfeld.dsmessenger.main.settings.SettingsFragment"
+        android:name="de.jeisfeld.coachat.main.settings.SettingsFragment"
         android:label="@string/menu_settings" />
 </navigation>

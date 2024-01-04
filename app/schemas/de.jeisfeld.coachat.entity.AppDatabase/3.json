@@ -1,0 +1,136 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 3,
+    "identityHash": "20abdc38469915d34a08e2f454542bfb",
+    "entities": [
+      {
+        "tableName": "conversation",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`relationId` INTEGER NOT NULL, `subject` TEXT, `conversationId` TEXT NOT NULL, `lastTimestamp` INTEGER NOT NULL, `conversationFlags` TEXT, `preparedMessage` TEXT, PRIMARY KEY(`conversationId`))",
+        "fields": [
+          {
+            "fieldPath": "relationId",
+            "columnName": "relationId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subject",
+            "columnName": "subject",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "conversationIdString",
+            "columnName": "conversationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastTimestamp",
+            "columnName": "lastTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationFlagsString",
+            "columnName": "conversationFlags",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "preparedMessage",
+            "columnName": "preparedMessage",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "conversationId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "message",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`messageText` TEXT, `isOwn` INTEGER NOT NULL, `messageId` TEXT NOT NULL, `conversationId` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `status` TEXT, PRIMARY KEY(`messageId`), FOREIGN KEY(`conversationId`) REFERENCES `conversation`(`conversationId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "messageText",
+            "columnName": "messageText",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isOwn",
+            "columnName": "isOwn",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "messageIdString",
+            "columnName": "messageId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "conversationIdString",
+            "columnName": "conversationId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "messageId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_message_conversationId",
+            "unique": false,
+            "columnNames": [
+              "conversationId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_message_conversationId` ON `${TABLE_NAME}` (`conversationId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "conversation",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "conversationId"
+            ],
+            "referencedColumns": [
+              "conversationId"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '20abdc38469915d34a08e2f454542bfb')"
+    ]
+  }
+}
