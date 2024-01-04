@@ -1,3 +1,8 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
 msgid "login"
 msgstr "Login"
 
@@ -81,3 +86,6 @@ msgstr "Confirm password"
 
 msgid "username_already_exists"
 msgstr "Username already exists"
+
+msgid "imprint"
+msgstr "Imprint"

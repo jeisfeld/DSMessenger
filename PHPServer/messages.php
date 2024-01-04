@@ -72,6 +72,9 @@ function convertTimestamp($mysqlTimestamp) {
 			</form>
 		</div>
 
+		<div id="footer">
+			<span class="left"></span> <span class="right"><a href="impressum.html" target="_blank"><?= _("imprint") ?></a></span>
+		</div>
 	</div>
 
     <script src="js/messages.js"></script>

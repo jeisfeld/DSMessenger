@@ -29,6 +29,9 @@ $password = $_SESSION['password'];
             }
             ?>
         </ul>
+		<div id="footer">
+			<span class="left"></span> <span class="right"><a href="impressum.html" target="_blank"><?= _("imprint") ?></a></span>
+		</div>
 	</div>
 </body>
 </html>

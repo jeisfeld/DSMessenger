@@ -88,6 +88,9 @@ $conn -> close();
 				<button type="submit" class="send-button"><?= _("send") ?></button>
 			</form>
 		</div>
+		<div id="footer">
+			<span class="left"></span> <span class="right"><a href="impressum.html" target="_blank"><?= _("imprint") ?></a></span>
+		</div>
 	</div>
 
 	<div id="modalDelete" class="modal">

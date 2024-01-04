@@ -7,6 +7,13 @@ body {
 
 h1 {
 	white-space: nowrap;
+	margin-top: 8px;
+	margin-bottom: 8px;
+	font-size: 1.5em;
+}
+
+ul {
+	margin: 0px;
 }
 
 a {
@@ -116,22 +123,14 @@ a:hover {
 	margin-bottom: 10px;
 }
 
-#chat-container {
-	display: flex;
-	flex-direction: column;
-	height: 100vh; /* Full viewport height */
-	max-width: 800px; /* Adjust based on your design */
-	margin: auto;
-	padding-left: 20px;
-	padding-right: 20px;
-	background-color: #f9f9f9;
-	border-radius: 10px;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-	/* Optional: for slight shadow effect */
+#header {
+	margin-top: 10px;
 }
 
-#chat-container #header {
-	margin-top: 20px;
+#footer {
+	margin-bottom: 10px;
+	margin-top: auto;
+	padding-top: 10px;
 }
 
 #header a {
@@ -199,7 +198,7 @@ a:hover {
 
 .message-form {
 	display: flex;
-	padding: 10px;
+	padding: 10px 10px 0px 10px;
 	background-color: #f9f9f9; /* Light grey background */
 }
 
@@ -229,14 +228,17 @@ a:hover {
 	background-color: #0056b3; 
 }
 
-#contacts-container, #conversations-container {
+#contacts-container, #conversations-container, #chat-container {
+	display: flex;
+	flex-direction: column;
+	height: 100vh; /* Full viewport height */
 	max-width: 800px;
 	margin: auto;
-	padding: 20px;
+	padding-left: 20px;
+	padding-right: 20px;
 	background-color: #f9f9f9;
 	border-radius: 10px;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-	/* Optional: for slight shadow effect */
 }
 
 #contact-list, #conversation-list {

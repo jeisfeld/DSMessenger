@@ -86,3 +86,6 @@ msgstr "Passwort best&auml;tigen"
 
 msgid "username_already_exists"
 msgstr "Benutzername existiert bereits"
+
+msgid "imprint"
+msgstr "Impressum"

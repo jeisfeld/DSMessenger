@@ -127,6 +127,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.CONVERSATION_DELETED,
 							null, null, deletedConversation, null);
 					MessageActivity.sendBroadcast(this, MessageActivity.ActionType.CONVERSATION_DELETED, null, deletedConversation);
+					cancelNotification(deletedConversation.getRelationId());
 				}
 				break;
 			case MESSAGE_RECEIVED:
@@ -288,6 +289,16 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		notificationManager.notify(textMessageDetails.getContact().getRelationId(), notificationBuilder.build());
+	}
+
+	/**
+	 * Cancel a notification.
+	 *
+	 * @param relationId The relationId
+	 */
+	public void cancelNotification(final int relationId) {
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancel(relationId);
 	}
 
 	@Override

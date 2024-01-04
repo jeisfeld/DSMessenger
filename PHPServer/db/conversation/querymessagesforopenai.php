@@ -56,7 +56,6 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     
     $totalMessages = 0;
     $plannedMessages = getRandomizedMessageCount($oldMessageCount, $oldMessageCountVariation);
-    print $plannedMessages . "<br>";
     
     $otherConversationId = null;
     $text = null;
