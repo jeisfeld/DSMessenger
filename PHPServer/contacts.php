@@ -18,7 +18,9 @@ $password = $_SESSION['password'];
 			<span class="left"><?= _("username") ?>: <?= $username ?></span>
 			<span class="right"><a href="change_password.php"><?= _("change_password") ?></a>&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
-		<h1><?= _("contacts") ?></h1>
+		<h1><?= _("contacts") ?>
+			<span class="right"><svg id="button-reload" onclick="location.reload()" class="icon"><use xlink:href="images/icons.svg#icon-reload"></use></svg></span>
+		</h1>
 		<ul id="contact-list">
             <?php
             // Assuming you have a function getContacts() that returns an array of contacts

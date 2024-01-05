@@ -1,4 +1,10 @@
 $(document).ready(function() {
+	$('#buttonSubmitMessage').click(function() {
+        $(this).prop('disabled', true);
+        $(this).css('color', 'transparent');
+        $('#formSubmitMessage').submit();
+    });
+	
 	// Open the modal and set data
 	$('.deleteButton').click(function() {
 		var conversationId = $(this).data('conversation-id');

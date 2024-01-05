@@ -47,7 +47,9 @@ function convertTimestamp($mysqlTimestamp) {
 			<a id="conversations-link" href="conversations.php?relationId=<?= $relationId ?>"><?= sprintf(_("conversations_with"), $contactName) ?></a>
 			&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
-		<h1><?= sprintf(_("conversation_with"),  substr($subject, 0, 30), $contactName) ?></h1>
+		<h1><?= sprintf(_("conversation_with"), substr($subject, 0, 30), $contactName) ?>
+			<span class="right"><svg id="button-reload" onclick="window.location.href = 'messages.php?relationId=<?= $relationId ?>&conversationId=<?= $conversationId ?>';" class="icon"><use xlink:href="images/icons.svg#icon-reload"></use></svg></span>
+		</h1>
 
 		<div id="messages">
             <?php
@@ -153,7 +155,7 @@ if ($message && $aiPolicy == 2) {
 }
 
 echo '<script type="text/javascript">';
-echo 'window.location.href = "https://coachat.de/messages.php?relationId=' . $relationId . '&conversationId=' . $conversationId . '";';
+echo 'window.location.href = "messages.php?relationId=' . $relationId . '&conversationId=' . $conversationId . '";';
 echo '</script>';
 
 ?>

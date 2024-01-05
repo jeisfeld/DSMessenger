@@ -43,7 +43,9 @@ function convertTimestamp($mysqlTimestamp) {
 			<a id="conversations-link" href="conversations.php?relationId=<?= $relationId ?>"><?= sprintf(_("conversations_with"), $contactName) ?></a>
 			&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
 		</div>
-		<h1><?= sprintf(_("conversation_with"), substr($subject, 0, 30), $contactName) ?></h1>
+		<h1><?= sprintf(_("conversation_with"), substr($subject, 0, 30), $contactName) ?>
+			<span class="right"><svg id="button-reload" onclick="location.reload()" class="icon"><use xlink:href="images/icons.svg#icon-reload"></use></svg></span>
+		</h1>
 
 		<div id="messages">
             <?php
@@ -59,7 +61,7 @@ function convertTimestamp($mysqlTimestamp) {
             ?>
 	    </div>
 		<div id="message-input">
-			<form action="sendmessage.php" method="post" class="message-form">
+			<form action="sendmessage.php" method="post" class="message-form" id="formSubmitMessage">
 				<input type="hidden" name="conversationId" id="conversationId" value="<?= $conversationId ?>">
 				<input type="hidden" name="relationId" id="relationId" value="<?= $relationId ?>"> 
 				<input type="hidden" name="contactId" value="<?= $contactId ?>">
@@ -68,7 +70,7 @@ function convertTimestamp($mysqlTimestamp) {
 				<input type="hidden" name="replyPolicy" value="">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
 				<textarea autofocus name="message" id="message" maxlength="40000" placeholder="<?= _("type_message") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
-				<button type="submit" class="send-button"><?= _("send") ?></button>
+				<button type="submit" class="send-button" id="buttonSubmitMessage"><?= _("send") ?></button>
 			</form>
 		</div>
 
