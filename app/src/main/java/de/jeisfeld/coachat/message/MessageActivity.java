@@ -39,6 +39,7 @@ import de.jeisfeld.coachat.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.coachat.message.MessageDetails.MessagePriority;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 import de.jeisfeld.coachat.util.DateUtil;
+import de.jeisfeld.coachat.util.DialogUtil;
 
 /**
  * Activity to display messages.
@@ -396,6 +397,7 @@ public class MessageActivity extends AppCompatActivity {
 			if (messageVibration != null) {
 				messageVibration.cancelVibration();
 			}
+			binding.buttonSend.setEnabled(false);
 			final long timestamp = System.currentTimeMillis();
 			UUID newMessageId = UUID.randomUUID();
 			String messageText = binding.editTextMessageText.getText().toString().trim();
@@ -426,8 +428,17 @@ public class MessageActivity extends AppCompatActivity {
 									binding.buttonAcknowledge.setVisibility(View.GONE);
 									binding.buttonSend
 											.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+									binding.buttonSend.setEnabled(true);
 									binding.layoutTextInput
 											.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+								});
+							}
+							else {
+								runOnUiThread(() -> {
+									binding.buttonSend
+											.setVisibility(conversation.getConversationFlags().isExpectingResponse() ? View.VISIBLE : View.GONE);
+									binding.buttonSend.setEnabled(true);
+									DialogUtil.displayToast(this, R.string.toast_error_when_sending, responseData.getMappedErrorMessage(this));
 								});
 							}
 						},

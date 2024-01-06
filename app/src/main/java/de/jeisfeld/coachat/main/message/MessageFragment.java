@@ -37,6 +37,7 @@ import de.jeisfeld.coachat.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.coachat.message.MessageDetails.MessagePriority;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 import de.jeisfeld.coachat.util.DateUtil;
+import de.jeisfeld.coachat.util.DialogUtil;
 
 /**
  * Fragment for sending messages.
@@ -350,6 +351,7 @@ public class MessageFragment extends Fragment {
 		String messageText = binding.editTextMessageText.getText().toString();
 		UUID messageId = UUID.randomUUID();
 		long timestamp = System.currentTimeMillis();
+		binding.buttonSend.setEnabled(false);
 
 		new HttpSender(getContext()).sendMessage("db/conversation/sendmessage.php", contact, messageId, (response, responseData) -> {
 					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
@@ -360,6 +362,7 @@ public class MessageFragment extends Fragment {
 					Activity activity = getActivity();
 					if (activity != null) {
 						activity.runOnUiThread(() -> {
+							binding.buttonSend.setEnabled(true);
 							if (responseData != null && responseData.isSuccess()) {
 								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
 									conversation.setPreparedMessage("");
@@ -371,6 +374,10 @@ public class MessageFragment extends Fragment {
 									addMessage(message);
 								}
 								binding.editTextMessageText.setText("");
+							}
+							else {
+								binding.buttonSend.setEnabled(true);
+								DialogUtil.displayToast(getContext(), R.string.toast_error_when_sending, responseData.getMappedErrorMessage(getContext()));
 							}
 						});
 					}

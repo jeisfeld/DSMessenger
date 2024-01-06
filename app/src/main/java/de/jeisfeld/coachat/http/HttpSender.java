@@ -409,6 +409,8 @@ public class HttpSender {
 				return context.getString(R.string.error_invalid_credentials);
 			case 106: // MAGIC_NUMBER
 				return context.getString(R.string.error_contact_not_connected);
+			case 107: // MAGIC_NUMBER
+				return context.getString(R.string.error_missing_privilege);
 			case 111: // MAGIC_NUMBER
 				return context.getString(R.string.error_missing_username);
 			case 112: // MAGIC_NUMBER

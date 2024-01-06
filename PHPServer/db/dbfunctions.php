@@ -79,7 +79,7 @@ function verifyCredentialsAndRelation($conn, $post) {
     $stmt->bind_param("ii", $relationId, $userId);
     $stmt->execute();
     if (! $stmt->get_result()->num_rows) {
-        printError(106, "Insufficient privileges");
+        printError(107, "Insufficient privileges");
     }
     $stmt->close();
     return $userId;

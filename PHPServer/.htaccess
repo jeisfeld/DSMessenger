@@ -1,2 +1,17 @@
 Allow from all
 AddType application/x-httpd-php81 .php
+
+<IfModule mod_headers.c>
+# 1 Jahr (der maximale unterstützte Wert) für Grafik-/Multimediadateien
+<FilesMatch "jquery-3.6.2.*\.js$">
+Header set Cache-Control "public, max-age=31536000, no-transform"
+</FilesMatch>
+<FilesMatch "\.(ico|jpg|jpeg|gif|png|pdf|mp3|mp4)$">
+Header set Cache-Control "public, max-age=31536000, no-transform"
+</FilesMatch>
+
+# 1 Stunde für eigene dateien
+<FilesMatch "\.(html|php|svg|js|css)$">
+Header set Cache-Control "public, max-age=3600, must-revalidate"
+</FilesMatch>
+</IfModule> 

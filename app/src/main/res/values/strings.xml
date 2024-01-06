@@ -123,6 +123,7 @@
     <string name="error_invalid_credentials">Username or Password is not correct</string>
     <string name="error_connection_failed">Connection failed</string>
     <string name="error_contact_not_connected">Contact is not connected</string>
+    <string name="error_missing_privilege">Missing privileges</string>
     <string name="error_user_already_exists">User %1$s already exists</string>
     <string name="error_user_already_logged_in">User %1$s is already logged in on another device. You may add this device as additional device.</string>
     <string name="error_device_already_exists">Device %1$s is already connected for this user</string>
@@ -132,6 +133,8 @@
     <string name="dialog_confirm_delete_contact">Do you really want to delete contact %1$s?</string>
     <string name="dialog_confirm_disconnect_device">Do you really want to dicsonnect device %1$s?</string>
     <string name="dialog_confirm_delete_conversation">Do you really want to delete conversation %1$s?</string>
+
+    <string name="toast_error_when_sending">Error when sending message: %1$s</string>
 
     <string-array name="array_vibrate_pattern_names">
         <item>Default</item>

@@ -123,6 +123,7 @@
     <string name="error_invalid_credentials">Benutzername oder Passwort ist nicht korrekt</string>
     <string name="error_connection_failed">Verbindung fehlgeschlagen</string>
     <string name="error_contact_not_connected">Kontakt ist nicht verbunden</string>
+    <string name="error_missing_privilege">Fehlende Berechtigung</string>
     <string name="error_user_already_exists">Benutzer %1$s existiert bereits</string>
     <string name="error_user_already_logged_in">Benutzer %1$s ist bereits auf einem anderen Gerät angemeldet. Sie können dieses Gerät als zusätzliches Gerät hinzufügen.</string>
     <string name="error_device_already_exists">Gerät %1$s ist bereits für diesen Benutzer verbunden</string>
@@ -132,6 +133,8 @@
     <string name="dialog_confirm_delete_contact">Möchten Sie wirklich den Kontakt %1$s löschen?</string>
     <string name="dialog_confirm_disconnect_device">Möchten Sie wirklich das Gerät %1$s trennen?</string>
     <string name="dialog_confirm_delete_conversation">Möchten Sie wirklich die Unterhaltung %1$s löschen?</string>
+
+    <string name="toast_error_when_sending">Fehler beim Senden der Nachricht: %1$s</string>
 
     <string-array name="array_vibrate_pattern_names">
         <item>Standard</item>

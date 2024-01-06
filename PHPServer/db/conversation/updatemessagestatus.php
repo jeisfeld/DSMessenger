@@ -18,10 +18,10 @@ $adminType = @$_POST['adminType'];
 $messageIds = @$_POST['messageIds'];
 
 if (! $conversationId) {
-    printError(114, "Missing conversationId");
+    printError(121, "Missing conversationId");
 }
 if (! $adminType) {
-    printError(114, "Missing adminType");
+    printError(122, "Missing adminType");
 }
 
 if ($adminType == "MESSAGE_RECEIVED") {
@@ -36,7 +36,7 @@ $stmt = $conn->prepare("SELECT id from dsm_conversation where id = ? and relatio
 $stmt->bind_param("si", $conversationId, $relationId);
 $stmt->execute();
 if (! $stmt->get_result()->num_rows) {
-    printError(106, "Insufficient privileges");
+    printError(107, "Insufficient privileges");
 }
 $stmt->close();
 
