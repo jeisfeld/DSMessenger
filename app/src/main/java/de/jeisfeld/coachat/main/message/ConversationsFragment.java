@@ -100,6 +100,13 @@ public class ConversationsFragment extends Fragment {
 		for (int i = 0; i < adapter.getGroupCount(); i++) {
 			binding.listViewConversations.expandGroup(i);
 		}
+		binding.imageViewRefreshContacts.setOnClickListener(
+				v -> ContactRegistry.getInstance().refreshContacts(getContext(),
+						() -> ContactRegistry.getInstance().refreshConversations(getContext(), () -> {
+							if (adapter != null) {
+								getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+							}
+						})));
 
 		return binding.getRoot();
 	}
@@ -123,16 +130,6 @@ public class ConversationsFragment extends Fragment {
 	public final void onDetach() {
 		super.onDetach();
 		broadcastManager.unregisterReceiver(localBroadcastReceiver);
-	}
-
-	@Override
-	public final void onResume() {
-		super.onResume();
-		ContactRegistry.getInstance().refreshContacts(getContext(), () -> ContactRegistry.getInstance().refreshConversations(getContext(), () -> {
-			if (adapter != null) {
-				getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
-			}
-		}));
 	}
 
 	/**

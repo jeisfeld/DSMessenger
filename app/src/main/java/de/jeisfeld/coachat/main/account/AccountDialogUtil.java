@@ -17,6 +17,7 @@ import de.jeisfeld.coachat.databinding.DialogEditConversationBinding;
 import de.jeisfeld.coachat.databinding.DialogEditDeviceBinding;
 import de.jeisfeld.coachat.databinding.DialogLoginBinding;
 import de.jeisfeld.coachat.entity.Contact;
+import de.jeisfeld.coachat.entity.Contact.AiPolicy;
 import de.jeisfeld.coachat.entity.Contact.ContactStatus;
 import de.jeisfeld.coachat.entity.Conversation;
 import de.jeisfeld.coachat.entity.ConversationFlags;
@@ -567,8 +568,9 @@ public final class AccountDialogUtil {
 				new HttpSender(getContext()).sendMessage("db/usermanagement/acceptinvitation.php", (response, responseData) -> {
 							if (responseData.isSuccess()) {
 								dismiss();
-								// TODO: fill slave permissions
-								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, null, ContactStatus.CONNECTED);
+								// TODO: fill slave permissions and AI Policy.
+								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, null,
+										ContactStatus.CONNECTED, AiPolicy.NONE, null);
 								ContactRegistry.getInstance().addOrUpdate(contact);
 
 								AccountFragment.sendBroadcast(getContext(), ActionType.CONTACTS_UPDATED);
@@ -659,7 +661,7 @@ public final class AccountDialogUtil {
 						ReplyPolicy.fromOrdinal(dropdownHandlerDefaultReplyPolicy.getSelectedPosition()));
 
 				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
-						contact.getConnectionCode(), newSlavePermissions, contact.getStatus());
+						contact.getConnectionCode(), newSlavePermissions, contact.getStatus(), contact.getAiPolicy(), contact.getAiUsername());
 				((AccountFragment) requireParentFragment()).handleEditContactDialogResponse(this, newContact);
 
 			});

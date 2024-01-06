@@ -17,6 +17,15 @@
         android:layout_height="match_parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <ImageButton
+        android:id="@+id/imageButtonRefreshMessage"
+        android:layout_width="@dimen/input_row_height"
+        android:layout_height="@dimen/input_row_height"
+        android:contentDescription="@string/text_refresh"
+        android:src="@drawable/ic_icon_refresh"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <TextView
         android:id="@+id/textViewMessage"
         android:layout_width="0dp"

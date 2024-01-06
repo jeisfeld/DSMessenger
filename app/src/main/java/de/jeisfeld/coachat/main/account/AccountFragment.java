@@ -24,6 +24,7 @@ import de.jeisfeld.coachat.databinding.ListViewContactBinding;
 import de.jeisfeld.coachat.databinding.ListViewDeviceMultiBinding;
 import de.jeisfeld.coachat.databinding.ListViewDeviceSingleBinding;
 import de.jeisfeld.coachat.entity.Contact;
+import de.jeisfeld.coachat.entity.Contact.AiPolicy;
 import de.jeisfeld.coachat.entity.Contact.ContactStatus;
 import de.jeisfeld.coachat.entity.Device;
 import de.jeisfeld.coachat.entity.SlavePermissions;
@@ -629,7 +630,7 @@ public class AccountFragment extends Fragment {
 				int relationId = (int) responseData.getData().get("relationId");
 
 				Contact contact = new Contact(relationId, contactName, myName, -1, !amSlave, connectionCode, SlavePermissions.DEFAULT_SLAVE_PERMISSIONS,
-						ContactStatus.INVITED);
+						ContactStatus.INVITED, AiPolicy.NONE, null);
 				ContactRegistry.getInstance().addOrUpdate(contact);
 				Activity activity = getActivity();
 				if (activity != null) {

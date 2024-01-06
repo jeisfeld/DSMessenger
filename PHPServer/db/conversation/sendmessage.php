@@ -1,6 +1,6 @@
 <?php
 require_once '../../firebase/firebasefunctions.php';
-require_once 'querymessagesforopenai.php';
+require_once 'querymessages.php';
 require_once '../../openai/queryopenai.php';
 use Ramsey\Uuid\Uuid;
 
@@ -26,6 +26,7 @@ $conversationFlags = @$_POST['conversationFlags'];
 $timestamp = @$_POST['timestamp'];
 $mysqltimestamp = convertJavaTimestamp($timestamp);
 $messageIds = @$_POST['messageIds'];
+$regenerate = @$_POST['regenerate'];
 
 $stmt = $conn->prepare("SELECT id FROM dsm_conversation WHERE id = ?");
 $stmt->bind_param("s", $conversationId);
@@ -52,9 +53,6 @@ if ($messageText) {
     $stmt->execute();
     $stmt->close();
 }
-else {
-    $stmt->close();
-}
 
 if ($messageIds) {
     $messageIdArr = explode(",", $messageIds);
@@ -63,6 +61,16 @@ if ($messageIds) {
         $stmt->bind_param("ss", $msgId, $conversationId);
         $stmt->execute();
         $stmt->close();
+    }
+}
+
+if ($regenerate) {
+    $messageId = deleteLastMessage($userId, $conversationId, $messageId);
+    if ($messageId) {
+        sendAdminMessage($conn, $username, $password, $relationId, "MESSAGE_DELETED", [
+            'conversationId' => $conversationId,
+            'messageId' => $messageId
+        ]);
     }
 }
 

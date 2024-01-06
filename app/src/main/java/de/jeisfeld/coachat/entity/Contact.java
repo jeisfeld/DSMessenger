@@ -45,6 +45,14 @@ public class Contact implements Serializable {
 	 * The contact status.
 	 */
 	private final ContactStatus status;
+	/**
+	 * The AI Policy.
+	 */
+	private final AiPolicy aiPolicy;
+	/**
+	 * The AI Username.
+	 */
+	private final String aiUsername;
 
 	/**
 	 * Constructor without id.
@@ -57,9 +65,12 @@ public class Contact implements Serializable {
 	 * @param connectionCode   The connection code
 	 * @param slavePermissions The slave permissions.
 	 * @param status           The contact status
+	 * @param aiPolicy         The AI Policy
+	 * @param aiUsername       The AI Username
 	 */
 	public Contact(final int relationId, final String name, final String myName, final int contactId,
-				   final boolean isSlave, final String connectionCode, final SlavePermissions slavePermissions, final ContactStatus status) {
+				   final boolean isSlave, final String connectionCode, final SlavePermissions slavePermissions, final ContactStatus status,
+				   final AiPolicy aiPolicy, final String aiUsername) {
 		this.relationId = relationId;
 		this.name = name;
 		this.myName = myName;
@@ -68,6 +79,8 @@ public class Contact implements Serializable {
 		this.connectionCode = connectionCode;
 		this.slavePermissions = slavePermissions;
 		this.status = status;
+		this.aiPolicy = aiPolicy;
+		this.aiUsername = aiUsername;
 	}
 
 	/**
@@ -86,6 +99,8 @@ public class Contact implements Serializable {
 				SlavePermissions.fromString(PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_slave_permissions, relationId));
 		String statusString = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_status, relationId);
 		status = statusString == null ? ContactStatus.INVITED : ContactStatus.valueOf(statusString);
+		aiPolicy = AiPolicy.fromOrdinal(PreferenceUtil.getIndexedSharedPreferenceInt(R.string.key_contact_ai_policy, relationId, 0));
+		aiUsername = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_username, relationId);
 	}
 
 	public final int getRelationId() {
@@ -120,6 +135,14 @@ public class Contact implements Serializable {
 		return status;
 	}
 
+	public AiPolicy getAiPolicy() {
+		return aiPolicy;
+	}
+
+	public String getAiUsername() {
+		return aiUsername;
+	}
+
 	/**
 	 * Get my permissions for this contact.
 	 *
@@ -148,7 +171,7 @@ public class Contact implements Serializable {
 	public final String toDetailedString() {
 		return "Contact{" + "relationId=" + relationId + ", name='" + name + '\'' + ", myName='" + myName + '\'' + ", contactId='" + contactId + '\''
 				+ ", isSlave=" + isSlave + ", connectionCode='" + connectionCode + "', slavePermissions=" + slavePermissions
-				+ ", status=" + status + '}';
+				+ ", status=" + status + ", aiPolicy=" + aiPolicy+", aiUsername=" + aiUsername + '}';
 	}
 
 	/**
@@ -167,6 +190,8 @@ public class Contact implements Serializable {
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_connection_code, getRelationId(), getConnectionCode());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_slave_permissions, getRelationId(), getSlavePermissions().toString());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_status, getRelationId(), getStatus().name());
+		PreferenceUtil.setIndexedSharedPreferenceInt(R.string.key_contact_ai_policy, getRelationId(), getAiPolicy().ordinal());
+		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_username, getRelationId(), getAiUsername());
 	}
 
 	/**
@@ -195,6 +220,44 @@ public class Contact implements Serializable {
 		 * Connected.
 		 */
 		CONNECTED
+	}
+
+
+	/**
+	 * AI Policies
+	 */
+	public enum AiPolicy {
+		/**
+		 * No use of AI.
+		 */
+		NONE,
+		/**
+		 * Manual use of AI.
+		 */
+		MANUAL,
+		/**
+		 * Automatic use of AI.
+		 */
+		AUTOMATIC,
+		/**
+		 * Automatic use of AI, no message forwarding.
+		 */
+		AUTOMATIC_NOMESSAGE;
+
+		/**
+		 * Get a AiPolicy from its ordinal value.
+		 *
+		 * @param ordinal The ordinal value.
+		 * @return The AI Policy.
+		 */
+		public static AiPolicy fromOrdinal(final int ordinal) {
+			for (AiPolicy messageDisplayType : values()) {
+				if (messageDisplayType.ordinal() == ordinal) {
+					return messageDisplayType;
+				}
+			}
+			return NONE;
+		}
 	}
 
 }

@@ -45,6 +45,8 @@
     <string name="key_contact_status" translatable="false">contact_status</string>
     <string name="key_contact_slave_permissions" translatable="false">contact_slave_permissions</string>
     <string name="key_contact_conversation_ids" translatable="false">contact_conversation_ids</string>
+    <string name="key_contact_ai_policy" translatable="false">contact_ai_policy</string>
+    <string name="key_contact_ai_username" translatable="false">contact_ai_username</string>
 
     <!-- Arrays for list preferences -->
     <string-array name="pref_list_titles_language">

@@ -139,6 +139,8 @@ public final class ContactRegistry {
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_connection_code, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_slave_permissions, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_status, relationId);
+		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_policy, relationId);
+		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_username, relationId);
 
 		Application.getAppDatabase().getConversationDao().deleteConversationsByRelationId(relationId);
 	}

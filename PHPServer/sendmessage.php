@@ -1,7 +1,7 @@
 <?php
 include __DIR__ . '/check_session.php';
 require_once 'firebase/firebasefunctions.php';
-require_once 'db/conversation/querymessagesforopenai.php';
+require_once 'db/conversation/querymessages.php';
 require_once 'openai/queryopenai.php';
 use Ramsey\Uuid\Uuid;
 $username = $_SESSION['username'];

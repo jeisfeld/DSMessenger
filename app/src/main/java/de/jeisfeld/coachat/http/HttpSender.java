@@ -31,6 +31,7 @@ import javax.net.ssl.HttpsURLConnection;
 import de.jeisfeld.coachat.Application;
 import de.jeisfeld.coachat.R;
 import de.jeisfeld.coachat.entity.Contact;
+import de.jeisfeld.coachat.entity.Contact.AiPolicy;
 import de.jeisfeld.coachat.entity.Contact.ContactStatus;
 import de.jeisfeld.coachat.entity.Conversation;
 import de.jeisfeld.coachat.entity.Device;
@@ -156,7 +157,8 @@ public class HttpSender {
 	 * @param parameters The POST parameters.
 	 */
 	public void sendSelfMessage(final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
-		sendMessage("firebase/sendselfmessage.php", new Contact(-1, null, null, 0, false, null, null, null),
+		sendMessage("firebase/sendselfmessage.php", new Contact(-1, null, null, 0, false, null,
+						null, null, AiPolicy.NONE, null),
 				messageId, listener, parameters);
 	}
 
@@ -298,8 +300,10 @@ public class HttpSender {
 								boolean isSlave = jsonContact.getBoolean("isSlave");
 								boolean isConfirmed = jsonContact.getBoolean("isConfirmed");
 								SlavePermissions slavePermissions = SlavePermissions.fromString(jsonContact.getString("slavePermissions"));
+								AiPolicy aiPolicy = AiPolicy.fromOrdinal(jsonContact.getInt("aiPolicy"));
+								String aiUsername = jsonContact.getString("aiUsername");
 								Contact contact = new Contact(relationId, contactName, myName, contactId, isSlave, connectionCode, slavePermissions,
-										isConfirmed ? ContactStatus.CONNECTED : ContactStatus.INVITED);
+										isConfirmed ? ContactStatus.CONNECTED : ContactStatus.INVITED, aiPolicy, aiUsername);
 								contacts.put(relationId, contact);
 							}
 							data.put(key, contacts);

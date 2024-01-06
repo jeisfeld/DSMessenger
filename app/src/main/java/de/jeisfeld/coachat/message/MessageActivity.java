@@ -28,6 +28,7 @@ import de.jeisfeld.coachat.Application;
 import de.jeisfeld.coachat.R;
 import de.jeisfeld.coachat.databinding.ActivityMessageBinding;
 import de.jeisfeld.coachat.entity.Contact;
+import de.jeisfeld.coachat.entity.Contact.AiPolicy;
 import de.jeisfeld.coachat.entity.Conversation;
 import de.jeisfeld.coachat.entity.Message;
 import de.jeisfeld.coachat.entity.ReplyPolicy;
@@ -243,6 +244,23 @@ public class MessageActivity extends AppCompatActivity {
 				default:
 					imageViewMessageStatus.setImageIcon(null);
 					break;
+				}
+
+				if (position == messageList.size() - 1 && !contact.isSlave() &&
+						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)) {
+					ImageView buttonRefreshMessage = view.findViewById(R.id.imageButtonRefreshMessage);
+					buttonRefreshMessage.setVisibility(View.VISIBLE);
+					buttonRefreshMessage.setOnClickListener(v -> {
+						buttonRefreshMessage.setEnabled(false);
+						new HttpSender(MessageActivity.this).sendMessage("db/conversation/sendmessage.php", contact, UUID.randomUUID(),
+								(response, responseData) -> runOnUiThread(() -> buttonRefreshMessage.setEnabled(true)),
+								"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_DELETED.name(),
+								"conversationId", conversation.getConversationId().toString(), "messageId", message.getMessageId().toString(),
+								"regenerate", "true");
+					});
+				}
+				else {
+					view.findViewById(R.id.imageButtonRefreshMessage).setVisibility(View.GONE);
 				}
 
 				return view;

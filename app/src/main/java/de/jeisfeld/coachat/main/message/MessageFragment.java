@@ -28,6 +28,7 @@ import de.jeisfeld.coachat.Application;
 import de.jeisfeld.coachat.R;
 import de.jeisfeld.coachat.databinding.FragmentMessageBinding;
 import de.jeisfeld.coachat.entity.Contact;
+import de.jeisfeld.coachat.entity.Contact.AiPolicy;
 import de.jeisfeld.coachat.entity.Conversation;
 import de.jeisfeld.coachat.entity.Message;
 import de.jeisfeld.coachat.entity.ReplyPolicy;
@@ -38,6 +39,7 @@ import de.jeisfeld.coachat.message.MessageDetails.MessagePriority;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 import de.jeisfeld.coachat.util.DateUtil;
 import de.jeisfeld.coachat.util.DialogUtil;
+import de.jeisfeld.coachat.util.Logger;
 import io.noties.markwon.Markwon;
 
 /**
@@ -245,6 +247,27 @@ public class MessageFragment extends Fragment {
 				default:
 					imageViewMessageStatus.setImageResource(0);
 					break;
+				}
+
+				if (position == messageList.size() - 1) {
+					Logger.log("aiPolicy: " + contact.getAiPolicy());
+				}
+
+				if (position == messageList.size() - 1 && !contact.isSlave() &&
+						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)) {
+					ImageView buttonRefreshMessage = view.findViewById(R.id.imageButtonRefreshMessage);
+					buttonRefreshMessage.setVisibility(View.VISIBLE);
+					buttonRefreshMessage.setOnClickListener(v -> {
+						buttonRefreshMessage.setEnabled(false);
+						new HttpSender(getActivity()).sendMessage("db/conversation/sendmessage.php", contact, UUID.randomUUID(),
+								(response, responseData) -> getActivity().runOnUiThread(() -> buttonRefreshMessage.setEnabled(true)),
+								"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_DELETED.name(),
+								"conversationId", conversation.getConversationId().toString(), "messageId", message.getMessageId().toString(),
+								"regenerate", "true");
+					});
+				}
+				else {
+					view.findViewById(R.id.imageButtonRefreshMessage).setVisibility(View.GONE);
 				}
 
 				return view;

@@ -16,6 +16,16 @@
         android:textSize="@dimen/text_xlarge"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageButton
+        android:id="@+id/imageViewRefreshContacts"
+        android:layout_width="@dimen/input_row_height"
+        android:layout_height="@dimen/input_row_height"
+        android:contentDescription="@string/text_refresh"
+        android:src="@drawable/ic_icon_refresh"
+        app:layout_constraintBottom_toBottomOf="@id/textSendMessage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/textSendMessage" />
+
     <ExpandableListView
         android:id="@+id/listViewConversations"
         android:layout_width="match_parent"
