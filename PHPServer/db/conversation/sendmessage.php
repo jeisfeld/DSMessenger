@@ -1,6 +1,5 @@
 <?php
 require_once '../../firebase/firebasefunctions.php';
-require_once 'queryairelation.php';
 require_once 'querymessagesforopenai.php';
 require_once '../../openai/queryopenai.php';
 use Ramsey\Uuid\Uuid;

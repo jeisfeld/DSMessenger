@@ -42,3 +42,20 @@ function queryMessages($username, $password, $relationId, $isSlave, $conversatio
     return $messages;
 }
 
+function deleteLastMessage($userId, $conversationId) {
+    // Create connection
+    $conn = getDbConnection();
+    
+    // Check connection
+    if ($conn->connect_error) {
+        printError(101, "Connection failed: " . $conn->connect_error);
+    }
+    
+    $stmt = $conn->prepare("DELETE FROM dsm_message WHERE conversation_id = ? AND user_id != ? and timestamp = 
+(SELECT * FROM (SELECT MAX(timestamp) FROM dsm_message WHERE conversation_id = ? AND user_id != ?) AS subquery);");
+    $stmt->bind_param("sisi", $conversationId, $userId, $conversationId, $userId);
+    $stmt->execute();
+    $stmt -> close();
+    $conn -> close();
+}
+

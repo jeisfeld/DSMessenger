@@ -2,7 +2,6 @@
 include __DIR__ . '/check_session.php';
 require_once 'firebase/firebasefunctions.php';
 require_once __DIR__ . '/db/conversation/querymessages.php';
-require_once 'db/conversation/queryairelation.php';
 require_once 'db/conversation/querymessagesforopenai.php';
 require_once 'openai/queryopenai.php';
 use Ramsey\Uuid\Uuid;
@@ -11,6 +10,7 @@ $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
 $relationId = $_GET['relationId'];
 $conversationId = $_GET['conversationId'];
+$deleteLast = @$_GET['deleteLast'];
 
 $conversationData = getConversationData($userId, $relationId, $conversationId);
 $contactName = $conversationData['contactName'];
@@ -53,7 +53,9 @@ function convertTimestamp($mysqlTimestamp) {
 
 		<div id="messages">
             <?php
-            $conversationId = $_GET['conversationId'];
+            if ($deleteLast == "true" && !$isSlave) {
+                deleteLastMessage($userId, $conversationId);
+            }
             $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
             foreach ($messages as $message) {
                 // Assume $message['is_own'] is true if it's the user's message

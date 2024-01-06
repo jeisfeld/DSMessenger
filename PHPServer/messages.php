@@ -1,6 +1,8 @@
 <?php
 include __DIR__ . '/check_session.php';
 require_once __DIR__ . '/db/conversation/querymessages.php';
+require_once 'openai/queryopenai.php';
+
 $username = $_SESSION['username'];
 $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
@@ -13,6 +15,13 @@ $contactId = $conversationData['contactId'];
 $isSlave = $conversationData['isSlave'];
 $preparedMessage = $isSlave ? $conversationData['preparedMessage'] : "";
 $subject = $conversationData['subject'];
+$aiPolicy = 0;
+if (! $isSlave) {
+    $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
+    if ($aiRelation) {
+        $aiPolicy = $aiRelation['aiPolicy'];
+    }
+}
 
 function convertTimestamp($mysqlTimestamp) {
     $timestampDateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
@@ -50,12 +59,16 @@ function convertTimestamp($mysqlTimestamp) {
 		<div id="messages">
             <?php
             $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
-            foreach ($messages as $message) {
+            $lastMessageKey = array_key_last($messages);
+            foreach ($messages as $key => $message) {
                 // Assume $message['is_own'] is true if it's the user's message
                 $class = $message['userId'] == $userId ? 'own-message' : 'other-message';
                 echo "<div class='message $class'>";
                 echo "<p class='text'>" . nl2br(htmlspecialchars($message['text'])) . "</p>";
-                echo "<span class='time'>" . htmlspecialchars(convertTimestamp($message['timestamp'])) . "</span>"; // Format time as needed
+                echo "<span class='time'>" . htmlspecialchars(convertTimestamp($message['timestamp'])) . "</span>";
+                if ($key === $lastMessageKey && $message['userId'] != $userId && ($aiPolicy == 2 || $aiPolicy == 3) && !$isSlave) {
+                    echo '<svg id="icon-retry" class="icon" onclick="window.location.href = \'messages2.php?relationId=' . $relationId . '&conversationId=' . $conversationId . '&deleteLast=true\';"><use xlink:href="images/icons.svg#icon-reload"></use></svg>';
+                }
                 echo "</div>";
             }
             ?>
@@ -80,5 +93,6 @@ function convertTimestamp($mysqlTimestamp) {
 	</div>
 
     <script src="js/messages.js"></script>
+
 </body>
 </html>
