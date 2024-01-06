@@ -155,6 +155,18 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			case MESSAGE_SELF_RESPONDED:
 				MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(), null);
 				break;
+			case MESSAGE_DELETED:
+				Message deletedMessage =
+						Application.getAppDatabase().getMessageDao().getMessageById(adminDetails.getMessageId());
+				if (deletedMessage != null) {
+					Conversation affectedConversation =
+							Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId"));
+					Application.getAppDatabase().getMessageDao().delete(deletedMessage);
+					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_DELETED,
+							null, null, affectedConversation, deletedMessage);
+					MessageActivity.sendBroadcast(this, MessageActivity.ActionType.MESSAGE_DELETED, deletedMessage.getMessageId(), affectedConversation);
+				}
+				break;
 			case PING:
 				new HttpSender(this).sendMessage(adminDetails.getContact(), adminDetails.getMessageId(), null,
 						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.PONG.name());

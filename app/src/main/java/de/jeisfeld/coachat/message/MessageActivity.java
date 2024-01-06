@@ -40,6 +40,7 @@ import de.jeisfeld.coachat.message.MessageDetails.MessagePriority;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 import de.jeisfeld.coachat.util.DateUtil;
 import de.jeisfeld.coachat.util.DialogUtil;
+import io.noties.markwon.Markwon;
 
 /**
  * Activity to display messages.
@@ -61,6 +62,10 @@ public class MessageActivity extends AppCompatActivity {
 	 * The conversation currently on top.
 	 */
 	private static Conversation currentTopConversation = null;
+	/**
+	 * An instance for markup handling.
+	 */
+	private Markwon markwon;
 	/**
 	 * The binding of the activity.
 	 */
@@ -101,6 +106,7 @@ public class MessageActivity extends AppCompatActivity {
 				switch (actionType) {
 				case MESSAGE_RECEIVED:
 				case MESSAGE_SENT:
+				case MESSAGE_DELETED:
 					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())) {
 						refreshMessageList(conversation.getConversationId(), null, null, false);
@@ -198,6 +204,8 @@ public class MessageActivity extends AppCompatActivity {
 		binding = ActivityMessageBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
 
+		markwon = Markwon.create(this);
+
 		arrayAdapter = new ArrayAdapter<Message>(this, R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
 			@Override
@@ -206,7 +214,7 @@ public class MessageActivity extends AppCompatActivity {
 
 				Message message = messageList.get(position);
 				TextView textViewMessage = view.findViewById(R.id.textViewMessage);
-				textViewMessage.setText(message.getMessageText());
+				markwon.setMarkdown(textViewMessage, message.getMessageText());
 
 				if (message.isOwn()) {
 					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
@@ -511,6 +519,10 @@ public class MessageActivity extends AppCompatActivity {
 		 * Inform about message acknowledgement sent.
 		 */
 		MESSAGE_ACKNOWLEDGED,
+		/**
+		 * Message deleted.
+		 */
+		MESSAGE_DELETED,
 		/**
 		 * Conversation edited.
 		 */

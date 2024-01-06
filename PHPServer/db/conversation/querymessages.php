@@ -51,11 +51,25 @@ function deleteLastMessage($userId, $conversationId) {
         printError(101, "Connection failed: " . $conn->connect_error);
     }
     
-    $stmt = $conn->prepare("DELETE FROM dsm_message WHERE conversation_id = ? AND user_id != ? and timestamp = 
-(SELECT * FROM (SELECT MAX(timestamp) FROM dsm_message WHERE conversation_id = ? AND user_id != ?) AS subquery);");
-    $stmt->bind_param("sisi", $conversationId, $userId, $conversationId, $userId);
+    $messageId = null;
+    $stmt = $conn->prepare("SELECT id FROM dsm_message WHERE conversation_id = ? AND user_id != ? order by timestamp desc");
+    $stmt->bind_param("si", $conversationId, $userId);
     $stmt->execute();
-    $stmt -> close();
-    $conn -> close();
+    $stmt->bind_result($messageId);
+    if ($stmt -> fetch()) {
+        $stmt -> close();
+        $stmt = $conn->prepare("DELETE FROM dsm_message WHERE id = ?");
+        $stmt->bind_param("s", $messageId);
+        $stmt->execute();
+        $stmt -> close();
+        $conn -> close();
+        return $messageId;
+    }
+    else {
+        $stmt -> close();
+        $conn -> close();
+        return '';
+    }
+
 }
 

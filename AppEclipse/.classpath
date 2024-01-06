@@ -48,5 +48,6 @@
 	<classpathentry kind="lib" path="libs-local/room-common-2.6.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/room-runtime-2.6.1.jar"/>
 	<classpathentry kind="lib" path="libs-local/sqlite-2.4.0.jar"/>
+	<classpathentry kind="lib" path="libs-local/core-4.6.2.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

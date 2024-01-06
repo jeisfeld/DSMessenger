@@ -150,6 +150,10 @@ public class AdminMessageDetails extends MessageDetails {
 		 */
 		MESSAGE_PREPARED,
 		/**
+		 * Message deleted.
+		 */
+		MESSAGE_DELETED,
+		/**
 		 * Password changed.
 		 */
 		PASSWORD_CHANGED,

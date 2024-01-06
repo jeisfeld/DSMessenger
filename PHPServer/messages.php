@@ -2,6 +2,7 @@
 include __DIR__ . '/check_session.php';
 require_once __DIR__ . '/db/conversation/querymessages.php';
 require_once 'openai/queryopenai.php';
+include __DIR__ . '/vendor/erusev/parsedown/Parsedown.php';
 
 $username = $_SESSION['username'];
 $password = $_SESSION['password'];
@@ -61,10 +62,12 @@ function convertTimestamp($mysqlTimestamp) {
             $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
             $lastMessageKey = array_key_last($messages);
             foreach ($messages as $key => $message) {
-                // Assume $message['is_own'] is true if it's the user's message
                 $class = $message['userId'] == $userId ? 'own-message' : 'other-message';
+                $parsedown = new Parsedown();
+                $messageText = $parsedown->text($message['text']);
+                
                 echo "<div class='message $class'>";
-                echo "<p class='text'>" . nl2br(htmlspecialchars($message['text'])) . "</p>";
+                echo "<div class='text'>" . $messageText . "</div>";
                 echo "<span class='time'>" . htmlspecialchars(convertTimestamp($message['timestamp'])) . "</span>";
                 if ($key === $lastMessageKey && $message['userId'] != $userId && ($aiPolicy == 2 || $aiPolicy == 3) && !$isSlave) {
                     echo '<svg id="icon-retry" class="icon" onclick="window.location.href = \'messages2.php?relationId=' . $relationId . '&conversationId=' . $conversationId . '&deleteLast=true\';"><use xlink:href="images/icons.svg#icon-reload"></use></svg>';

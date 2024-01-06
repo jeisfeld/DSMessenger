@@ -4,7 +4,9 @@ require_once 'firebase/firebasefunctions.php';
 require_once __DIR__ . '/db/conversation/querymessages.php';
 require_once 'db/conversation/querymessagesforopenai.php';
 require_once 'openai/queryopenai.php';
+include __DIR__ . '/vendor/erusev/parsedown/Parsedown.php';
 use Ramsey\Uuid\Uuid;
+
 $username = $_SESSION['username'];
 $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
@@ -27,6 +29,11 @@ function convertTimestamp($mysqlTimestamp) {
     } else {
         return $timestampDateTime->format('Y-m-d H:i:s');
     }
+}
+
+$conn = getDbConnection();
+if ($conn->connect_error) {
+    printError(101, "Connection failed: " . $conn->connect_error);
 }
 
 ?>
@@ -54,14 +61,22 @@ function convertTimestamp($mysqlTimestamp) {
 		<div id="messages">
             <?php
             if ($deleteLast == "true" && !$isSlave) {
-                deleteLastMessage($userId, $conversationId);
+                $messageId = deleteLastMessage($userId, $conversationId);
+                if ($messageId) {
+                    sendAdminMessage($conn, $username, $password, $relationId, "MESSAGE_DELETED", [
+                        'conversationId' => $conversationId,
+                        'messageId' => $messageId
+                    ]);
+                }
             }
             $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
             foreach ($messages as $message) {
-                // Assume $message['is_own'] is true if it's the user's message
                 $class = $message['userId'] == $userId ? 'own-message' : 'other-message';
+                $parsedown = new Parsedown();
+                $messageText = $parsedown->text($message['text']);
+                
                 echo "<div class='message $class'>";
-                echo "<p class='text'>" . nl2br(htmlspecialchars($message['text'])) . "</p>";
+                echo "<div class='text'>" . $messageText . "</div>";
                 echo "<span class='time'>" . htmlspecialchars(convertTimestamp($message['timestamp'])) . "</span>"; // Format time as needed
                 echo "</div>";
             }
@@ -80,11 +95,6 @@ function convertTimestamp($mysqlTimestamp) {
     </script>
     
 <?php 
-$conn = getDbConnection();
-if ($conn->connect_error) {
-    printError(101, "Connection failed: " . $conn->connect_error);
-}
-
 $responseMessage = null;
 $aiPolicy = 0;
 

@@ -23,20 +23,9 @@ if (isset($_POST['submit'])) {
 
     $stmt->execute();
 
-    $data = getAdminData($relationId, "CONVERSATION_DELETED", [
+    sendAdminMessage($conn, $username, $password, $relationId, "CONVERSATION_DELETED", [
         'conversationId' => $conversationId
     ]);
-    
-    $tokens = getUnmutedTokens($conn, $username, $password, $relationId);
-    foreach ($tokens as $token) {
-        sendFirebaseMessage($token, $data, null);
-    }
-    
-    $tokens = getSelfTokens($conn, $username, $password, - 1);
-    foreach ($tokens as $token) {
-        sendFirebaseMessage($token, $data, null);
-    }
-    
     
     header("Location: conversations.php?relationId=" . $relationId);
 }

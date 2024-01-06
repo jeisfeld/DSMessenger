@@ -38,6 +38,7 @@ import de.jeisfeld.coachat.message.MessageDetails.MessagePriority;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 import de.jeisfeld.coachat.util.DateUtil;
 import de.jeisfeld.coachat.util.DialogUtil;
+import io.noties.markwon.Markwon;
 
 /**
  * Fragment for sending messages.
@@ -47,6 +48,10 @@ public class MessageFragment extends Fragment {
 	 * The intent action for broadcast to this fragment.
 	 */
 	private static final String BROADCAST_ACTION = "de.jeisfeld.coachat.main.message.MessageFragment";
+	/**
+	 * An instance for markup handling.
+	 */
+	private Markwon markwon;
 	/**
 	 * The view binding.
 	 */
@@ -84,6 +89,7 @@ public class MessageFragment extends Fragment {
 				case MESSAGE_RECEIVED:
 				case MESSAGE_ACKNOWLEDGED:
 				case MESSAGE_SENT:
+				case MESSAGE_DELETED:
 				case TEXT_RESPONSE:
 					Conversation receivedConversation = (Conversation) intent.getSerializableExtra("conversation");
 					if (receivedConversation != null && receivedConversation.getConversationId().equals(conversation.getConversationId())
@@ -171,6 +177,7 @@ public class MessageFragment extends Fragment {
 	@Override
 	public final View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		binding = FragmentMessageBinding.inflate(inflater, container, false);
+		markwon = Markwon.create(getContext());
 
 		binding.buttonSend.setOnClickListener(v -> sendMessage(MessagePriority.NORMAL));
 		binding.buttonSendWithPriority.setOnClickListener(v -> sendMessage(MessagePriority.HIGH));
@@ -209,7 +216,7 @@ public class MessageFragment extends Fragment {
 
 				Message message = messageList.get(position);
 				TextView textViewMessage = view.findViewById(R.id.textViewMessage);
-				textViewMessage.setText(message.getMessageText());
+				markwon.setMarkdown(textViewMessage, message.getMessageText());
 
 				if (message.isOwn()) {
 					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
@@ -418,6 +425,10 @@ public class MessageFragment extends Fragment {
 		 * Inform about message acknowledged.
 		 */
 		MESSAGE_ACKNOWLEDGED,
+		/**
+		 * Message deleted.
+		 */
+		MESSAGE_DELETED,
 		/**
 		 * Conversation edited.
 		 */

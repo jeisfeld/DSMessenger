@@ -65,4 +65,19 @@ function getAdminData($relationId, $adminType, $data = [], $isHighPrio = FALSE)
     return $result;
 }
 
+function sendAdminMessage($conn, $username, $password, $relationId, $adminType, $data = [], $deviceId = -1, $isHighPrio = FALSE)
+{
+    $data = getAdminData($relationId, $adminType, $data, $isHighPrio);
+    
+    $tokens = getUnmutedTokens($conn, $username, $password, $relationId);
+    foreach ($tokens as $token) {
+        sendFirebaseMessage($token, $data, null);
+    }
+    
+    $tokens = getSelfTokens($conn, $username, $password, $deviceId);
+    foreach ($tokens as $token) {
+        sendFirebaseMessage($token, $data, null);
+    }
+}
+
 ?>
