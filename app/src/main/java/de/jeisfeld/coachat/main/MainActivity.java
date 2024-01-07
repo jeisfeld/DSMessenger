@@ -83,10 +83,9 @@ public class MainActivity extends AppCompatActivity {
 	 *
 	 * @return true if DS user.
 	 */
-	private boolean isDsUser() {
+	public static boolean isDsUser() {
 		return PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_usertype, 0) == 1;
 	}
-
 
 	@Override
 	protected final void onResume() {

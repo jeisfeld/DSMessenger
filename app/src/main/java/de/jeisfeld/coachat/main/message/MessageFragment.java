@@ -209,6 +209,7 @@ public class MessageFragment extends Fragment {
 		if (contact.isSlave()) {
 			binding.editTextMessageText.setText(conversation.getPreparedMessage());
 		}
+		binding.imageViewConnectionStatus.setVisibility(MainActivity.isDsUser() ? View.VISIBLE : View.GONE);
 
 		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
@@ -316,7 +317,9 @@ public class MessageFragment extends Fragment {
 	@Override
 	public final void onResume() {
 		super.onResume();
-		pingContact();
+		if (MainActivity.isDsUser()) {
+			pingContact();
+		}
 	}
 
 	@Override
