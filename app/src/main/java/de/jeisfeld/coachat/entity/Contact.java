@@ -197,11 +197,13 @@ public class Contact implements Serializable {
 	/**
 	 * Get the conversations of this contact.
 	 *
+	 * @param archived Flag indicating if archived conversations should be included.
 	 * @return The conversations.
 	 */
-	public List<Conversation> getConversations() {
+	public List<Conversation> getConversations(final boolean archived) {
 		ConversationDao conversationDao = Application.getAppDatabase().getConversationDao();
-		List<Conversation> result = new ArrayList<>(conversationDao.getConversationsByRelationId(getRelationId()));
+		List<Conversation> result = archived ? new ArrayList<>(conversationDao.getConversationsByRelationId(getRelationId()))
+				: new ArrayList<>(conversationDao.getUnarchivedConversationsByRelationId(getRelationId()));
 		if (getMyPermissions().isManageConversations()) {
 			result.add(Conversation.createNewConversation(this));
 		}

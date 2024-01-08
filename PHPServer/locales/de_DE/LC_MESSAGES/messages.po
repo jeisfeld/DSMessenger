@@ -69,8 +69,14 @@ msgstr "Wollen Sie die Unterhaltung &bdquo;%s&ldquo; l&ouml;schen?"
 msgid "delete"
 msgstr "L&ouml;schen"
 
-msgid "modal_edit_subject"
-msgstr "Geben Sie den neuen Betreff der Unterhaltung &bdquo;%s&ldquo; ein."
+msgid "modal_edit_conversation"
+msgstr "Unterhaltung bearbeiten"
+
+msgid "subject"
+msgstr "Betreff"
+
+msgid "archived"
+msgstr "Archiv"
 
 msgid "change_subject"
 msgstr "Betreff &auml;ndern"

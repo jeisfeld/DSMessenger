@@ -111,6 +111,9 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 					if (adminDetails.getValue("conversationFlags") != null) {
 						editedConversation.setConversationFlags(ConversationFlags.fromString(adminDetails.getValue("conversationFlags")));
 					}
+					if (adminDetails.getValue("archived") != null) {
+						editedConversation.setArchived(Boolean.parseBoolean(adminDetails.getValue("archived")));
+					}
 					editedConversation.update();
 					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, editedConversation);
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.CONVERSATION_EDITED,

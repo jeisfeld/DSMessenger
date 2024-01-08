@@ -8,7 +8,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 /**
  * The application database.
  */
-@Database(entities = {Conversation.class, Message.class}, version = 3)
+@Database(entities = {Conversation.class, Message.class}, version = 4)
 public abstract class AppDatabase extends RoomDatabase {
 	/**
 	 * Migration from version 2 to version 3
@@ -17,6 +17,16 @@ public abstract class AppDatabase extends RoomDatabase {
 		@Override
 		public void migrate(SupportSQLiteDatabase database) {
 			database.execSQL("ALTER TABLE conversation ADD COLUMN preparedMessage TEXT");
+		}
+	};
+
+	/**
+	 * Migration from version 3 to version 4
+	 */
+	public static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+		@Override
+		public void migrate(SupportSQLiteDatabase database) {
+			database.execSQL("ALTER TABLE conversation ADD COLUMN archived INTEGER not null DEFAULT 0");
 		}
 	};
 

@@ -53,6 +53,9 @@ public class Conversation implements Serializable {
 	@ColumnInfo(name = "preparedMessage")
 	private String preparedMessage;
 
+	@ColumnInfo(name = "archived")
+	private boolean archived;
+
 	/**
 	 * Flag indicating if the conversation is already stored.
 	 */
@@ -68,31 +71,18 @@ public class Conversation implements Serializable {
 	 * @param lastTimestamp           The last timestamp of this conversation.
 	 * @param conversationFlagsString The conversation flags.
 	 * @param preparedMessage         The prepared message.
+	 * @param archived                The archived flag.
 	 */
 	public Conversation(final int relationId, final String subject, @NonNull final String conversationIdString, final long lastTimestamp,
-						final String conversationFlagsString, final String preparedMessage) {
+						final String conversationFlagsString, final String preparedMessage, final boolean archived) {
 		this.relationId = relationId;
 		this.subject = subject;
 		this.conversationIdString = conversationIdString;
 		this.lastTimestamp = lastTimestamp;
 		this.conversationFlagsString = conversationFlagsString;
 		this.preparedMessage = preparedMessage;
+		this.archived = archived;
 		isStored = true;
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param relationId        The relationId of the contact.
-	 * @param subject           The subject of the conversation.
-	 * @param conversationId    The unique id of the conversation.
-	 * @param lastTimestamp     The last timestamp of this conversation.
-	 * @param conversationFlags The conversation flags.
-	 */
-	@Ignore
-	public Conversation(final int relationId, final String subject, @NonNull final UUID conversationId, final long lastTimestamp,
-						final ConversationFlags conversationFlags) {
-		this(relationId, subject, conversationId.toString(), lastTimestamp, conversationFlags.toString(), null);
 	}
 
 	/**
@@ -103,8 +93,9 @@ public class Conversation implements Serializable {
 	 */
 	public static Conversation createNewConversation(final Contact contact) {
 		Conversation result = new Conversation(contact.getRelationId(), Application.getResourceString(R.string.text_new_conversation_name),
-				UUID.randomUUID(), System.currentTimeMillis(),
-				new ConversationFlags(contact.getSlavePermissions().getDefaultReplyPolicy(), false, false));
+				UUID.randomUUID().toString(), System.currentTimeMillis(),
+				new ConversationFlags(contact.getSlavePermissions().getDefaultReplyPolicy(), false, false).toString(),
+				"", false);
 		result.isStored = false;
 		return result;
 	}
@@ -118,9 +109,10 @@ public class Conversation implements Serializable {
 	public static Conversation createNewConversation(final TextMessageDetails textMessageDetails) {
 		ReplyPolicy defaultReplyPolicy = textMessageDetails.getContact().getMyPermissions().getDefaultReplyPolicy();
 		Conversation result = new Conversation(textMessageDetails.getContact().getRelationId(), textMessageDetails.getMessageText(),
-				textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(),
+				textMessageDetails.getConversationId().toString(), textMessageDetails.getTimestamp(),
 				new ConversationFlags(defaultReplyPolicy, defaultReplyPolicy.isExpectsAcknowledgement(),
-						defaultReplyPolicy.isExpectsResponse() && !defaultReplyPolicy.isExpectsAcknowledgement()));
+						defaultReplyPolicy.isExpectsResponse() && !defaultReplyPolicy.isExpectsAcknowledgement()).toString(),
+				"", false);
 		result.isStored = false;
 		return result;
 	}
@@ -236,6 +228,14 @@ public class Conversation implements Serializable {
 
 	public void setPreparedMessage(String preparedMessage) {
 		this.preparedMessage = preparedMessage;
+	}
+
+	public boolean isArchived() {
+		return archived;
+	}
+
+	public void setArchived(boolean archived) {
+		this.archived = archived;
 	}
 
 	public final boolean isStored() {

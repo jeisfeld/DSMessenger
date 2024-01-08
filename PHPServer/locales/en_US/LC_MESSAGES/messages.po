@@ -69,8 +69,14 @@ msgstr "Do you want to delete the conversation &ldquo;%s&rdquo;?"
 msgid "delete"
 msgstr "Delete"
 
-msgid "modal_edit_subject"
-msgstr "Enter the new subject of the conversation &ldquo;%s&rdquo;."
+msgid "modal_edit_conversation"
+msgstr "Edit Conversation"
+
+msgid "subject"
+msgstr "Subject"
+
+msgid "archived"
+msgstr "Archived"
 
 msgid "change_subject"
 msgstr "Change Subject"

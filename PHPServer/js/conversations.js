@@ -19,13 +19,18 @@ $(document).ready(function() {
 		var conversationId = $(this).data('conversation-id');
 		var relationId = $(this).data('relation-id');
 		var subject = $(this).data('subject');
-		$('#dataSubjectEdit').text(subject);
+		var archived = $(this).data('archived');
 		$('#modalEditConversationId').val(conversationId);
 		$('#modalEditRelationId').val(relationId);
 		$('#modalEditSubject').val(subject);
+		$('#modalEditArchived').prop('checked', archived);
 		$('#modalEdit').show();
 	});
 
+    $('#button-archive').click(function() {
+        $('#button-archive').toggleClass('active');
+        $('.conversation-item.archived').toggleClass('hidden');
+    });
 
 	// Close the modal on clicking 'x'
 	$('#modalDelete .close').click(function() {
@@ -45,3 +50,5 @@ $(document).ready(function() {
 		}
 	});
 });
+
+

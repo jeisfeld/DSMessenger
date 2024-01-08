@@ -26,6 +26,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/textSendMessage" />
 
+    <ToggleButton
+        android:id="@+id/toggleShowArchived"
+        android:layout_width="@dimen/input_row_height"
+        android:layout_height="@dimen/input_row_height"
+        android:contentDescription="@string/text_refresh"
+        android:drawableTop="@drawable/ic_toggle_archive"
+        android:src="@drawable/ic_icon_archive"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintBottom_toBottomOf="@id/textSendMessage"
+        app:layout_constraintEnd_toStartOf="@id/imageViewRefreshContacts"
+        app:layout_constraintTop_toTopOf="@id/textSendMessage" />
+
     <ExpandableListView
         android:id="@+id/listViewConversations"
         android:layout_width="match_parent"

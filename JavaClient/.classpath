@@ -32,5 +32,6 @@
 	<classpathentry kind="lib" path="libs-zxing/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="lib" path="libs-zxing/text-ui-0.0.2.jar"/>
 	<classpathentry kind="lib" path="libs-zxing/zxing-1.1.1.jar"/>
+	<classpathentry kind="lib" path="libs/json-20231013.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

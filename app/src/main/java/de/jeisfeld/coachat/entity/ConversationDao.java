@@ -33,6 +33,9 @@ public interface ConversationDao {
 	@Query("SELECT * FROM conversation WHERE relationId = :relationId ORDER BY lastTimestamp DESC")
 	List<Conversation> getConversationsByRelationId(int relationId);
 
+	@Query("SELECT * FROM conversation WHERE relationId = :relationId AND archived = 0 ORDER BY lastTimestamp DESC")
+	List<Conversation> getUnarchivedConversationsByRelationId(int relationId);
+
 	@Query("SELECT * FROM conversation WHERE conversationId = :conversationId")
 	Conversation getConversationById(String conversationId);
 

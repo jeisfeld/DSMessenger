@@ -38,6 +38,10 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 	 * The list of connected contacts.
 	 */
 	private final List<Contact> contacts;
+	/**
+	 * Flag indicating if archived conversations are included.
+	 */
+	private boolean archived = false;
 
 	/**
 	 * Constructor.
@@ -56,17 +60,17 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 
 	@Override
 	public final int getChildrenCount(final int groupPosition) {
-		return contacts.get(groupPosition).getConversations().size();
+		return contacts.get(groupPosition).getConversations(archived).size();
 	}
 
 	@Override
 	public final List<Conversation> getGroup(final int groupPosition) {
-		return contacts.get(groupPosition).getConversations();
+		return contacts.get(groupPosition).getConversations(archived);
 	}
 
 	@Override
 	public final Object getChild(final int groupPosition, final int childPosition) {
-		return contacts.get(groupPosition).getConversations().get(childPosition);
+		return contacts.get(groupPosition).getConversations(archived).get(childPosition);
 	}
 
 	@Override
@@ -118,7 +122,7 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 			view = layoutInflater.inflate(R.layout.list_view_conversation, parent, false);
 		}
 		Contact contact = contacts.get(groupPosition);
-		Conversation conversation = contact.getConversations().get(childPosition);
+		Conversation conversation = contact.getConversations(archived).get(childPosition);
 
 		TextView textViewSubject = view.findViewById(R.id.textViewSubject);
 		textViewSubject.setText(conversation.getSubject());
@@ -186,4 +190,7 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 		return true;
 	}
 
+	public void setArchived(boolean archived) {
+		this.archived = archived;
+	}
 }

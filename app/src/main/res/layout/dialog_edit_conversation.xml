@@ -47,6 +47,14 @@
                 android:textSize="@dimen/text_normal" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkboxArchive"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_row_height_small"
+            android:layout_marginTop="@dimen/margin_small"
+            android:text="@string/text_archive"
+            app:layout_constraintTop_toBottomOf="@id/layoutReplyPolicy" />
+
         <TextView
             android:id="@+id/textViewErrorMessage"
             android:layout_width="match_parent"

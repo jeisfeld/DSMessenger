@@ -101,6 +101,7 @@
     <string name="text_pending">Ausstehend</string>
     <string name="text_confirmed">Bestätigt</string>
     <string name="text_refresh">Aktualisieren</string>
+    <string name="text_archive">Archiv</string>
     <string name="text_subject_invitation">Einladung zu Coachat</string>
     <string name="text_sending_message">Nachricht wird gesendet…</string>
     <string name="text_message_sent">Nachricht gesendet</string>

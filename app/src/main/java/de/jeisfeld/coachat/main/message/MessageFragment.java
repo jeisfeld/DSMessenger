@@ -39,7 +39,6 @@ import de.jeisfeld.coachat.message.MessageDetails.MessagePriority;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 import de.jeisfeld.coachat.util.DateUtil;
 import de.jeisfeld.coachat.util.DialogUtil;
-import de.jeisfeld.coachat.util.Logger;
 import io.noties.markwon.Markwon;
 
 /**
@@ -250,10 +249,6 @@ public class MessageFragment extends Fragment {
 					break;
 				}
 
-				if (position == messageList.size() - 1) {
-					Logger.log("aiPolicy: " + contact.getAiPolicy());
-				}
-
 				if (position == messageList.size() - 1 && !contact.isSlave() &&
 						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)) {
 					ImageView buttonRefreshMessage = view.findViewById(R.id.imageButtonRefreshMessage);
@@ -330,7 +325,8 @@ public class MessageFragment extends Fragment {
 			conversation.update();
 			new HttpSender(getActivity()).sendMessage("db/conversation/editconversation.php", contact, UUID.randomUUID(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_PREPARED.name(),
-					"conversationId", conversation.getConversationId().toString(), "preparedMessage", binding.editTextMessageText.getText().toString());
+					"conversationId", conversation.getConversationId().toString(),
+					"preparedMessage", binding.editTextMessageText.getText().toString());
 		}
 	}
 

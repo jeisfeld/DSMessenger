@@ -11,8 +11,8 @@ if ($conn->connect_error) {
 }
 
 // sql to create table dsm_ai_priming
-$sql = "ALTER TABLE dsm_ai_priming 
-ADD COLUMN max_characters INT(7) UNSIGNED DEFAULT 40000;";
+$sql = "ALTER TABLE dsm_conversation 
+ADD COLUMN archived BOOL DEFAULT false;";
 
 // variation: 0 no, 1 linear, 2 exponential
 

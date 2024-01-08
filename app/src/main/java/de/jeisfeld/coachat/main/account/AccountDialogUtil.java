@@ -818,6 +818,7 @@ public final class AccountDialogUtil {
 			final DropdownHandler<String> dropdownHandlerReplyPolicy = DropdownHandler.fromResource(getContext(),
 					binding.dropdownReplyPolicy, R.array.array_reply_policies,
 					conversation.getConversationFlags().getReplyPolicy().ordinal());
+			binding.checkboxArchive.setChecked(conversation.isArchived());
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 			builder.setTitle(R.string.title_dialog_edit_conversation).setView(binding.getRoot());
@@ -831,12 +832,14 @@ public final class AccountDialogUtil {
 					return;
 				}
 				String subject = binding.editTextSubject.getText().toString().trim();
+				boolean archived = binding.checkboxArchive.isChecked();
 
 				ReplyPolicy replyPolicy = ReplyPolicy.fromOrdinal(dropdownHandlerReplyPolicy.getSelectedPosition());
-				Conversation newConversation = new Conversation(conversation.getRelationId(), subject, conversation.getConversationId(),
-						conversation.getLastTimestamp(),
+				Conversation newConversation = new Conversation(conversation.getRelationId(), subject,
+						conversation.getConversationId().toString(), conversation.getLastTimestamp(),
 						new ConversationFlags(replyPolicy, replyPolicy.isExpectsAcknowledgement(),
-								replyPolicy.isExpectsResponse() && !replyPolicy.isExpectsAcknowledgement()));
+								replyPolicy.isExpectsResponse() && !replyPolicy.isExpectsAcknowledgement()).toString(),
+						null, archived);
 
 				((ConversationsFragment) requireParentFragment()).handleEditConversationDialogResponse(this, contact, newConversation);
 			});

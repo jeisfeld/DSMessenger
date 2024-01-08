@@ -17,6 +17,7 @@ $conversationFlags = @$_POST['conversationFlags'];
 $subject = @$_POST['subject'];
 $preparedMessage = @$_POST['preparedMessage'];
 $relationId = @$_POST['relationId'];
+$archived = intval(@$_POST['archived'] == 'true');
 
 // There are two variants: either set prepared_message, or set subject and flags
 if ($adminType === "MESSAGE_PREPARED") {
@@ -26,8 +27,8 @@ if ($adminType === "MESSAGE_PREPARED") {
     $stmt->close();
 }
 else {
-    $stmt = $conn->prepare("UPDATE dsm_conversation SET subject = ?, flags = ? WHERE id = ? and relation_id = ?");
-    $stmt->bind_param("sssi", $subject, $conversationFlags, $conversationId, $relationId);
+    $stmt = $conn->prepare("UPDATE dsm_conversation SET subject = ?, flags = ?, archived = ? WHERE id = ? and relation_id = ?");
+    $stmt->bind_param("ssisi", $subject, $conversationFlags, $archived, $conversationId, $relationId);
     $stmt->execute();
     $stmt->close();
     

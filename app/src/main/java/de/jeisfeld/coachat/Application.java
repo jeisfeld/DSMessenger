@@ -79,6 +79,7 @@ public class Application extends android.app.Application {
 
 		appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "coachat")
 				.addMigrations(AppDatabase.MIGRATION_2_3)
+				.addMigrations(AppDatabase.MIGRATION_3_4)
 				.allowMainThreadQueries().build();
 
 		createNotificationChannel();

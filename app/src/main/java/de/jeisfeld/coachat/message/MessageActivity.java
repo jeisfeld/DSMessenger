@@ -321,7 +321,8 @@ public class MessageActivity extends AppCompatActivity {
 			conversation.update();
 			new HttpSender(this).sendMessage("db/conversation/editconversation.php", contact, UUID.randomUUID(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_PREPARED.name(),
-					"conversationId", conversation.getConversationId().toString(), "preparedMessage", binding.editTextMessageText.getText().toString());
+					"conversationId", conversation.getConversationId().toString(),
+					"preparedMessage", binding.editTextMessageText.getText().toString());
 		}
 	}
 

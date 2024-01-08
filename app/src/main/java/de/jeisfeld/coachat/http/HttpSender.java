@@ -320,8 +320,9 @@ public class HttpSender {
 								String conversationFlags = jsonConversation.getString("flags");
 								long lasttimestamp = jsonConversation.getLong("lasttimestamp");
 								String preparedMessage = jsonConversation.getString("preparedMessage");
+								boolean archived = jsonConversation.getBoolean("archived");
 								Conversation conversation = new Conversation(relationId, subject,
-										conversationIdString, lasttimestamp, conversationFlags, preparedMessage);
+										conversationIdString, lasttimestamp, conversationFlags, preparedMessage, archived);
 								conversations.add(conversation);
 								if (jsonConversation.has("messages")) {
 									JSONArray messageArray = jsonConversation.getJSONArray("messages");

@@ -61,8 +61,21 @@ a:hover {
 	color: #007bff;
 }
 
+h1 .icon {
+	width: 20px;
+	height: 20px;
+}
+
 .icon:hover {
 	color: #0056b3;
+}
+
+.icon.active {
+	color: #b31600;
+}
+
+.icon.active:hover {
+	color: #801000;
 }
 
 .form-group input[type="text"], .form-group input[type="password"] {
@@ -263,6 +276,10 @@ a:hover {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+}
+
+.conversation-item.hidden {
+	display: none;
 }
 
 .modal {

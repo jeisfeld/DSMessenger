@@ -137,7 +137,7 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     $timestamp = null;
     $messageId = null;
     $stmt = $conn->prepare("SELECT conversation_id, text, timestamp, id from dsm_message WHERE conversation_id != ? AND user_id != ?
-                            AND conversation_id in (SELECT id from dsm_conversation WHERE relation_id = ?)
+                            AND conversation_id in (SELECT id from dsm_conversation WHERE relation_id = ? and archived = 0)
                             order by timestamp desc");
     $stmt->bind_param("sii", $conversationId, $userId, $relationId);
     $stmt->execute();

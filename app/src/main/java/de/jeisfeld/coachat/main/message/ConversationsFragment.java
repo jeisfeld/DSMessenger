@@ -107,7 +107,10 @@ public class ConversationsFragment extends Fragment {
 								getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
 							}
 						})));
-
+		binding.toggleShowArchived.setOnCheckedChangeListener((buttonView, isChecked) -> {
+			adapter.setArchived(binding.toggleShowArchived.isChecked());
+			getActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+		});
 		return binding.getRoot();
 	}
 
@@ -148,6 +151,7 @@ public class ConversationsFragment extends Fragment {
 			new HttpSender(activity).sendMessage("db/conversation/editconversation.php", contact, UUID.randomUUID(), null,
 					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_EDITED.name(),
 					"conversationId", conversation.getConversationId().toString(), "subject", conversation.getSubject(),
+					"archived", Boolean.toString(conversation.isArchived()),
 					"conversationFlags", conversation.getConversationFlags().toString());
 		}
 		dialog.dismiss();
