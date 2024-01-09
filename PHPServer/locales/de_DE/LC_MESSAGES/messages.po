@@ -3,49 +3,49 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-msgid "login"
+msgid "Login"
 msgstr "Anmelden"
 
-msgid "logout"
+msgid "Logout"
 msgstr "Abmelden"
 
-msgid "username"
+msgid "Username"
 msgstr "Benutzername"
 
-msgid "password"
+msgid "Password"
 msgstr "Passwort"
 
-msgid "contacts"
+msgid "Contacts"
 msgstr "Kontakte"
 
-msgid "conversations_with"
+msgid "Conversations with"
 msgstr "Unterhaltungen mit %s"
 
-msgid "conversation_with"
+msgid "Conversation with"
 msgstr "Unterhaltung &bdquo;%s&ldquo; mit %s"
 
-msgid "start_new_conversation"
+msgid "Start a new conversation here..."
 msgstr "Neue Unterhaltung beginnen..."
 
-msgid "type_message"
+msgid "Type your message here..."
 msgstr "Schreiben Sie ihre Nachricht hier..."
 
-msgid "send"
+msgid "Send"
 msgstr "Senden"
 
-msgid "change_password"
+msgid "Change password"
 msgstr "Passwort &auml;ndern"
 
-msgid "old_password"
+msgid "Old password"
 msgstr "Altes Passwort"
 
-msgid "new_password"
+msgid "New password"
 msgstr "Neues Passwort"
 
-msgid "confirm_new_password"
+msgid "Confirm new password"
 msgstr "Neues Passwort best&auml;tigen"
 
-msgid "cancel"
+msgid "Cancel"
 msgstr "Abbrechen"
 
 msgid "wrong_credentials"
@@ -63,35 +63,36 @@ msgstr "Das Passwort muss mindestens 8 Zeichen enthalten"
 msgid "change_password_failed"
 msgstr "Passwort-&Auml;nderung fehlgeschlagen"
 
-msgid "modal_do_you_want_to_delete"
+msgid "Do you want to delete the conversation?"
 msgstr "Wollen Sie die Unterhaltung &bdquo;%s&ldquo; l&ouml;schen?"
 
-msgid "delete"
+msgid "Delete"
 msgstr "L&ouml;schen"
 
-msgid "modal_edit_conversation"
+msgid "Edit Conversation"
 msgstr "Unterhaltung bearbeiten"
 
-msgid "subject"
+msgid "Subject"
 msgstr "Betreff"
 
-msgid "archived"
+msgid "Archived"
 msgstr "Archiv"
 
-msgid "change_subject"
-msgstr "Betreff &auml;ndern"
+msgid "Save Conversation"
+msgstr "Unterhaltung speichern"
 
-msgid "waiting_for_response"
+msgid "(Waiting for response...)"
 msgstr "(Warte auf Antwort...)"
 
-msgid "create_account"
+msgid "Create account"
 msgstr "Konto erstellen"
 
-msgid "confirm_password"
+msgid "Confirm password"
 msgstr "Passwort best&auml;tigen"
 
 msgid "username_already_exists"
 msgstr "Benutzername existiert bereits"
 
-msgid "imprint"
+msgid "Imprint"
 msgstr "Impressum"
+

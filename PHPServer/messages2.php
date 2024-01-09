@@ -39,7 +39,7 @@ if ($conn->connect_error) {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Coachat - <?= sprintf(_("conversation_with"), $subject, $contactName) ?></title>
+<title>Coachat - <?= sprintf(_("Conversation with"), $subject, $contactName) ?></title>
 <link rel="stylesheet" type="text/css" href="css/styles.css">
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,11 +49,11 @@ if ($conn->connect_error) {
 
 	<div id="chat-container">
 		<div id="header">
-			<span class="left"><?= _("username") ?>: <?= $username ?></span> <span class="right">
-			<a id="conversations-link" href="conversations.php?relationId=<?= $relationId ?>"><?= sprintf(_("conversations_with"), $contactName) ?></a>
-			&nbsp;<a href="logout.php"><?= _("logout") ?></a></span>
+			<span class="left"><?= _("Username") ?>: <?= $username ?></span> <span class="right">
+			<a id="conversations-link" href="conversations.php?relationId=<?= $relationId ?>"><?= sprintf(_("Conversations with"), $contactName) ?></a>
+			&nbsp;<a href="logout.php"><?= _("Logout") ?></a></span>
 		</div>
-		<h1><?= sprintf(_("conversation_with"), substr($subject, 0, 30), $contactName) ?>
+		<h1><?= sprintf(_("Conversation with"), substr($subject, 0, 30), $contactName) ?>
 			<span class="right"><svg id="button-reload" onclick="window.location.href = 'messages.php?relationId=<?= $relationId ?>&conversationId=<?= $conversationId ?>';" class="icon"><use xlink:href="images/icons.svg#icon-reload"></use></svg></span>
 		</h1>
 
@@ -80,11 +80,11 @@ if ($conn->connect_error) {
                 echo "</div>";
             }
             ?>
-	        <div class="message" id="waiting-for-response"><?= _("waiting_for_response") ?></div>
+	        <div class="message" id="waiting-for-response"><?= _("(Waiting for response...)") ?></div>
         </div>
         
 		<div id="footer">
-			<span class="left"></span> <span class="right"><a href="impressum.html" target="_blank"><?= _("imprint") ?></a></span>
+			<span class="left"></span> <span class="right"><a href="impressum.html" target="_blank"><?= _("Imprint") ?></a></span>
 		</div>
 	</div>
 

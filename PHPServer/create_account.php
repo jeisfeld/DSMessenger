@@ -14,13 +14,13 @@ $errorText = $error ? _($error) : "";
 </head>
 <body>
 	<div id="createaccount-container">
-		<h1><?= _("create_account") ?></h1>
+		<h1><?= _("Create account") ?></h1>
 		<form action="perform_create_account.php" method="post">
 			<div class="form-group">
-				<label for="username"><?= _("username") ?>:</label> <input type="text" id="username" name="username" required>
+				<label for="username"><?= _("Username") ?>:</label> <input type="text" id="username" name="username" required>
 			</div>
 			<div class="form-group password-container">
-				<label for="password"><?= _("password") ?>:</label> <input type="password" id="password" class="password"
+				<label for="password"><?= _("Password") ?>:</label> <input type="password" id="password" class="password"
 					name="password" required>
 				<span class="toggle-password" onclick="togglePassword()">
 					<svg class="eyeIcon" viewBox="0 0 576 512"><path fill="currentColor" d="M288 144a110.94 110.94 0 0 0-31.24 5 55.4 55.4 0 0 1 7.24 27 56 56 0 0 1-56 56 55.4 55.4 0 0 1-27-7.24A111.71 111.71 0 1 0 288 144zm284.52 97.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400c-98.65 0-189.09-55-237.93-144C98.91 167 189.34 112 288 112s189.09 55 237.93 144C477.1 345 386.66 400 288 400z"/></svg>
@@ -28,7 +28,7 @@ $errorText = $error ? _($error) : "";
 				</span>
 			</div>
 			<div class="form-group password-container">
-				<label for="confirm_password"><?= _("confirm_password") ?>:</label> <input type="password" class="password"
+				<label for="confirm_password"><?= _("Confirm password") ?>:</label> <input type="password" class="password"
 					id="confirm_password" name="confirm_password" required>
 				<span class="toggle-password" onclick="togglePassword()">
 					<svg class="eyeIcon" viewBox="0 0 576 512"><path fill="currentColor" d="M288 144a110.94 110.94 0 0 0-31.24 5 55.4 55.4 0 0 1 7.24 27 56 56 0 0 1-56 56 55.4 55.4 0 0 1-27-7.24A111.71 111.71 0 1 0 288 144zm284.52 97.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400c-98.65 0-189.09-55-237.93-144C98.91 167 189.34 112 288 112s189.09 55 237.93 144C477.1 345 386.66 400 288 400z"/></svg>
@@ -37,10 +37,10 @@ $errorText = $error ? _($error) : "";
 			</div>
 			<div class="errormessage"><?= $errorText ?></div>
 			<div class="container">
-				<span class="left"> <input type="button" name="cancel" class="change-password-button" value="<?= _("cancel") ?>"
+				<span class="left"> <input type="button" name="cancel" class="change-password-button" value="<?= _("Cancel") ?>"
 					onclick="window.location='http://coachat.de/contacts.php'">
 				</span> <span class="right"> <input type="submit" name="submit" class="change-password-button"
-					value="<?= _("create_account") ?>"></span>
+					value="<?= _("Create account") ?>"></span>
 			</div>
 		</form>
 	</div>

@@ -55,7 +55,7 @@ $conn -> close();
 <!DOCTYPE html>
 <html>
 <head>
-<title>Coachat - <?= sprintf(_("conversations_with"), $contactName) ?></title>
+<title>Coachat - <?= sprintf(_("Conversations with"), $contactName) ?></title>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,10 +65,10 @@ $conn -> close();
 <body>
 	<div id="conversations-container">
 		<div id="header">
-			<span class="left"><?= _("username") ?>: <?= $username ?></span> <span class="right"> <a href="contacts.php"><?= _("contacts") ?></a>&nbsp;<a
-				href="logout.php"><?= _("logout") ?></a></span>
+			<span class="left"><?= _("Username") ?>: <?= $username ?></span> <span class="right"> <a href="contacts.php"><?= _("Contacts") ?></a>&nbsp;<a
+				href="logout.php"><?= _("Logout") ?></a></span>
 		</div>
-		<h1><?= sprintf(_("conversations_with"), $contactName) ?>
+		<h1><?= sprintf(_("Conversations with"), $contactName) ?>
 			<span class="right">
 			<svg id="button-archive" class="icon"><use xlink:href="images/icons.svg#icon-archive"></use></svg>
 			<svg id="button-reload" onclick="location.reload()" class="icon"><use xlink:href="images/icons.svg#icon-reload"></use></svg>
@@ -97,46 +97,46 @@ $conn -> close();
 				<input type="hidden" name="relationId" value="<?= $relationId ?>">
 				<input type="hidden" name="conversationId" value="">
 				<input type="hidden" name="subject" value="">
-				<textarea autofocus name="message" maxlength="40000" placeholder="<?= _("start_new_conversation") ?>" class="message-textarea"></textarea>
-				<button type="submit" class="send-button" id="buttonSubmitMessage"><?= _("send") ?></button>
+				<textarea autofocus name="message" maxlength="40000" placeholder="<?= _("Start a new conversation here...") ?>" class="message-textarea"></textarea>
+				<button type="submit" class="send-button" id="buttonSubmitMessage"><?= _("Send") ?></button>
 			</form>
 		</div>
 		<div id="footer">
-			<span class="left"></span> <span class="right"><a href="impressum.html" target="_blank"><?= _("imprint") ?></a></span>
+			<span class="left"></span> <span class="right"><a href="impressum.html" target="_blank"><?= _("Imprint") ?></a></span>
 		</div>
 	</div>
 
 	<div id="modalDelete" class="modal">
 		<div class="modal-content">
-			<h2><?= sprintf(_("modal_do_you_want_to_delete"), '<span id="dataSubjectDelete"></span>') ?></h2>
+			<h2><?= sprintf(_("Do you want to delete the conversation?"), '<span id="dataSubjectDelete"></span>') ?></h2>
 			<span class="close">&times;</span>
 			<form action="perform_delete_conversation.php" method="post">
     			<input type="hidden" name="conversationId" id="modalDeleteConversationId" value="">
     			<input type="hidden" name="relationId" id="modalDeleteRelationId" value="">
     			<div class="container">
-    				<span class="left"> <input type="button" name="cancel" class="modal-button" value="<?= _("cancel") ?>" onclick="$('#modalDelete').hide();"></span> 
-    				<span class="right"> <input type="submit" name="submit" class="modal-button" value="<?= _("delete") ?>"></span>
+    				<span class="left"> <input type="button" name="cancel" class="modal-button" value="<?= _("Cancel") ?>" onclick="$('#modalDelete').hide();"></span> 
+    				<span class="right"> <input type="submit" name="submit" class="modal-button" value="<?= _("Delete") ?>"></span>
     			</div>
 			</form>
 		</div>
 	</div>
 	<div id="modalEdit" class="modal">
 		<div class="modal-content">
-			<h2><?= _("modal_edit_conversation") ?></h2>
+			<h2><?= _("Edit Conversation") ?></h2>
 			<span class="close">&times;</span> 
 			<form action="perform_edit_conversation.php" method="post">
 				<input type="hidden" name="conversationId" id="modalEditConversationId" value="">
 				<input type="hidden" name="relationId" id="modalEditRelationId" value="">
 				<div class="form-group">
-    				<label for="modalEditSubject"><?= _("subject") ?>:</label><input type="text" name="modalEditSubject" id="modalEditSubject" maxlength="100" value="">
+    				<label for="modalEditSubject"><?= _("Subject") ?>:</label><input type="text" name="modalEditSubject" id="modalEditSubject" maxlength="100" value="">
 				</div>
 				<div class="form-group">
-    				<label for="modalEditArchived"><?= _("archived") ?>:</label><input type="checkbox" name="modalEditArchived" value="true" id="modalEditArchived">
+    				<label for="modalEditArchived"><?= _("Archived") ?>:</label><input type="checkbox" name="modalEditArchived" value="true" id="modalEditArchived">
 				</div>
 				<div class="container">
-					<span class="left"> <input type="button" name="cancel" class="modal-button" value="<?= _("cancel") ?>"
+					<span class="left"> <input type="button" name="cancel" class="modal-button" value="<?= _("Cancel") ?>"
 						onclick="$('#modalEdit').hide();"></span> <span class="right"> <input type="submit" name="submit"
-						class="modal-button" value="<?= _("change_subject") ?>"></span>
+						class="modal-button" value="<?= _("Save Conversation") ?>"></span>
 				</div>
 			</form>
 		</div>
