@@ -34,6 +34,8 @@ import de.jeisfeld.coachat.entity.Message;
 import de.jeisfeld.coachat.entity.ReplyPolicy;
 import de.jeisfeld.coachat.http.HttpSender;
 import de.jeisfeld.coachat.main.MainActivity;
+import de.jeisfeld.coachat.main.account.AccountDialogUtil;
+import de.jeisfeld.coachat.main.account.AccountDialogUtil.EditConversationDialogFragment;
 import de.jeisfeld.coachat.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.coachat.message.MessageDetails.MessagePriority;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
@@ -44,7 +46,7 @@ import io.noties.markwon.Markwon;
 /**
  * Fragment for sending messages.
  */
-public class MessageFragment extends Fragment {
+public class MessageFragment extends Fragment implements EditConversationParentFragment {
 	/**
 	 * The intent action for broadcast to this fragment.
 	 */
@@ -199,6 +201,7 @@ public class MessageFragment extends Fragment {
 								.map(message -> message.getMessageId().toString()).collect(Collectors.joining(",")));
 			}
 		});
+		binding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditConversationDialog(this, conversation, contact));
 
 		assert getArguments() != null;
 		contact = (Contact) getArguments().getSerializable("contact");
@@ -284,10 +287,12 @@ public class MessageFragment extends Fragment {
 		boolean enableSend = contact.isSlave() || conversation.getConversationFlags().isExpectingResponse()
 				|| conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED;
 		boolean enablePrioSend = contact.isSlave() || conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED;
+		boolean enableEdit = contact.getMyPermissions().isManageConversations();
 		binding.buttonAcknowledge.setVisibility(enableAcknowledgement ? View.VISIBLE : View.GONE);
 		binding.buttonSend.setVisibility(enableSend ? View.VISIBLE : enableAcknowledgement ? View.INVISIBLE : View.GONE);
 		binding.buttonSendWithPriority.setVisibility(enablePrioSend ? View.VISIBLE : View.INVISIBLE);
 		binding.layoutTextInput.setVisibility(enableSend ? View.VISIBLE : View.GONE);
+		binding.buttonEdit.setVisibility(enableEdit && conversation.isStored() ? View.VISIBLE : View.GONE);
 	}
 
 	/**
@@ -433,6 +438,29 @@ public class MessageFragment extends Fragment {
 			binding.listViewMessages.setSelection(messageList.size() - 1);
 			binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
 		}
+	}
+
+	/**
+	 * Handle the response of edit conversation dialog.
+	 *
+	 * @param dialog       The dialog.
+	 * @param contact      The contact.
+	 * @param conversation The new conversation data.
+	 */
+	public void handleEditConversationDialogResponse(final EditConversationDialogFragment dialog, final Contact contact,
+													 final Conversation conversation) {
+		conversation.update();
+		this.conversation = conversation;
+		binding.textSubject.setText(conversation.getSubject());
+		Activity activity = getActivity();
+		if (activity != null) {
+			new HttpSender(activity).sendMessage("db/conversation/editconversation.php", contact, UUID.randomUUID(), null,
+					"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_EDITED.name(),
+					"conversationId", conversation.getConversationId().toString(), "subject", conversation.getSubject(),
+					"archived", Boolean.toString(conversation.isArchived()),
+					"conversationFlags", conversation.getConversationFlags().toString());
+		}
+		dialog.dismiss();
 	}
 
 	/**

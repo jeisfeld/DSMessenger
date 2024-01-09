@@ -10,6 +10,7 @@ if (isset($_POST['submit'])) {
     $relationId = $_POST['relationId'];
     $subject = $_POST['modalEditSubject'];
     $archived = intval($_POST['modalEditArchived'] == 'true');
+    $fromMessages = $_POST['fromMessages'];
     
     // Create connection
     $conn = getDbConnection();
@@ -30,7 +31,12 @@ if (isset($_POST['submit'])) {
         'subject' => $subject,
         'archived' => $archived ? 'true' : 'false'
     ]);
-    
-    header("Location: conversations.php?relationId=" . $relationId);
+
+    if ($fromMessages) {
+        header("Location: messages.php?relationId=" . $relationId . "&conversationId=" . $conversationId);
+    }
+    else {
+        header("Location: conversations.php?relationId=" . $relationId);        
+    }
 }
 ?>

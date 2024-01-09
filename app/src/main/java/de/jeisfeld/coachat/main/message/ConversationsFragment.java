@@ -27,7 +27,7 @@ import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 /**
  * Fragment for sending messages.
  */
-public class ConversationsFragment extends Fragment {
+public class ConversationsFragment extends Fragment implements EditConversationParentFragment {
 	/**
 	 * The intent action for broadcast to this fragment.
 	 */

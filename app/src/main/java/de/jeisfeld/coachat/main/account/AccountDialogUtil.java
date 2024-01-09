@@ -7,6 +7,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import de.jeisfeld.coachat.R;
 import de.jeisfeld.coachat.databinding.DialogAcceptInvitationBinding;
 import de.jeisfeld.coachat.databinding.DialogChangePasswordBinding;
@@ -27,7 +28,7 @@ import de.jeisfeld.coachat.entity.SlavePermissions;
 import de.jeisfeld.coachat.http.HttpSender;
 import de.jeisfeld.coachat.main.MainActivity;
 import de.jeisfeld.coachat.main.account.AccountFragment.ActionType;
-import de.jeisfeld.coachat.main.message.ConversationsFragment;
+import de.jeisfeld.coachat.main.message.EditConversationParentFragment;
 import de.jeisfeld.coachat.message.MessageDisplayStrategy;
 import de.jeisfeld.coachat.message.MessageDisplayStrategy.MessageDisplayType;
 import de.jeisfeld.coachat.util.DropdownHandler;
@@ -194,11 +195,11 @@ public final class AccountDialogUtil {
 	/**
 	 * Display dialog for edit conversation.
 	 *
-	 * @param conversationsFragment The triggering fragment.
-	 * @param conversation          The conversation
-	 * @param contact               The contact
+	 * @param triggeringFragment The triggering fragment.
+	 * @param conversation       The conversation
+	 * @param contact            The contact
 	 */
-	public static void displayEditConversationDialog(final ConversationsFragment conversationsFragment, final Conversation conversation,
+	public static void displayEditConversationDialog(final EditConversationParentFragment triggeringFragment, final Conversation conversation,
 													 final Contact contact) {
 		EditConversationDialogFragment fragment = new EditConversationDialogFragment();
 		Bundle bundle = new Bundle();
@@ -206,7 +207,7 @@ public final class AccountDialogUtil {
 		bundle.putSerializable("contact", contact);
 		fragment.setArguments(bundle);
 		try {
-			fragment.show(conversationsFragment.getChildFragmentManager(), fragment.getClass().toString());
+			fragment.show(((Fragment) triggeringFragment).getChildFragmentManager(), fragment.getClass().toString());
 		}
 		catch (IllegalStateException e) {
 			// May appear if activity is not active any more - ignore.
@@ -841,7 +842,7 @@ public final class AccountDialogUtil {
 								replyPolicy.isExpectsResponse() && !replyPolicy.isExpectsAcknowledgement()).toString(),
 						null, archived);
 
-				((ConversationsFragment) requireParentFragment()).handleEditConversationDialogResponse(this, contact, newConversation);
+				((EditConversationParentFragment) requireParentFragment()).handleEditConversationDialogResponse(this, contact, newConversation);
 			});
 
 			return builder.create();

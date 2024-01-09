@@ -16,6 +16,7 @@ $contactId = $conversationData['contactId'];
 $isSlave = $conversationData['isSlave'];
 $preparedMessage = $isSlave ? $conversationData['preparedMessage'] : "";
 $subject = $conversationData['subject'];
+$archived = $conversationData['archived'];
 $aiPolicy = 0;
 if (! $isSlave) {
     $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
@@ -54,7 +55,10 @@ function convertTimestamp($mysqlTimestamp) {
 			&nbsp;<a href="logout.php"><?= _("Logout") ?></a></span>
 		</div>
 		<h1><?= sprintf(_("Conversation with"), substr($subject, 0, 30), $contactName) ?>
-			<span class="right"><svg id="button-reload" onclick="location.reload()" class="icon"><use xlink:href="images/icons.svg#icon-reload"></use></svg></span>
+			<span class="right">
+			<svg id="editButton" class="icon" data-conversation-id="<?= $conversationId ?>" data-relation-id="<?= $relationId ?>" data-subject="<?= $subject ?>" data-archived="<?= $archived ?>"><use xlink:href="images/icons.svg#icon-edit"></use></svg>
+			<svg id="button-reload" onclick="location.reload()" class="icon"><use xlink:href="images/icons.svg#icon-reload"></use></svg>
+			</span>
 		</h1>
 
 		<div id="messages">
@@ -92,6 +96,28 @@ function convertTimestamp($mysqlTimestamp) {
 
 		<div id="footer">
 			<span class="left"></span> <span class="right"><a href="impressum.html" target="_blank"><?= _("Imprint") ?></a></span>
+		</div>
+	</div>
+
+	<div id="modalEdit" class="modal">
+		<div class="modal-content">
+			<h2><?= _("Edit Conversation") ?></h2>
+			<span class="close">&times;</span> 
+			<form action="perform_edit_conversation.php" method="post">
+				<input type="hidden" name="conversationId" id="modalEditConversationId" value="">
+				<input type="hidden" name="relationId" id="modalEditRelationId" value="">
+				<div class="form-group">
+    				<label for="modalEditSubject"><?= _("Subject") ?>:</label><input type="text" name="modalEditSubject" id="modalEditSubject" maxlength="100" value="">
+				</div>
+				<div class="form-group">
+    				<label for="modalEditArchived"><?= _("Archived") ?>:</label><input type="checkbox" name="modalEditArchived" value="true" id="modalEditArchived">
+				</div>
+				<div class="container">
+					<span class="left"> <input type="button" name="cancel" class="modal-button" value="<?= _("Cancel") ?>"
+						onclick="$('#modalEdit').hide();"></span> <span class="right"> <input type="submit" name="submit"
+						class="modal-button" value="<?= _("Save Conversation") ?>"></span>
+				</div>
+			</form>
 		</div>
 	</div>
 

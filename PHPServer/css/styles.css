@@ -124,7 +124,7 @@ h1 .icon {
 }
 
 .change-password-button, .modal-button {
-	width: 130px;
+	min-width: 130px;
 }
 
 .login-button:hover, .change-password-button:hover {
