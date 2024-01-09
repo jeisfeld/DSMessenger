@@ -1,5 +1,7 @@
 package de.jeisfeld.coachat.message;
 
+import android.util.Log;
+
 import com.google.firebase.messaging.RemoteMessage;
 
 import java.io.Serializable;
@@ -7,6 +9,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.UUID;
 
+import de.jeisfeld.coachat.Application;
 import de.jeisfeld.coachat.entity.Contact;
 import de.jeisfeld.coachat.entity.Device;
 import de.jeisfeld.coachat.main.account.ContactRegistry;
@@ -72,8 +75,13 @@ public class MessageDetails implements Serializable {
 		}
 		UUID messageId = null;
 		String messageIdString = data.get("messageId");
-		if (messageIdString != null) {
-			messageId = UUID.fromString(messageIdString);
+		if (messageIdString != null && messageIdString.length() > 0) {
+			try {
+				messageId = UUID.fromString(messageIdString);
+			}
+			catch (IllegalArgumentException e) {
+				Log.e(Application.TAG, "Error when reading messageId", e);
+			}
 		}
 		String relationId = data.get("relationId");
 		Contact contact = null;

@@ -12,6 +12,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $relationId = $_POST['relationId'];
     $conversationId = $_POST['conversationId'];
     $message = $_POST['message'];
+    $lastOwnMessageId = $_POST['lastOwnMessageId'];
+    $lastAiMessageId = $_POST['lastAiMessageId'];
     $isNewConversation = ! $conversationId;
 
     if ($isNewConversation) {
@@ -31,6 +33,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = getDbConnection();
     if ($conn->connect_error) {
         printError(101, "Connection failed: " . $conn->connect_error);
+    }
+    
+    if ($lastOwnMessageId) {
+        $stmt = $conn->prepare("DELETE FROM dsm_message WHERE conversation_id = ? and (id = ? or id = ?)");
+        $stmt->bind_param("sss", $conversationId, $lastOwnMessageId, $lastAiMessageId);
+        $stmt->execute();
+        $stmt -> close();
+        sendAdminMessage($conn, $username, $password, $relationId, "MESSAGE_DELETED", [
+            'conversationId' => $conversationId,
+            'messageId' => $lastAiMessageId
+        ]);
+        sendAdminMessage($conn, $username, $password, $relationId, "MESSAGE_DELETED", [
+            'conversationId' => $conversationId,
+            'messageId' => $lastOwnMessageId
+        ]);
     }
 
     $currentDateTime = new DateTime();

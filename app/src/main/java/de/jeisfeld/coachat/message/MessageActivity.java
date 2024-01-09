@@ -95,6 +95,10 @@ public class MessageActivity extends AppCompatActivity {
 	 * The last received messageId.
 	 */
 	private TextMessageDetails lastTextMessageDetails;
+	/**
+	 * Messages to be deleted for retry.
+	 */
+	private final List<Message> deleteMessages = new ArrayList<>();
 
 	/**
 	 * The local broadcast receiver to do actions sent to this fragment.
@@ -246,17 +250,23 @@ public class MessageActivity extends AppCompatActivity {
 					break;
 				}
 
-				if (position == messageList.size() - 1 && !contact.isSlave() &&
-						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)) {
+				if (position == messageList.size() - 1 && !contact.isSlave() && deleteMessages.size() == 0 &&
+						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)
+						&& !messageList.get(messageList.size() - 1).isOwn() && messageList.get(messageList.size() - 2).isOwn()) {
 					ImageView buttonRefreshMessage = view.findViewById(R.id.imageButtonRefreshMessage);
 					buttonRefreshMessage.setVisibility(View.VISIBLE);
 					buttonRefreshMessage.setOnClickListener(v -> {
-						buttonRefreshMessage.setEnabled(false);
-						new HttpSender(MessageActivity.this).sendMessage("db/conversation/sendmessage.php", contact, UUID.randomUUID(),
-								(response, responseData) -> runOnUiThread(() -> buttonRefreshMessage.setEnabled(true)),
-								"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_DELETED.name(),
-								"conversationId", conversation.getConversationId().toString(), "messageId", message.getMessageId().toString(),
-								"regenerate", "true");
+						buttonRefreshMessage.setVisibility(View.GONE);
+						Message lastAiMessage = messageList.get(messageList.size() - 1);
+						Message lastOwnMessage = messageList.get(messageList.size() - 2);
+						messageList.remove(lastAiMessage);
+						messageList.remove(lastOwnMessage);
+						deleteMessages.add(lastAiMessage);
+						deleteMessages.add(lastOwnMessage);
+						arrayAdapter.notifyDataSetChanged();
+						binding.listViewMessages.setSelection(messageList.size() - 1);
+						binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
+						binding.editTextMessageText.setText(lastOwnMessage.getMessageText());
 					});
 				}
 				else {
@@ -291,6 +301,7 @@ public class MessageActivity extends AppCompatActivity {
 									final boolean scrollDown) {
 		new Thread(() -> {
 			List<Message> newMessageList = Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversationId);
+			deleteMessages.clear();
 			messageList.clear();
 			messageList.addAll(newMessageList);
 			runOnUiThread(() -> {
@@ -425,6 +436,7 @@ public class MessageActivity extends AppCompatActivity {
 				messageVibration.cancelVibration();
 			}
 			binding.buttonSend.setEnabled(false);
+
 			final long timestamp = System.currentTimeMillis();
 			UUID newMessageId = UUID.randomUUID();
 			String messageText = binding.editTextMessageText.getText().toString().trim();
@@ -472,9 +484,12 @@ public class MessageActivity extends AppCompatActivity {
 						"messageType", MessageType.TEXT_RESPONSE.name(), "messageText", messageText,
 						"priority", MessagePriority.NORMAL.name(), "conversationId", conversation.getConversationId().toString(),
 						"timestamp", Long.toString(timestamp), "conversationFlags", conversation.getConversationFlags().toString(), "messageIds",
-						messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).collect(Collectors.joining(",")));
+						messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).collect(Collectors.joining(",")),
+						"lastAiMessageId", deleteMessages.size() == 2 ? deleteMessages.get(0).getMessageId().toString() : "",
+						"lastOwnMessageId", deleteMessages.size() == 2 ? deleteMessages.get(1).getMessageId().toString() : "");
 				new HttpSender(this).sendSelfMessage(textMessageDetails.getMessageId(), null,
 						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_SELF_RESPONDED.name());
+				deleteMessages.clear();
 			}
 		});
 		lastTextMessageDetails = textMessageDetails;

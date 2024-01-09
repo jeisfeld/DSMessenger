@@ -72,6 +72,10 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	 */
 	private Conversation conversation;
 	/**
+	 * Messages to be deleted for retry.
+	 */
+	private final List<Message> deleteMessages = new ArrayList<>();
+	/**
 	 * The array adapter for the list of displayed messages.
 	 */
 	private ArrayAdapter<Message> arrayAdapter;
@@ -213,7 +217,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		}
 		binding.imageViewConnectionStatus.setVisibility(MainActivity.isDsUser() ? View.VISIBLE : View.GONE);
 
-		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
+		arrayAdapter = new ArrayAdapter<>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
@@ -252,17 +256,23 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 					break;
 				}
 
-				if (position == messageList.size() - 1 && !contact.isSlave() &&
-						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)) {
+				if (position == messageList.size() - 1 && !contact.isSlave() && deleteMessages.size() == 0 &&
+						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)
+						&& !messageList.get(messageList.size() - 1).isOwn() && messageList.get(messageList.size() - 2).isOwn()) {
 					ImageView buttonRefreshMessage = view.findViewById(R.id.imageButtonRefreshMessage);
 					buttonRefreshMessage.setVisibility(View.VISIBLE);
 					buttonRefreshMessage.setOnClickListener(v -> {
-						buttonRefreshMessage.setEnabled(false);
-						new HttpSender(getActivity()).sendMessage("db/conversation/sendmessage.php", contact, UUID.randomUUID(),
-								(response, responseData) -> getActivity().runOnUiThread(() -> buttonRefreshMessage.setEnabled(true)),
-								"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_DELETED.name(),
-								"conversationId", conversation.getConversationId().toString(), "messageId", message.getMessageId().toString(),
-								"regenerate", "true");
+						buttonRefreshMessage.setVisibility(View.GONE);
+						Message lastAiMessage = messageList.get(messageList.size() - 1);
+						Message lastOwnMessage = messageList.get(messageList.size() - 2);
+						messageList.remove(lastAiMessage);
+						messageList.remove(lastOwnMessage);
+						deleteMessages.add(lastAiMessage);
+						deleteMessages.add(lastOwnMessage);
+						arrayAdapter.notifyDataSetChanged();
+						binding.listViewMessages.setSelection(messageList.size() - 1);
+						binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
+						binding.editTextMessageText.setText(lastOwnMessage.getMessageText());
 					});
 				}
 				else {
@@ -302,6 +312,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		new Thread(() -> {
 			List<Message> newMessageList =
 					Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversation.getConversationId());
+			deleteMessages.clear();
 			messageList.clear();
 			messageList.addAll(newMessageList);
 			Activity activity = getActivity();
@@ -422,7 +433,10 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 				"messageText", messageText, "priority", priority.name(),
 				"conversationId", conversation.getConversationId().toString(), "timestamp", Long.toString(timestamp),
 				"conversationFlags", conversation.getConversationFlags().toString(), "messageIds",
-				messageList.stream().filter(msg -> !msg.isOwn()).map(message -> message.getMessageId().toString()).collect(Collectors.joining(",")));
+				messageList.stream().filter(msg -> !msg.isOwn()).map(message -> message.getMessageId().toString()).collect(Collectors.joining(",")),
+				"lastAiMessageId", deleteMessages.size() == 2 ? deleteMessages.get(0).getMessageId().toString() : "",
+				"lastOwnMessageId", deleteMessages.size() == 2 ? deleteMessages.get(1).getMessageId().toString() : "");
+		deleteMessages.clear();
 	}
 
 	/**

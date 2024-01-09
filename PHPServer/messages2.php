@@ -11,7 +11,6 @@ $password = $_SESSION['password'];
 $userId = $_SESSION['userId'];
 $relationId = $_GET['relationId'];
 $conversationId = $_GET['conversationId'];
-$deleteLast = @$_GET['deleteLast'];
 
 $conversationData = getConversationData($userId, $relationId, $conversationId);
 $contactName = $conversationData['contactName'];
@@ -59,15 +58,6 @@ if ($conn->connect_error) {
 
 		<div id="messages">
             <?php
-            if ($deleteLast == "true" && !$isSlave) {
-                $messageId = deleteLastMessage($userId, $conversationId);
-                if ($messageId) {
-                    sendAdminMessage($conn, $username, $password, $relationId, "MESSAGE_DELETED", [
-                        'conversationId' => $conversationId,
-                        'messageId' => $messageId
-                    ]);
-                }
-            }
             $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
             foreach ($messages as $message) {
                 $class = $message['userId'] == $userId ? 'own-message' : 'other-message';

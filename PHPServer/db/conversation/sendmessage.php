@@ -26,7 +26,9 @@ $conversationFlags = @$_POST['conversationFlags'];
 $timestamp = @$_POST['timestamp'];
 $mysqltimestamp = convertJavaTimestamp($timestamp);
 $messageIds = @$_POST['messageIds'];
-$regenerate = @$_POST['regenerate'];
+$lastAiMessageId = @$_POST['lastAiMessageId'];
+$lastOwnMessageId = @$_POST['lastOwnMessageId'];
+
 
 $stmt = $conn->prepare("SELECT id FROM dsm_conversation WHERE id = ?");
 $stmt->bind_param("s", $conversationId);
@@ -64,14 +66,19 @@ if ($messageIds) {
     }
 }
 
-if ($regenerate) {
-    $messageId = deleteLastMessage($userId, $conversationId, $messageId);
-    if ($messageId) {
-        sendAdminMessage($conn, $username, $password, $relationId, "MESSAGE_DELETED", [
-            'conversationId' => $conversationId,
-            'messageId' => $messageId
-        ]);
-    }
+if ($lastOwnMessageId) {
+    $stmt = $conn->prepare("DELETE FROM dsm_message WHERE conversation_id = ? and (id = ? or id = ?)");
+    $stmt->bind_param("sss", $conversationId, $lastOwnMessageId, $lastAiMessageId);
+    $stmt->execute();
+    $stmt -> close();
+    sendAdminMessage($conn, $username, $password, $relationId, "MESSAGE_DELETED", [
+        'conversationId' => $conversationId,
+        'messageId' => $lastAiMessageId
+    ]);
+    sendAdminMessage($conn, $username, $password, $relationId, "MESSAGE_DELETED", [
+        'conversationId' => $conversationId,
+        'messageId' => $lastOwnMessageId
+    ]);
 }
 
 session_write_close();

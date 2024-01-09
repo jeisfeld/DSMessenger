@@ -28,6 +28,14 @@ $('#conversations-link').click(function(event) {
 	});
 });
 
+function retryMessage() {
+	$("#lastai").hide();
+	$("#lastown").hide();
+	$("#message").val($("#lastMessage").val());
+	$("#lastOwnMessageId").val($("#lastown").data("messageid"));
+	$("#lastAiMessageId").val($("#lastai").data("messageid"));
+}
+
 $('#editButton').click(function() {
 	var conversationId = $(this).data('conversation-id');
 	var relationId = $(this).data('relation-id');

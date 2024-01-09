@@ -64,17 +64,26 @@ function convertTimestamp($mysqlTimestamp) {
 		<div id="messages">
             <?php
             $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
-            $lastMessageKey = array_key_last($messages);
+            $lastMessageKey = count($messages) - 1;
+            $enableRetryForUser = ($aiPolicy == 2 || $aiPolicy == 3) && ! $isSlave && count($messages) > 1 && $messages[count($messages) - 1]['userId'] != $userId && $messages[count($messages) - 2]['userId'] == $userId;
+            $lastInputText = $enableRetryForUser ? $messages[count($messages) - 2]['text'] : "";
             foreach ($messages as $key => $message) {
                 $class = $message['userId'] == $userId ? 'own-message' : 'other-message';
                 $parsedown = new Parsedown();
                 $messageText = $parsedown->text($message['text']);
-                
-                echo "<div class='message $class'>";
+                if ($key == count($messages) - 2) {
+                    echo '<div class="message '.$class.'" id="lastown" data-messageid="'. $message['messageId'] . '">';
+                }
+                else if ($key == count($messages) - 1) {
+                    echo '<div class="message '.$class.'" id="lastai" data-messageid="'. $message['messageId'] . '">';
+                }
+                else {
+                    echo '<div class="message '.$class.'">';
+                }
                 echo "<div class='text'>" . $messageText . "</div>";
                 echo "<span class='time'>" . htmlspecialchars(convertTimestamp($message['timestamp'])) . "</span>";
-                if ($key === $lastMessageKey && $message['userId'] != $userId && ($aiPolicy == 2 || $aiPolicy == 3) && !$isSlave) {
-                    echo '<svg id="icon-retry" class="icon" onclick="window.location.href = \'messages2.php?relationId=' . $relationId . '&conversationId=' . $conversationId . '&deleteLast=true\';"><use xlink:href="images/icons.svg#icon-reload"></use></svg>';
+                if ($key == $lastMessageKey && $enableRetryForUser) {
+                    echo '<svg id="icon-retry" class="icon" onclick="retryMessage();"><use xlink:href="images/icons.svg#icon-reload"></use></svg>';
                 }
                 echo "</div>";
             }
@@ -88,6 +97,9 @@ function convertTimestamp($mysqlTimestamp) {
 				<input type="hidden" name="isSlave" id="isSlave" value="<?= $isSlave ?>">
 				<input type="hidden" name="subject" value="<?= $subject ?>">
 				<input type="hidden" name="replyPolicy" value="">
+				<input type="hidden" name="lastMessage" id="lastMessage" value="<?= $lastInputText ?>">
+				<input type="hidden" name="lastOwnMessageId" id="lastOwnMessageId" value="">
+				<input type="hidden" name="lastAiMessageId" id="lastAiMessageId" value="">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
 				<textarea autofocus name="message" id="message" maxlength="40000" placeholder="<?= _("Type your message here...") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
 				<button type="submit" class="send-button" id="buttonSubmitMessage"><?= _("Send") ?></button>
