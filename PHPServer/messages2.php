@@ -58,7 +58,7 @@ if ($conn->connect_error) {
 
 		<div id="messages">
             <?php
-            $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
+            $messages = queryMessages($username, $password, $relationId, $conversationId);
             foreach ($messages as $message) {
                 $class = $message['userId'] == $userId ? 'own-message' : 'other-message';
                 $parsedown = new Parsedown();

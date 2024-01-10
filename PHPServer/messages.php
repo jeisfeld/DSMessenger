@@ -16,7 +16,7 @@ $contactId = $conversationData['contactId'];
 $isSlave = $conversationData['isSlave'];
 $preparedMessage = $isSlave ? $conversationData['preparedMessage'] : "";
 $subject = $conversationData['subject'];
-$archived = $conversationData['archived'];
+$archived = @$conversationData['archived'];
 $aiPolicy = 0;
 if (! $isSlave) {
     $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
@@ -63,7 +63,7 @@ function convertTimestamp($mysqlTimestamp) {
 
 		<div id="messages">
             <?php
-            $messages = queryMessages($username, $password, $relationId, $isSlave, $conversationId);
+            $messages = queryMessages($username, $password, $relationId, $conversationId);
             $lastMessageKey = count($messages) - 1;
             $enableRetryForUser = ($aiPolicy == 2 || $aiPolicy == 3) && ! $isSlave && count($messages) > 1 && $messages[count($messages) - 1]['userId'] != $userId && $messages[count($messages) - 2]['userId'] == $userId;
             $lastInputText = $enableRetryForUser ? $messages[count($messages) - 2]['text'] : "";

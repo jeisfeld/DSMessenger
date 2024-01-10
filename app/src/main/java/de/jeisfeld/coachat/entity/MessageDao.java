@@ -31,6 +31,9 @@ public interface MessageDao {
 	@Query("SELECT * FROM message WHERE conversationId = :conversationId ORDER BY timestamp")
 	List<Message> getMessagesByConversationId(String conversationId);
 
+	@Query("DELETE FROM message WHERE conversationId = :conversationId")
+	void deleteMessagesByConversationId(final String conversationId);
+
 	default List<Message> getMessagesByConversationId(final UUID conversationId) {
 		return getMessagesByConversationId(conversationId.toString());
 	}

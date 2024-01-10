@@ -109,8 +109,13 @@ SELECT connection_code, slave_name as contact_name, slave_id as contact_id, mast
     $stmt->execute();
     $stmt->bind_result($connectionCode, $contactName, $contactId, $myName, $isSlave, $slavePermissions);
     if (! $stmt->fetch()) {
-        // relation does not belong to user - logout
-        header("Location: logout.php");
+        // relation does not belong to user
+        if ($_SESSION['username']) {
+            header("Location: logout.php");
+        }
+        else {
+            printError(107, "Insufficient privileges - " . $userId  . " - " . $relationId);
+        }
         exit(0);
     }
     $stmt->close();

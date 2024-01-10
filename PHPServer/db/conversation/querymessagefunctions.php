@@ -2,7 +2,7 @@
 require_once __DIR__.'/../dbfunctions.php';
 require_once __DIR__ . '/../../openai/queryopenai.php';
 
-function queryMessages($username, $password, $relationId, $isSlave, $conversationId)
+function queryMessages($username, $password, $relationId, $conversationId)
 {
     // Create connection
     $conn = getDbConnection();
@@ -17,7 +17,7 @@ function queryMessages($username, $password, $relationId, $isSlave, $conversatio
     getRelationData($userId, $relationId, $conn);
     
     $messageId = null;
-    $userId = null;
+    $msgUserId = null;
     $text = null;
     $timestamp = null;
     $status = null;
@@ -25,16 +25,18 @@ function queryMessages($username, $password, $relationId, $isSlave, $conversatio
     
     $stmt->bind_param("s", $conversationId);
     $stmt->execute();
-    $stmt->bind_result($messageId, $userId, $text, $timestamp, $status);
+    $stmt->bind_result($messageId, $msgUserId, $text, $timestamp, $status);
     
     $messages = array();
     while ($stmt->fetch()) {
         $messages[] = [
             'messageId' => $messageId,
             'userId' => $userId,
+            'isOwn' => $msgUserId == $userId ? 1 : 0,
             'text' => $text,
             'timestamp' => $timestamp,
-            'status' => $status
+            'status' => $status,
+            'conversationId' => $conversationId
         ];
     }
     $stmt -> close();

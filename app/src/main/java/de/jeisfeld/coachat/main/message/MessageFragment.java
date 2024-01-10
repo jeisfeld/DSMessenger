@@ -1,23 +1,23 @@
 package de.jeisfeld.coachat.main.message;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -148,16 +148,16 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	/**
 	 * Send a broadcast to this fragment.
 	 *
-	 * @param context      The context.
-	 * @param actionType   The action type.
-	 * @param messageId    The messageId.
-	 * @param contact      The contact.
+	 * @param context The context.
+	 * @param actionType The action type.
+	 * @param messageId The messageId.
+	 * @param contact The contact.
 	 * @param conversation The conversation.
-	 * @param message      The message.
-	 * @param parameters   The parameters.
+	 * @param message The message.
+	 * @param parameters The parameters.
 	 */
 	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final Contact contact,
-									 final Conversation conversation, final Message message, final String... parameters) {
+			final Conversation conversation, final Message message, final String... parameters) {
 		final Intent intent = new Intent(BROADCAST_ACTION);
 		final Bundle bundle = new Bundle();
 		bundle.putSerializable("actionType", actionType);
@@ -207,6 +207,22 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		});
 		binding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditConversationDialog(this, conversation, contact));
 
+		binding.imageViewRefreshMessages.setOnClickListener(
+				v -> new HttpSender(getContext()).sendMessage("db/conversation/querymessages.php", contact, null, (response, responseData) -> {
+					if (responseData.isSuccess()) {
+						List<Message> messages = (List<Message>) responseData.getData().get("messages");
+						if (messages == null) {
+							return;
+						}
+						Application.getAppDatabase().getMessageDao().deleteMessagesByConversationId(conversation.getConversationId().toString());
+						Application.getAppDatabase().getMessageDao().insert(messages);
+						refreshMessageList();
+					}
+					else {
+						Log.e(Application.TAG, "Failed to retrieve message data: " + responseData.getErrorMessage());
+					}
+				}, "conversationId", conversation.getConversationId().toString()));
+
 		assert getArguments() != null;
 		contact = (Contact) getArguments().getSerializable("contact");
 		conversation = (Conversation) getArguments().getSerializable("conversation");
@@ -217,7 +233,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		}
 		binding.imageViewConnectionStatus.setVisibility(MainActivity.isDsUser() ? View.VISIBLE : View.GONE);
 
-		arrayAdapter = new ArrayAdapter<>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
+		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
 			@NonNull
 			@Override
 			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
@@ -313,8 +329,10 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 			List<Message> newMessageList =
 					Application.getAppDatabase().getMessageDao().getMessagesByConversationId(conversation.getConversationId());
 			deleteMessages.clear();
-			messageList.clear();
-			messageList.addAll(newMessageList);
+			synchronized (messageList) {
+				messageList.clear();
+				messageList.addAll(newMessageList);
+			}
 			Activity activity = getActivity();
 			if (activity != null) {
 				activity.runOnUiThread(() -> {
@@ -375,15 +393,15 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		UUID messageId = UUID.randomUUID();
 
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
-					Activity activity = getActivity();
-					if (activity != null) {
-						activity.runOnUiThread(() -> {
-							if (responseData == null || !responseData.isSuccess()) {
-								binding.imageViewConnectionStatus.setImageResource(R.drawable.ic_icon_connection_gone);
-							}
-						});
+			Activity activity = getActivity();
+			if (activity != null) {
+				activity.runOnUiThread(() -> {
+					if (responseData == null || !responseData.isSuccess()) {
+						binding.imageViewConnectionStatus.setImageResource(R.drawable.ic_icon_connection_gone);
 					}
-				},
+				});
+			}
+		},
 				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.PING.name());
 	}
 
@@ -399,34 +417,34 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		binding.buttonSend.setEnabled(false);
 
 		new HttpSender(getContext()).sendMessage("db/conversation/sendmessage.php", contact, messageId, (response, responseData) -> {
-					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
-							conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
-					Application.getAppDatabase().getMessageDao().acknowledgeMessages(
-							messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
-					refreshMessageList();
-					Activity activity = getActivity();
-					if (activity != null) {
-						activity.runOnUiThread(() -> {
-							binding.buttonSend.setEnabled(true);
-							if (responseData != null && responseData.isSuccess()) {
-								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
-									conversation.setPreparedMessage("");
-									conversation.insertIfNew(message.getMessageText());
-									if (!contact.isSlave()) {
-										conversation.updateWithResponse();
-										setButtonVisibility();
-									}
-									addMessage(message);
-								}
-								binding.editTextMessageText.setText("");
+			Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
+					conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
+			Application.getAppDatabase().getMessageDao().acknowledgeMessages(
+					messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
+			refreshMessageList();
+			Activity activity = getActivity();
+			if (activity != null) {
+				activity.runOnUiThread(() -> {
+					binding.buttonSend.setEnabled(true);
+					if (responseData != null && responseData.isSuccess()) {
+						if (message.getMessageText() != null && message.getMessageText().length() > 0) {
+							conversation.setPreparedMessage("");
+							conversation.insertIfNew(message.getMessageText());
+							if (!contact.isSlave()) {
+								conversation.updateWithResponse();
+								setButtonVisibility();
 							}
-							else {
-								binding.buttonSend.setEnabled(true);
-								DialogUtil.displayToast(getContext(), R.string.toast_error_when_sending, responseData.getMappedErrorMessage(getContext()));
-							}
-						});
+							addMessage(message);
+						}
+						binding.editTextMessageText.setText("");
 					}
-				},
+					else {
+						binding.buttonSend.setEnabled(true);
+						DialogUtil.displayToast(getContext(), R.string.toast_error_when_sending, responseData.getMappedErrorMessage(getContext()));
+					}
+				});
+			}
+		},
 				"messageType", !contact.isSlave() && conversation.getConversationFlags().getReplyPolicy() != ReplyPolicy.UNLIMITED
 						? MessageType.TEXT_RESPONSE.name()
 						: MessageType.TEXT.name(),
@@ -447,7 +465,9 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	private void addMessage(final Message message) {
 		message.store(conversation);
 		if (message.getConversationId().equals(conversation.getConversationId())) {
-			messageList.add(message);
+			synchronized (messageList) {
+				messageList.add(message);
+			}
 			arrayAdapter.notifyDataSetChanged();
 			binding.listViewMessages.setSelection(messageList.size() - 1);
 			binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
@@ -457,12 +477,13 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	/**
 	 * Handle the response of edit conversation dialog.
 	 *
-	 * @param dialog       The dialog.
-	 * @param contact      The contact.
+	 * @param dialog The dialog.
+	 * @param contact The contact.
 	 * @param conversation The new conversation data.
 	 */
+	@Override
 	public void handleEditConversationDialogResponse(final EditConversationDialogFragment dialog, final Contact contact,
-													 final Conversation conversation) {
+			final Conversation conversation) {
 		conversation.update();
 		this.conversation = conversation;
 		binding.textSubject.setText(conversation.getSubject());

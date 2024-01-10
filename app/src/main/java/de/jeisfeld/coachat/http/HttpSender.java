@@ -341,6 +341,22 @@ public class HttpSender {
 							data.put(key, conversations);
 							data.put("messages", messages);
 						}
+						else if ("messages".equals(key)) {
+							List<Message> messages = new ArrayList<>();
+							JSONArray jsonArray = jsonObject.getJSONArray(key);
+							for (int j = 0; j < jsonArray.length(); j++) {
+								JSONObject jsonMessage = jsonArray.getJSONObject(j);
+								String messageIdString = jsonMessage.getString("messageId");
+								String conversationIdString = jsonMessage.getString("conversationId");
+								long timestamp = jsonMessage.getLong("timestamp");
+								String text = jsonMessage.getString("text");
+								boolean isOwn = jsonMessage.getInt("isOwn") == 1;
+								MessageStatus status = MessageStatus.fromOrdinal(jsonMessage.getInt("status"));
+								Message message = new Message(text, isOwn, messageIdString, conversationIdString, timestamp, status);
+								messages.add(message);
+							}
+							data.put("messages", messages);
+						}
 						else if ("devices".equals(key)) {
 							List<Device> devices = new ArrayList<>();
 							JSONArray jsonArray = jsonObject.getJSONArray(key);

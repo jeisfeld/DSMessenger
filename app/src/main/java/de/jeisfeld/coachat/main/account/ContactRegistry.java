@@ -164,7 +164,7 @@ public final class ContactRegistry {
 		if (!AccountFragment.isLoggedIn()) {
 			return;
 		}
-		new Thread(() -> new HttpSender(context).sendMessage("db/usermanagement/querycontacts.php", (response, responseData) -> {
+		new HttpSender(context).sendMessage("db/usermanagement/querycontacts.php", (response, responseData) -> {
 			if (responseData.isSuccess()) {
 				SparseArray<Contact> newContacts = (SparseArray<Contact>) responseData.getData().get("contacts");
 				if (newContacts == null) {
@@ -191,7 +191,7 @@ public final class ContactRegistry {
 			else {
 				Log.e(Application.TAG, "Failed to retrieve contact data: " + responseData.getErrorMessage());
 			}
-		})).start();
+		});
 	}
 
 	/**
@@ -206,7 +206,7 @@ public final class ContactRegistry {
 		}
 		final long lastTimestamp = PreferenceUtil.getSharedPreferenceLong(R.string.key_last_conversation_timestamp, 0);
 		final ConversationDao conversationDao = Application.getAppDatabase().getConversationDao();
-		new Thread(() -> new HttpSender(context).sendMessage("db/conversation/queryconversationsandmessages.php", (response, responseData) -> {
+		new HttpSender(context).sendMessage("db/conversation/queryconversationsandmessages.php", (response, responseData) -> {
 			if (responseData.isSuccess()) {
 				List<Conversation> conversations = (List<Conversation>) responseData.getData().get("conversations");
 				assert conversations != null;
@@ -239,6 +239,6 @@ public final class ContactRegistry {
 			else {
 				Log.e(Application.TAG, "Failed to retrieve conversation data: " + responseData.getErrorMessage());
 			}
-		})).start();
+		});
 	}
 }

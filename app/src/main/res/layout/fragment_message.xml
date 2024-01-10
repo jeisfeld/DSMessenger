@@ -72,12 +72,21 @@
         tools:ignore="ContentDescription" />
 
     <ImageButton
-        android:id="@+id/button_edit"
+        android:id="@+id/imageViewRefreshMessages"
+        android:layout_width="@dimen/input_row_height"
+        android:layout_height="@dimen/input_row_height"
+        android:contentDescription="@string/text_refresh"
+        android:src="@drawable/ic_icon_refresh"
+        app:layout_constraintEnd_toStartOf="@id/imageViewConnectionStatus"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/buttonEdit"
         android:layout_width="@dimen/input_row_height"
         android:layout_height="@dimen/input_row_height"
         android:contentDescription="@string/text_edit"
         android:src="@drawable/ic_icon_edit"
-        app:layout_constraintEnd_toStartOf="@id/imageViewConnectionStatus"
+        app:layout_constraintEnd_toStartOf="@id/imageViewRefreshMessages"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ListView
