@@ -11,7 +11,7 @@ $('#conversations-link').click(function(event) {
 		url: 'setPreparedMessage.php',
 		type: 'POST',
 		data: {
-			'preparedMessage': $('#message').val(),
+			'preparedMessage': $('#messageText').val(),
 			'relationId': $('#relationId').val(),
 			'conversationId': $('#conversationId').val(),
 			'isSlave': $('#isSlave').val()
@@ -31,7 +31,7 @@ $('#conversations-link').click(function(event) {
 function retryMessage() {
 	$("#lastai").hide();
 	$("#lastown").hide();
-	$("#message").val($("#lastMessage").val());
+	$("#messageText").val($("#lastMessage").val());
 	$("#lastOwnMessageId").val($("#lastown").data("messageid"));
 	$("#lastAiMessageId").val($("#lastai").data("messageid"));
 }

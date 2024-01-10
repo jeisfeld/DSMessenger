@@ -61,6 +61,43 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		}
 	}
 
+	/**
+	 * Cancel a notification.
+	 *
+	 * @param relationId The relationId
+	 */
+	public static void cancelNotification(final Context context, final int relationId) {
+		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancel(relationId);
+	}
+
+	/**
+	 * Display a notification.
+	 *
+	 * @param textMessageDetails The text message details.
+	 * @param textMessage        The text message.
+	 */
+	public void displayNotification(final TextMessageDetails textMessageDetails, final Message textMessage) {
+		String message = textMessageDetails.getMessageText();
+		String title = getString(R.string.notification_title, textMessageDetails.getContact().getName());
+
+		Notification.Builder notificationBuilder;
+		notificationBuilder = new Notification.Builder(this, "MessageNotification");
+		notificationBuilder.setSmallIcon(R.drawable.ic_notification)
+				.setContentTitle(title)
+				.setContentText(message)
+				.setChannelId(Application.NOTIFICATION_CHANNEL_ID)
+				.setStyle(new Notification.BigTextStyle().bigText(message));
+
+		Intent actionIntent = MessageActivity.createIntent(this, textMessageDetails, textMessage);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, textMessageDetails.getContact().getRelationId(), actionIntent,
+				PendingIntent.FLAG_CANCEL_CURRENT | (VERSION.SDK_INT >= VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0));
+		notificationBuilder.setContentIntent(pendingIntent);
+
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.notify(textMessageDetails.getContact().getRelationId(), notificationBuilder.build());
+	}
+
 	@Override
 	public final void onMessageReceived(@NonNull final RemoteMessage message) {
 		super.onMessageReceived(message);
@@ -107,12 +144,17 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				Conversation editedConversation =
 						Application.getAppDatabase().getConversationDao().getConversationById(adminDetails.getValue("conversationId"));
 				if (editedConversation != null) {
-					editedConversation.setSubject(adminDetails.getValue("subject"));
+					if (adminDetails.getValue("subject") != null) {
+						editedConversation.setSubject(adminDetails.getValue("subject"));
+					}
 					if (adminDetails.getValue("conversationFlags") != null) {
 						editedConversation.setConversationFlags(ConversationFlags.fromString(adminDetails.getValue("conversationFlags")));
 					}
 					if (adminDetails.getValue("archived") != null) {
 						editedConversation.setArchived(Boolean.parseBoolean(adminDetails.getValue("archived")));
+					}
+					if (adminDetails.getValue("preparedMessage") != null) {
+						editedConversation.setPreparedMessage(adminDetails.getValue("preparedMessage"));
 					}
 					editedConversation.update();
 					ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, editedConversation);
@@ -130,7 +172,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.CONVERSATION_DELETED,
 							null, null, deletedConversation, null);
 					MessageActivity.sendBroadcast(this, MessageActivity.ActionType.CONVERSATION_DELETED, null, deletedConversation);
-					cancelNotification(deletedConversation.getRelationId());
+					cancelNotification(this, deletedConversation.getRelationId());
 				}
 				break;
 			case MESSAGE_RECEIVED:
@@ -277,43 +319,6 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		default:
 			break;
 		}
-	}
-
-	/**
-	 * Display a notification.
-	 *
-	 * @param textMessageDetails The text message details.
-	 * @param textMessage        The text message.
-	 */
-	public void displayNotification(final TextMessageDetails textMessageDetails, final Message textMessage) {
-		String message = textMessageDetails.getMessageText();
-		String title = getString(R.string.notification_title, textMessageDetails.getContact().getName());
-
-		Notification.Builder notificationBuilder;
-		notificationBuilder = new Notification.Builder(this, "MessageNotification");
-		notificationBuilder.setSmallIcon(R.drawable.ic_notification)
-				.setContentTitle(title)
-				.setContentText(message)
-				.setChannelId(Application.NOTIFICATION_CHANNEL_ID)
-				.setStyle(new Notification.BigTextStyle().bigText(message));
-
-		Intent actionIntent = MessageActivity.createIntent(this, textMessageDetails, textMessage);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, textMessageDetails.getContact().getRelationId(), actionIntent,
-				PendingIntent.FLAG_CANCEL_CURRENT | (VERSION.SDK_INT >= VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0));
-		notificationBuilder.setContentIntent(pendingIntent);
-
-		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.notify(textMessageDetails.getContact().getRelationId(), notificationBuilder.build());
-	}
-
-	/**
-	 * Cancel a notification.
-	 *
-	 * @param relationId The relationId
-	 */
-	public void cancelNotification(final int relationId) {
-		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		notificationManager.cancel(relationId);
 	}
 
 	@Override

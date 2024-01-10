@@ -1,6 +1,6 @@
 <?php
 require_once '../../firebase/firebasefunctions.php';
-require_once 'querymessages.php';
+require_once 'querymessagefunctions.php';
 require_once '../../openai/queryopenai.php';
 use Ramsey\Uuid\Uuid;
 
@@ -95,7 +95,7 @@ if (function_exists('fastcgi_finish_request')) {
 }
 
 $preparedMessage = "";
-$responseMessage = null;
+$responseMessage = "";
 $aiPolicy = 0;
 
 if (! $isSlave) {
@@ -103,7 +103,7 @@ if (! $isSlave) {
     if ($aiRelation) {
         $aiPolicy = $aiRelation['aiPolicy'];
     }
-    if ($aiPolicy > 0) {
+    if ($messageText && $aiPolicy > 0) {
         $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
 
         $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty']);
@@ -116,7 +116,7 @@ if (! $isSlave) {
     }
 }
 
-if ($aiPolicy == 1) {
+if ($responseMessage && $aiPolicy == 1) {
     $preparedMessage = $responseMessage;
     $stmt = $conn->prepare("UPDATE dsm_conversation SET prepared_message = ? where id = ?");
     $stmt->bind_param("ss", $responseMessage, $conversationId);
@@ -142,7 +142,7 @@ if ($aiPolicy != 3) {
     }
 }
 
-if ($aiPolicy == 2 || $aiPolicy == 3) {
+if ($responseMessage && ($aiPolicy == 2 || $aiPolicy == 3)) {
     $responseMessageId = Uuid::uuid4()->toString();
     $currentDateTime = new DateTime();
     $responseMysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);
@@ -173,7 +173,7 @@ if ($aiPolicy == 2 || $aiPolicy == 3) {
     }   
 }
 
-if ($aiPolicy == 2) {
+if ($responseMessage && $aiPolicy == 2) {
     $tokens = getVerifiedTokensFromRequestData();
     $currentDateTime = new DateTime();
     $data = [

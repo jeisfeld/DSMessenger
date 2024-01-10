@@ -1,6 +1,8 @@
 <?php
 include __DIR__ . '/check_session.php';
-require_once 'db/dbfunctions.php';
+require_once 'firebase/firebasefunctions.php';
+$username = $_SESSION['username'];
+$password = $_SESSION['password'];
 
 // Create connection
 $conn = getDbConnection();
@@ -23,6 +25,10 @@ if ($isSlave) {
     $stmt->bind_param("sssi", $preparedMessage, $mysqlTimestamp, $conversationId, $relationId);
     $stmt->execute();
     $stmt->close();
+    sendAdminMessage($conn, $username, $password, $relationId, "CONVERSATION_EDITED", [
+        'conversationId' => $conversationId,
+        'preparedMessage' => $preparedMessage
+    ]);
     $conn->close();
 }
 

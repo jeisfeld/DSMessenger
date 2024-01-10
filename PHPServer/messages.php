@@ -1,6 +1,6 @@
 <?php
 include __DIR__ . '/check_session.php';
-require_once __DIR__ . '/db/conversation/querymessages.php';
+require_once __DIR__ . '/db/conversation/querymessagefunctions.php';
 require_once 'openai/queryopenai.php';
 include __DIR__ . '/vendor/erusev/parsedown/Parsedown.php';
 
@@ -101,7 +101,7 @@ function convertTimestamp($mysqlTimestamp) {
 				<input type="hidden" name="lastOwnMessageId" id="lastOwnMessageId" value="">
 				<input type="hidden" name="lastAiMessageId" id="lastAiMessageId" value="">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">
-				<textarea autofocus name="message" id="message" maxlength="40000" placeholder="<?= _("Type your message here...") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
+				<textarea autofocus name="messageText" id="messageText" maxlength="40000" placeholder="<?= _("Type your message here...") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
 				<button type="submit" class="send-button" id="buttonSubmitMessage"><?= _("Send") ?></button>
 			</form>
 		</div>

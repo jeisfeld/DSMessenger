@@ -97,7 +97,7 @@ $conn -> close();
 				<input type="hidden" name="relationId" value="<?= $relationId ?>">
 				<input type="hidden" name="conversationId" value="">
 				<input type="hidden" name="subject" value="">
-				<textarea autofocus name="message" maxlength="40000" placeholder="<?= _("Start a new conversation here...") ?>" class="message-textarea"></textarea>
+				<textarea autofocus name="messageText" maxlength="40000" placeholder="<?= _("Start a new conversation here...") ?>" class="message-textarea"></textarea>
 				<button type="submit" class="send-button" id="buttonSubmitMessage"><?= _("Send") ?></button>
 			</form>
 		</div>

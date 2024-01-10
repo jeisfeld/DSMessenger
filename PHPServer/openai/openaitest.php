@@ -1,16 +1,16 @@
 <?php
 require_once 'queryopenai.php';
 
-$message = createOpenAiMessage(
+$messageText = createOpenAiMessage(
     'user',
     'Translate the following English text to an arbitrary language: Hello, how are you? Tell which language you selected.'
 );
 
-$result = queryOpenAi([$message], 1, 0, 0);
+$result = queryOpenAi([$messageText], 1, 0, 0);
 
 if ($result['success']) {
-    $message = $result['message'];
-    echo "<i>[".$message['role']."]:</i> ".$message['content'];
+    $messageText = $result['message'];
+    echo "<i>[".$messageText['role']."]:</i> ".$messageText['content'];
 }
 else {
     $error = $result['error'];

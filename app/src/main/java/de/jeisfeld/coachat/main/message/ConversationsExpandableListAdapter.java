@@ -24,6 +24,7 @@ import de.jeisfeld.coachat.main.account.AccountDialogUtil;
 import de.jeisfeld.coachat.main.account.ContactRegistry;
 import de.jeisfeld.coachat.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
+import de.jeisfeld.coachat.service.FirebaseDsMessagingService;
 import de.jeisfeld.coachat.util.DialogUtil;
 
 /**
@@ -172,6 +173,7 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 								new HttpSender(activity).sendMessage("db/conversation/deleteconversation.php", contact, UUID.randomUUID(), null,
 										"messageType", MessageType.ADMIN.name(), "adminType", AdminType.CONVERSATION_DELETED.name(),
 										"conversationId", conversationId.toString());
+								FirebaseDsMessagingService.cancelNotification(fragment.getContext(), conversation.getRelationId());
 							},
 							R.string.title_dialog_confirm_deletion, R.string.button_cancel, R.string.button_delete_conversation,
 							R.string.dialog_confirm_delete_conversation, conversation.getSubject());

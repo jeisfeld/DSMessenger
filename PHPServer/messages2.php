@@ -1,7 +1,7 @@
 <?php
 include __DIR__ . '/check_session.php';
 require_once 'firebase/firebasefunctions.php';
-require_once __DIR__ . '/db/conversation/querymessages.php';
+require_once __DIR__ . '/db/conversation/querymessagefunctions.php';
 require_once 'openai/queryopenai.php';
 include __DIR__ . '/vendor/erusev/parsedown/Parsedown.php';
 use Ramsey\Uuid\Uuid;

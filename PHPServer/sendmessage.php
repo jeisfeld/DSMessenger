@@ -1,7 +1,7 @@
 <?php
 include __DIR__ . '/check_session.php';
 require_once 'firebase/firebasefunctions.php';
-require_once 'db/conversation/querymessages.php';
+require_once 'db/conversation/querymessagefunctions.php';
 require_once 'openai/queryopenai.php';
 use Ramsey\Uuid\Uuid;
 $username = $_SESSION['username'];
@@ -11,7 +11,7 @@ $userId = $_SESSION['userId'];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $relationId = $_POST['relationId'];
     $conversationId = $_POST['conversationId'];
-    $message = $_POST['message'];
+    $messageText = $_POST['messageText'];
     $lastOwnMessageId = $_POST['lastOwnMessageId'];
     $lastAiMessageId = $_POST['lastAiMessageId'];
     $isNewConversation = ! $conversationId;
@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $conversationId = Uuid::uuid4()->toString();
         $relationData = getRelationData($userId, $relationId);
         $isSlave = $relationData['isSlave'];
-        $subject = substr($message, 0, 100);
+        $subject = substr($messageText, 0, 100);
         $replyPolicy = substr($relationData['slavePermissions'], 3, 1);
     }
     else {
@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);
 
     $messageId = Uuid::uuid4()->toString();
-    if ($message) {
+    if ($messageText) {
         if ($isNewConversation) {
             $conversationFlags = $replyPolicy ? $replyPolicy . "00" : "000";
             $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp, prepared_message) values (?, ?, ?, ?, ?, '')");
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->close();
         }
         $stmt = $conn->prepare("INSERT INTO dsm_message (id, conversation_id, user_id, text, timestamp, status) values (?, ?, ?, ?, ?, 0)");
-        $stmt->bind_param("ssiss", $messageId, $conversationId, $userId, $message, $mysqlTimestamp);
+        $stmt->bind_param("ssiss", $messageId, $conversationId, $userId, $messageText, $mysqlTimestamp);
         $stmt->execute();
         $stmt->close();
     }
@@ -86,10 +86,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ob_start();
     // Redirect back to the chat
     echo "Dummy response";
-    if ($isNewConversation && ! $message) {
+    if ($isNewConversation && ! $messageText) {
         header("Location: conversations.php?relationId=" . $relationId);
     }
-    else if ($aiPolicy == 2 || $aiPolicy == 3) {
+    else if (($aiPolicy == 2 || $aiPolicy == 3) && $messageText) {
         header("Location: messages2.php?relationId=" . $relationId . "&conversationId=" . $conversationId);
     }
     else {
@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $responseMessage = "";
     
-    if ($message && $aiPolicy == 1) {
+    if ($messageText && $aiPolicy == 1) {
         $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
 
         $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty']);
@@ -127,11 +127,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($aiPolicy != 3) {
         $tokens = getUnmutedTokens($conn, $username, $password, $relationId);
         
-        $data = getTextData($relationId, "TEXT", $message, $conversationId, $mysqlTimestamp, $messageId);
+        $data = getTextData($relationId, "TEXT", $messageText, $conversationId, $mysqlTimestamp, $messageId);
         foreach ($tokens as $token) {
             sendFirebaseMessage($token, $data);
         }
-        $data = getTextData($relationId, "TEXT_OWN", $message, $conversationId, $mysqlTimestamp, $messageId);
+        $data = getTextData($relationId, "TEXT_OWN", $messageText, $conversationId, $mysqlTimestamp, $messageId);
         $tokens = getSelfTokens($conn, $username, $password, - 1);
         foreach ($tokens as $token) {
             sendFirebaseMessage($token, $data, null);
