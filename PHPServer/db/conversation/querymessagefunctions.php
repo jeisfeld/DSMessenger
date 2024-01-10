@@ -31,7 +31,7 @@ function queryMessages($username, $password, $relationId, $conversationId)
     while ($stmt->fetch()) {
         $messages[] = [
             'messageId' => $messageId,
-            'userId' => $userId,
+            'userId' => $msgUserId,
             'isOwn' => $msgUserId == $userId ? 1 : 0,
             'text' => $text,
             'timestamp' => $timestamp,

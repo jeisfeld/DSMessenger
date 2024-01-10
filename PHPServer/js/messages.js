@@ -36,6 +36,27 @@ function retryMessage() {
 	$("#lastAiMessageId").val($("#lastai").data("messageid"));
 }
 
+function recreatePreparedMessage() {
+		$("#messageText").prop('disabled', true);
+		$.ajax({
+		url: 'recreatePreparedMessage.php',
+		type: 'POST',
+		data: {
+			'relationId': $('#relationId').val(),
+			'conversationId': $('#conversationId').val(),
+			'isSlave': $('#isSlave').val()
+		},
+		success: function(response) {
+			$("#messageText").val(response);
+			$("#messageText").prop('disabled', false);
+		},
+		error: function(xhr, status, error) {
+			$("#messageText").prop('disabled', false);
+		}
+	});
+}
+
+
 $('#editButton').click(function() {
 	var conversationId = $(this).data('conversation-id');
 	var relationId = $(this).data('relation-id');

@@ -1,6 +1,8 @@
 <?php
 include __DIR__ . '/check_session.php';
 require_once 'firebase/firebasefunctions.php';
+require_once 'db/conversation/querymessagefunctions.php';
+require_once 'openai/queryopenai.php';
 $username = $_SESSION['username'];
 $password = $_SESSION['password'];
 
@@ -12,12 +14,17 @@ if ($conn->connect_error) {
     printError(101, "Connection failed: " . $conn->connect_error);
 }
 
-$preparedMessage = @$_POST['preparedMessage'];
 $conversationId = @$_POST['conversationId'];
 $relationId = @$_POST['relationId'];
 $isSlave = @$_POST['isSlave'];
+$aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
 
-if ($isSlave) {
+if ($aiRelation['aiPolicy'] == 1 && $isSlave) {
+    $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
+    $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty']);
+    $preparedMessage = $result['success'] ? $result['message']['content'] : "";
+    echo $preparedMessage;
+    
     $currentDateTime = new DateTime();
     $mysqlTimestamp = substr($currentDateTime->format("Y-m-d H:i:s.u"), 0, 23);
     
@@ -30,6 +37,7 @@ if ($isSlave) {
         'preparedMessage' => $preparedMessage
     ]);
 }
-$conn->close();
+
+$conn -> close();
 
 ?>

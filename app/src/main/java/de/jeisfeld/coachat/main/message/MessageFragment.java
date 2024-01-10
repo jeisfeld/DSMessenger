@@ -1,10 +1,5 @@
 package de.jeisfeld.coachat.main.message;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,6 +13,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -148,16 +149,16 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	/**
 	 * Send a broadcast to this fragment.
 	 *
-	 * @param context The context.
-	 * @param actionType The action type.
-	 * @param messageId The messageId.
-	 * @param contact The contact.
+	 * @param context      The context.
+	 * @param actionType   The action type.
+	 * @param messageId    The messageId.
+	 * @param contact      The contact.
 	 * @param conversation The conversation.
-	 * @param message The message.
-	 * @param parameters The parameters.
+	 * @param message      The message.
+	 * @param parameters   The parameters.
 	 */
 	public static void sendBroadcast(final Context context, final ActionType actionType, final UUID messageId, final Contact contact,
-			final Conversation conversation, final Message message, final String... parameters) {
+									 final Conversation conversation, final Message message, final String... parameters) {
 		final Intent intent = new Intent(BROADCAST_ACTION);
 		final Bundle bundle = new Bundle();
 		bundle.putSerializable("actionType", actionType);
@@ -222,6 +223,24 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 						Log.e(Application.TAG, "Failed to retrieve message data: " + responseData.getErrorMessage());
 					}
 				}, "conversationId", conversation.getConversationId().toString()));
+
+		binding.imageButtonRefreshPreparedMessage.setOnClickListener(v -> {
+			binding.buttonSend.setEnabled(false);
+			binding.buttonSendWithPriority.setEnabled(false);
+			binding.editTextMessageText.setEnabled(false);
+			new HttpSender(getContext()).sendMessage("db/conversation/recreatepreparedmessage.php", contact, null,
+					(response, responseData) -> getActivity().runOnUiThread(() -> {
+						binding.buttonSend.setEnabled(true);
+						binding.buttonSendWithPriority.setEnabled(true);
+						binding.editTextMessageText.setEnabled(true);
+						if (responseData.isSuccess()) {
+							binding.editTextMessageText.setText((String) responseData.getData().get("preparedMessage"));
+						}
+						else {
+							Log.e(Application.TAG, "Failed to retrieve message data: " + responseData.getErrorMessage());
+						}
+					}), "conversationId", conversation.getConversationId().toString());
+		});
 
 		assert getArguments() != null;
 		contact = (Contact) getArguments().getSerializable("contact");
@@ -319,6 +338,8 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		binding.buttonSendWithPriority.setVisibility(enablePrioSend ? View.VISIBLE : View.INVISIBLE);
 		binding.layoutTextInput.setVisibility(enableSend ? View.VISIBLE : View.GONE);
 		binding.buttonEdit.setVisibility(enableEdit && conversation.isStored() ? View.VISIBLE : View.GONE);
+		binding.imageButtonRefreshPreparedMessage.setVisibility(
+				enableSend && contact.isSlave() && contact.getAiPolicy() == AiPolicy.MANUAL ? View.VISIBLE : View.GONE);
 	}
 
 	/**
@@ -393,15 +414,15 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		UUID messageId = UUID.randomUUID();
 
 		new HttpSender(getContext()).sendMessage(contact, messageId, (response, responseData) -> {
-			Activity activity = getActivity();
-			if (activity != null) {
-				activity.runOnUiThread(() -> {
-					if (responseData == null || !responseData.isSuccess()) {
-						binding.imageViewConnectionStatus.setImageResource(R.drawable.ic_icon_connection_gone);
+					Activity activity = getActivity();
+					if (activity != null) {
+						activity.runOnUiThread(() -> {
+							if (responseData == null || !responseData.isSuccess()) {
+								binding.imageViewConnectionStatus.setImageResource(R.drawable.ic_icon_connection_gone);
+							}
+						});
 					}
-				});
-			}
-		},
+				},
 				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.PING.name());
 	}
 
@@ -417,34 +438,34 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		binding.buttonSend.setEnabled(false);
 
 		new HttpSender(getContext()).sendMessage("db/conversation/sendmessage.php", contact, messageId, (response, responseData) -> {
-			Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
-					conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
-			Application.getAppDatabase().getMessageDao().acknowledgeMessages(
-					messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
-			refreshMessageList();
-			Activity activity = getActivity();
-			if (activity != null) {
-				activity.runOnUiThread(() -> {
-					binding.buttonSend.setEnabled(true);
-					if (responseData != null && responseData.isSuccess()) {
-						if (message.getMessageText() != null && message.getMessageText().length() > 0) {
-							conversation.setPreparedMessage("");
-							conversation.insertIfNew(message.getMessageText());
-							if (!contact.isSlave()) {
-								conversation.updateWithResponse();
-								setButtonVisibility();
+					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
+							conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
+					Application.getAppDatabase().getMessageDao().acknowledgeMessages(
+							messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
+					refreshMessageList();
+					Activity activity = getActivity();
+					if (activity != null) {
+						activity.runOnUiThread(() -> {
+							binding.buttonSend.setEnabled(true);
+							if (responseData != null && responseData.isSuccess()) {
+								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
+									conversation.setPreparedMessage("");
+									conversation.insertIfNew(message.getMessageText());
+									if (!contact.isSlave()) {
+										conversation.updateWithResponse();
+										setButtonVisibility();
+									}
+									addMessage(message);
+								}
+								binding.editTextMessageText.setText("");
 							}
-							addMessage(message);
-						}
-						binding.editTextMessageText.setText("");
+							else {
+								binding.buttonSend.setEnabled(true);
+								DialogUtil.displayToast(getContext(), R.string.toast_error_when_sending, responseData.getMappedErrorMessage(getContext()));
+							}
+						});
 					}
-					else {
-						binding.buttonSend.setEnabled(true);
-						DialogUtil.displayToast(getContext(), R.string.toast_error_when_sending, responseData.getMappedErrorMessage(getContext()));
-					}
-				});
-			}
-		},
+				},
 				"messageType", !contact.isSlave() && conversation.getConversationFlags().getReplyPolicy() != ReplyPolicy.UNLIMITED
 						? MessageType.TEXT_RESPONSE.name()
 						: MessageType.TEXT.name(),
@@ -477,13 +498,13 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	/**
 	 * Handle the response of edit conversation dialog.
 	 *
-	 * @param dialog The dialog.
-	 * @param contact The contact.
+	 * @param dialog       The dialog.
+	 * @param contact      The contact.
 	 * @param conversation The new conversation data.
 	 */
 	@Override
 	public void handleEditConversationDialogResponse(final EditConversationDialogFragment dialog, final Contact contact,
-			final Conversation conversation) {
+													 final Conversation conversation) {
 		conversation.update();
 		this.conversation = conversation;
 		binding.textSubject.setText(conversation.getSubject());
