@@ -40,15 +40,6 @@ $(document).ready(function() {
 		$('#modalEdit').hide();
 	});
 
-	// Close the modal if user clicks outside of it
-	$(window).click(function(event) {
-		if ($(event.target).is('#modalDelete')) {
-			$('#modalDelete').hide();
-		}
-		if ($(event.target).is('#modalEdit')) {
-			$('#modalEdit').hide();
-		}
-	});
 });
 
 

@@ -12,8 +12,8 @@ import org.json.JSONObject;
 public class DialogToJsonFileConverter {
 
 	public static void main(final String[] args) {
-		String inputFilePath = "D:\\Jörg\\Word\\homodea\\AI\\dialog5.txt"; // Replace with the path to your input file
-		String outputFilePath = "D:\\Jörg\\Word\\homodea\\AI\\dialog5.json"; // Replace with the path to your output file
+		String inputFilePath = "D:\\Jörg\\Word\\homodea\\AI\\dialog9.txt"; // Replace with the path to your input file
+		String outputFilePath = "D:\\Jörg\\Word\\homodea\\AI\\dialog9.json"; // Replace with the path to your output file
 
 		try {
 			String[] dialog = readDialogFromFile(inputFilePath);

@@ -52,11 +52,11 @@ function convertTimestamp($mysqlTimestamp)
 				&nbsp;<a href="logout.php"><?= _("Logout") ?></a></span>
 		</div>
 		<h1><?= sprintf(_("Conversation with"), substr($subject, 0, 30), $contactName) ?>
-			<span class="right"> <svg id="editButton" class="icon" data-conversation-id="<?= $conversationId ?>"
+			<span class="right"> 
+				<svg id="editButton" class="icon" data-conversation-id="<?= $conversationId ?>"
 					data-relation-id="<?= $relationId ?>" data-subject="<?= $subject ?>" data-archived="<?= $archived ?>">
-					<use xlink:href="images/icons.svg#icon-edit"></use></svg> <svg id="button-reload" onclick="location.reload()"
-					class="icon">
-					<use xlink:href="images/icons.svg#icon-reload"></use></svg>
+					<use href="images/icons.svg#icon-edit"/></svg> 
+				<svg id="button-reload" onclick="location.reload()" class="icon"><use href="images/icons.svg#icon-reload"/></svg>
 			</span>
 		</h1>
 
@@ -79,12 +79,12 @@ function convertTimestamp($mysqlTimestamp)
                 else {
                     echo '<div class="message ' . $class . '">';
                 }
-                echo "<div class='text'>" . $messageText . "</div>";
-                echo "<span class='time'>" . htmlspecialchars(convertTimestamp($message['timestamp'])) . "</span>";
+                echo '<div class="text">' . $messageText . '</div>';
+                echo '<span class="time">' . htmlspecialchars(convertTimestamp($message['timestamp'])) . '</span>';
                 if ($key == $lastMessageKey && $enableRetryForUser) {
                     echo '<svg id="icon-retry" class="icon" onclick="retryMessage();"><use xlink:href="images/icons.svg#icon-reload"></use></svg>';
                 }
-                echo "</div>";
+                echo '</div>';
             }
             ?>
 	    </div>
@@ -119,8 +119,8 @@ function convertTimestamp($mysqlTimestamp)
 
 	<div id="modalEdit" class="modal">
 		<div class="modal-content">
-			<h2><?= _("Edit Conversation") ?></h2>
 			<span class="close">&times;</span>
+			<h2><?= _("Edit Conversation") ?></h2>
 			<form action="perform_edit_conversation.php" method="post">
 				<input type="hidden" name="conversationId" id="modalEditConversationId" value=""> <input type="hidden"
 					name="relationId" id="modalEditRelationId" value="">

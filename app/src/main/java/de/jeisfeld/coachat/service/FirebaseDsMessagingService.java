@@ -231,7 +231,8 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			MessageDisplayType displayType = textMessageDetails.getDisplayStrategy().getMessageDisplayType();
 			UUID conversationId = textMessageDetails.getConversationId();
 			Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId);
-			if (messageConversation == null && textMessageDetails.getMessageText() != null && textMessageDetails.getMessageText().length() > 0) {
+			if (messageConversation == null && textMessageDetails.getContact() != null
+					&& textMessageDetails.getMessageText() != null && textMessageDetails.getMessageText().length() > 0) {
 				messageConversation = Conversation.createNewConversation(textMessageDetails);
 				messageConversation.insertIfNew(textMessageDetails.getMessageText());
 				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, messageConversation);

@@ -53,7 +53,7 @@ if ($conn->connect_error) {
 			&nbsp;<a href="logout.php"><?= _("Logout") ?></a></span>
 		</div>
 		<h1><?= sprintf(_("Conversation with"), substr($subject, 0, 30), $contactName) ?>
-			<span class="right"><svg id="button-reload" onclick="window.location.href = 'messages.php?relationId=<?= $relationId ?>&conversationId=<?= $conversationId ?>';" class="icon"><use xlink:href="images/icons.svg#icon-reload"></use></svg></span>
+			<span class="right"><svg id="button-reload" onclick="window.location.href = 'messages.php?relationId=<?= $relationId ?>&conversationId=<?= $conversationId ?>';" class="icon"><use href="images/icons.svg#icon-reload"/></svg></span>
 		</h1>
 
 		<div id="messages">
@@ -64,10 +64,10 @@ if ($conn->connect_error) {
                 $parsedown = new Parsedown();
                 $messageText = $parsedown->text($message['text']);
                 
-                echo "<div class='message $class'>";
-                echo "<div class='text'>" . $messageText . "</div>";
-                echo "<span class='time'>" . htmlspecialchars(convertTimestamp($message['timestamp'])) . "</span>"; // Format time as needed
-                echo "</div>";
+                echo '<div class="message '. $class. '">';
+                echo '<div class="text">' . $messageText . '</div>';
+                echo '<span class="time">' . htmlspecialchars(convertTimestamp($message['timestamp'])) . '</span>'; // Format time as needed
+                echo '</div>';
             }
             ?>
 	        <div class="message" id="waiting-for-response"><?= _("(Waiting for response...)") ?></div>

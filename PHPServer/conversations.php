@@ -4,7 +4,6 @@ require_once __DIR__ . '/db/dbfunctions.php';
 $username = $_SESSION['username'];
 $userId = $_SESSION['userId'];
 $relationId = $_GET['relationId'];
-$showArchived = false;
 
 if (! $relationId) {
     header("Location: contacts.php");
@@ -70,8 +69,8 @@ $conn -> close();
 		</div>
 		<h1><?= sprintf(_("Conversations with"), $contactName) ?>
 			<span class="right">
-			<svg id="button-archive" class="icon"><use xlink:href="images/icons.svg#icon-archive"></use></svg>
-			<svg id="button-reload" onclick="location.reload()" class="icon"><use xlink:href="images/icons.svg#icon-reload"></use></svg>
+			<svg id="button-archive" class="icon"><use href="images/icons.svg#icon-archive"/></svg>
+			<svg id="button-reload" onclick="location.reload()" class="icon"><use href="images/icons.svg#icon-reload"/></svg>
 			</span>
 		</h1>
 		<ul id="conversation-list">
@@ -81,11 +80,11 @@ $conn -> close();
                 $conversationId = $conversation['conversationId'];
                 $subject = $conversation['subject'];
                 $archived = $conversation['archived'];
-                echo "<li class='conversation-item";
+                echo '<li class="conversation-item';
                 if ($archived) {
                     echo " archived hidden";
                 }
-                echo "'><a href='messages.php?relationId=" . $relationId . "&conversationId=" . $conversationId . "'>" . $subject . '</a><div class="icons">
+                echo '"><a href="messages.php?relationId=' . $relationId . '&conversationId=' . $conversationId . '">' . $subject . '</a><div class="icons">
                 <svg class="icon editButton" data-conversation-id="' . $conversationId . '" data-relation-id="' . $relationId . '" data-subject="' . $subject . '" data-archived="' . $archived . '"><use xlink:href="images/icons.svg#icon-edit"></use></svg>
                 <svg class="icon deleteButton" data-conversation-id="' . $conversationId . '" data-relation-id="' . $relationId . '" data-subject="' . $subject . '"><use xlink:href="images/icons.svg#icon-delete"></use></svg></div></li>';
             }
@@ -110,8 +109,8 @@ $conn -> close();
 
 	<div id="modalDelete" class="modal">
 		<div class="modal-content">
-			<h2><?= sprintf(_("Do you want to delete the conversation?"), '<span id="dataSubjectDelete"></span>') ?></h2>
 			<span class="close">&times;</span>
+			<h2><?= sprintf(_("Do you want to delete the conversation?"), '<span id="dataSubjectDelete"></span>') ?></h2>
 			<form action="perform_delete_conversation.php" method="post">
     			<input type="hidden" name="conversationId" id="modalDeleteConversationId" value="">
     			<input type="hidden" name="relationId" id="modalDeleteRelationId" value="">
@@ -124,8 +123,8 @@ $conn -> close();
 	</div>
 	<div id="modalEdit" class="modal">
 		<div class="modal-content">
-			<h2><?= _("Edit Conversation") ?></h2>
 			<span class="close">&times;</span> 
+			<h2><?= _("Edit Conversation") ?></h2>
 			<form action="perform_edit_conversation.php" method="post">
 				<input type="hidden" name="conversationId" id="modalEditConversationId" value="">
 				<input type="hidden" name="relationId" id="modalEditRelationId" value="">

@@ -73,12 +73,6 @@ $('#modalEdit .close').click(function() {
 	$('#modalEdit').hide();
 });
 
-$(window).click(function(event) {
-	if ($(event.target).is('#modalEdit')) {
-		$('#modalEdit').hide();
-	}
-});
-
 $(document).ready(function() {
 	$('#buttonSubmitMessage').click(function() {
 		$(this).prop('disabled', true);
