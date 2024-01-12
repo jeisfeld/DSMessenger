@@ -123,7 +123,6 @@
     <string name="error_invalid_connectioncode">Invalid connection code</string>
     <string name="error_invalid_credentials">Username or Password is not correct</string>
     <string name="error_connection_failed">Connection failed</string>
-    <string name="error_contact_not_connected">Contact is not connected</string>
     <string name="error_missing_privilege">Missing privileges</string>
     <string name="error_user_already_exists">User %1$s already exists</string>
     <string name="error_user_already_logged_in">User %1$s is already logged in on another device. You may add this device as additional device.</string>

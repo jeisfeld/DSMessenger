@@ -123,7 +123,6 @@
     <string name="error_invalid_connectioncode">Ungültiger Verbindungscode</string>
     <string name="error_invalid_credentials">Benutzername oder Passwort ist nicht korrekt</string>
     <string name="error_connection_failed">Verbindung fehlgeschlagen</string>
-    <string name="error_contact_not_connected">Kontakt ist nicht verbunden</string>
     <string name="error_missing_privilege">Fehlende Berechtigung</string>
     <string name="error_user_already_exists">Benutzer %1$s existiert bereits</string>
     <string name="error_user_already_logged_in">Benutzer %1$s ist bereits auf einem anderen Gerät angemeldet. Sie können dieses Gerät als zusätzliches Gerät hinzufügen.</string>
