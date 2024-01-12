@@ -25,11 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
     
     if (! $hashedpassword) {
-        header("Location: login.php?error=wrong_credentials");
+        header("Location: login.php?error=Wrong_credentials");
         exit;
     }
     if (! password_verify($password, $hashedpassword)) {
-        header("Location: login.php?error=wrong_credentials");
+        header("Location: login.php?error=Wrong_credentials");
         exit;
     }
     

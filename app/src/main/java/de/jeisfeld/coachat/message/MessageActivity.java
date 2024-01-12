@@ -287,6 +287,11 @@ public class MessageActivity extends AppCompatActivity {
 		IntentFilter actionReceiver = new IntentFilter();
 		actionReceiver.addAction(BROADCAST_ACTION);
 		broadcastManager.registerReceiver(localBroadcastReceiver, actionReceiver);
+
+		contact = textMessageDetails.getContact();
+		if (contact == null) {
+			finish();
+		}
 	}
 
 	/**

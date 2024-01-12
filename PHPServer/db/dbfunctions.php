@@ -189,9 +189,6 @@ WHERE d.user_id = r.master_id AND r.slave_id = ? AND r.id = ?");
     }
     
     $stmt->close();
-    if (!sizeof($tokens)) {
-        printError(106, "Failed to retrieve token");
-    }
     return $tokens;
 }
 
@@ -217,9 +214,6 @@ WHERE d.user_id = r.master_id AND r.slave_id = ? AND r.id = ? AND d.muted = 0");
     }
     
     $stmt->close();
-    if (!sizeof($tokens)) {
-        printError(106, "Failed to retrieve token");
-    }
     return $tokens;
 }
 

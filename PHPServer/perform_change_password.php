@@ -11,17 +11,17 @@ if (isset($_POST['submit'])) {
     $confirm_new_password = $_POST['confirm_new_password'];
 
     if ($password != $old_password) {
-        header("Location: change_password.php?error=wrong_old_password");
+        header("Location: change_password.php?error=Wrong_old_password");
         exit;
     }
 
     if ($new_password != $confirm_new_password) {
-        header("Location: change_password.php?error=passwords_nomatch");
+        header("Location: change_password.php?error=Passwords_nomatch");
         exit;
     }
 
     if (strlen($new_password) < 8) {
-        header("Location: change_password.php?error=password_8_characters");
+        header("Location: change_password.php?error=Password_8_characters");
         exit;
     }
     $hashedpassword = password_hash($new_password, PASSWORD_BCRYPT);
@@ -62,7 +62,7 @@ if (isset($_POST['submit'])) {
     }
     else {
         $stmt -> close();
-        header("Location: change_password.php?error=change_password_failed");
+        header("Location: change_password.php?error=Change_password_failed");
     }
 
     $conn->close();

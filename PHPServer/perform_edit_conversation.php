@@ -25,18 +25,21 @@ if (isset($_POST['submit'])) {
     $stmt->bind_param("sisiii", $subject, $archived, $conversationId, $relationId, $userId, $userId);
 
     $stmt->execute();
-
+    $stmt->close();
+    
     sendAdminMessage($conn, $username, $password, $relationId, "CONVERSATION_EDITED", [
         'conversationId' => $conversationId,
         'subject' => $subject,
         'archived' => $archived ? 'true' : 'false'
     ]);
-
+    
     if ($fromMessages) {
         header("Location: messages.php?relationId=" . $relationId . "&conversationId=" . $conversationId);
     }
     else {
         header("Location: conversations.php?relationId=" . $relationId);        
     }
+    
+    $conn->close();
 }
 ?>

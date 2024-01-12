@@ -9,12 +9,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirmPassword = $_POST['confirm_password'];
     
     if ($password != $confirmPassword) {
-        header("Location: create_account.php?error=passwords_nomatch");
+        header("Location: create_account.php?error=Passwords_nomatch");
         exit;
     }
     
     if (strlen($password) < 8) {
-        header("Location: create_account.php?error=password_8_characters");
+        header("Location: create_account.php?error=Password_8_characters");
         exit;
     }
     $hashedpassword = password_hash($password, PASSWORD_BCRYPT);
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->execute();
     if ($stmt->get_result()->num_rows) {
         $stmt->close();
-        header("Location: create_account.php?error=username_already_exists");
+        header("Location: create_account.php?error=Username_already_exists");
         exit;
     }
     else {

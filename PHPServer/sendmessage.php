@@ -12,8 +12,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $relationId = $_POST['relationId'];
     $conversationId = $_POST['conversationId'];
     $messageText = $_POST['messageText'];
-    $lastOwnMessageId = $_POST['lastOwnMessageId'];
-    $lastAiMessageId = $_POST['lastAiMessageId'];
+    @$lastOwnMessageId = $_POST['lastOwnMessageId'];
+    @$lastAiMessageId = $_POST['lastAiMessageId'];
     $isNewConversation = ! $conversationId;
 
     if ($isNewConversation) {

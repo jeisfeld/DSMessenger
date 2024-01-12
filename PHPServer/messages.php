@@ -133,9 +133,8 @@ function convertTimestamp($mysqlTimestamp)
 						value="true" id="modalEditArchived">
 				</div>
 				<div class="container">
-					<span class="left"> <input type="button" name="cancel" class="modal-button" value="<?= _("Cancel") ?>"
-						onclick="$('#modalEdit').hide();"></span> <span class="right"> <input type="submit" name="submit"
-						class="modal-button" value="<?= _("Save Conversation") ?>"></span>
+					<span class="left"> <input type="button" name="cancel" class="modal-button" value="<?= _("Cancel") ?>" onclick="$('#modalEdit').hide();"></span>
+					<span class="right"> <input type="submit" name="submit" class="modal-button" value="<?= _("Save Conversation") ?>"></span>
 				</div>
 			</form>
 		</div>

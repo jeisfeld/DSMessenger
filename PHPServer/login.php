@@ -1,7 +1,7 @@
 <?php
 include __DIR__ . '/check_language.php';
-$error = $_GET['error'];
-$errorText = $error ? _($error) : "";
+@$error = $_GET['error'];
+@$errorText = $error ? _($error) : "";
 ?>
 <!DOCTYPE html>
 <html>

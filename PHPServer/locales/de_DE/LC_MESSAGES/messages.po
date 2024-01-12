@@ -3,6 +3,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
+msgid "Wrong_credentials"
+msgstr "Benutzername oder Passwort ist falsch"
+
+msgid "Wrong_old_password"
+msgstr "Das alte Passwort war falsch"
+
+msgid "Passwords_nomatch"
+msgstr "Die Passw&ouml;rter stimmen nicht &uuml;berein"
+
+msgid "Password_8_characters"
+msgstr "Das Passwort muss mindestens 8 Zeichen enthalten"
+
+msgid "Change_password_failed"
+msgstr "Passwort-&Auml;nderung fehlgeschlagen"
+
+msgid "Username_already_exists"
+msgstr "Benutzername existiert bereits"
+
 msgid "Login"
 msgstr "Anmelden"
 
@@ -48,21 +66,6 @@ msgstr "Neues Passwort best&auml;tigen"
 msgid "Cancel"
 msgstr "Abbrechen"
 
-msgid "wrong_credentials"
-msgstr "Benutzername oder Passwort ist falsch"
-
-msgid "wrong_old_password"
-msgstr "Das alte Passwort war falsch"
-
-msgid "passwords_nomatch"
-msgstr "Die Passw&ouml;rter stimmen nicht &uuml;berein"
-
-msgid "password_8_characters"
-msgstr "Das Passwort muss mindestens 8 Zeichen enthalten"
-
-msgid "change_password_failed"
-msgstr "Passwort-&Auml;nderung fehlgeschlagen"
-
 msgid "Do you want to delete the conversation?"
 msgstr "Wollen Sie die Unterhaltung &bdquo;%s&ldquo; l&ouml;schen?"
 
@@ -81,6 +84,36 @@ msgstr "Archiv"
 msgid "Save Conversation"
 msgstr "Unterhaltung speichern"
 
+msgid "Edit Contact"
+msgstr "Kontakt bearbeiten"
+
+msgid "My Name"
+msgstr "Mein Name"
+
+msgid "Contact Name"
+msgstr "Kontaktname"
+
+msgid "My Name for AI"
+msgstr "Mein Name f&uuml;r KI"
+
+msgid "AI Behavior"
+msgstr "KI-Verhalten"
+
+msgid "AI Type"
+msgstr "KI-Typ"
+
+msgid "AI Additional Text"
+msgstr "KI-Zusatztext"
+
+msgid "manual"
+msgstr "manuell"
+
+msgid "automatic"
+msgstr "automatisch"
+
+msgid "Save Contact"
+msgstr "Kontakt speichern"
+
 msgid "(Waiting for response...)"
 msgstr "(Warte auf Antwort...)"
 
@@ -89,9 +122,6 @@ msgstr "Konto erstellen"
 
 msgid "Confirm password"
 msgstr "Passwort best&auml;tigen"
-
-msgid "username_already_exists"
-msgstr "Benutzername existiert bereits"
 
 msgid "Imprint"
 msgstr "Impressum"

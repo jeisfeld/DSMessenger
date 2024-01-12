@@ -3,6 +3,24 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
+msgid "Wrong_credentials"
+msgstr "Wrong username or password"
+
+msgid "Wrong_old_password"
+msgstr "Wrong old password"
+
+msgid "Passwords_nomatch"
+msgstr "Passwords did not match"
+
+msgid "Password_8_characters"
+msgstr "Password must have at least 8 characters"
+
+msgid "Change_password_failed"
+msgstr "Change of password failed"
+
+msgid "Username_already_exists"
+msgstr "Username already exists"
+
 msgid "Login"
 msgstr "Login"
 
@@ -48,21 +66,6 @@ msgstr "Confirm new password"
 msgid "Cancel"
 msgstr "Cancel"
 
-msgid "wrong_credentials"
-msgstr "Wrong username or password"
-
-msgid "wrong_old_password"
-msgstr "Wrong old password"
-
-msgid "passwords_nomatch"
-msgstr "Passwords did not match"
-
-msgid "password_8_characters"
-msgstr "Password must have at least 8 characters"
-
-msgid "change_password_failed"
-msgstr "Change of password failed"
-
 msgid "Do you want to delete the conversation?"
 msgstr "Do you want to delete the conversation &ldquo;%s&rdquo;?"
 
@@ -81,6 +84,36 @@ msgstr "Archived"
 msgid "Save Conversation"
 msgstr "Save Conversation"
 
+msgid "Edit Contact"
+msgstr "Edit Contact"
+
+msgid "My Name"
+msgstr "My Name"
+
+msgid "Contact Name"
+msgstr "Contact Name"
+
+msgid "My Name for AI"
+msgstr "My Name for AI"
+
+msgid "AI Behavior"
+msgstr "AI Behavior"
+
+msgid "AI Type"
+msgstr "AI Type"
+
+msgid "AI Additional Text"
+msgstr "AI Additional Text"
+
+msgid "manual"
+msgstr "manual"
+
+msgid "automatic"
+msgstr "automatic"
+
+msgid "Save Contact"
+msgstr "Save Contact"
+
 msgid "(Waiting for response...)"
 msgstr "(Waiting for response...)"
 
@@ -89,9 +122,6 @@ msgstr "Create account"
 
 msgid "Confirm password"
 msgstr "Confirm password"
-
-msgid "username_already_exists"
-msgstr "Username already exists"
 
 msgid "Imprint"
 msgstr "Imprint"
