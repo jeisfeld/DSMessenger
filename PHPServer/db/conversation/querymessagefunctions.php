@@ -181,9 +181,10 @@ function queryAiRelation($username, $password, $relationId, $isSlave)
     $oldMessageCount = null;
     $oldMessageCountVariation = null;
     $maxCharacters = null;
+    $model = null;
     
-    $stmt = $conn->prepare("SELECT ai.user_name, ai.add_priming_text, ai.ai_policy, p.priming_text,
-            p.temperature, p.presence_penalty, p.frequency_penalty, p.old_message_count, p.old_message_count_variation, p.max_characters
+    $stmt = $conn->prepare("SELECT ai.user_name, ai.add_priming_text, ai.ai_policy, p.priming_text, p.temperature,
+            p.presence_penalty, p.frequency_penalty, p.old_message_count, p.old_message_count_variation, p.max_characters, p.model
             from dsm_ai_relation ai, dsm_ai_priming p
             where ai.relation_id = ?
             and ai.priming_id = p.id");
@@ -191,7 +192,7 @@ function queryAiRelation($username, $password, $relationId, $isSlave)
     $stmt->bind_param("i", $relationId);
     $stmt->execute();
     $stmt->bind_result($aiUserName, $addPrimingText, $aiPolicy, $primingText,
-        $temperature, $presencePenalty, $frequencyPenalty, $oldMessageCount, $oldMessageCountVariation, $maxCharacters);
+        $temperature, $presencePenalty, $frequencyPenalty, $oldMessageCount, $oldMessageCountVariation, $maxCharacters, $model);
     
     if ($stmt->fetch()) {
         $primingText2 = str_replace("[EXTRA_TEXT]", $addPrimingText, $primingText);
@@ -207,7 +208,8 @@ function queryAiRelation($username, $password, $relationId, $isSlave)
             'frequencyPenalty' => $frequencyPenalty,
             'oldMessageCount' => $oldMessageCount,
             'oldMessageCountVariation' => $oldMessageCountVariation,
-            'maxCharacters' => $maxCharacters
+            'maxCharacters' => $maxCharacters,
+            'model' => $model
         ];
     }
     else {

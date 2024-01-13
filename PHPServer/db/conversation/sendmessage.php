@@ -106,7 +106,7 @@ if (! $isSlave) {
     if ($messageText && $aiPolicy > 0) {
         $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
 
-        $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty']);
+        $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty'], $aiRelation['model']);
         if ($result['success']) {
             $responseMessage = $result['message']['content'];
         }

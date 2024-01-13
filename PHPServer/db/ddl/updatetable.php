@@ -11,8 +11,8 @@ if ($conn->connect_error) {
 }
 
 // sql to create table dsm_ai_priming
-$sql = "ALTER TABLE dsm_conversation 
-ADD COLUMN archived BOOL DEFAULT false;";
+$sql = "ALTER TABLE dsm_ai_priming
+ADD COLUMN model VARCHAR(100) DEFAULT 'gpt-4-1106-preview'";
 
 // variation: 0 no, 1 linear, 2 exponential
 

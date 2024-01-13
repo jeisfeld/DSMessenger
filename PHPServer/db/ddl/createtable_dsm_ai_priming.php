@@ -27,7 +27,8 @@ presence_penalty FLOAT(4, 3) DEFAULT 0,
 frequency_penalty FLOAT(4, 3) DEFAULT 0,
 old_message_count INT(4) UNSIGNED DEFAULT 20,
 old_message_count_variation INT(1) UNSIGNED DEFAULT 0,
-max_characters INT(7) UNSIGNED DEFAULT 40000
+max_characters INT(7) UNSIGNED DEFAULT 40000,
+model VARCHAR(100) DEFAULT 'gpt-4-1106-preview'
 )";
 
 if ($conn->query($sql) === TRUE) {
