@@ -20,9 +20,11 @@ import androidx.navigation.ui.NavigationUI;
 import de.jeisfeld.coachat.Application;
 import de.jeisfeld.coachat.R;
 import de.jeisfeld.coachat.databinding.ActivityMainBinding;
+import de.jeisfeld.coachat.entity.Conversation;
 import de.jeisfeld.coachat.main.account.AccountDialogUtil;
 import de.jeisfeld.coachat.main.account.AccountFragment;
 import de.jeisfeld.coachat.main.account.ContactRegistry;
+import de.jeisfeld.coachat.message.TextMessageDetails;
 import de.jeisfeld.coachat.service.FirebaseDsMessagingService;
 import de.jeisfeld.coachat.util.DialogUtil;
 import de.jeisfeld.coachat.util.PreferenceUtil;
@@ -32,6 +34,10 @@ import de.jeisfeld.coachat.util.PreferenceUtil;
  */
 public class MainActivity extends AppCompatActivity {
 	/**
+	 * The resource key for the text message details.
+	 */
+	private static final String STRING_EXTRA_MESSAGE_DETAILS = "de.jeisfeld.coachat.MESSAGE_DETAILS";
+	/**
 	 * The configuration of the app bar.
 	 */
 	private AppBarConfiguration mAppBarConfiguration;
@@ -39,6 +45,20 @@ public class MainActivity extends AppCompatActivity {
 	 * The id of the navigation start.
 	 */
 	private int navigationStartId = R.id.nav_conversations;
+
+	/**
+	 * Static helper method to create an intent for this activity.
+	 *
+	 * @param context            The context in which this activity is started.
+	 * @param textMessageDetails The message details.
+	 * @return the intent.
+	 */
+	public static Intent createIntent(final Context context, final TextMessageDetails textMessageDetails) {
+		Intent intent = new Intent(context, MainActivity.class);
+		intent.putExtra(STRING_EXTRA_MESSAGE_DETAILS, textMessageDetails);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		return intent;
+	}
 
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
@@ -64,6 +84,15 @@ public class MainActivity extends AppCompatActivity {
 
 		logMessagingToken();
 		handleAppLink();
+
+		TextMessageDetails textMessageDetails = (TextMessageDetails) getIntent().getSerializableExtra(STRING_EXTRA_MESSAGE_DETAILS);
+		if (textMessageDetails != null) {
+			Conversation conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
+			Bundle bundle = new Bundle();
+			bundle.putSerializable("contact", textMessageDetails.getContact());
+			bundle.putSerializable("conversation", conversation);
+			navController.navigate(R.id.nav_conversations_to_message, bundle);
+		}
 
 		ContactRegistry.getInstance().refreshContacts(this, () -> ContactRegistry.getInstance().refreshConversations(this, null));
 	}

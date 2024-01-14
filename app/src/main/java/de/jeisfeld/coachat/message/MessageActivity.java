@@ -403,6 +403,7 @@ public class MessageActivity extends AppCompatActivity {
 		binding.buttonAcknowledge.setVisibility(
 				amSlave && conversation.getConversationFlags().isExpectingAcknowledgement() ? View.VISIBLE : View.GONE);
 		binding.buttonSend.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse()
+				|| conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED
 				? View.VISIBLE
 				: conversation.getConversationFlags().isExpectingAcknowledgement() ? View.INVISIBLE : View.GONE);
 		binding.layoutTextInput.setVisibility(!amSlave || conversation.getConversationFlags().isExpectingResponse()

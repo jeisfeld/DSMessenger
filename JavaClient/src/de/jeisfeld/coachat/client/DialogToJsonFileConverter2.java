@@ -38,13 +38,6 @@ public class DialogToJsonFileConverter2 {
 		JSONObject root = new JSONObject();
 		JSONArray jsonArray = new JSONArray();
 
-		// Add the system message at the beginning
-		JSONObject systemMessage = new JSONObject();
-		systemMessage.put("role", "system");
-		systemMessage.put("content",
-				"Du bist Veit Lindau, ein bekannter Life Coach. Du führst für Teilnehmer Deiner LTC-Ausbildung kurze Laser-Coachings durch, in denen Du Dein Gegenüber durch einen kurzen, 20-minütigen Coaching-Prozess führst.");
-		jsonArray.put(systemMessage);
-
 		for (String line : dialog) {
 			if (line.trim().isEmpty()) {
 				continue; // Skip empty lines
@@ -58,6 +51,10 @@ public class DialogToJsonFileConverter2 {
 			else if (line.startsWith("AI:")) {
 				jsonEntry.put("role", "assistant");
 				jsonEntry.put("content", line.substring(4).trim()); // Remove "AI: "
+			}
+			else if (line.startsWith("System:")) {
+				jsonEntry.put("role", "system");
+				jsonEntry.put("content", line.substring(8).trim()); // Remove "System: "
 			}
 			else if (!line.isEmpty()) {
 				System.out.println("Unexpected line: " + line);

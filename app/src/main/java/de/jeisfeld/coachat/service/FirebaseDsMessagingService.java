@@ -21,6 +21,7 @@ import de.jeisfeld.coachat.entity.Conversation;
 import de.jeisfeld.coachat.entity.ConversationFlags;
 import de.jeisfeld.coachat.entity.Message;
 import de.jeisfeld.coachat.http.HttpSender;
+import de.jeisfeld.coachat.main.MainActivity;
 import de.jeisfeld.coachat.main.account.AccountFragment;
 import de.jeisfeld.coachat.main.account.AccountFragment.ActionType;
 import de.jeisfeld.coachat.main.account.ContactRegistry;
@@ -89,7 +90,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				.setChannelId(Application.NOTIFICATION_CHANNEL_ID)
 				.setStyle(new Notification.BigTextStyle().bigText(message));
 
-		Intent actionIntent = MessageActivity.createIntent(this, textMessageDetails, textMessage);
+		Intent actionIntent = MainActivity.createIntent(this, textMessageDetails);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, textMessageDetails.getContact().getRelationId(), actionIntent,
 				PendingIntent.FLAG_CANCEL_CURRENT | (VERSION.SDK_INT >= VERSION_CODES.S ? PendingIntent.FLAG_IMMUTABLE : 0));
 		notificationBuilder.setContentIntent(pendingIntent);
