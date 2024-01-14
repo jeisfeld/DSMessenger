@@ -34,9 +34,10 @@ $password = $_SESSION['password'];
                 $isSlave = $contact['isSlave'];
                 echo '<li class="contact-item"><a href="conversations.php?relationId=' . $relationId . '">' . 
                     ($isSlave ? '' : '<b>') . $contactName . ($isSlave ? '' : '</b>') . '</a><div class="icons">
-                <svg class="icon editButton" data-contact="' . htmlspecialchars(json_encode($contact), ENT_QUOTES, 'UTF-8') . '"><use xlink:href="images/icons.svg#icon-edit"></use></svg></div></li>';
+                <svg class="icon editButton" data-contact="' . htmlspecialchars(json_encode($contact), ENT_QUOTES, 'UTF-8') . '"><use href="images/icons.svg#icon-edit"></use></svg></div></li>';
             }
             ?>
+            <li class="contact-add-on"><svg class="icon" id="createButton"><use href="images/icons.svg#icon-circle-plus"></use></svg></li>
         </ul>
 		<div id="footer">
 			<span class="right"><a href="impressum.html" target="_blank"><?= _("Imprint") ?></a></span>
@@ -89,6 +90,47 @@ $password = $_SESSION['password'];
    				</div>
 				<div class="container">
 					<span class="left"><input type="button" name="cancel" class="modal-button" value="<?= _("Cancel") ?>" onclick="$('#modalEdit').hide();"></span>
+					<span class="right"> <input type="submit" name="submit" class="modal-button" value="<?= _("Save Contact") ?>"></span>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div id="modalCreate" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span> 
+			<h2><?= _("Create Contact") ?></h2>
+			<form action="perform_create_contact.php" method="post">
+				<div class="form-group">
+    				<label for="modalCreateMyName"><?= _("My Name") ?>:</label>
+    				<input type="text" name="modalCreateMyName" id="modalCreateMyName" maxlength="30" value="<?= $username ?>">
+				</div>
+				<div class="form-group">
+    				<label for="modalCreateContactName"><?= _("Contact Name") ?>:</label>
+    				<input type="text" name="modalCreateContactName" id="modalCreateContactName" maxlength="30" value="">
+				</div>
+				<div id="modalCreateGroupAi">
+    				<div class="form-group">
+        				<label for="modalCreateAiPolicy"><?= _("AI Behavior") ?>:</label>
+	    				<select id="modalCreateAiPolicy" name="modalCreateAiPolicy">
+	    					<option value="3" selected><?= _("automatic") ?></option>
+	    					<option value="1"><?= _("manual") ?></option>
+	    				</select>
+    				</div>
+       				<div class="form-group">
+        				<label for="modalCreateAiPrimingId"><?= _("AI Type") ?>:</label>
+	    				<select id="modalCreateAiPrimingId" name="modalCreateAiPrimingId">
+	    				<?php 
+	    				foreach ($primings as $priming) {
+	    				    echo '<option value="' . htmlspecialchars($priming['id']) . '"' . ($priming['id'] == 3 ? ' selected' : '') .
+	    				    '>' . htmlspecialchars($priming['name']) . '</option>';
+	    				}
+	    				?>
+	    				</select>
+    				</div>
+   				</div>
+				<div class="container">
+					<span class="left"><input type="button" name="cancel" class="modal-button" value="<?= _("Cancel") ?>" onclick="$('#modalCreate').hide();"></span>
 					<span class="right"> <input type="submit" name="submit" class="modal-button" value="<?= _("Save Contact") ?>"></span>
 				</div>
 			</form>

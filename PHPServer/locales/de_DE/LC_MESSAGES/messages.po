@@ -87,6 +87,9 @@ msgstr "Unterhaltung speichern"
 msgid "Edit Contact"
 msgstr "Kontakt bearbeiten"
 
+msgid "Create Contact"
+msgstr "Kontakt erstellen"
+
 msgid "My Name"
 msgstr "Mein Name"
 

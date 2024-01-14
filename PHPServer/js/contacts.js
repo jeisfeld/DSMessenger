@@ -22,11 +22,9 @@ $(document).ready(function() {
 		else {
 			$('#modalEditGroupAi').hide();					
 		}
-		console.log("values: " + aiPolicy + "," + aiPrimingId);
-		$('#modalEditContactName').val(contactName);
 		$('#modalEditContactName').val(contactName);
 		$('#modalEditRelationId').val(relationId);
-		$('#modalEditIsSlave').val(isSlave);
+		$('#modalEditIsSlave').val(isSlave ? 1 : 0);
 		$('#modalEditAiRelationId').val(aiRelationId);
 		$('#modalEditMyName').val(myName);
 		$('#modalEditAiUsername').val(aiUsername);
@@ -36,9 +34,20 @@ $(document).ready(function() {
 		$('#modalEdit').show();
 	});
 
+	$('#createButton').click(function() {
+		$('#modalCreateContactName').val('');
+		$('#modalCreateAiPolicy').val(3);
+		$('#modalCreateAiPrimingId').val(3);
+		$('#modalCreate').show();
+	});
+
 	// Close the modal on clicking 'x'
 	$('#modalEdit .close').click(function() {
 		$('#modalEdit').hide();
 	});
+	
+	$('#modalCreate .close').click(function() {
+		$('#modalCreate').hide();
+	});	
 
 });

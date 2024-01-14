@@ -9,17 +9,21 @@ import java.nio.file.Paths;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class DialogToJsonFileConverter {
+public class DialogToJsonFileConverter2 {
 
 	public static void main(final String[] args) {
-		String inputFilePath = "D:\\Jörg\\Word\\homodea\\AI\\dialog20.txt"; // Replace with the path to your input file
-		String outputFilePath = "D:\\Jörg\\Word\\homodea\\AI\\dialog20.json"; // Replace with the path to your output file
+		String filePath = "D:\\Jörg\\Word\\homodea\\AI\\dialog";
+		String inputSuffix = ".txt";
+		String outputSuffix = ".json";
+		String fullSuffix = "s.jsonl";
 
-		try {
-			String[] dialog = readDialogFromFile(inputFilePath);
-			String jsonOutput = convertDialogToJson(dialog);
-			writeJsonToFile(jsonOutput, outputFilePath);
-			System.out.println("Conversion completed. Output saved to: " + outputFilePath);
+		try (BufferedWriter fullWriter = new BufferedWriter(new FileWriter(filePath + fullSuffix))) {
+			for (int i = 1; i <= 20; i++) {
+				String[] dialog = readDialogFromFile(filePath + i + inputSuffix);
+				String jsonOutput = convertDialogToJson(dialog);
+				writeJsonToFile(jsonOutput, filePath + i + outputSuffix, fullWriter);
+				System.out.println("Conversion completed. Output saved to: " + filePath + i + outputSuffix);
+			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -66,9 +70,11 @@ public class DialogToJsonFileConverter {
 		return root.toString(); // Single line output
 	}
 
-	private static void writeJsonToFile(final String json, final String filePath) throws IOException {
+	private static void writeJsonToFile(final String json, final String filePath, final BufferedWriter fullWriter) throws IOException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
 			writer.write(json);
+			fullWriter.write(json);
+			fullWriter.write("\n");
 		}
 	}
 }

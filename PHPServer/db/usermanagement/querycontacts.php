@@ -82,19 +82,6 @@ function queryUsertype($username, $password)
     return $usertype;
 }
 
-$username = @$_POST['username'];
-$password = @$_POST['password'];
-if ($username) {
-    header('Content-Type: text/json');
-    $contacts = queryContacts($username, $password);
-    $usertype = queryUsertype($username, $password);
-    
-    printSuccess("Contacts of user " . $username . " have been retrieved.", [
-        'contacts' => $contacts,
-        'usertype' => $usertype
-    ]);
-}
-
 function queryPrimings()
 {
     // Create connection
@@ -126,7 +113,9 @@ function queryPrimings()
 
 $username = @$_POST['username'];
 $password = @$_POST['password'];
-if ($username) {
+$messageTime = @$_POST['messageTime'];
+
+if ($username && $messageTime) {
     header('Content-Type: text/json');
     $contacts = queryContacts($username, $password);
     $usertype = queryUsertype($username, $password);

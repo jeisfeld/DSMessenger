@@ -288,6 +288,13 @@ h1 .icon {
 	align-items: center;
 }
 
+.contact-add-on {
+	padding: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
 .conversation-item.hidden {
 	display: none;
 }

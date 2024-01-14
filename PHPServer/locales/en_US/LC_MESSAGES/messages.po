@@ -87,6 +87,9 @@ msgstr "Save Conversation"
 msgid "Edit Contact"
 msgstr "Edit Contact"
 
+msgid "Create Contact"
+msgstr "Create Contact"
+
 msgid "My Name"
 msgstr "My Name"
 
