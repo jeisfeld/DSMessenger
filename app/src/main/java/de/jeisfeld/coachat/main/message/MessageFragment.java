@@ -331,7 +331,8 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		boolean enableAcknowledgement = !contact.isSlave() && conversation.getConversationFlags().isExpectingAcknowledgement();
 		boolean enableSend = contact.isSlave() || conversation.getConversationFlags().isExpectingResponse()
 				|| conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED;
-		boolean enablePrioSend = contact.isSlave() || conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED;
+		boolean enablePrioSend = (contact.isSlave() || conversation.getConversationFlags().getReplyPolicy() == ReplyPolicy.UNLIMITED)
+				&& contact.getAiPolicy() != AiPolicy.AUTOMATIC_NOMESSAGE;
 		boolean enableEdit = contact.getMyPermissions().isManageConversations();
 		binding.buttonAcknowledge.setVisibility(enableAcknowledgement ? View.VISIBLE : View.GONE);
 		binding.buttonSend.setVisibility(enableSend ? View.VISIBLE : enableAcknowledgement ? View.INVISIBLE : View.GONE);

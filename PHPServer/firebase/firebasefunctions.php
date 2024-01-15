@@ -32,7 +32,7 @@ function sendFirebaseMessage($token, $data, $ttl = null)
     $messaging->send($message);
 }
 
-function getTextData($relationId, $messageType, $messageText, $conversationId, $mysqlTimestamp, $messageId, $isHighPrio = FALSE, $preparedMessage = "")
+function getTextData($relationId, $messageType, $messageText, $conversationId, $mysqlTimestamp, $messageId, $preparedMessage = "", $isHighPrio = FALSE)
 {
     $currentDateTime = new DateTime();
     return [

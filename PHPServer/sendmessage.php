@@ -127,11 +127,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($aiPolicy != 3) {
         $tokens = getUnmutedTokens($conn, $username, $password, $relationId);
         
-        $data = getTextData($relationId, "TEXT", $messageText, $conversationId, $mysqlTimestamp, $messageId);
+        $data = getTextData($relationId, "TEXT", $messageText, $conversationId, $mysqlTimestamp, $messageId, $responseMessage);
         foreach ($tokens as $token) {
             sendFirebaseMessage($token, $data);
         }
-        $data = getTextData($relationId, "TEXT_OWN", $messageText, $conversationId, $mysqlTimestamp, $messageId);
+        $data = getTextData($relationId, "TEXT_OWN", $messageText, $conversationId, $mysqlTimestamp, $messageId, $responseMessage);
         $tokens = getSelfTokens($conn, $username, $password, - 1);
         foreach ($tokens as $token) {
             sendFirebaseMessage($token, $data, null);

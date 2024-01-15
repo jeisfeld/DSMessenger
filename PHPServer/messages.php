@@ -42,6 +42,7 @@ function convertTimestamp($mysqlTimestamp)
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="js/jquery-3.6.2.min.js"></script>
+<script src="js/messages.js"></script>
 </head>
 <body>
 
@@ -139,8 +140,6 @@ function convertTimestamp($mysqlTimestamp)
 			</form>
 		</div>
 	</div>
-
-	<script src="js/messages.js"></script>
 
 </body>
 </html>

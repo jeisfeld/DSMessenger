@@ -1,10 +1,6 @@
 $(document).ready(function() {
-	$('#buttonSubmitMessage').click(function() {
-        $(this).prop('disabled', true);
-        $(this).css('color', 'transparent');
-        $('#formSubmitMessage').submit();
-    });
-	
+	var formSubmitted = false;
+
 	// Open the modal and set data
 	$('.deleteButton').click(function() {
 		var conversationId = $(this).data('conversation-id');
@@ -39,6 +35,28 @@ $(document).ready(function() {
 	$('#modalEdit .close').click(function() {
 		$('#modalEdit').hide();
 	});
+	
+			
+	$('#buttonSubmitMessage').click(function() {
+		if (formSubmitted) {
+			return false;
+		}
+		formSubmitted = true;
+        $(this).prop('disabled', true);
+        $('#formSubmitMessage').submit();
+    });
+	
+	// submit via Ctrl-Return
+	$('#messageText').keydown(function(event) {
+        if (event.ctrlKey && event.which === 13) { // 13 is the Enter key
+			if (formSubmitted) {
+				return false;
+			}
+			formSubmitted = true;
+			$('#buttonSubmitMessage').prop('disabled', true);
+			$('#formSubmitMessage').submit();
+        }
+    });
 
 });
 
