@@ -196,8 +196,10 @@ function queryAiRelation($username, $password, $relationId, $isSlave)
     
     if ($stmt->fetch()) {
         $primingText2 = str_replace("[EXTRA_TEXT]", $addPrimingText, $primingText);
+        if (!$aiUserName || $aiUserName == "unbekannt") {
+            $primingText2 = str_replace("Dein Gegenüber heißt [NAME].", "", $primingText2);
+        }
         $primingText3 = str_replace("[NAME]", $aiUserName, $primingText2);
-        
         
         $aiRelation = [
             'aiUserName' => $aiUserName,
