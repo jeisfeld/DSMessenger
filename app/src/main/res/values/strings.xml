@@ -101,6 +101,7 @@
     <string name="text_pending">Pending</string>
     <string name="text_confirmed">Confirmed</string>
     <string name="text_refresh">Refresh</string>
+    <string name="text_voice_recording">Voice Recording</string>
     <string name="text_archive">Archive</string>
     <string name="text_subject_invitation">Invitation to Coachat</string>
     <string name="text_sending_message">Sending message…</string>
@@ -109,6 +110,7 @@
     <string name="text_message_acknowledged">Message acknowledged</string>
     <string name="text_new_conversation_name">New conversation</string>
     <string name="text_new_dummy_conversation">%1$s sends you a reminder</string>
+    <string name="text_recording_voice">(Recording voice)</string>
 
     <string name="error_missing_username">Missing username</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>

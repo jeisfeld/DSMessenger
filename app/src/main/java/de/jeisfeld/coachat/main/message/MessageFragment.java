@@ -1,14 +1,21 @@
 package de.jeisfeld.coachat.main.message;
 
+import android.Manifest.permission;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -19,8 +26,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
@@ -147,6 +157,13 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	};
 
 	/**
+	 * The Activity result launcher for audio permission.
+	 */
+	private final ActivityResultLauncher<String> requestPermissionLauncher =
+			registerForActivityResult(new RequestPermission(), isGranted -> {
+			});
+
+	/**
 	 * Send a broadcast to this fragment.
 	 *
 	 * @param context      The context.
@@ -182,6 +199,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	}
 
+	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public final View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		binding = FragmentMessageBinding.inflate(inflater, container, false);
@@ -240,6 +258,109 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 							Log.e(Application.TAG, "Failed to retrieve message data: " + responseData.getErrorMessage());
 						}
 					}), "conversationId", conversation.getConversationId().toString());
+		});
+
+		binding.imageButtonRecordVoice.setOnClickListener(new OnClickListener() {
+			/**
+			 * The speech recognizer.
+			 */
+			private final SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
+			/**
+			 * The old text.
+			 */
+			private String oldText = "";
+			/**
+			 * Flag indicating if recording is happening.
+			 */
+			private boolean isRecording = false;
+
+			@Override
+			public void onClick(View v) {
+				if (isRecording) {
+					isRecording = false;
+					speechRecognizer.stopListening();
+				}
+				else {
+					if (ContextCompat.checkSelfPermission(MessageFragment.this.getContext(), permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+						oldText = binding.editTextMessageText.getText().toString();
+
+						Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+						speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+						//speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "de-DE");
+
+						speechRecognizer.setRecognitionListener(new RecognitionListener() {
+							@Override
+							public void onReadyForSpeech(Bundle params) {
+								getActivity().runOnUiThread(() -> {
+									binding.editTextMessageText.setText(R.string.text_recording_voice);
+									binding.editTextMessageText.setEnabled(false);
+								});
+							}
+
+							@Override
+							public void onBeginningOfSpeech() {
+							}
+
+							@Override
+							public void onRmsChanged(float rmsdB) {
+							}
+
+							@Override
+							public void onBufferReceived(byte[] buffer) {
+							}
+
+							@Override
+							public void onEndOfSpeech() {
+							}
+
+							@Override
+							public void onError(int error) {
+								getActivity().runOnUiThread(() -> {
+									binding.editTextMessageText.setText(oldText);
+									binding.editTextMessageText.setEnabled(true);
+								});
+							}
+
+							@Override
+							public void onResults(Bundle results) {
+								isRecording = false;
+								ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+								if (matches != null && !matches.isEmpty()) {
+									String recognizedText = matches.get(0);
+									getActivity().runOnUiThread(() -> {
+										binding.editTextMessageText.setEnabled(true);
+										if ("löschen".equals(recognizedText)) {
+											binding.editTextMessageText.setText("");
+										}
+										else {
+											if (oldText.trim().length() == 0) {
+												binding.editTextMessageText.setText(recognizedText);
+											}
+											else {
+												binding.editTextMessageText.setText(oldText.trim() + "\n" + recognizedText);
+											}
+										}
+									});
+								}
+							}
+
+							@Override
+							public void onPartialResults(Bundle partialResults) {
+							}
+
+							@Override
+							public void onEvent(int eventType, Bundle params) {
+							}
+						});
+
+						speechRecognizer.startListening(speechRecognizerIntent);
+						isRecording = true;
+					}
+					else {
+						requestPermissionLauncher.launch(permission.RECORD_AUDIO);
+					}
+				}
+			}
 		});
 
 		assert getArguments() != null;
@@ -338,6 +459,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		binding.buttonSend.setVisibility(enableSend ? View.VISIBLE : enableAcknowledgement ? View.INVISIBLE : View.GONE);
 		binding.buttonSendWithPriority.setVisibility(enablePrioSend ? View.VISIBLE : View.INVISIBLE);
 		binding.layoutTextInput.setVisibility(enableSend ? View.VISIBLE : View.GONE);
+		binding.imageButtonRecordVoice.setVisibility(enableSend && isSpeechRecognitionActivityAvailable() ? View.VISIBLE : View.GONE);
 		binding.buttonEdit.setVisibility(enableEdit && conversation.isStored() ? View.VISIBLE : View.GONE);
 		binding.imageButtonRefreshPreparedMessage.setVisibility(
 				enableSend && contact.isSlave() && contact.getAiPolicy() == AiPolicy.MANUAL ? View.VISIBLE : View.GONE);
@@ -518,6 +640,17 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 					"conversationFlags", conversation.getConversationFlags().toString());
 		}
 		dialog.dismiss();
+	}
+
+	private boolean isSpeechRecognitionActivityAvailable() {
+		try {
+			PackageManager pm = getContext().getPackageManager();
+			return pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0).size() > 0;
+		}
+		catch (Exception e) {
+			Log.e(Application.TAG, "Error when retrieving speech recognition activities", e);
+			return false;
+		}
 	}
 
 	/**

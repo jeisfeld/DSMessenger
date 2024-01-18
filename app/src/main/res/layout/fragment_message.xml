@@ -134,7 +134,15 @@
         android:contentDescription="@string/text_refresh"
         android:src="@drawable/ic_icon_refresh"
         android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/layoutTextInput" />
+
+    <ImageButton
+        android:id="@+id/imageButtonRecordVoice"
+        android:layout_width="@dimen/input_row_height"
+        android:layout_height="@dimen/input_row_height"
+        android:contentDescription="@string/text_voice_recording"
+        android:src="@drawable/ic_icon_microphone"
         app:layout_constraintBottom_toBottomOf="@id/layoutTextInput"
         app:layout_constraintEnd_toEndOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
