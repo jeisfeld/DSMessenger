@@ -821,6 +821,9 @@ public final class AccountDialogUtil {
 					conversation.getConversationFlags().getReplyPolicy().ordinal());
 			binding.checkboxArchive.setChecked(conversation.isArchived());
 
+			boolean allowReplyPolicy = contact.isSlave() || contact.getSlavePermissions().isEditSlavePermissions();
+			binding.layoutReplyPolicy.setVisibility(allowReplyPolicy ? View.VISIBLE : View.GONE);
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 			builder.setTitle(R.string.title_dialog_edit_conversation).setView(binding.getRoot());
 

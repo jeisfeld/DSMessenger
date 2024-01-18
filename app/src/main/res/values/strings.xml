@@ -110,7 +110,6 @@
     <string name="text_message_acknowledged">Message acknowledged</string>
     <string name="text_new_conversation_name">New conversation</string>
     <string name="text_new_dummy_conversation">%1$s sends you a reminder</string>
-    <string name="text_recording_voice">(Recording voice)</string>
 
     <string name="error_missing_username">Missing username</string>
     <string name="error_passwords_do_not_match">Passwords do not match</string>

@@ -260,108 +260,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 					}), "conversationId", conversation.getConversationId().toString());
 		});
 
-		binding.imageButtonRecordVoice.setOnClickListener(new OnClickListener() {
-			/**
-			 * The speech recognizer.
-			 */
-			private final SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
-			/**
-			 * The old text.
-			 */
-			private String oldText = "";
-			/**
-			 * Flag indicating if recording is happening.
-			 */
-			private boolean isRecording = false;
-
-			@Override
-			public void onClick(View v) {
-				if (isRecording) {
-					isRecording = false;
-					speechRecognizer.stopListening();
-				}
-				else {
-					if (ContextCompat.checkSelfPermission(MessageFragment.this.getContext(), permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-						oldText = binding.editTextMessageText.getText().toString();
-
-						Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-						speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-						//speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "de-DE");
-
-						speechRecognizer.setRecognitionListener(new RecognitionListener() {
-							@Override
-							public void onReadyForSpeech(Bundle params) {
-								getActivity().runOnUiThread(() -> {
-									binding.editTextMessageText.setText(R.string.text_recording_voice);
-									binding.editTextMessageText.setEnabled(false);
-								});
-							}
-
-							@Override
-							public void onBeginningOfSpeech() {
-							}
-
-							@Override
-							public void onRmsChanged(float rmsdB) {
-							}
-
-							@Override
-							public void onBufferReceived(byte[] buffer) {
-							}
-
-							@Override
-							public void onEndOfSpeech() {
-							}
-
-							@Override
-							public void onError(int error) {
-								getActivity().runOnUiThread(() -> {
-									binding.editTextMessageText.setText(oldText);
-									binding.editTextMessageText.setEnabled(true);
-								});
-							}
-
-							@Override
-							public void onResults(Bundle results) {
-								isRecording = false;
-								ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-								if (matches != null && !matches.isEmpty()) {
-									String recognizedText = matches.get(0);
-									getActivity().runOnUiThread(() -> {
-										binding.editTextMessageText.setEnabled(true);
-										if ("löschen".equals(recognizedText)) {
-											binding.editTextMessageText.setText("");
-										}
-										else {
-											if (oldText.trim().length() == 0) {
-												binding.editTextMessageText.setText(recognizedText);
-											}
-											else {
-												binding.editTextMessageText.setText(oldText.trim() + "\n" + recognizedText);
-											}
-										}
-									});
-								}
-							}
-
-							@Override
-							public void onPartialResults(Bundle partialResults) {
-							}
-
-							@Override
-							public void onEvent(int eventType, Bundle params) {
-							}
-						});
-
-						speechRecognizer.startListening(speechRecognizerIntent);
-						isRecording = true;
-					}
-					else {
-						requestPermissionLauncher.launch(permission.RECORD_AUDIO);
-					}
-				}
-			}
-		});
+		setRecordVoiceButtonListener();
 
 		assert getArguments() != null;
 		contact = (Contact) getArguments().getSerializable("contact");
@@ -443,6 +342,122 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		refreshMessageList();
 
 		return binding.getRoot();
+	}
+
+	/**
+	 * Set the listener for the "Record Voice" button
+	 */
+	private void setRecordVoiceButtonListener() {
+		binding.imageButtonRecordVoice.setOnClickListener(new OnClickListener() {
+			/**
+			 * The speech recognizer.
+			 */
+			private final SpeechRecognizer speechRecognizer = SpeechRecognizer.createSpeechRecognizer(getContext());
+			/**
+			 * The old text.
+			 */
+			private String oldText = "";
+			/**
+			 * Flag indicating if recording is happening.
+			 */
+			private boolean isRecording = false;
+
+			@Override
+			public void onClick(View v) {
+				if (isRecording) {
+					isRecording = false;
+					speechRecognizer.stopListening();
+				}
+				else {
+					if (ContextCompat.checkSelfPermission(MessageFragment.this.getContext(), permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+						oldText = binding.editTextMessageText.getText().toString();
+
+						Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+						speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+						//speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "de-DE");
+
+						speechRecognizer.setRecognitionListener(new RecognitionListener() {
+							@Override
+							public void onReadyForSpeech(Bundle params) {
+								getActivity().runOnUiThread(() -> {
+									binding.imageButtonRecordVoice.setImageResource(R.drawable.ic_icon_microphone_red);
+									binding.editTextMessageText.setEnabled(false);
+								});
+							}
+
+							@Override
+							public void onBeginningOfSpeech() {
+							}
+
+							@Override
+							public void onRmsChanged(float rmsdB) {
+							}
+
+							@Override
+							public void onBufferReceived(byte[] buffer) {
+							}
+
+							@Override
+							public void onEndOfSpeech() {
+							}
+
+							@Override
+							public void onError(int error) {
+								getActivity().runOnUiThread(() -> {
+									binding.imageButtonRecordVoice.setImageResource(R.drawable.ic_icon_microphone);
+									binding.editTextMessageText.setEnabled(true);
+								});
+							}
+
+							@Override
+							public void onResults(Bundle results) {
+								isRecording = false;
+								ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+								if (matches != null && !matches.isEmpty()) {
+									String foundText = matches.get(0);
+									String recognizedText;
+									if (foundText != null && foundText.length() >= 1) {
+										recognizedText = foundText.substring(0, 1).toUpperCase() + foundText.substring(1);
+									}
+									else {
+										recognizedText = "";
+									}
+									getActivity().runOnUiThread(() -> {
+										binding.imageButtonRecordVoice.setImageResource(R.drawable.ic_icon_microphone);
+										binding.editTextMessageText.setEnabled(true);
+										if ("Löschen".equals(recognizedText)) {
+											binding.editTextMessageText.setText("");
+										}
+										else {
+											if (oldText.trim().length() == 0) {
+												binding.editTextMessageText.setText(recognizedText);
+											}
+											else {
+												binding.editTextMessageText.setText(oldText.trim() + "\n" + recognizedText);
+											}
+										}
+									});
+								}
+							}
+
+							@Override
+							public void onPartialResults(Bundle partialResults) {
+							}
+
+							@Override
+							public void onEvent(int eventType, Bundle params) {
+							}
+						});
+
+						speechRecognizer.startListening(speechRecognizerIntent);
+						isRecording = true;
+					}
+					else {
+						requestPermissionLauncher.launch(permission.RECORD_AUDIO);
+					}
+				}
+			}
+		});
 	}
 
 	/**

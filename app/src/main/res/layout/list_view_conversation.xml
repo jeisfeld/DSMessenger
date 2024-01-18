@@ -8,6 +8,7 @@
 
     <ImageButton
         android:id="@+id/button_delete"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="@dimen/input_row_height"
         android:layout_height="@dimen/input_row_height"
         android:contentDescription="@string/text_delete"
@@ -18,6 +19,7 @@
 
     <ImageButton
         android:id="@+id/button_edit"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="@dimen/input_row_height"
         android:layout_height="@dimen/input_row_height"
         android:contentDescription="@string/text_edit"
