@@ -50,15 +50,19 @@ public final class DateUtil {
 	/**
 	 * Format a timestamp for GUI display.
 	 *
-	 * @param timestamp The timestamp.
+	 * @param timestamp   The timestamp.
+	 * @param shortFormat flat indicating if shor formatting should be applied
 	 * @return The formatted timestamp.
 	 */
-	public static String formatTimestamp(final long timestamp) {
+	public static String formatTimestamp(final long timestamp, final boolean shortFormat) {
 		String dateString = android.text.format.DateFormat.getDateFormat(Application.getAppContext()).format(new Date(timestamp));
 		String currentDateString = android.text.format.DateFormat.getDateFormat(Application.getAppContext()).format(new Date());
 		String timeString = android.text.format.DateFormat.getTimeFormat(Application.getAppContext()).format(new Date(timestamp));
 		if (currentDateString.equals(dateString)) {
 			return timeString;
+		}
+		else if (shortFormat) {
+			return dateString;
 		}
 		else {
 			return dateString + " " + timeString;

@@ -10,6 +10,7 @@
     <dimen name="text_xlarge">24sp</dimen>
     <dimen name="input_row_height_small">30dp</dimen>
     <dimen name="input_row_height">40dp</dimen>
+    <dimen name="icon_width_small">30dp</dimen>
     <dimen name="margin_small">4dp</dimen>
     <dimen name="padding_message_vertical">6dp</dimen>
     <dimen name="padding_message_horizontal">12dp</dimen>
@@ -25,6 +26,7 @@
     <dimen name="icon_size_message_status">14dp</dimen>
     <dimen name="message_corners">10dp</dimen>
     <dimen name="message_margin">40dp</dimen>
+    <dimen name="text_width_date">70sp</dimen>
 
     <integer name="selector_label_width">32</integer>
     <integer name="selector_input_width">68</integer>

@@ -39,7 +39,7 @@
     <string name="button_update_contact">Update Contact</string>
     <string name="button_disconnect_device">Disconnect Device</string>
     <string name="button_update_device">Update Device</string>
-    <string name="button_update_conversation">Update\nConversation</string>
+    <string name="button_update_conversation">Update</string>
     <string name="button_trigger_lut">Send Pulse</string>
 
     <string name="text_send_message">Send Message</string>

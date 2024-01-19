@@ -25,6 +25,7 @@ import de.jeisfeld.coachat.main.account.ContactRegistry;
 import de.jeisfeld.coachat.message.AdminMessageDetails.AdminType;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 import de.jeisfeld.coachat.service.FirebaseDsMessagingService;
+import de.jeisfeld.coachat.util.DateUtil;
 import de.jeisfeld.coachat.util.DialogUtil;
 
 /**
@@ -127,6 +128,8 @@ public class ConversationsExpandableListAdapter extends BaseExpandableListAdapte
 
 		TextView textViewSubject = view.findViewById(R.id.textViewSubject);
 		textViewSubject.setText(conversation.getSubject());
+		TextView textViewDate = view.findViewById(R.id.textViewDate);
+		textViewDate.setText(conversation.isStored() ? DateUtil.formatTimestamp(conversation.getLastTimestamp(), true) : "");
 
 		prepareConversationButtons(view, contact, conversation);
 

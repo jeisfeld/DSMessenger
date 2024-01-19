@@ -6,6 +6,7 @@
     <dimen name="margin_medium">20dp</dimen>
     <dimen name="margin_large">30dp</dimen>
     <dimen name="input_row_height_small">40dp</dimen>
+    <dimen name="icon_width_small">40dp</dimen>
 
     <integer name="selector_label_width">30</integer>
     <integer name="selector_input_width">70</integer>

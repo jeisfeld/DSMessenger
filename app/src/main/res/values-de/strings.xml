@@ -39,7 +39,7 @@
     <string name="button_update_contact">Aktualisieren</string>
     <string name="button_disconnect_device">Gerät trennen</string>
     <string name="button_update_device">Aktualisieren</string>
-    <string name="button_update_conversation">Unterhaltung\naktualisieren</string>
+    <string name="button_update_conversation">Aktualisieren</string>
     <string name="button_trigger_lut">Impuls senden</string>
 
     <string name="text_send_message">Nachricht senden</string>

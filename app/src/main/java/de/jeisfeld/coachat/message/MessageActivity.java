@@ -232,7 +232,7 @@ public class MessageActivity extends AppCompatActivity {
 					textViewMessage.setBackgroundResource(R.drawable.background_message_contact);
 				}
 
-				((TextView) view.findViewById(R.id.textViewMessageTime)).setText(DateUtil.formatTimestamp(message.getTimestamp()));
+				((TextView) view.findViewById(R.id.textViewMessageTime)).setText(DateUtil.formatTimestamp(message.getTimestamp(), false));
 
 				ImageView imageViewMessageStatus = view.findViewById(R.id.imageViewMessageStatus);
 				switch (message.getStatus()) {
