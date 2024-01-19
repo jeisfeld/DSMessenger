@@ -5,6 +5,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,6 +64,7 @@ public final class ContactRegistry {
 		for (int i = 0; i < contacts.size(); i++) {
 			result.add(contacts.valueAt(i));
 		}
+		result.sort(Comparator.comparing(Contact::getName));
 		return result;
 	}
 
@@ -79,6 +81,7 @@ public final class ContactRegistry {
 				result.add(contact);
 			}
 		}
+		result.sort(Comparator.comparing(Contact::getName));
 		return result;
 	}
 
