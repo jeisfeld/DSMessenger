@@ -60,7 +60,7 @@ function getRandomizedMessageCount($baseCount, $variance)
     }
 }
 
-function queryMessagesForOpenai($username, $password, $relationId, $conversationId, $promptmessage, $oldMessageCount = 20, $oldMessageCountVariation = 0, $maxCharacters = 40000)
+function queryMessagesForOpenai($username, $password, $relationId, $conversationId, $promptmessage, $messageSuffix, $oldMessageCount = 20, $oldMessageCountVariation = 0, $maxCharacters = 40000)
 {
     $totalcharacters = strlen($promptmessage['content']);
     
@@ -152,6 +152,39 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     }
     $stmt->close();
     
+    if ($messageSuffix) {
+        $messageSuffixJson = json_decode($messageSuffix, true);
+        if ($messageSuffixJson) {
+            $lastMessage = end($messages);
+            $input = $lastMessage['content'];
+            
+            $pattern = '/^(.*)\s*\[([a-z]+)\]$/i';
+            $matches = [];
+            
+            if (preg_match($pattern, $input, $matches)) {
+                $modifiedMessage = $matches[1];
+                $letters = str_split($matches[2]);
+                $modified = false;
+                
+                foreach ($letters as $letter) {
+                    $suffix = $messageSuffixJson[$letter];
+                    if ($suffix) {
+                        $modifiedMessage .= ("\n" . $suffix);
+                        $modified = true;
+                    }
+                }
+                
+                if ($modified) {
+                    $messages[key($messages)]['content'] = $modifiedMessage;
+                }
+            }
+        }
+        else {
+            end($messages);
+            $messages[key($messages)]['content'] .= ("\n" . $messageSuffix);
+        }
+    }    
+    
     array_unshift($messages, $promptmessage);
     
     $conn2->close();
@@ -173,6 +206,7 @@ function queryAiRelation($username, $password, $relationId, $isSlave)
     
     $aiUserName = null;
     $addPrimingText = null;
+    $messageSuffix = null;
     $aiPolicy = null;
     $primingText = null;
     $temperature = null;
@@ -183,7 +217,7 @@ function queryAiRelation($username, $password, $relationId, $isSlave)
     $maxCharacters = null;
     $model = null;
     
-    $stmt = $conn->prepare("SELECT ai.user_name, ai.add_priming_text, ai.ai_policy, p.priming_text, p.temperature,
+    $stmt = $conn->prepare("SELECT ai.user_name, ai.add_priming_text, ai.message_suffix, ai.ai_policy, p.priming_text, p.temperature,
             p.presence_penalty, p.frequency_penalty, p.old_message_count, p.old_message_count_variation, p.max_characters, p.model
             from dsm_ai_relation ai, dsm_ai_priming p
             where ai.relation_id = ?
@@ -191,7 +225,7 @@ function queryAiRelation($username, $password, $relationId, $isSlave)
     
     $stmt->bind_param("i", $relationId);
     $stmt->execute();
-    $stmt->bind_result($aiUserName, $addPrimingText, $aiPolicy, $primingText,
+    $stmt->bind_result($aiUserName, $addPrimingText, $messageSuffix, $aiPolicy, $primingText,
         $temperature, $presencePenalty, $frequencyPenalty, $oldMessageCount, $oldMessageCountVariation, $maxCharacters, $model);
     
     if ($stmt->fetch()) {
@@ -205,6 +239,7 @@ function queryAiRelation($username, $password, $relationId, $isSlave)
             'aiUserName' => $aiUserName,
             'aiPolicy' => $aiPolicy,
             'promptmessage' => createOpenAiMessage('system', $primingText3),
+            'messageSuffix' => $messageSuffix,
             'temperature' => $temperature,
             'presencePenalty' => $presencePenalty,
             'frequencyPenalty' => $frequencyPenalty,

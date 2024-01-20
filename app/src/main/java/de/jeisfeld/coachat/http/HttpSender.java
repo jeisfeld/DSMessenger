@@ -158,7 +158,7 @@ public class HttpSender {
 	 */
 	public void sendSelfMessage(final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
 		sendMessage("firebase/sendselfmessage.php", new Contact(-1, null, null, 0, false, null,
-						null, null, AiPolicy.NONE, null),
+						null, null, null, AiPolicy.NONE, null, null, null),
 				messageId, listener, parameters);
 	}
 
@@ -300,10 +300,17 @@ public class HttpSender {
 								boolean isSlave = jsonContact.getBoolean("isSlave");
 								boolean isConfirmed = jsonContact.getBoolean("isConfirmed");
 								SlavePermissions slavePermissions = SlavePermissions.fromString(jsonContact.getString("slavePermissions"));
+								Integer aiRelationId = jsonContact.optInt("aiRelationId", -1);
+								if (aiRelationId == -1) {
+									aiRelationId = null;
+								}
 								AiPolicy aiPolicy = AiPolicy.fromOrdinal(jsonContact.getInt("aiPolicy"));
 								String aiUsername = jsonContact.getString("aiUsername");
+								String aiAddPrimingText = jsonContact.getString("aiAddPrimingText");
+								String aiMessageSuffix = jsonContact.getString("aiMessageSuffix");
 								Contact contact = new Contact(relationId, contactName, myName, contactId, isSlave, connectionCode, slavePermissions,
-										isConfirmed ? ContactStatus.CONNECTED : ContactStatus.INVITED, aiPolicy, aiUsername);
+										isConfirmed ? ContactStatus.CONNECTED : ContactStatus.INVITED, aiRelationId, aiPolicy, aiUsername,
+										aiAddPrimingText, aiMessageSuffix);
 								contacts.put(relationId, contact);
 							}
 							data.put(key, contacts);

@@ -45,8 +45,11 @@
     <string name="key_contact_status" translatable="false">contact_status</string>
     <string name="key_contact_slave_permissions" translatable="false">contact_slave_permissions</string>
     <string name="key_contact_conversation_ids" translatable="false">contact_conversation_ids</string>
+    <string name="key_contact_ai_relation_id" translatable="false">contact_ai_relation_id</string>
     <string name="key_contact_ai_policy" translatable="false">contact_ai_policy</string>
     <string name="key_contact_ai_username" translatable="false">contact_ai_username</string>
+    <string name="key_contact_ai_add_priming_text" translatable="false">contact_ai_username_add_priming_text</string>
+    <string name="key_contact_ai_message_suffix" translatable="false">contact_ai_username_message_suffix</string>
 
     <!-- Arrays for list preferences -->
     <string-array name="pref_list_titles_language">

@@ -87,7 +87,10 @@ $password = $_SESSION['password'];
         				<label for="modalEditAddPrimingText"><?= _("AI Additional Text") ?>:</label>
         				<textarea name="modalEditAddPrimingText" id="modalEditAddPrimingText" maxlength="4096"></textarea>
     				</div>
-   				</div>
+    				<div class="form-group">
+        				<label for="modalEditMessageSuffix"><?= _("Message Suffix") ?>:</label>
+        				<input type="text" name="modalEditMessageSuffix" id="modalEditMessageSuffix" maxlength="1024" value=""/>
+    				</div>   				</div>
 				<div class="container">
 					<span class="left"><input type="button" name="cancel" class="modal-button" value="<?= _("Cancel") ?>" onclick="$('#modalEdit').hide();"></span>
 					<span class="right"> <input type="submit" name="submit" class="modal-button" value="<?= _("Save Contact") ?>"></span>

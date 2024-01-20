@@ -154,6 +154,7 @@
 
             <ImageButton
                 android:id="@+id/imageViewRefreshContacts"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="@dimen/input_row_height"
                 android:layout_height="@dimen/input_row_height"
                 android:contentDescription="@string/text_refresh"

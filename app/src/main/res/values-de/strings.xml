@@ -67,6 +67,7 @@
     <string name="text_message_display_urgent">Dringende Nachrichtenanzeige</string>
     <string name="text_message_display_type">Anzeigeart</string>
     <string name="text_slave_permissions">Sub-Berechtigungen</string>
+    <string name="text_ai_settings">KI-Einstellungen</string>
     <string name="text_edit_slave_permissions">Sub-Berechtigungen bearbeiten</string>
     <string name="text_edit_relation">Name bearbeiten / Kontakt löschen</string>
     <string name="text_manage_conversations">Unterhaltungen verwalten</string>
@@ -87,6 +88,7 @@
     <string name="text_my_name_m">Mein Name *</string>
     <string name="text_contact_name">Kontaktname *</string>
     <string name="text_contact">Kontakt</string>
+    <string name="text_ai_message_suffix">Nachrichten-Suffix</string>
     <string name="text_device_name">Gerätename *</string>
     <string name="text_sub">Sub</string>
     <string name="text_dom">Dom</string>

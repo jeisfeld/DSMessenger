@@ -67,6 +67,7 @@
     <string name="text_message_display_urgent">Urgent message display</string>
     <string name="text_message_display_type">Display Type</string>
     <string name="text_slave_permissions">Slave permissions</string>
+    <string name="text_ai_settings">AI Settings</string>
     <string name="text_edit_slave_permissions">Edit slave permissions</string>
     <string name="text_edit_relation">Edit contact name / delete contact</string>
     <string name="text_manage_conversations">Manage conversations</string>
@@ -87,6 +88,7 @@
     <string name="text_my_name_m">My Name *</string>
     <string name="text_contact_name">Contact Name *</string>
     <string name="text_contact">Contact</string>
+    <string name="text_ai_message_suffix">Message Suffix</string>
     <string name="text_device_name">Device Name *</string>
     <string name="text_sub">Sub</string>
     <string name="text_dom">Dom</string>

@@ -10,6 +10,7 @@ $(document).ready(function() {
 		var aiUsername = contact.aiUsername;
 		var aiPrimingId = contact.aiPrimingId;
 		var aiAddPrimingText = contact.aiAddPrimingText;
+		var aiMessageSuffix = contact.aiMessageSuffix;
 		if (isSlave) {
 			$('.modalEditOnlyMaster').show();					
 		}
@@ -31,6 +32,7 @@ $(document).ready(function() {
 		$('#modalEditAiPolicy').val(aiPolicy >=2 ? 3 : 1);
 		$('#modalEditAiPrimingId').val(aiPrimingId);
 		$('#modalEditAddPrimingText').val(aiAddPrimingText);
+		$('#modalEditMessageSuffix').val(aiMessageSuffix);
 		$('#modalEdit').show();
 	});
 

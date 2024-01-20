@@ -108,6 +108,9 @@ msgstr "AI Type"
 msgid "AI Additional Text"
 msgstr "AI Additional Text"
 
+msgid "AI Message Suffix"
+msgstr "AI Message Suffix"
+
 msgid "manual"
 msgstr "manual"
 

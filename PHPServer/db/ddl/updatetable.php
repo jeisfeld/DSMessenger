@@ -11,13 +11,13 @@ if ($conn->connect_error) {
 }
 
 // sql to create table dsm_ai_priming
-$sql = "ALTER TABLE dsm_ai_priming
-ADD COLUMN model VARCHAR(100) DEFAULT 'gpt-4-1106-preview'";
+$sql = "ALTER TABLE dsm_ai_relation
+ADD message_suffix VARCHAR(1024) AFTER add_priming_text";
 
 // variation: 0 no, 1 linear, 2 exponential
 
 if ($conn->query($sql) === TRUE) {
-    printSuccess("Table dsm_ai_priming updated successfully");
+    printSuccess("Table dsm_ai_relation updated successfully");
 }
 else {
     printError(102, "Error updating table: " . $conn->error);

@@ -108,6 +108,9 @@ msgstr "KI-Typ"
 msgid "AI Additional Text"
 msgstr "KI-Zusatztext"
 
+msgid "AI Message Suffix"
+msgstr "KI-Nachrichten-Suffix"
+
 msgid "manual"
 msgstr "manuell"
 

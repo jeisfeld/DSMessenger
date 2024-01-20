@@ -101,6 +101,37 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/layout_ai_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@id/layout_slave_permissions">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginBottom="@dimen/margin_small"
+                android:text="@string/text_ai_settings"
+                android:textSize="@dimen/text_large" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextAiMessageSuffix"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/input_row_height"
+                    android:hint="@string/text_ai_message_suffix"
+                    android:inputType="text"
+                    android:padding="0dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
         <TextView
             android:id="@+id/textViewErrorMessage"
             android:layout_width="match_parent"
@@ -113,7 +144,7 @@
             android:textColor="@android:color/holo_red_dark"
             android:textSize="@dimen/text_normal"
             android:visibility="invisible"
-            app:layout_constraintTop_toBottomOf="@id/layout_slave_permissions" />
+            app:layout_constraintTop_toBottomOf="@id/layout_ai_settings" />
 
         <Button
             android:id="@+id/button_update_contact"

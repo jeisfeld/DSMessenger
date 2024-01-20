@@ -630,7 +630,7 @@ public class AccountFragment extends Fragment {
 				int relationId = (int) responseData.getData().get("relationId");
 
 				Contact contact = new Contact(relationId, contactName, myName, -1, !amSlave, connectionCode, SlavePermissions.DEFAULT_SLAVE_PERMISSIONS,
-						ContactStatus.INVITED, AiPolicy.NONE, null);
+						ContactStatus.INVITED, null, AiPolicy.NONE, null, null, null);
 				ContactRegistry.getInstance().addOrUpdate(contact);
 				Activity activity = getActivity();
 				if (activity != null) {
@@ -682,7 +682,9 @@ public class AccountFragment extends Fragment {
 					activity.runOnUiThread(() -> dialog.displayError(responseData.getMappedErrorMessage(getContext())));
 				}
 			}
-		}, "myName", contact.getMyName(), "contactName", contact.getName(), "slavePermissions", contact.getSlavePermissions().toString());
+				}, "myName", contact.getMyName(), "contactName", contact.getName(), "slavePermissions", contact.getSlavePermissions().toString(),
+				"aiRelationId", contact.getAiRelationId() == null ? "" : Integer.toString(contact.getAiRelationId()),
+				"aiPolicy", Integer.toString(contact.getAiPolicy().ordinal()), "aiMessageSuffix", contact.getAiMessageSuffix());
 	}
 
 	/**

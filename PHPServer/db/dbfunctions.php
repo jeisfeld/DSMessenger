@@ -282,3 +282,10 @@ function convertToJavaTimestamp($mysqlTimestamp) {
     return $javaTimestamp; 
 }
 
+function consoleLog($debugData) {
+    ob_start(); // Start output buffering
+    print_r($debugData); // Print the object
+    $debugDataAsString = ob_get_clean();
+    echo "<script>console.log('Debug Data: " . json_encode($debugDataAsString) . "');</script>";
+}
+

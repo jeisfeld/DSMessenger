@@ -571,7 +571,7 @@ public final class AccountDialogUtil {
 								dismiss();
 								// TODO: fill slave permissions and AI Policy.
 								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, null,
-										ContactStatus.CONNECTED, AiPolicy.NONE, null);
+										ContactStatus.CONNECTED, null, AiPolicy.NONE, null, null, null);
 								ContactRegistry.getInstance().addOrUpdate(contact);
 
 								AccountFragment.sendBroadcast(getContext(), ActionType.CONTACTS_UPDATED);
@@ -630,6 +630,8 @@ public final class AccountDialogUtil {
 
 			binding.editTextMyName.setText(contact.getMyName());
 			binding.editTextContactName.setText(contact.getName());
+			binding.editTextAiMessageSuffix.setText(contact.getAiMessageSuffix());
+			binding.layoutAiSettings.setVisibility(contact.getAiPolicy() == AiPolicy.NONE ? View.GONE : View.VISIBLE);
 
 			binding.checkboxEditSlavePermissions.setChecked(contact.getSlavePermissions().isEditSlavePermissions());
 			binding.checkboxEditRelation.setChecked(contact.getSlavePermissions().isEditRelation());
@@ -656,13 +658,15 @@ public final class AccountDialogUtil {
 				}
 				String myName = binding.editTextMyName.getText().toString().trim();
 				String contactName = binding.editTextContactName.getText().toString().trim();
+				String messageSuffix = binding.editTextAiMessageSuffix.getText().toString().trim();
 
 				SlavePermissions newSlavePermissions = new SlavePermissions(binding.checkboxEditSlavePermissions.isChecked(),
 						binding.checkboxEditRelation.isChecked(), binding.checkboxManageConversations.isChecked(),
 						ReplyPolicy.fromOrdinal(dropdownHandlerDefaultReplyPolicy.getSelectedPosition()));
 
 				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
-						contact.getConnectionCode(), newSlavePermissions, contact.getStatus(), contact.getAiPolicy(), contact.getAiUsername());
+						contact.getConnectionCode(), newSlavePermissions, contact.getStatus(), contact.getAiRelationId(), contact.getAiPolicy(),
+						contact.getAiUsername(), contact.getAiAddPrimingText(), messageSuffix);
 				((AccountFragment) requireParentFragment()).handleEditContactDialogResponse(this, newContact);
 
 			});

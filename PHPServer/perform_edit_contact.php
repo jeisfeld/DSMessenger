@@ -15,6 +15,7 @@ if (isset($_POST['submit'])) {
     $aiPolicy = $_POST['modalEditAiPolicy'];
     $aiPrimingId = $_POST['modalEditAiPrimingId'];
     $aiAddPrimingText = $_POST['modalEditAddPrimingText'];
+    $aiMessageSuffix = $_POST['modalEditMessageSuffix'];
     
     // Create connection
     $conn = getDbConnection();
@@ -38,9 +39,9 @@ if (isset($_POST['submit'])) {
     sendAdminMessage($conn, $username, $password, $relationId, "CONTACT_UPDATED");
     
     if ($aiRelationId) {
-        $stmt = $conn->prepare("update dsm_ai_relation set user_name = ?, priming_id = ?, add_priming_text = ?, ai_policy = ? where id = ? and relation_id = ? and relation_id in 
+        $stmt = $conn->prepare("update dsm_ai_relation set user_name = ?, priming_id = ?, add_priming_text = ?, message_suffix = ?, ai_policy = ? where id = ? and relation_id = ? and relation_id in 
 (SELECT id from dsm_relation where slave_id = ? or master_id = ?)");
-        $stmt->bind_param("sisiiiii", $aiUsername, $aiPrimingId, $aiAddPrimingText, $aiPolicy, $aiRelationId, $relationId, $userId, $userId);
+        $stmt->bind_param("sissiiiii", $aiUsername, $aiPrimingId, $aiAddPrimingText, $aiMessageSuffix, $aiPolicy, $aiRelationId, $relationId, $userId, $userId);
         $stmt->execute();
         $stmt->close();
     }

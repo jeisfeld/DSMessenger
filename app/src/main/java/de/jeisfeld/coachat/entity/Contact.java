@@ -46,6 +46,10 @@ public class Contact implements Serializable {
 	 */
 	private final ContactStatus status;
 	/**
+	 * The AI Relation Id
+	 */
+	private final Integer aiRelationId;
+	/**
 	 * The AI Policy.
 	 */
 	private final AiPolicy aiPolicy;
@@ -53,6 +57,14 @@ public class Contact implements Serializable {
 	 * The AI Username.
 	 */
 	private final String aiUsername;
+	/**
+	 * The AI Additional Priming Text.
+	 */
+	private final String aiAddPrimingText;
+	/**
+	 * The AI Message Suffix.
+	 */
+	private final String aiMessageSuffix;
 
 	/**
 	 * Constructor without id.
@@ -65,12 +77,16 @@ public class Contact implements Serializable {
 	 * @param connectionCode   The connection code
 	 * @param slavePermissions The slave permissions.
 	 * @param status           The contact status
+	 * @param aiRelationId     The AI relation id
 	 * @param aiPolicy         The AI Policy
 	 * @param aiUsername       The AI Username
+	 * @param aiAddPrimingText The AI additional priming text
+	 * @param aiMessageSuffix  The AI message suffix
 	 */
 	public Contact(final int relationId, final String name, final String myName, final int contactId,
 				   final boolean isSlave, final String connectionCode, final SlavePermissions slavePermissions, final ContactStatus status,
-				   final AiPolicy aiPolicy, final String aiUsername) {
+				   final Integer aiRelationId, final AiPolicy aiPolicy, final String aiUsername, final String aiAddPrimingText,
+				   final String aiMessageSuffix) {
 		this.relationId = relationId;
 		this.name = name;
 		this.myName = myName;
@@ -79,8 +95,11 @@ public class Contact implements Serializable {
 		this.connectionCode = connectionCode;
 		this.slavePermissions = slavePermissions;
 		this.status = status;
+		this.aiRelationId = aiRelationId;
 		this.aiPolicy = aiPolicy;
 		this.aiUsername = aiUsername;
+		this.aiAddPrimingText = aiAddPrimingText;
+		this.aiMessageSuffix = aiMessageSuffix;
 	}
 
 	/**
@@ -99,8 +118,12 @@ public class Contact implements Serializable {
 				SlavePermissions.fromString(PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_slave_permissions, relationId));
 		String statusString = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_status, relationId);
 		status = statusString == null ? ContactStatus.INVITED : ContactStatus.valueOf(statusString);
+		int storedAiRelationId = PreferenceUtil.getIndexedSharedPreferenceInt(R.string.key_contact_ai_relation_id, relationId, -1);
+		aiRelationId = storedAiRelationId == -1 ? null : storedAiRelationId;
 		aiPolicy = AiPolicy.fromOrdinal(PreferenceUtil.getIndexedSharedPreferenceInt(R.string.key_contact_ai_policy, relationId, 0));
 		aiUsername = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_username, relationId);
+		aiAddPrimingText = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_add_priming_text, relationId);
+		aiMessageSuffix = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_message_suffix, relationId);
 	}
 
 	public final int getRelationId() {
@@ -135,12 +158,24 @@ public class Contact implements Serializable {
 		return status;
 	}
 
+	public Integer getAiRelationId() {
+		return aiRelationId;
+	}
+
 	public AiPolicy getAiPolicy() {
-		return aiPolicy;
+		return aiPolicy == null ? AiPolicy.NONE : aiPolicy;
 	}
 
 	public String getAiUsername() {
 		return aiUsername;
+	}
+
+	public String getAiAddPrimingText() {
+		return aiAddPrimingText;
+	}
+
+	public String getAiMessageSuffix() {
+		return aiMessageSuffix;
 	}
 
 	/**
@@ -191,7 +226,12 @@ public class Contact implements Serializable {
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_slave_permissions, getRelationId(), getSlavePermissions().toString());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_status, getRelationId(), getStatus().name());
 		PreferenceUtil.setIndexedSharedPreferenceInt(R.string.key_contact_ai_policy, getRelationId(), getAiPolicy().ordinal());
+		if (getAiRelationId() != null) {
+			PreferenceUtil.setIndexedSharedPreferenceInt(R.string.key_contact_ai_relation_id, getAiRelationId(), getContactId());
+		}
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_username, getRelationId(), getAiUsername());
+		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_add_priming_text, getRelationId(), getAiAddPrimingText());
+		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_message_suffix, getRelationId(), getAiMessageSuffix());
 	}
 
 	/**

@@ -25,14 +25,15 @@ function queryContacts($username, $password)
     $aiUsername = null;
     $aiPrimingId = null;
     $aiAddPrimingText = null;
-    $stmt = $conn->prepare("SELECT r.id, connection_code, master_name as contact_name, master_id as contact_id, slave_name as my_name, false as is_slave, slave_permissions, ai_policy, a.id as ai_relation_id, a.user_name as ai_user_name, priming_id, add_priming_text FROM dsm_relation r LEFT JOIN dsm_ai_relation a ON r.id = a.relation_id WHERE slave_id = ?
+    $aiMessageSuffix = null;
+    $stmt = $conn->prepare("SELECT r.id, connection_code, master_name as contact_name, master_id as contact_id, slave_name as my_name, false as is_slave, slave_permissions, ai_policy, a.id as ai_relation_id, a.user_name as ai_user_name, priming_id, add_priming_text, message_suffix FROM dsm_relation r LEFT JOIN dsm_ai_relation a ON r.id = a.relation_id WHERE slave_id = ?
 UNION
-SELECT r.id, connection_code, slave_name as contact_name, slave_id as contact_id, master_name as my_name, true as is_slave, slave_permissions, ai_policy, a.id as ai_relation_id, a.user_name as ai_user_name, priming_id, add_priming_text FROM dsm_relation r LEFT JOIN dsm_ai_relation a ON r.id = a.relation_id WHERE master_id = ?
+SELECT r.id, connection_code, slave_name as contact_name, slave_id as contact_id, master_name as my_name, true as is_slave, slave_permissions, ai_policy, a.id as ai_relation_id, a.user_name as ai_user_name, priming_id, add_priming_text, message_suffix FROM dsm_relation r LEFT JOIN dsm_ai_relation a ON r.id = a.relation_id WHERE master_id = ?
 ORDER BY contact_name");
     
     $stmt->bind_param("ii", $userid, $userid);
     $stmt->execute();
-    $stmt->bind_result($relationId, $connectionCode, $contactName, $contactId, $myName, $isSlave, $slavePermissions, $aiPolicy, $aiRelationId, $aiUsername, $aiPrimingId, $aiAddPrimingText);
+    $stmt->bind_result($relationId, $connectionCode, $contactName, $contactId, $myName, $isSlave, $slavePermissions, $aiPolicy, $aiRelationId, $aiUsername, $aiPrimingId, $aiAddPrimingText, $aiMessageSuffix);
     
     $contacts = array();
     while ($stmt->fetch()) {
@@ -49,7 +50,8 @@ ORDER BY contact_name");
             'aiRelationId' => $aiRelationId ?? '',
             'aiUsername' => $aiUsername ?? '',
             'aiPrimingId' => $aiPrimingId,
-            'aiAddPrimingText' => $aiAddPrimingText
+            'aiAddPrimingText' => $aiAddPrimingText,
+            'aiMessageSuffix' => $aiMessageSuffix
         ];
     }
     $stmt->close();
