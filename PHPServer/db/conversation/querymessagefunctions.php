@@ -2,6 +2,12 @@
 require_once __DIR__.'/../dbfunctions.php';
 require_once __DIR__ . '/../../openai/queryopenai.php';
 
+$modelMap = [
+  "3" => "gpt-3.5-turbo-16k",
+  "4" => "gpt-4-1106-preview",
+  "9" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0"
+];
+
 function queryMessages($username, $password, $relationId, $conversationId)
 {
     // Create connection
@@ -78,12 +84,14 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     
     // first add messages of current conversation.
     
+    $lastMessageId = null;
+    $messageId = null;
     $messageUser = null;
     $text = null;
-    $stmt = $conn->prepare("SELECT user_id, text from dsm_message WHERE conversation_id = ? order by timestamp desc");
+    $stmt = $conn->prepare("SELECT id, user_id, text from dsm_message WHERE conversation_id = ? order by timestamp desc");
     $stmt->bind_param("s", $conversationId);
     $stmt->execute();
-    $stmt->bind_result($messageUser, $text);
+    $stmt->bind_result($messageId, $messageUser, $text);
     
     $messages = [];
     while ($totalcharacters < $maxCharacters && $stmt->fetch()) {
@@ -92,104 +100,126 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
             'content' => $text
         ]);
         $totalcharacters += strlen($text);
-    }
-    $stmt->close();
-    
-    // Then add messages of other conversations of same relation.
-    
-    $totalMessages = 0;
-    $plannedMessages = getRandomizedMessageCount($oldMessageCount, $oldMessageCountVariation);
-    
-    $otherConversationId = null;
-    $text = null;
-    $timestamp = null;
-    $messageId = null;
-    $stmt = $conn->prepare("SELECT conversation_id, text, timestamp, id from dsm_message WHERE conversation_id != ? AND user_id != ?
-                            AND conversation_id in (SELECT id from dsm_conversation WHERE relation_id = ? and archived = 0)
-                            order by timestamp desc");
-    $stmt->bind_param("sii", $conversationId, $userId, $relationId);
-    $stmt->execute();
-    $stmt->bind_result($otherConversationId, $text, $timestamp, $messageId);
-    while ($totalcharacters < $maxCharacters && $totalMessages < $plannedMessages && $stmt->fetch()) {
-        $totalMessages ++;
-        array_unshift($messages, [
-            'role' => 'assistant',
-            'content' => $text
-        ]);
-        $totalcharacters += strlen($text);
-        
-        $messageUser = null;
-        $text2 = null;
-        $messageId2 = null;
-        $stmt2 = $conn2->prepare("SELECT user_id, text, id from dsm_message WHERE conversation_id = ? order by timestamp desc");
-        $stmt2->bind_param("s", $otherConversationId);
-        $stmt2->execute();
-        $stmt2->bind_result($messageUser, $text2, $messageId2);
-        $status = 0;
-        
-        while ($status < 2 && $stmt2->fetch()) {
-            if ($status == 0) {
-                if ($messageId2 == $messageId) {
-                    $status = 1;
-                }
-                continue;
-            }
-            else if ($status == 1) {
-                if ($messageUser == $userId) {
-                    array_unshift($messages, [
-                        'role' => 'user',
-                        'content' => $text2
-                    ]);
-                    $totalcharacters += strlen($text);
-                }
-                else {
-                    $status = 2;
-                    break;
-                }
-            }
+        if (! $lastMessageId) {
+            $lastMessageId = $messageId;
         }
-        $stmt2->close();
     }
     $stmt->close();
     
+    // Handle special instructions in last message.
+    
+    $letters = null;
+    $lastMessage = end($messages);
+    $lastMessageContent = $lastMessage['content'];
+    
+    if (str_ends_with($lastMessageContent, "]")) {
+        $pattern = '/^(.*)\s*\[([a-zA-Z0-9]+)\]$/is';
+        $matches = [];
+        if (preg_match($pattern, $lastMessageContent, $matches)) {
+            $shortMessageContent = $matches[1];
+            $letters = str_split($matches[2]);
+            
+            if ($lastMessageId) {
+                $stmt = $conn->prepare("UPDATE dsm_message SET text = ? WHERE id = ? AND text = ?");
+                $stmt->bind_param("sss", $shortMessageContent, $lastMessageId, $lastMessageContent);
+                $stmt->execute();
+                $stmt->close();
+            }
+            
+            $lastMessageContent = $shortMessageContent;
+            $messages[key($messages)]['content'] = $lastMessageContent;
+        }
+    }
     if ($messageSuffix) {
         $messageSuffixJson = json_decode($messageSuffix, true);
         if ($messageSuffixJson) {
-            $lastMessage = end($messages);
-            $input = $lastMessage['content'];
-            
-            $pattern = '/^(.*)\s*\[([a-z]+)\]$/i';
-            $matches = [];
-            
-            if (preg_match($pattern, $input, $matches)) {
-                $modifiedMessage = $matches[1];
-                $letters = str_split($matches[2]);
+            if ($letters) {
                 $modified = false;
-                
                 foreach ($letters as $letter) {
                     $suffix = $messageSuffixJson[$letter];
                     if ($suffix) {
-                        $modifiedMessage .= ("\n" . $suffix);
+                        $lastMessageContent .= ("\n" . $suffix);
                         $modified = true;
                     }
                 }
                 
                 if ($modified) {
-                    $messages[key($messages)]['content'] = $modifiedMessage;
+                    $messages[key($messages)]['content'] = $lastMessageContent;
                 }
             }
         }
         else {
-            end($messages);
             $messages[key($messages)]['content'] .= ("\n" . $messageSuffix);
         }
-    }    
+    }
+    $letters ??= [];
     
+    // Then add messages of other conversations of same relation.
+    
+    if (!in_array("0", $letters)) {
+        $totalMessages = 0;
+        $plannedMessages = getRandomizedMessageCount($oldMessageCount, $oldMessageCountVariation);
+        
+        $otherConversationId = null;
+        $text = null;
+        $timestamp = null;
+        $messageId = null;
+        $stmt = $conn->prepare("SELECT conversation_id, text, timestamp, id from dsm_message WHERE conversation_id != ? AND user_id != ?
+                            AND conversation_id in (SELECT id from dsm_conversation WHERE relation_id = ? and archived = 0)
+                            order by timestamp desc");
+        $stmt->bind_param("sii", $conversationId, $userId, $relationId);
+        $stmt->execute();
+        $stmt->bind_result($otherConversationId, $text, $timestamp, $messageId);
+        while ($totalcharacters < $maxCharacters && $totalMessages < $plannedMessages && $stmt->fetch()) {
+            $totalMessages ++;
+            array_unshift($messages, [
+                'role' => 'assistant',
+                'content' => $text
+            ]);
+            $totalcharacters += strlen($text);
+            
+            $messageUser = null;
+            $text2 = null;
+            $messageId2 = null;
+            $stmt2 = $conn2->prepare("SELECT user_id, text, id from dsm_message WHERE conversation_id = ? order by timestamp desc");
+            $stmt2->bind_param("s", $otherConversationId);
+            $stmt2->execute();
+            $stmt2->bind_result($messageUser, $text2, $messageId2);
+            $status = 0;
+            
+            while ($status < 2 && $stmt2->fetch()) {
+                if ($status == 0) {
+                    if ($messageId2 == $messageId) {
+                        $status = 1;
+                    }
+                    continue;
+                }
+                else if ($status == 1) {
+                    if ($messageUser == $userId) {
+                        array_unshift($messages, [
+                            'role' => 'user',
+                            'content' => $text2
+                        ]);
+                        $totalcharacters += strlen($text);
+                    }
+                    else {
+                        $status = 2;
+                        break;
+                    }
+                }
+            }
+            $stmt2->close();
+        }
+        $stmt->close();
+    }
+
     array_unshift($messages, $promptmessage);
-    
     $conn2->close();
     $conn->close();
-    return $messages;
+    return [
+        'messages' => $messages,
+        'letters' => $letters
+    ];
 }
 
 function queryAiRelation($username, $password, $relationId, $isSlave)
@@ -259,3 +289,17 @@ function queryAiRelation($username, $password, $relationId, $isSlave)
     return $aiRelation;
 }
 
+function handleOpenAi($username, $password, $relationId, $conversationId, $aiRelation) {
+    global $modelMap;
+    $messageInfo = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['messageSuffix'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
+    $messages = $messageInfo['messages'];
+    $letters = $messageInfo['letters'];
+    $model = $aiRelation['model'];
+    foreach ($letters as $letter) {
+        $altModel = $modelMap[$letter];
+        if ($altModel) {
+            $model = $altModel;
+        }
+    }
+    return queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty'], $model);
+}

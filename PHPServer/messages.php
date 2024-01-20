@@ -52,7 +52,7 @@ function convertTimestamp($mysqlTimestamp)
 				href="conversations.php?relationId=<?= $relationId ?>"><?= sprintf(_("Conversations with"), $contactName) ?></a>
 				&nbsp;<a href="logout.php"><?= _("Logout") ?></a></span>
 		</div>
-		<h1><?= sprintf(_("Conversation with"), substr($subject, 0, 30), $contactName) ?>
+		<h1 class="contains-heading-text"><span class="heading-text"><?= sprintf(_("Conversation with"), $subject, $contactName) ?></span>
 			<span class="right"> 
 				<svg id="editButton" class="icon" data-conversation-id="<?= $conversationId ?>"
 					data-relation-id="<?= $relationId ?>" data-subject="<?= $subject ?>" data-archived="<?= $archived ?>">

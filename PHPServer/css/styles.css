@@ -7,9 +7,21 @@ body {
 
 h1 {
 	white-space: nowrap;
+    text-overflow: ellipsis;
+    height: 2em;
 	margin-top: 8px;
 	margin-bottom: 8px;
 	font-size: 1.5em;
+}
+
+h1.contains-heading-text {
+	display: flex;
+}
+
+h1 .heading-text {
+	overflow: hidden;
+	text-overflow: ellipsis;	
+	flex-grow: 1;
 }
 
 ul {

@@ -108,9 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $responseMessage = "";
     
     if ($messageText && $aiPolicy == 1) {
-        $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['messageSuffix'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
-
-        $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty'], $aiRelation['model']);
+        $result = handleOpenAi($username, $password, $relationId, $conversationId, $aiRelation);
         if ($result['success']) {
             $responseMessage = $result['message']['content'];
         }

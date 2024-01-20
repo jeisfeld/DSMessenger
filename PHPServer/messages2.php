@@ -52,7 +52,7 @@ if ($conn->connect_error) {
 			<a id="conversations-link" href="conversations.php?relationId=<?= $relationId ?>"><?= sprintf(_("Conversations with"), $contactName) ?></a>
 			&nbsp;<a href="logout.php"><?= _("Logout") ?></a></span>
 		</div>
-		<h1><?= sprintf(_("Conversation with"), substr($subject, 0, 30), $contactName) ?>
+		<h1><span class="heading-text"><?= sprintf(_("Conversation with"), $subject, $contactName) ?></span>
 			<span class="right"><svg id="button-reload" onclick="window.location.href = 'messages.php?relationId=<?= $relationId ?>&conversationId=<?= $conversationId ?>';" class="icon"><use href="images/icons.svg#icon-reload"/></svg></span>
 		</h1>
 
@@ -93,9 +93,7 @@ if ($aiRelation) {
 }
 
 if ($message && $aiPolicy > 1) {
-    $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['messageSuffix'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
-    
-    $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty'], $aiRelation['model']);
+    $result = handleOpenAi($username, $password, $relationId, $conversationId, $aiRelation);
     if ($result['success']) {
         $responseMessage = $result['message']['content'];
     }

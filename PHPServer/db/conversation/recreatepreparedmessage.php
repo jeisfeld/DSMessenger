@@ -22,8 +22,7 @@ $relationId = @$_POST['relationId'];
 $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
 
 if ($aiRelation['aiPolicy'] == 1 && $isSlave) {
-    $messages = queryMessagesForOpenai($username, $password, $relationId, $conversationId, $aiRelation['promptmessage'], $aiRelation['messageSuffix'], $aiRelation['oldMessageCount'], $aiRelation['oldMessageCountVariation'], $aiRelation['maxCharacters']);
-    $result = queryOpenAi($messages, $aiRelation['temperature'], $aiRelation['presencePenalty'], $aiRelation['frequencyPenalty'], $aiRelation['model']);
+    $result = handleOpenAi($username, $password, $relationId, $conversationId, $aiRelation);
     $preparedMessage = $result['success'] ? $result['message']['content'] : "";
 
     printSuccess("Message successfully sent", [
