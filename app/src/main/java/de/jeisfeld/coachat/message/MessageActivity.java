@@ -390,7 +390,9 @@ public class MessageActivity extends AppCompatActivity {
 
 		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
 		if (contact.isSlave()) {
-			binding.editTextMessageText.setText(conversation.getPreparedMessage());
+			String oldEditText = binding.editTextMessageText.getText().toString();
+			binding.editTextMessageText.setText(oldEditText.trim().isEmpty() ? conversation.getPreparedMessage() :
+					oldEditText + "\n" + conversation.getPreparedMessage());
 		}
 
 		new HttpSender(this).sendMessage("db/conversation/updatemessagestatus.php",

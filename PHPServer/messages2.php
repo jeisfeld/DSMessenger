@@ -92,7 +92,7 @@ if ($aiRelation) {
     $aiPolicy = $aiRelation['aiPolicy'];
 }
 
-if ($message && $aiPolicy > 1) {
+if ($message && ($aiPolicy == 2 || $aiPolicy == 3)) {
     $result = handleOpenAi($username, $password, $relationId, $conversationId, $aiRelation);
     if ($result['success']) {
         $responseMessage = $result['message']['content'];
@@ -153,9 +153,48 @@ if ($message && $aiPolicy == 2) {
     }
 }
 
+if ($message && $aiPolicy == 4) {
+    $lastMessage = end($messages);
+    if ($lastMessage['userId'] == $userId) {
+        $lastTimestamp = $lastMessage['timestamp'];
+        
+        $result = null;
+        $timeout = 180; // Timeout after 120 seconds (2 minutes) to avoid infinite loop
+        $start_time = time();
+
+        $stmt = $conn->prepare("SELECT id, user_id, text, timestamp, status from dsm_message WHERE conversation_id = ? AND timestamp > ? ORDER BY timestamp");
+        $stmt->bind_param("ss", $conversationId, $lastTimestamp);
+        $found = false;
+        
+        while (!$found && (time() - $start_time) < $timeout) {
+            $stmt->execute();
+            
+            $messageId = null;
+            $msgUserId = null;
+            $text = null;
+            $timestamp = null;
+            $status = null;
+            $stmt->bind_result($messageId, $msgUserId, $text, $timestamp, $status);
+            
+            if ($stmt->fetch()) {
+                $found = true;
+            }
+            else {
+                $expiredTime = time() - $start_time;
+                sleep($expiredTime < 15 ? 2 : ($expiredTime < 40 ? 5 : 10)); 
+            }
+            $stmt->reset();
+        }
+
+        $stmt->close();
+    }
+}
+
 echo '<script type="text/javascript">';
 echo 'window.location.href = "messages.php?relationId=' . $relationId . '&conversationId=' . $conversationId . '";';
 echo '</script>';
+
+$conn-close();
 
 ?>
 

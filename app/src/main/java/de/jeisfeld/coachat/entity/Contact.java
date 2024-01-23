@@ -284,7 +284,11 @@ public class Contact implements Serializable {
 		/**
 		 * Automatic use of AI, no message forwarding.
 		 */
-		AUTOMATIC_NOMESSAGE;
+		AUTOMATIC_NOMESSAGE,
+		/**
+		 * Manual use of AI in near-realtime.
+		 */
+		MANUAL_LIVE;
 
 		/**
 		 * Get a AiPolicy from its ordinal value.

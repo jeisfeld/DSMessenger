@@ -111,11 +111,20 @@ msgstr "KI-Zusatztext"
 msgid "AI Message Suffix"
 msgstr "KI-Nachrichten-Suffix"
 
+msgid "none"
+msgstr "keine"
+
 msgid "manual"
 msgstr "manuell"
 
 msgid "automatic"
 msgstr "automatisch"
+
+msgid "manual live"
+msgstr "manuell live"
+
+msgid "automatic live"
+msgstr "automatisch live"
 
 msgid "Save Contact"
 msgstr "Kontakt speichern"

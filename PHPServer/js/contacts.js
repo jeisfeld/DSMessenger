@@ -29,7 +29,7 @@ $(document).ready(function() {
 		$('#modalEditAiRelationId').val(aiRelationId);
 		$('#modalEditMyName').val(myName);
 		$('#modalEditAiUsername').val(aiUsername);
-		$('#modalEditAiPolicy').val(aiPolicy >=2 ? 3 : 1);
+		$('#modalEditAiPolicy').val(aiPolicy);
 		$('#modalEditAiPrimingId').val(aiPrimingId);
 		$('#modalEditAddPrimingText').val(aiAddPrimingText);
 		$('#modalEditMessageSuffix').val(aiMessageSuffix);

@@ -68,8 +68,11 @@ $password = $_SESSION['password'];
     				<div class="form-group">
         				<label for="modalEditAiPolicy"><?= _("AI Behavior") ?>:</label>
 	    				<select id="modalEditAiPolicy" name="modalEditAiPolicy">
+	    					<option value="0"><?= _("none") ?></option>
 	    					<option value="3" selected><?= _("automatic") ?></option>
+	    					<option value="2"><?= _("automatic live") ?></option>
 	    					<option value="1"><?= _("manual") ?></option>
+	    					<option value="4"><?= _("manual live") ?></option>
 	    				</select>
     				</div>
        				<div class="form-group">
@@ -116,8 +119,11 @@ $password = $_SESSION['password'];
     				<div class="form-group">
         				<label for="modalCreateAiPolicy"><?= _("AI Behavior") ?>:</label>
 	    				<select id="modalCreateAiPolicy" name="modalCreateAiPolicy">
+	    					<option value="0"><?= _("none") ?></option>
 	    					<option value="3" selected><?= _("automatic") ?></option>
+	    					<option value="2"><?= _("automatic live") ?></option>
 	    					<option value="1"><?= _("manual") ?></option>
+	    					<option value="4"><?= _("manual live") ?></option>
 	    				</select>
     				</div>
        				<div class="form-group">

@@ -21,7 +21,7 @@ $relationId = @$_POST['relationId'];
 
 $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
 
-if ($aiRelation['aiPolicy'] == 1 && $isSlave) {
+if ($isSlave && ($aiRelation['aiPolicy'] == 1 || $aiRelation['aiPolicy'] == 4)) {
     $result = handleOpenAi($username, $password, $relationId, $conversationId, $aiRelation);
     $preparedMessage = $result['success'] ? $result['message']['content'] : "";
 

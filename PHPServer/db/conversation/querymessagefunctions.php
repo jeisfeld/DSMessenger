@@ -27,7 +27,7 @@ function queryMessages($username, $password, $relationId, $conversationId)
     $text = null;
     $timestamp = null;
     $status = null;
-    $stmt = $conn->prepare("SELECT id, user_id, text, timestamp, status from dsm_message WHERE conversation_id = ? order by timestamp");
+    $stmt = $conn->prepare("SELECT id, user_id, text, timestamp, status from dsm_message WHERE conversation_id = ? ORDER BY timestamp");
     
     $stmt->bind_param("s", $conversationId);
     $stmt->execute();

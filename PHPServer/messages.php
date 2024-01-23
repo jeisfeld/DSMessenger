@@ -104,7 +104,7 @@ function convertTimestamp($mysqlTimestamp)
 				<div class="message-textarea-container">
 					<textarea autofocus name="messageText" id="messageText" maxlength="40000" placeholder="<?= _("Type your message here...") ?>" class="message-textarea"><?= $preparedMessage ?></textarea>
 				<?php
-    if ($aiPolicy == 1 && $isSlave) {
+    if ($isSlave && ($aiPolicy == 1 || $aiPolicy == 4)) {
         echo '<svg id="icon-reprepare" class="icon" onclick="recreatePreparedMessage()"><use xlink:href="images/icons.svg#icon-reload"></use></svg>';
     }
     ?>

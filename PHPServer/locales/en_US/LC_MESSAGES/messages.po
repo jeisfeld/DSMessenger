@@ -111,11 +111,20 @@ msgstr "AI Additional Text"
 msgid "AI Message Suffix"
 msgstr "AI Message Suffix"
 
+msgid "none"
+msgstr "none"
+
 msgid "manual"
 msgstr "manual"
 
 msgid "automatic"
 msgstr "automatic"
+
+msgid "manual live"
+msgstr "manual live"
+
+msgid "automatic live"
+msgstr "automatic live"
 
 msgid "Save Contact"
 msgstr "Save Contact"

@@ -89,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($isNewConversation && ! $messageText) {
         header("Location: conversations.php?relationId=" . $relationId);
     }
-    else if (($aiPolicy == 2 || $aiPolicy == 3) && $messageText) {
+    else if (($aiPolicy == 2 || $aiPolicy == 3 || $aiPolicy == 4) && $messageText) {
         header("Location: messages2.php?relationId=" . $relationId . "&conversationId=" . $conversationId);
     }
     else {
@@ -107,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $responseMessage = "";
     
-    if ($messageText && $aiPolicy == 1) {
+    if ($messageText && ($aiPolicy == 1 || $aiPolicy == 4)) {
         $result = handleOpenAi($username, $password, $relationId, $conversationId, $aiRelation);
         if ($result['success']) {
             $responseMessage = $result['message']['content'];

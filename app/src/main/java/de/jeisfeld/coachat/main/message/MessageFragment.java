@@ -115,7 +115,9 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 						conversation = receivedConversation;
 						refreshMessageList();
 						if (conversation.getPreparedMessage() != null && conversation.getPreparedMessage().length() > 0 && contact.isSlave()) {
-							binding.editTextMessageText.setText(conversation.getPreparedMessage());
+							String oldEditText = binding.editTextMessageText.getText().toString();
+							binding.editTextMessageText.setText(oldEditText.trim().isEmpty() ? conversation.getPreparedMessage() :
+									oldEditText + "\n" + conversation.getPreparedMessage());
 						}
 					}
 					break;
@@ -477,7 +479,8 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		binding.imageButtonRecordVoice.setVisibility(enableSend && isSpeechRecognitionActivityAvailable() ? View.VISIBLE : View.GONE);
 		binding.buttonEdit.setVisibility(enableEdit && conversation.isStored() ? View.VISIBLE : View.GONE);
 		binding.imageButtonRefreshPreparedMessage.setVisibility(
-				enableSend && contact.isSlave() && contact.getAiPolicy() == AiPolicy.MANUAL ? View.VISIBLE : View.GONE);
+				enableSend && contact.isSlave() && (contact.getAiPolicy() == AiPolicy.MANUAL || contact.getAiPolicy() == AiPolicy.MANUAL_LIVE)
+						? View.VISIBLE : View.GONE);
 	}
 
 	/**
