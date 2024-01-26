@@ -7,6 +7,8 @@ use Ramsey\Uuid\Uuid;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\AndroidConfig;
+use Kreait\Firebase\Exception\Messaging\InvalidMessage;
+use Kreait\Firebase\Exception\Messaging\NotFound;
 
 function sendFirebaseMessage($token, $data, $ttl = null)
 {
@@ -29,7 +31,20 @@ function sendFirebaseMessage($token, $data, $ttl = null)
     $message = CloudMessage::withTarget('token', $token)->withData($data)
         ->withAndroidConfig($androidConfig)
         ->withHighestPossiblePriority();
-    $messaging->send($message);
+
+    try {
+        $messaging->send($message);
+    }
+    catch (NotFound $e) {
+        error_log($e->getMessage() . " Stack trace:");
+        error_log($e->getTraceAsString());
+        muteDeviceByToken($token, 2);
+    }
+    catch (InvalidMessage $e) {
+        error_log($e->getMessage());
+        error_log($e->getTraceAsString());
+        muteDeviceByToken($token, 2);
+    }
 }
 
 function getTextData($relationId, $messageType, $messageText, $conversationId, $mysqlTimestamp, $messageId, $preparedMessage = "", $isHighPrio = FALSE)

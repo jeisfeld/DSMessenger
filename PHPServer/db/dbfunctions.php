@@ -210,7 +210,9 @@ WHERE d.user_id = r.master_id AND r.slave_id = ? AND r.id = ? AND d.muted = 0");
     
     $tokens = array();
     while ($stmt->fetch()) {
-        $tokens[] = $token;
+        if ($token) {
+            $tokens[] = $token;
+        }
     }
     
     $stmt->close();
@@ -230,7 +232,9 @@ WHERE user_id = ? AND id <> ?");
     
     $tokens = array();
     while ($stmt->fetch()) {
-        $tokens[] = $token;
+        if ($token) {
+            $tokens[] = $token;
+        }
     }
     
     return $tokens;
@@ -239,8 +243,7 @@ WHERE user_id = ? AND id <> ?");
 function getDeviceToken($conn, $username, $password, $deviceId) {
     $userId = verifyCredentials($conn, $username, $password);
     
-    $stmt = $conn->prepare("SELECT token FROM dsm_device
-WHERE user_id = ? AND id = ?");
+    $stmt = $conn->prepare("SELECT token FROM dsm_device WHERE user_id = ? AND id = ?");
     
     $token = null;
     $stmt->bind_param("ii", $userId, $deviceId);
@@ -248,6 +251,23 @@ WHERE user_id = ? AND id = ?");
     $stmt->bind_result($token);
     $stmt->fetch();
     return $token;
+}
+
+function muteDeviceByToken($token, $muted) {
+    if ($token) {
+        $conn = getDbConnection();
+        
+        // Check connection
+        if ($conn->connect_error) {
+            printError(101, "Connection failed: " . $conn->connect_error);
+        }
+        
+        $stmt = $conn->prepare("update dsm_device set muted = ? where token = ?");
+        $stmt->bind_param("is", $muted, $token);
+        $stmt->execute();
+        $stmt->close();
+        $conn->close();
+    }
 }
 
 function getVerifiedTokensFromRequestData() {
