@@ -435,6 +435,11 @@ public final class AccountDialogUtil {
 		public final Dialog onCreateDialog(final Bundle savedInstanceState) {
 			binding = DialogCreateInvitationBinding.inflate(getLayoutInflater());
 
+			if (MainActivity.isDsUser()) {
+				binding.radioButtonSub.setText(R.string.text_sub);
+				binding.radioButtonDom.setText(R.string.text_dom);
+			}
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 			builder.setTitle(R.string.button_create_invitation).setView(binding.getRoot());
 
@@ -502,6 +507,10 @@ public final class AccountDialogUtil {
 			if (initialConnectionCode != null) {
 				binding.editTextConnectionCode.setText(initialConnectionCode);
 				binding.editTextConnectionCode.setEnabled(false);
+			}
+			if (MainActivity.isDsUser()) {
+				binding.radioButtonSub.setText(R.string.text_sub);
+				binding.radioButtonDom.setText(R.string.text_dom);
 			}
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());

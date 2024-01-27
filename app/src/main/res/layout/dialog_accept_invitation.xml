@@ -60,7 +60,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:enabled="false"
-                        android:text="@string/text_sub" />
+                        android:text="@string/text_client" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/radio_button_dom"
@@ -68,7 +68,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:enabled="false"
-                        android:text="@string/text_dom" />
+                        android:text="@string/text_coach" />
                 </RadioGroup>
 
             </TableRow>

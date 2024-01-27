@@ -237,8 +237,7 @@ public class AccountFragment extends Fragment {
 		configureMyAccountButtons();
 		configureContactButtons();
 
-		int userType = PreferenceUtil.getSharedPreferenceInt(R.string.key_pref_usertype, 0);
-		if (userType == 1) {
+		if (MainActivity.isDsUser()) {
 			binding.textMyDoms.setText(R.string.text_my_doms);
 			binding.textMySubs.setText(R.string.text_my_subs);
 		}

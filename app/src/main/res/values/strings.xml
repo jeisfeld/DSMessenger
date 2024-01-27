@@ -92,6 +92,8 @@
     <string name="text_device_name">Device Name *</string>
     <string name="text_sub">Sub</string>
     <string name="text_dom">Dom</string>
+    <string name="text_client">Client</string>
+    <string name="text_coach">Coach</string>
     <string name="text_connection_code">Connection Code</string>
     <string name="text_my_devices">My Devices</string>
     <string name="text_my_doms">My Doms</string>
