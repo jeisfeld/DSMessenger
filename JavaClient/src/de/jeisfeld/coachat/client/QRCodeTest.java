@@ -16,7 +16,7 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 public class QRCodeTest {
 	public static void createQR(final String data, final String path,
-			final String charset, final Map hashMap,
+			final String charset, final Map<EncodeHintType, ErrorCorrectionLevel> hashMap,
 			final int height, final int width)
 			throws WriterException, IOException {
 
