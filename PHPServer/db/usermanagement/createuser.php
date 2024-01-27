@@ -66,6 +66,27 @@ if ($stmt->execute()) {
     if (! $deviceId) {
         printError(102, "Failed to retrieve deviceId");
     }
+    
+    // By default, create connection to user jeisfeld, named "Coach", with automatic coaching.
+    $masterId = 3;
+    
+    $stmt = $conn->prepare("INSERT INTO dsm_relation (slave_id, master_id, slave_name, master_name) VALUES (?, ?, ?, 'Coach')");
+    $stmt->bind_param("iis", $userId, $masterId, $username);
+    $stmt->execute();
+    $stmt->close();
+    $relationId = null;
+    $stmt = $conn->prepare("SELECT MAX(id) FROM dsm_relation WHERE slave_id=? AND master_id=?");
+    $stmt->bind_param("ii", $userId, $masterId);
+    $stmt->execute();
+    $stmt->bind_result($relationId);
+    $stmt->fetch();
+    $stmt->close();
+    if ($relationId) {
+        $stmt = $conn->prepare("INSERT INTO dsm_ai_relation (relation_id, user_name, priming_id, add_priming_text, ai_policy) values (?, ?, 3, '', 2)");
+        $stmt->bind_param("is", $relationId, $username);
+        $stmt->execute();
+        $stmt->close();
+    }
 
     printSuccess("User " . $username . " successfully created.", [
         'userId' => $userId,

@@ -510,7 +510,7 @@ public class AccountFragment extends Fragment {
 						PreferenceUtil.setSharedPreferenceString(
 								R.string.key_pref_device_display_strategy_urgent, (String) responseData.getData().get("displayStrategyUrgent"));
 
-						Activity activity = getActivity();
+						final Activity activity = getActivity();
 						if (activity != null) {
 							activity.runOnUiThread(() -> {
 								binding.tableRowButtonsLogin.setVisibility(View.GONE);
@@ -522,6 +522,15 @@ public class AccountFragment extends Fragment {
 								displaySingleDeviceInfo(Device.getThisDevice());
 							});
 						}
+
+						ContactRegistry.getInstance().refreshContacts(getContext(), () -> {
+							if (activity != null) {
+								activity.runOnUiThread(() -> {
+									refreshDisplayedContactList();
+									((MainActivity) activity).navigateTo(R.id.nav_conversations);
+								});
+							}
+						});
 					}
 					else {
 						Activity activity = getActivity();

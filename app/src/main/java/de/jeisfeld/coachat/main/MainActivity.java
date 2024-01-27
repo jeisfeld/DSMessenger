@@ -204,6 +204,16 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	/**
+	 * Navigate to a certain page.
+	 *
+	 * @param navigationId The page where to navigate.
+	 */
+	public void navigateTo(int navigationId) {
+		NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+		navController.navigate(navigationId);
+	}
+
+	/**
 	 * Log the messaging token.
 	 */
 	private void logMessagingToken() {
