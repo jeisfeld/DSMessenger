@@ -20,19 +20,6 @@ $archived = @$conversationData['archived'];
 $aiRelation = queryAiRelation($username, $password, $relationId, $isSlave);
 $aiPolicy = $aiRelation ? $aiRelation['aiPolicy'] : 0;
 
-function convertTimestamp($mysqlTimestamp)
-{
-    $timestampDateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
-    $todayDateTime = new DateTime();
-    $todayDateTime->setTime(0, 0, 0); // Reset time part to 00:00:00 for accurate comparison
-    if ($timestampDateTime->format('Y-m-d') === $todayDateTime->format('Y-m-d')) {
-        return $timestampDateTime->format('H:i:s');
-    }
-    else {
-        return $timestampDateTime->format('Y-m-d H:i:s');
-    }
-}
-
 ?>
 <!DOCTYPE html>
 <html>

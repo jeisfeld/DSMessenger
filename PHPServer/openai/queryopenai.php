@@ -1,7 +1,7 @@
 <?php
 require_once 'apikey.php';
 
-function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequencyPenalty = 0, $model = 'gpt-4-1106-preview')
+function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequencyPenalty = 0, $model = 'gpt-4-0125-preview')
 {
     $data = [
         'model' => $model,

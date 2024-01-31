@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__.'/../dbfunctions.php';
 
-function queryContacts($username, $password)
+function queryContacts($username, $password, $checkTimestamp = false)
 {
     // Create connection
     $conn = getDbConnection();
@@ -55,6 +55,22 @@ ORDER BY contact_name");
         ];
     }
     $stmt->close();
+    
+    if ($checkTimestamp) {
+        $stmt = $conn->prepare("SELECT MAX(lasttimestamp) FROM dsm_conversation WHERE relation_id=?");
+        foreach($contacts as &$contact) {
+            $timestamp = null;
+            $stmt->bind_param("i", $contact['relationId']);
+            $stmt->execute();
+            $stmt->bind_result($timestamp);
+            $stmt->fetch();
+            if ($timestamp) {
+                $contact['lasttimestamp'] = $timestamp;
+            }
+        }
+        $stmt -> close();
+    } 
+    
     $conn -> close();
     
     return $contacts;

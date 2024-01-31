@@ -302,6 +302,24 @@ function convertToJavaTimestamp($mysqlTimestamp) {
     return $javaTimestamp; 
 }
 
+function convertTimestamp($mysqlTimestamp) {
+    if (!$mysqlTimestamp) {
+        return "";
+    }
+    $timestampDateTime = DateTime::createFromFormat('Y-m-d H:i:s.u', $mysqlTimestamp);
+    $todayDateTime = new DateTime();
+    $todayDateTime->setTime(0, 0, 0); // Reset time part to 00:00:00 for accurate comparison
+    if ($timestampDateTime->format('Y-m-d') === $todayDateTime->format('Y-m-d')) {
+        return $timestampDateTime->format('H:i');
+    }
+    else if ($timestampDateTime->format('Y') === $todayDateTime->format('Y')) {
+        return $timestampDateTime->format('d.m. H:i');
+    }
+    else {
+        return $timestampDateTime->format('d.m.Y H:i');
+    }
+}
+
 function consoleLog($debugData) {
     ob_start(); // Start output buffering
     print_r($debugData); // Print the object
