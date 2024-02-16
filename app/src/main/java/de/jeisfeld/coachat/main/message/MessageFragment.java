@@ -24,6 +24,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -568,6 +570,28 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	}
 
 	/**
+	 * Remove trailing parameters such as [3ok] from messageText.
+	 *
+	 * @param messageText The message of the text.
+	 * @return The messageText where trailing parameters have been removed if applicable.
+	 */
+	private static String removeTrailingParametersFromMessage(String messageText) {
+		if (messageText.endsWith("]")) {
+			Pattern pattern = Pattern.compile("^(.*)\\s*\\[([a-zA-Z0-9]+)]$", Pattern.CASE_INSENSITIVE);
+			Matcher matcher = pattern.matcher(messageText);
+			if (matcher.find()) {
+				return matcher.group(1);
+			}
+			else {
+				return messageText;
+			}
+		}
+		else {
+			return messageText;
+		}
+	}
+
+	/**
 	 * Send the message.
 	 *
 	 * @param priority The message priority.
@@ -579,8 +603,8 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		binding.buttonSend.setEnabled(false);
 
 		new HttpSender(getContext()).sendMessage("db/conversation/sendmessage.php", contact, messageId, (response, responseData) -> {
-					Message message = new Message(binding.editTextMessageText.getText().toString(), true, messageId,
-							conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
+					Message message = new Message(removeTrailingParametersFromMessage(binding.editTextMessageText.getText().toString()),
+							true, messageId, conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
 					Application.getAppDatabase().getMessageDao().acknowledgeMessages(
 							messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
 					refreshMessageList();
@@ -591,6 +615,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 							if (responseData != null && responseData.isSuccess()) {
 								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
 									conversation.setPreparedMessage("");
+
 									conversation.insertIfNew(message.getMessageText());
 									if (!contact.isSlave()) {
 										conversation.updateWithResponse();

@@ -113,7 +113,7 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     $lastMessageContent = $lastMessage['content'];
     
     if (str_ends_with($lastMessageContent, "]")) {
-        $pattern = '/^(.*)\s*\[([a-zA-Z0-9]+)\]$/is';
+        $pattern = '/^(.*)\s*\[([a-zA-Z0-9]+)]$/is';
         $matches = [];
         if (preg_match($pattern, $lastMessageContent, $matches)) {
             $shortMessageContent = $matches[1];
