@@ -67,6 +67,11 @@ public class Contact implements Serializable {
 	private final String aiMessageSuffix;
 
 	/**
+	 * A timeout after which AI is triggered.
+	 */
+	private final Long aiTimeout;
+
+	/**
 	 * Constructor without id.
 	 *
 	 * @param relationId       The relation id
@@ -82,11 +87,12 @@ public class Contact implements Serializable {
 	 * @param aiUsername       The AI Username
 	 * @param aiAddPrimingText The AI additional priming text
 	 * @param aiMessageSuffix  The AI message suffix
+	 * @param aiTimeout        The AI timeout
 	 */
 	public Contact(final int relationId, final String name, final String myName, final int contactId,
 				   final boolean isSlave, final String connectionCode, final SlavePermissions slavePermissions, final ContactStatus status,
 				   final Integer aiRelationId, final AiPolicy aiPolicy, final String aiUsername, final String aiAddPrimingText,
-				   final String aiMessageSuffix) {
+				   final String aiMessageSuffix, final Long aiTimeout) {
 		this.relationId = relationId;
 		this.name = name;
 		this.myName = myName;
@@ -100,6 +106,7 @@ public class Contact implements Serializable {
 		this.aiUsername = aiUsername;
 		this.aiAddPrimingText = aiAddPrimingText;
 		this.aiMessageSuffix = aiMessageSuffix;
+		this.aiTimeout = aiTimeout;
 	}
 
 	/**
@@ -124,6 +131,8 @@ public class Contact implements Serializable {
 		aiUsername = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_username, relationId);
 		aiAddPrimingText = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_add_priming_text, relationId);
 		aiMessageSuffix = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_message_suffix, relationId);
+		long storedAiTimeout = PreferenceUtil.getIndexedSharedPreferenceLong(R.string.key_contact_ai_timeout, relationId, -1);
+		aiTimeout = storedAiTimeout == -1 ? null : storedAiTimeout;
 	}
 
 	public final int getRelationId() {
@@ -178,6 +187,20 @@ public class Contact implements Serializable {
 		return aiMessageSuffix;
 	}
 
+	public Long getAiTimeout() {
+		return aiTimeout;
+	}
+
+	/**
+	 * Get the time to be used for an alarm.
+	 *
+	 * @return The time to be used for an alarm.
+	 */
+	public Long getAlarmTime() {
+		return getAiTimeout() == null ? null
+				: Application.getAppDatabase().getConversationDao().getLastTimestampForContact(getRelationId()) + getAiTimeout();
+	}
+
 	/**
 	 * Get my permissions for this contact.
 	 *
@@ -206,7 +229,7 @@ public class Contact implements Serializable {
 	public final String toDetailedString() {
 		return "Contact{" + "relationId=" + relationId + ", name='" + name + '\'' + ", myName='" + myName + '\'' + ", contactId='" + contactId + '\''
 				+ ", isSlave=" + isSlave + ", connectionCode='" + connectionCode + "', slavePermissions=" + slavePermissions
-				+ ", status=" + status + ", aiPolicy=" + aiPolicy+", aiUsername=" + aiUsername + '}';
+				+ ", status=" + status + ", aiPolicy=" + aiPolicy + ", aiUsername=" + aiUsername + ", aiTimeout=" + aiTimeout + '}';
 	}
 
 	/**
@@ -229,9 +252,18 @@ public class Contact implements Serializable {
 		if (getAiRelationId() != null) {
 			PreferenceUtil.setIndexedSharedPreferenceInt(R.string.key_contact_ai_relation_id, getAiRelationId(), getContactId());
 		}
+		else {
+			PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_relation_id, getRelationId());
+		}
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_username, getRelationId(), getAiUsername());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_add_priming_text, getRelationId(), getAiAddPrimingText());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_message_suffix, getRelationId(), getAiMessageSuffix());
+		if (getAiTimeout() != null) {
+			PreferenceUtil.setIndexedSharedPreferenceLong(R.string.key_contact_ai_timeout, getRelationId(), getAiTimeout());
+		}
+		else {
+			PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_timeout, getRelationId());
+		}
 	}
 
 	/**

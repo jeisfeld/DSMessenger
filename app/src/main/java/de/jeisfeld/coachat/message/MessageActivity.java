@@ -252,6 +252,7 @@ public class MessageActivity extends AppCompatActivity {
 
 				if (position == messageList.size() - 1 && !contact.isSlave() && deleteMessages.size() == 0 &&
 						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)
+						&& messageList.size() >= 2
 						&& !messageList.get(messageList.size() - 1).isOwn() && messageList.get(messageList.size() - 2).isOwn()) {
 					ImageView buttonRefreshMessage = view.findViewById(R.id.imageButtonRefreshMessage);
 					buttonRefreshMessage.setVisibility(View.VISIBLE);

@@ -36,6 +36,7 @@ import de.jeisfeld.coachat.main.account.AccountDialogUtil.CreateInvitationDialog
 import de.jeisfeld.coachat.main.account.AccountDialogUtil.EditContactDialogFragment;
 import de.jeisfeld.coachat.main.account.AccountDialogUtil.EditDeviceDialogFragment;
 import de.jeisfeld.coachat.main.account.AccountDialogUtil.LoginDialogFragment;
+import de.jeisfeld.coachat.service.AlarmReceiver;
 import de.jeisfeld.coachat.util.DialogUtil;
 import de.jeisfeld.coachat.util.PreferenceUtil;
 
@@ -638,7 +639,7 @@ public class AccountFragment extends Fragment {
 				int relationId = (int) responseData.getData().get("relationId");
 
 				Contact contact = new Contact(relationId, contactName, myName, -1, !amSlave, connectionCode, SlavePermissions.DEFAULT_SLAVE_PERMISSIONS,
-						ContactStatus.INVITED, null, AiPolicy.NONE, null, null, null);
+						ContactStatus.INVITED, null, AiPolicy.NONE, null, null, null, null);
 				ContactRegistry.getInstance().addOrUpdate(contact);
 				Activity activity = getActivity();
 				if (activity != null) {
@@ -683,6 +684,7 @@ public class AccountFragment extends Fragment {
 				if (activity != null) {
 					activity.runOnUiThread(this::refreshDisplayedContactList);
 				}
+				AlarmReceiver.setAlarm(getContext(), contact);
 			}
 			else {
 				Activity activity = getActivity();

@@ -76,9 +76,8 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 	 * Display a notification.
 	 *
 	 * @param textMessageDetails The text message details.
-	 * @param textMessage        The text message.
 	 */
-	public void displayNotification(final TextMessageDetails textMessageDetails, final Message textMessage) {
+	public void displayNotification(final TextMessageDetails textMessageDetails) {
 		String message = textMessageDetails.getMessageText();
 		String title = getString(R.string.notification_title, textMessageDetails.getContact().getName());
 
@@ -252,7 +251,8 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			if (displayType == MessageDisplayType.ACTION) {
 				startActivity(MessageActivity.createIntent(this, textMessageDetails, textMessage));
 			}
-			displayNotification(textMessageDetails, textMessage);
+			displayNotification(textMessageDetails);
+			AlarmReceiver.setAlarm(this, textMessageDetails.getContact());
 			break;
 		case TEXT_RESPONSE:
 			textMessageDetails = (TextMessageDetails) messageDetails;
@@ -270,7 +270,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_RESPONSE, messageDetails.getMessageId(),
 					messageDetails.getContact(), conversation, receivedMessage);
-			displayNotification(textMessageDetails, receivedMessage);
+			displayNotification(textMessageDetails);
 			break;
 		case TEXT_OWN:
 			textMessageDetails = (TextMessageDetails) messageDetails;

@@ -28,7 +28,10 @@ $mysqltimestamp = convertJavaTimestamp($timestamp);
 $messageIds = @$_POST['messageIds'];
 $lastAiMessageId = @$_POST['lastAiMessageId'];
 $lastOwnMessageId = @$_POST['lastOwnMessageId'];
-
+$subject = @$_POST['subject'];
+if (!$subject) {
+    $subject = substr($messageText, 0, 100);
+}
 
 $stmt = $conn->prepare("SELECT id FROM dsm_conversation WHERE id = ?");
 $stmt->bind_param("s", $conversationId);
@@ -38,7 +41,6 @@ $stmt->close();
 
 if ($messageText) {
     if ($isNewConversation) {
-        $subject = substr($messageText, 0, 100);
         $stmt = $conn->prepare("INSERT INTO dsm_conversation (id, relation_id, subject, flags, lasttimestamp, prepared_message) values (?, ?, ?, ?, ?, '')");
         $stmt->bind_param("sisss", $conversationId, $relationId, $subject, $conversationFlags, $mysqltimestamp);
         $stmt->execute();

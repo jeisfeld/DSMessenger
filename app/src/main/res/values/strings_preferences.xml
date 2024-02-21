@@ -50,6 +50,7 @@
     <string name="key_contact_ai_username" translatable="false">contact_ai_username</string>
     <string name="key_contact_ai_add_priming_text" translatable="false">contact_ai_username_add_priming_text</string>
     <string name="key_contact_ai_message_suffix" translatable="false">contact_ai_username_message_suffix</string>
+    <string name="key_contact_ai_timeout" translatable="false">contact_ai_timeout</string>
 
     <!-- Arrays for list preferences -->
     <string-array name="pref_list_titles_language">

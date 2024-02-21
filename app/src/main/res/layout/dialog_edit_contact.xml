@@ -133,6 +133,11 @@
                     android:padding="0dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkboxAiTimeout"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_row_height_small"
+                android:text="@string/text_ai_timeout" />
         </LinearLayout>
 
         <TextView

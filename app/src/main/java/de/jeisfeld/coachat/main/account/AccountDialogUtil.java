@@ -4,6 +4,8 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 
+import java.util.concurrent.TimeUnit;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
@@ -42,6 +44,11 @@ public final class AccountDialogUtil {
 	 * The min length of passwords.
 	 */
 	private static final int MIN_PASSWORD_LENGTH = 8;
+
+	/**
+	 * The default value for AI timeouts.
+	 */
+	private static final long AI_TIMEOUT_DEFAULT = TimeUnit.DAYS.toMillis(2);
 
 	/**
 	 * Hide default constructor.
@@ -580,7 +587,7 @@ public final class AccountDialogUtil {
 								dismiss();
 								// TODO: fill slave permissions and AI Policy.
 								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, null,
-										ContactStatus.CONNECTED, null, AiPolicy.NONE, null, null, null);
+										ContactStatus.CONNECTED, null, AiPolicy.NONE, null, null, null, null);
 								ContactRegistry.getInstance().addOrUpdate(contact);
 
 								AccountFragment.sendBroadcast(getContext(), ActionType.CONTACTS_UPDATED);
@@ -640,6 +647,7 @@ public final class AccountDialogUtil {
 			binding.editTextMyName.setText(contact.getMyName());
 			binding.editTextContactName.setText(contact.getName());
 			binding.editTextAiMessageSuffix.setText(contact.getAiMessageSuffix());
+			binding.checkboxAiTimeout.setChecked(contact.getAiTimeout() != null);
 			binding.layoutAiSettings.setVisibility(contact.getAiPolicy() == AiPolicy.NONE ? View.GONE : View.VISIBLE);
 
 			binding.checkboxEditSlavePermissions.setChecked(contact.getSlavePermissions().isEditSlavePermissions());
@@ -668,6 +676,7 @@ public final class AccountDialogUtil {
 				String myName = binding.editTextMyName.getText().toString().trim();
 				String contactName = binding.editTextContactName.getText().toString().trim();
 				String messageSuffix = binding.editTextAiMessageSuffix.getText().toString().trim();
+				Long aiTimeout = binding.checkboxAiTimeout.isChecked() ? AI_TIMEOUT_DEFAULT : null;
 
 				SlavePermissions newSlavePermissions = new SlavePermissions(binding.checkboxEditSlavePermissions.isChecked(),
 						binding.checkboxEditRelation.isChecked(), binding.checkboxManageConversations.isChecked(),
@@ -675,7 +684,7 @@ public final class AccountDialogUtil {
 
 				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
 						contact.getConnectionCode(), newSlavePermissions, contact.getStatus(), contact.getAiRelationId(), contact.getAiPolicy(),
-						contact.getAiUsername(), contact.getAiAddPrimingText(), messageSuffix);
+						contact.getAiUsername(), contact.getAiAddPrimingText(), messageSuffix, aiTimeout);
 				((AccountFragment) requireParentFragment()).handleEditContactDialogResponse(this, newContact);
 
 			});

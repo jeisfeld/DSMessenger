@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.room.Room;
 import de.jeisfeld.coachat.entity.AppDatabase;
 import de.jeisfeld.coachat.main.MainActivity;
+import de.jeisfeld.coachat.service.AlarmReceiver;
 import de.jeisfeld.coachat.util.PreferenceUtil;
 
 /**
@@ -83,6 +84,7 @@ public class Application extends android.app.Application {
 				.allowMainThreadQueries().build();
 
 		createNotificationChannel();
+		AlarmReceiver.recreateAllAlarms(Application.mContext);
 	}
 
 	/**

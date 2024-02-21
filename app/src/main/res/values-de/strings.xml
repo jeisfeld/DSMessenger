@@ -89,6 +89,7 @@
     <string name="text_contact_name">Kontaktname *</string>
     <string name="text_contact">Kontakt</string>
     <string name="text_ai_message_suffix">Nachrichten-Suffix</string>
+    <string name="text_ai_timeout">Nachricht nach Timeout senden</string>
     <string name="text_device_name">Gerätename *</string>
     <string name="text_sub">Sub</string>
     <string name="text_dom">Dom</string>
@@ -114,6 +115,7 @@
     <string name="text_message_acknowledged">Nachricht bestätigt</string>
     <string name="text_new_conversation_name">Neue Unterhaltung</string>
     <string name="text_new_dummy_conversation">%1$s sendet Dir eine Erinnerung</string>
+    <string name="text_automatic_message">Automatische Nachricht</string>
 
     <string name="error_missing_username">Benutzername fehlt</string>
     <string name="error_passwords_do_not_match">Passwörter stimmen nicht überein</string>

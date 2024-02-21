@@ -42,6 +42,9 @@ public interface ConversationDao {
 	@Query("SELECT * FROM conversation")
 	List<Conversation> getAllConversations();
 
+	@Query("SELECT MAX(lastTimestamp) FROM conversation WHERE relationId = :relationId")
+	long getLastTimestampForContact(int relationId);
+
 	default Conversation getConversationById(UUID conversationId) {
 		return getConversationById(conversationId.toString());
 	}
