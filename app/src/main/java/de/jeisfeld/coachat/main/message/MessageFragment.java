@@ -577,7 +577,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	 */
 	private static String removeTrailingParametersFromMessage(String messageText) {
 		if (messageText.endsWith("]")) {
-			Pattern pattern = Pattern.compile("^(.*)\\s*\\[([a-zA-Z0-9]+)]$", Pattern.CASE_INSENSITIVE);
+			Pattern pattern = Pattern.compile("^(.*)\\s*\\[([a-zA-Z0-9@]+)]$", Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(messageText);
 			if (matcher.find()) {
 				return matcher.group(1);

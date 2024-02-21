@@ -3,8 +3,11 @@ require_once __DIR__.'/../dbfunctions.php';
 require_once __DIR__ . '/../../openai/queryopenai.php';
 
 $modelMap = [
-  "3" => "gpt-3.5-turbo-16k",
-  "4" => "gpt-4-1106-preview",
+  "2" => "gpt-3.5-turbo-16k-0613",
+  "3" => "gpt-3.5-turbo-0125",
+  "4" => "gpt-4",
+  "5" => "gpt-4-1106-preview",
+  "6" => "gpt-4-0125-preview",
   "9" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0"
 ];
 
@@ -112,16 +115,23 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     $lastMessage = end($messages);
     $lastMessageContent = $lastMessage['content'];
     
+    
     if (str_ends_with($lastMessageContent, "]")) {
-        $pattern = '/^(.*)\s*\[([a-zA-Z0-9]+)]$/is';
+        $pattern = '/^(.*)\s*\[([a-zA-Z0-9@]+)]$/is';
         $matches = [];
         if (preg_match($pattern, $lastMessageContent, $matches)) {
             $shortMessageContent = $matches[1];
             $letters = str_split($matches[2]);
             
             if ($lastMessageId) {
-                $stmt = $conn->prepare("UPDATE dsm_message SET text = ? WHERE id = ? AND text = ?");
-                $stmt->bind_param("sss", $shortMessageContent, $lastMessageId, $lastMessageContent);
+                if (!$shortMessageContent) {
+                    $stmt = $conn->prepare("DELETE FROM dsm_message WHERE id = ? AND text = ?");
+                    $stmt->bind_param("ss", $lastMessageId, $lastMessageContent);
+                }
+                else {
+                    $stmt = $conn->prepare("UPDATE dsm_message SET text = ? WHERE id = ? AND text = ?");
+                    $stmt->bind_param("sss", $shortMessageContent, $lastMessageId, $lastMessageContent);
+                }
                 $stmt->execute();
                 $stmt->close();
             }

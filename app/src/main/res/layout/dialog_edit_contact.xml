@@ -124,9 +124,12 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextAiMessageSuffix"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/input_row_height"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine"
                     android:hint="@string/text_ai_message_suffix"
-                    android:inputType="text"
+                    android:maxLines="@integer/message_text_max_lines"
+                    android:minHeight="@dimen/input_row_height"
+                    android:minLines="1"
                     android:padding="0dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
