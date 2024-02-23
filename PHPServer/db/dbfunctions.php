@@ -145,11 +145,12 @@ function getConversationData($userId, $relationId, $conversationId) {
     $flags = null;
     $lasttimestamp = null;
     $preparedMessage = null;
-    $stmt = $conn->prepare("SELECT subject, flags, lasttimestamp, prepared_message from dsm_conversation WHERE relation_id = ? AND id = ? order by lasttimestamp desc");
+    $archived = null;
+    $stmt = $conn->prepare("SELECT subject, flags, lasttimestamp, prepared_message, archived from dsm_conversation WHERE relation_id = ? AND id = ? order by lasttimestamp desc");
     
     $stmt->bind_param("ss", $relationId, $conversationId);
     $stmt->execute();
-    $stmt->bind_result($subject, $flags, $lasttimestamp, $preparedMessage);
+    $stmt->bind_result($subject, $flags, $lasttimestamp, $preparedMessage, $archived);
     if (! $stmt->fetch()) {
         // conversation does not belong to relation - logout
         header("Location: logout.php");
@@ -161,6 +162,7 @@ function getConversationData($userId, $relationId, $conversationId) {
     $data['flags'] = $flags;
     $data['lasttimestamp'] = $lasttimestamp;
     $data['preparedMessage'] = $preparedMessage;
+    $data['archived'] = $archived;
     return $data;
 }
 

@@ -300,6 +300,8 @@ h1 .icon {
 #contact-list, #conversation-list {
 	list-style: none;
 	padding: 0;
+	flex-grow: 1; /* Allows this area to grow and shrink dynamically */
+	overflow-y: auto; /* Enable scrolling for overflow */
 }
 
 .contact-item, .conversation-item {

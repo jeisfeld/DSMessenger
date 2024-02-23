@@ -89,8 +89,7 @@ $conn -> close();
                 <svg class="icon editButton" data-conversation-id="' . $conversationId . '" data-relation-id="' . $relationId . '" data-subject="' . $subject . '" data-archived="' . $archived . '"><use xlink:href="images/icons.svg#icon-edit"></use></svg>
                 <svg class="icon deleteButton" data-conversation-id="' . $conversationId . '" data-relation-id="' . $relationId . '" data-subject="' . $subject . '"><use xlink:href="images/icons.svg#icon-delete"></use></svg></div></li>';
             }
-            ?>
-            
+            ?>    
         </ul>
 		<div id="message-input">
 			<form action="sendmessage.php" method="post" class="message-form" id="formSubmitMessage">

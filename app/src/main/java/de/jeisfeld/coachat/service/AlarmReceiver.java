@@ -48,10 +48,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 	public static void setAlarm(final Context context, final Contact contact) {
 		if (contact == null || contact.isSlave()
 				|| (contact.getAiPolicy() != AiPolicy.AUTOMATIC && contact.getAiPolicy() != AiPolicy.AUTOMATIC_NOMESSAGE)) {
+			cancelAlarm(context, contact);
 			return;
 		}
 		Long alarmTime = contact.getAlarmTime();
 		if (alarmTime == null) {
+			cancelAlarm(context, contact);
 			return;
 		}
 		if (alarmTime < System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5)) {
