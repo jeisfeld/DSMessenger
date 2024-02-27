@@ -35,9 +35,9 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_marginTop="@dimen/margin_small"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTextContactName"
@@ -125,8 +125,8 @@
                     android:id="@+id/editTextAiMessageSuffix"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
                     android:hint="@string/text_ai_message_suffix"
+                    android:inputType="textMultiLine"
                     android:maxLines="@integer/message_text_max_lines"
                     android:minHeight="@dimen/input_row_height"
                     android:minLines="1"
@@ -137,7 +137,49 @@
                 android:id="@+id/checkboxAiTimeout"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/input_row_height_small"
+                android:layout_marginTop="@dimen/margin_large"
                 android:text="@string/text_ai_timeout" />
+
+            <LinearLayout
+                android:id="@+id/layoutAiTimeoutValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextAiTimeoutValue"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/input_row_height"
+                        android:hint="@string/text_timeout_duration"
+                        android:inputType="number"
+                        android:padding="0dp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/dropdownAiTimeoutUnit"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/input_row_height"
+                        android:layout_margin="0dp"
+                        android:inputType="text"
+                        android:padding="0dp"
+                        android:textSize="@dimen/text_normal" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
         </LinearLayout>
 
         <TextView

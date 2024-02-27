@@ -18,4 +18,12 @@
         <item>Hell</item>
         <item>Dunkel</item>
     </string-array>
+
+    <string-array name="array_timer_unit_names">
+        <item>Minute(n)</item>
+        <item>Stunde(n)</item>
+        <item>Tag(e)</item>
+        <item>Woche(n)</item>
+        <item>Monat(e)</item>
+    </string-array>
 </resources>

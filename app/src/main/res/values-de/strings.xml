@@ -74,6 +74,7 @@
     <string name="text_default_reply_policy">Standard-Antwortrichtlinie</string>
     <string name="text_reply_policy">Antwortrichtlinie</string>
     <string name="text_subject_name">Betreff</string>
+    <string name="text_timeout_duration">Timeout</string>
 
     <string name="text_my_account">Mein Konto</string>
     <string name="text_username">Benutzername</string>

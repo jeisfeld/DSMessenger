@@ -73,4 +73,19 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+
+    <string-array name="array_timer_unit_names">
+        <item>minute(s)</item>
+        <item>hour(s)</item>
+        <item>day(s)</item>
+        <item>week(s)</item>
+        <item>month(s)</item>
+    </string-array>
+    <integer-array name="array_timer_unit_values" translatable="false">
+        <item>60</item>
+        <item>3600</item>
+        <item>86400</item>
+        <item>604800</item>
+        <item>2629746</item>
+    </integer-array>
 </resources>

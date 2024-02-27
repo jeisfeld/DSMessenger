@@ -11,6 +11,9 @@ $modelMap = [
   "9" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0"
 ];
 
+$autoQueryTriggerMessage = "[@]";
+$autoQueryMessageText = "Kannst Du bitte noch etwas zu Deiner letzten Nachricht sagen?";
+
 function queryMessages($username, $password, $relationId, $conversationId)
 {
     // Create connection
@@ -71,6 +74,9 @@ function getRandomizedMessageCount($baseCount, $variance)
 
 function queryMessagesForOpenai($username, $password, $relationId, $conversationId, $promptmessage, $messageSuffix, $oldMessageCount = 20, $oldMessageCountVariation = 0, $maxCharacters = 40000)
 {
+    global $autoQueryTriggerMessage;
+    global $autoQueryMessageText;
+    
     $totalcharacters = strlen($promptmessage['content']);
     
     // Create connection
@@ -114,7 +120,7 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     $letters = null;
     $lastMessage = end($messages);
     $lastMessageContent = $lastMessage['content'];
-    
+    $isAutoRetry = $lastMessageContent == $autoQueryTriggerMessage;
     
     if (str_ends_with($lastMessageContent, "]")) {
         $pattern = '/^(.*)\s*\[([a-zA-Z0-9@]+)]$/is';
@@ -140,6 +146,11 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
             $messages[key($messages)]['content'] = $lastMessageContent;
         }
     }
+    
+    if ($isAutoRetry && (!$letters || !in_array("@", $letters))) {
+        $messages[key($messages)]['content'] = $autoQueryMessageText;
+    }
+    
     if ($messageSuffix) {
         $messageSuffixJson = json_decode($messageSuffix, true);
         if ($messageSuffixJson) {
@@ -166,9 +177,12 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     
     // Then add messages of other conversations of same relation.
     
-    if (!in_array("0", $letters)) {
+    if (!in_array("0", $letters) || $isAutoRetry) {
         $totalMessages = 0;
         $plannedMessages = getRandomizedMessageCount($oldMessageCount, $oldMessageCountVariation);
+        if ($isAutoRetry && $plannedMessages < 10) {
+            $plannedMessages = 10;
+        }
         
         $otherConversationId = null;
         $text = null;

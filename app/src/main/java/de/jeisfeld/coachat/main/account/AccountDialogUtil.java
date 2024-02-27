@@ -4,8 +4,6 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 
-import java.util.concurrent.TimeUnit;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
@@ -44,11 +42,6 @@ public final class AccountDialogUtil {
 	 * The min length of passwords.
 	 */
 	private static final int MIN_PASSWORD_LENGTH = 8;
-
-	/**
-	 * The default value for AI timeouts.
-	 */
-	private static final long AI_TIMEOUT_DEFAULT = TimeUnit.DAYS.toMillis(2);
 
 	/**
 	 * Hide default constructor.
@@ -647,6 +640,8 @@ public final class AccountDialogUtil {
 			binding.editTextMyName.setText(contact.getMyName());
 			binding.editTextContactName.setText(contact.getName());
 			binding.editTextAiMessageSuffix.setText(contact.getAiMessageSuffix());
+			binding.checkboxAiTimeout.setOnCheckedChangeListener((buttonView, isChecked) ->
+					binding.layoutAiTimeoutValue.setVisibility(isChecked ? View.VISIBLE : View.GONE));
 			binding.checkboxAiTimeout.setChecked(contact.getAiTimeout() != null);
 			binding.layoutAiSettings.setVisibility(contact.getAiPolicy() == AiPolicy.NONE ? View.GONE : View.VISIBLE);
 
@@ -656,6 +651,9 @@ public final class AccountDialogUtil {
 			final DropdownHandler<String> dropdownHandlerDefaultReplyPolicy = DropdownHandler.fromResource(getContext(),
 					binding.dropdownDefaultReplyPolicy, R.array.array_reply_policies,
 					contact.getSlavePermissions().getDefaultReplyPolicy().ordinal());
+			int timerUnitSelection = splitTimerValue(contact);
+			final DropdownHandler<String> dropdownHandlerTimeUnit = DropdownHandler.fromResource(getContext(),
+					binding.dropdownAiTimeoutUnit, R.array.array_timer_unit_names, timerUnitSelection);
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 			builder.setTitle(R.string.title_dialog_edit_contact).setView(binding.getRoot());
@@ -676,11 +674,23 @@ public final class AccountDialogUtil {
 				String myName = binding.editTextMyName.getText().toString().trim();
 				String contactName = binding.editTextContactName.getText().toString().trim();
 				String messageSuffix = binding.editTextAiMessageSuffix.getText().toString().trim();
-				Long aiTimeout = binding.checkboxAiTimeout.isChecked() ? AI_TIMEOUT_DEFAULT : null;
 
 				SlavePermissions newSlavePermissions = new SlavePermissions(binding.checkboxEditSlavePermissions.isChecked(),
 						binding.checkboxEditRelation.isChecked(), binding.checkboxManageConversations.isChecked(),
 						ReplyPolicy.fromOrdinal(dropdownHandlerDefaultReplyPolicy.getSelectedPosition()));
+
+				Long aiTimeout = null;
+				if (binding.checkboxAiTimeout.isChecked()) {
+					int aiTimeoutValue;
+					try {
+						aiTimeoutValue = Integer.parseInt(binding.editTextAiTimeoutValue.getText().toString());
+					}
+					catch (NumberFormatException e) {
+						aiTimeoutValue = 1;
+					}
+					aiTimeout = 1000 * aiTimeoutValue *
+							(long) (getResources().getIntArray(R.array.array_timer_unit_values))[dropdownHandlerTimeUnit.getSelectedPosition()];
+				}
 
 				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
 						contact.getConnectionCode(), newSlavePermissions, contact.getStatus(), contact.getAiRelationId(), contact.getAiPolicy(),
@@ -691,7 +701,27 @@ public final class AccountDialogUtil {
 
 			return builder.create();
 		}
+
+		private int splitTimerValue(final Contact contact) {
+			if (contact.getAiTimeout() == null || contact.getAiTimeout() <= 0) {
+				binding.editTextAiTimeoutValue.setText("1");
+				return 2;
+			}
+
+			long timerValueSeconds = contact.getAiTimeout() / 1000;
+			int[] timerUnitValues = getResources().getIntArray(R.array.array_timer_unit_values);
+
+			for (int i = timerUnitValues.length - 1; i >= 0; i--) {
+				int timerUnitValue = timerUnitValues[i];
+				if (timerValueSeconds % timerUnitValue == 0) {
+					binding.editTextAiTimeoutValue.setText(Long.toString(timerValueSeconds / timerUnitValue));
+					return i;
+				}
+			}
+			return 1;
+		}
 	}
+
 
 	/**
 	 * Fragment to edit device dialog.

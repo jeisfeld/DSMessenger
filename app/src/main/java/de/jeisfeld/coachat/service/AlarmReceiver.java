@@ -100,8 +100,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 	 * @param contact The contact.
 	 */
 	public static void executeAlarm(final Context context, final Contact contact) {
-		if (contact.isSlave() || !contact.getAiMessageSuffix().contains("\"@\":")
-				|| (contact.getAiPolicy() != AiPolicy.AUTOMATIC && contact.getAiPolicy() != AiPolicy.AUTOMATIC_NOMESSAGE)) {
+		if (contact.isSlave() || (contact.getAiPolicy() != AiPolicy.AUTOMATIC && contact.getAiPolicy() != AiPolicy.AUTOMATIC_NOMESSAGE)) {
 			return;
 		}
 
