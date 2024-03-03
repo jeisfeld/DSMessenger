@@ -84,7 +84,7 @@ $aiPolicy = $aiRelation ? $aiRelation['aiPolicy'] : 0;
 				<input type="hidden" name="isSlave" id="isSlave" value="<?= $isSlave ?>">
 				<input type="hidden" name="subject" value="<?= $subject ?>">
 				<input type="hidden" name="replyPolicy" value="">
-				<input type="hidden" name="lastMessage" id="lastMessage" value="<?= $lastInputText ?>">
+				<input type="hidden" name="lastMessage" id="lastMessage" value="<?= htmlspecialchars($lastInputText) ?>">
 				<input type="hidden" name="lastOwnMessageId" id="lastOwnMessageId" value="">
 				<input type="hidden" name="lastAiMessageId" id="lastAiMessageId" value="">
 				<input type="hidden" name="contactName" value="<?= $contactName ?>">

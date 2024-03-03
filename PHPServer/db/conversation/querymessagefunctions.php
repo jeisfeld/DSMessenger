@@ -8,11 +8,12 @@ $modelMap = [
   "4" => "gpt-4",
   "5" => "gpt-4-1106-preview",
   "6" => "gpt-4-0125-preview",
-  "9" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0"
+  "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
+  "9" => "ft:gpt-3.5-turbo-0125:personal:vlc:8yk5JMTw"
 ];
 
 $autoQueryTriggerMessage = "[@]";
-$autoQueryMessageText = "Kannst Du bitte noch etwas zu Deiner letzten Nachricht sagen?";
+$defaultAutoQueryMessageText = "Kannst Du bitte noch etwas zu Deiner letzten Nachricht sagen?";
 
 function queryMessages($username, $password, $relationId, $conversationId)
 {
@@ -75,7 +76,7 @@ function getRandomizedMessageCount($baseCount, $variance)
 function queryMessagesForOpenai($username, $password, $relationId, $conversationId, $promptmessage, $messageSuffix, $oldMessageCount = 20, $oldMessageCountVariation = 0, $maxCharacters = 40000)
 {
     global $autoQueryTriggerMessage;
-    global $autoQueryMessageText;
+    global $defaultAutoQueryMessageText;
     
     $totalcharacters = strlen($promptmessage['content']);
     
@@ -117,13 +118,14 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     
     // Handle special instructions in last message.
     
-    $letters = null;
+    $letters = [];
     $lastMessage = end($messages);
     $lastMessageContent = $lastMessage['content'];
     $isAutoRetry = $lastMessageContent == $autoQueryTriggerMessage;
+    $pattern = '/^(.*)\s*\[([a-zA-Z0-9@]+)]$/ms';
     
     if (str_ends_with($lastMessageContent, "]")) {
-        $pattern = '/^(.*)\s*\[([a-zA-Z0-9@]+)]$/is';
+
         $matches = [];
         if (preg_match($pattern, $lastMessageContent, $matches)) {
             $shortMessageContent = $matches[1];
@@ -148,12 +150,31 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     }
     
     if ($isAutoRetry && (!$letters || !in_array("@", $letters))) {
-        $messages[key($messages)]['content'] = $autoQueryMessageText;
+        $messages[key($messages)]['content'] = $defaultAutoQueryMessageText;
     }
     
     if ($messageSuffix) {
         $messageSuffixJson = json_decode($messageSuffix, true);
         if ($messageSuffixJson) {
+            // treat . parameter as default values
+            $plainMessageSuffix = $messageSuffixJson["."];
+            if ($plainMessageSuffix) {
+                $matches = [];
+                if (preg_match($pattern, $plainMessageSuffix, $matches)) {
+                    $plainMessageSuffix = $matches[1];
+                    foreach (str_split($matches[2]) as $letter) {
+                        if (!in_array($letter, $letters)) {
+                            $letters[] = $letter;
+                        }
+                    }
+                }
+            }
+            
+            if ($plainMessageSuffix) {
+                $lastMessageContent .= ("\n" . $plainMessageSuffix);
+                $messages[key($messages)]['content'] = $lastMessageContent;
+            }
+            
             if ($letters) {
                 $modified = false;
                 foreach ($letters as $letter) {
@@ -173,7 +194,6 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
             $messages[key($messages)]['content'] .= ("\n" . $messageSuffix);
         }
     }
-    $letters ??= [];
     
     // Then add messages of other conversations of same relation.
     

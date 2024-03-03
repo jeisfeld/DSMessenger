@@ -127,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/text_ai_message_suffix"
                     android:inputType="textMultiLine"
-                    android:maxLines="@integer/message_text_max_lines"
+                    android:maxLines="40"
                     android:minHeight="@dimen/input_row_height"
                     android:minLines="1"
                     android:padding="0dp" />

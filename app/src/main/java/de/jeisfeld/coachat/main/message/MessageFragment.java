@@ -578,7 +578,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	 */
 	private static String removeTrailingParametersFromMessage(String messageText) {
 		if (messageText.endsWith("]")) {
-			Pattern pattern = Pattern.compile("^(.*)\\s*\\[([a-zA-Z0-9@]+)]$", Pattern.CASE_INSENSITIVE);
+			Pattern pattern = Pattern.compile("^(.*)\\s*\\[([a-zA-Z0-9@]+)]$", Pattern.MULTILINE);
 			Matcher matcher = pattern.matcher(messageText);
 			if (matcher.find()) {
 				return matcher.group(1);
@@ -604,7 +604,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		binding.buttonSend.setEnabled(false);
 
 		new HttpSender(getContext()).sendMessage("db/conversation/sendmessage.php", contact, messageId, (response, responseData) -> {
-					Message message = new Message(removeTrailingParametersFromMessage(binding.editTextMessageText.getText().toString()),
+					Message message = new Message(removeTrailingParametersFromMessage(binding.editTextMessageText.getText().toString().trim()),
 							true, messageId, conversation.getConversationId(), timestamp, MessageStatus.MESSAGE_SENT);
 					Application.getAppDatabase().getMessageDao().acknowledgeMessages(
 							messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));

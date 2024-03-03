@@ -15,6 +15,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     @$lastOwnMessageId = $_POST['lastOwnMessageId'];
     @$lastAiMessageId = $_POST['lastAiMessageId'];
     $isNewConversation = ! $conversationId;
+    
+    if ($messageText) {
+        $messageText = trim($messageText);
+    }
 
     if ($isNewConversation) {
         $conversationId = Uuid::uuid4()->toString();
