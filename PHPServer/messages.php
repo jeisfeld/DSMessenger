@@ -58,6 +58,9 @@ $aiPolicy = $aiRelation ? $aiRelation['aiPolicy'] : 0;
                 $class = $message['isOwn'] ? 'own-message' : 'other-message';
                 $parsedown = new Parsedown();
                 $messageText = $parsedown->text($message['text']);
+                $messageText = preg_replace("/\r\n|\n/", "<br>\n", $messageText);
+                $messageText = preg_replace("/(<\/?(p|li|ul|ol|h1|h2|h3|h4|h5)>)<br>/", "$1", $messageText);
+                
                 if ($key == count($messages) - 2) {
                     echo '<div class="message ' . $class . '" id="lastown" data-messageid="' . $message['messageId'] . '">';
                 }

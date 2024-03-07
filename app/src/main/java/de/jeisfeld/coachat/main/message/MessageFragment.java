@@ -116,7 +116,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 							&& activity != null) {
 						conversation = receivedConversation;
 						refreshMessageList();
-						if (conversation.getPreparedMessage() != null && conversation.getPreparedMessage().length() > 0 && contact.isSlave()) {
+						if (conversation.getPreparedMessage() != null && !conversation.getPreparedMessage().isEmpty() && contact.isSlave()) {
 							String oldEditText = binding.editTextMessageText.getText().toString();
 							binding.editTextMessageText.setText(oldEditText.trim().isEmpty() ? conversation.getPreparedMessage() :
 									oldEditText + "\n" + conversation.getPreparedMessage());
@@ -284,7 +284,11 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 
 				Message message = messageList.get(position);
 				TextView textViewMessage = view.findViewById(R.id.textViewMessage);
-				markwon.setMarkdown(textViewMessage, message.getMessageText());
+				String messageText = message.getMessageText();
+				messageText = messageText.replaceAll("\\r\\n|\\n", "\\\\\n");
+				messageText = messageText.replaceAll("\\\\\\n\\\\\\n", "\n\n");
+				messageText = messageText.replaceAll("\\\\\\n(\\d+)\\.", "\n$1.");
+				markwon.setMarkdown(textViewMessage, messageText);
 
 				if (message.isOwn()) {
 					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
@@ -315,7 +319,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 					break;
 				}
 
-				if (position == messageList.size() - 1 && !contact.isSlave() && deleteMessages.size() == 0 &&
+				if (position == messageList.size() - 1 && !contact.isSlave() && deleteMessages.isEmpty() &&
 						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)
 						&& messageList.size() >= 2
 						&& !messageList.get(messageList.size() - 1).isOwn() && messageList.get(messageList.size() - 2).isOwn()) {
@@ -421,7 +425,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 								if (matches != null && !matches.isEmpty()) {
 									String foundText = matches.get(0);
 									String recognizedText;
-									if (foundText != null && foundText.length() >= 1) {
+									if (foundText != null && !foundText.isEmpty()) {
 										recognizedText = foundText.substring(0, 1).toUpperCase() + foundText.substring(1);
 									}
 									else {
@@ -434,7 +438,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 											binding.editTextMessageText.setText("");
 										}
 										else {
-											if (oldText.trim().length() == 0) {
+											if (oldText.trim().isEmpty()) {
 												binding.editTextMessageText.setText(recognizedText);
 											}
 											else {
@@ -614,7 +618,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 						activity.runOnUiThread(() -> {
 							binding.buttonSend.setEnabled(true);
 							if (responseData != null && responseData.isSuccess()) {
-								if (message.getMessageText() != null && message.getMessageText().length() > 0) {
+								if (message.getMessageText() != null && !message.getMessageText().isEmpty()) {
 									conversation.setPreparedMessage("");
 
 									conversation.insertIfNew(message.getMessageText());
@@ -689,7 +693,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	private boolean isSpeechRecognitionActivityAvailable() {
 		try {
 			PackageManager pm = getContext().getPackageManager();
-			return pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0).size() > 0;
+			return !pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0).isEmpty();
 		}
 		catch (Exception e) {
 			Log.e(Application.TAG, "Error when retrieving speech recognition activities", e);

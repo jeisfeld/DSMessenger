@@ -52,6 +52,8 @@ if ($conn->connect_error) {
                 $class = $message['userId'] == $userId ? 'own-message' : 'other-message';
                 $parsedown = new Parsedown();
                 $messageText = $parsedown->text($message['text']);
+                $messageText = preg_replace("/\r\n|\n/", "<br>\n", $messageText);
+                $messageText = preg_replace("/(<\/?(p|li|ul|ol|h1|h2|h3|h4|h5)>)<br>/", "$1", $messageText);
                 
                 echo '<div class="message '. $class. '">';
                 echo '<div class="text">' . $messageText . '</div>';

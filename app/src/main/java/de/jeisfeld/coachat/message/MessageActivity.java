@@ -219,7 +219,11 @@ public class MessageActivity extends AppCompatActivity {
 
 				Message message = messageList.get(position);
 				TextView textViewMessage = view.findViewById(R.id.textViewMessage);
-				markwon.setMarkdown(textViewMessage, message.getMessageText());
+				String messageText = message.getMessageText();
+				messageText = messageText.replaceAll("\\r\\n|\\n", "\\\\\n");
+				messageText = messageText.replaceAll("\\\\\\n\\\\\\n", "\n\n");
+				messageText = messageText.replaceAll("\\\\\\n(\\d+)\\.", "\n$1.");
+				markwon.setMarkdown(textViewMessage, messageText);
 
 				if (message.isOwn()) {
 					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
@@ -250,7 +254,7 @@ public class MessageActivity extends AppCompatActivity {
 					break;
 				}
 
-				if (position == messageList.size() - 1 && !contact.isSlave() && deleteMessages.size() == 0 &&
+				if (position == messageList.size() - 1 && !contact.isSlave() && deleteMessages.isEmpty() &&
 						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)
 						&& messageList.size() >= 2
 						&& !messageList.get(messageList.size() - 1).isOwn() && messageList.get(messageList.size() - 2).isOwn()) {
@@ -449,7 +453,7 @@ public class MessageActivity extends AppCompatActivity {
 			final long timestamp = System.currentTimeMillis();
 			UUID newMessageId = UUID.randomUUID();
 			String messageText = binding.editTextMessageText.getText().toString().trim();
-			if (messageText.length() > 0) {
+			if (!messageText.isEmpty()) {
 				if (amSlave) {
 					conversation.updateWithResponse();
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED,
