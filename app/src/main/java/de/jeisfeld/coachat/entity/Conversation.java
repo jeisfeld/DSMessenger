@@ -107,8 +107,9 @@ public class Conversation implements Serializable {
 	 * @return the conversation.
 	 */
 	public static Conversation createNewConversation(final TextMessageDetails textMessageDetails) {
+		String subject = textMessageDetails.getSubject() == null ? textMessageDetails.getMessageText() : textMessageDetails.getSubject();
 		ReplyPolicy defaultReplyPolicy = textMessageDetails.getContact().getMyPermissions().getDefaultReplyPolicy();
-		Conversation result = new Conversation(textMessageDetails.getContact().getRelationId(), textMessageDetails.getMessageText(),
+		Conversation result = new Conversation(textMessageDetails.getContact().getRelationId(), subject,
 				textMessageDetails.getConversationId().toString(), textMessageDetails.getTimestamp(),
 				new ConversationFlags(defaultReplyPolicy, defaultReplyPolicy.isExpectsAcknowledgement(),
 						defaultReplyPolicy.isExpectsResponse() && !defaultReplyPolicy.isExpectsAcknowledgement()).toString(),

@@ -21,6 +21,10 @@ public class TextMessageDetails extends MessageDetails {
 	 */
 	private final UUID conversationId;
 	/**
+	 * The conversation subject.
+	 */
+	private final String subject;
+	/**
 	 * The timestamp.
 	 */
 	private final long timestamp;
@@ -46,16 +50,18 @@ public class TextMessageDetails extends MessageDetails {
 	 * @param contact         The contact who sent the message.
 	 * @param messageText     The message text.
 	 * @param conversationId  The conversation id.
+	 * @param subject    The conversation subject.
 	 * @param timestamp       The timestamp.
 	 * @param messageIds      The messageIds.
 	 * @param preparedMessage The prepared message.
 	 */
 	public TextMessageDetails(final MessageType messageType, final UUID messageId, final Instant messageTime, final MessagePriority priority,
-							  final Contact contact, final String messageText, final UUID conversationId, final long timestamp,
+							  final Contact contact, final String messageText, final UUID conversationId, final String subject, final long timestamp,
 							  final String[] messageIds, final String preparedMessage) {
 		super(messageType, messageId, messageTime, priority, contact);
 		this.messageText = messageText;
 		this.conversationId = conversationId;
+		this.subject = subject;
 		this.timestamp = timestamp;
 		this.messageIds = messageIds;
 		this.preparedMessage = preparedMessage;
@@ -77,12 +83,13 @@ public class TextMessageDetails extends MessageDetails {
 		Map<String, String> data = message.getData();
 		String messageText = data.get("messageText");
 		UUID conversationId = UUID.fromString(data.get("conversationId"));
+		String subject = data.get("subject");
 		long timestamp = Long.parseLong(data.get("timestamp"));
 		String messageIdsString = data.get("messageIds");
 		String[] messageIds = messageIdsString == null ? new String[0] : messageIdsString.split(",");
 		String preparedMessage = data.get("preparedMessage");
-		return new TextMessageDetails(messageType, messageId, messageTime, priority, contact, messageText, conversationId, timestamp, messageIds,
-				preparedMessage);
+		return new TextMessageDetails(messageType, messageId, messageTime, priority, contact, messageText, conversationId, subject,
+				timestamp, messageIds, preparedMessage);
 	}
 
 	public final String getMessageText() {
@@ -91,6 +98,10 @@ public class TextMessageDetails extends MessageDetails {
 
 	public final UUID getConversationId() {
 		return conversationId;
+	}
+
+	public final String getSubject() {
+		return subject;
 	}
 
 	public final long getTimestamp() {

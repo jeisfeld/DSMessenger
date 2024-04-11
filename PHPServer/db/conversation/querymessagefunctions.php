@@ -7,7 +7,7 @@ $modelMap = [
   "3" => "gpt-3.5-turbo-0125",
   "4" => "gpt-4",
   "5" => "gpt-4-1106-preview",
-  "6" => "gpt-4-0125-preview",
+  "6" => "gpt-4-turbo-2024-04-09",
   "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
   "9" => "ft:gpt-3.5-turbo-0125:personal:vlc:8yk5JMTw"
 ];

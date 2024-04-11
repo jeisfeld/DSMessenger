@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
+import android.util.SparseArray;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +39,16 @@ public class AlarmReceiver extends BroadcastReceiver {
 	 * The text send for auto-generated message to AI.
 	 */
 	private static final String AUTO_MESSAGE_TEXT = "[@]";
+
+	/**
+	 * Minimum delay in milliseconds between automatic messages to the same contact.
+	 */
+	private static final long MIN_DELAY = 20000;
+
+	/**
+	 * Temporary storage for last alarm execution times.
+	 */
+	private static final SparseArray<Long> LAST_EXECUTION_TIMES = new SparseArray<>();
 
 	/**
 	 * Set the alarm for a contact.
@@ -102,6 +113,16 @@ public class AlarmReceiver extends BroadcastReceiver {
 	public static void executeAlarm(final Context context, final Contact contact) {
 		if (contact.isSlave() || (contact.getAiPolicy() != AiPolicy.AUTOMATIC && contact.getAiPolicy() != AiPolicy.AUTOMATIC_NOMESSAGE)) {
 			return;
+		}
+
+		// Prevent two executions in short sequence. May happen if alarm starts application and both alarm and application start trigger execution.
+		synchronized (LAST_EXECUTION_TIMES) {
+			long currentTimestamp = System.currentTimeMillis();
+			Long lastTimestamp = LAST_EXECUTION_TIMES.get(contact.getContactId());
+			if (lastTimestamp != null && currentTimestamp < lastTimestamp + MIN_DELAY) {
+				return;
+			}
+			LAST_EXECUTION_TIMES.put(contact.getContactId(), currentTimestamp);
 		}
 
 		ReplyPolicy replyPolicy = contact.getMyPermissions().getDefaultReplyPolicy();

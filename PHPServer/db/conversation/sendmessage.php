@@ -168,6 +168,9 @@ if ($responseMessage && ($aiPolicy == 2 || $aiPolicy == 3)) {
         "preparedMessage" => "",
         "messageTime" => $currentDateTime->format("Y-m-d\TH:i:s.v") . 'Z'
     ];
+    if ($isNewConversation) {
+        $data["subject"] = $subject;
+    }
     foreach ($tokens as $token) {
         sendFirebaseMessage($token, $data, null);
     }   
