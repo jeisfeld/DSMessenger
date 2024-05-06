@@ -18,7 +18,7 @@ public class DialogToJsonFileConverter2 {
 		String fullSuffix = "s.jsonl";
 
 		try (BufferedWriter fullWriter = new BufferedWriter(new FileWriter(filePath + fullSuffix))) {
-			for (int i = 1; i <= 24; i++) {
+			for (int i = 1; i <= 27; i++) {
 				String[] dialog = readDialogFromFile(filePath + i + inputSuffix);
 				String jsonOutput = convertDialogToJson(dialog);
 				writeJsonToFile(jsonOutput, filePath + i + outputSuffix, fullWriter);
