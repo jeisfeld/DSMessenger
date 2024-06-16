@@ -122,7 +122,7 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     $letters = [];
     $lastMessage = end($messages);
     $lastMessageContent = $lastMessage['content'];
-    $isAutoRetry = $lastMessageContent == $autoQueryTriggerMessage;
+    $isAutoQuery = $lastMessageContent == $autoQueryTriggerMessage;
     $pattern = '/^(.*)\s*\[([a-zA-Z0-9@]+)]$/ms';
     
     if (str_ends_with($lastMessageContent, "]")) {
@@ -148,10 +148,6 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
             $lastMessageContent = $shortMessageContent;
             $messages[key($messages)]['content'] = $lastMessageContent;
         }
-    }
-    
-    if ($isAutoRetry && (!$letters || !in_array("@", $letters))) {
-        $messages[key($messages)]['content'] = $defaultAutoQueryMessageText;
     }
     
     if ($messageSuffix) {
@@ -189,6 +185,10 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
                 if ($modified) {
                     $messages[key($messages)]['content'] = $lastMessageContent;
                 }
+                
+                if ($isAutoQuery && str_ends_with($messageSuffixJson['@'], "[0]")) {
+                    $letters[] = '0';
+                }
             }
         }
         else {
@@ -196,12 +196,16 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
         }
     }
     
+    if ($isAutoQuery && (!$messageSuffix || !$messageSuffixJson || !$messageSuffixJson['@'])) {
+        $messages[key($messages)]['content'] = $defaultAutoQueryMessageText;
+    }
+    
     // Then add messages of other conversations of same relation.
     
     if (!in_array("0", $letters)) {
         $totalMessages = 0;
         $plannedMessages = getRandomizedMessageCount($oldMessageCount, $oldMessageCountVariation);
-        if ($isAutoRetry && $plannedMessages < 10) {
+        if ($isAutoQuery && $plannedMessages < 10) {
             $plannedMessages = 10;
         }
         
