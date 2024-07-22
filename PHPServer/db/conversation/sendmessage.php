@@ -155,7 +155,7 @@ if ($responseMessage && ($aiPolicy == 2 || $aiPolicy == 3)) {
     $stmt->execute();
     $stmt->close();
 
-    $tokens = getSelfTokens($conn, $username, $password, - 1);
+    $tokens = getUnmutedSelfTokens($conn, $username, $password, - 1);
     $currentDateTime = new DateTime();
     $data = [
         "messageType" => "TEXT",

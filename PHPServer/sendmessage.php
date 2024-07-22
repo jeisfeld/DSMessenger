@@ -134,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             sendFirebaseMessage($token, $data);
         }
         $data = getTextData($relationId, "TEXT_OWN", $messageText, $conversationId, $mysqlTimestamp, $messageId, $responseMessage);
-        $tokens = getSelfTokens($conn, $username, $password, - 1);
+        $tokens = getUnmutedSelfTokens($conn, $username, $password, - 1);
         foreach ($tokens as $token) {
             sendFirebaseMessage($token, $data, null);
         }

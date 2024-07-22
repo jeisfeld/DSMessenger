@@ -5,10 +5,10 @@ require_once __DIR__ . '/../../openai/queryopenai.php';
 $modelMap = [
     "2" => "gpt-3.5-turbo-16k-0613",
     "3" => "gpt-3.5-turbo-0125",
-    "4" => "gpt-4",
-    "5" => "gpt-4-1106-preview",
+    "4" => "gpt-4o-mini-2024-07-18",
+    "5" => "gpt-4o-2024-05-13",
     "6" => "gpt-4-turbo-2024-04-09",
-    "7" => "gpt-4o-2024-05-13",
+    "7" => "gpt-4-1106-preview",
     "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
     "9" => "ft:gpt-3.5-turbo-0125:personal:vlc:8yk5JMTw"
 ];

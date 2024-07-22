@@ -13,7 +13,7 @@ $username = @$_POST['username'];
 $password = @$_POST['password'];
 $deviceId = @$_POST['deviceId'];
 
-$tokens = getSelfTokens($conn, $username, $password, $deviceId);
+$tokens = getUnmutedSelfTokens($conn, $username, $password, $deviceId);
 
 $data = [];
 
