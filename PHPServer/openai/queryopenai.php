@@ -1,7 +1,8 @@
 <?php
 require_once 'apikey.php';
+require_once __DIR__ .'/../util/utilityfunctions.php';
 
-function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequencyPenalty = 0, $model = 'gpt-4-0125-preview')
+function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequencyPenalty = 0, $model = 'gpt-4o-mini-2024-07-18')
 {
     $data = [
         'model' => $model,
@@ -54,6 +55,24 @@ function createOpenAiMessage($role, $content)
         'role' => $role,
         'content' => $content
     ];
+}
+
+$systemmessage = @$_POST['systemmessage'];
+$usermessage = @$_POST['usermessage'];
+
+if ($usermessage) {
+    $messages = [];
+    if ($systemmessage) {
+        $messages[] = createOpenAiMessage('system', $systemmessage);
+    }
+    $messages[] = createOpenAiMessage('user', $usermessage);
+    $result = queryOpenAi($messages);
+    if ($result['success']) {
+        printSuccess($result['message']['content']);
+    }
+    else {
+        printError(222, "Failed to query OpenAI");
+    }
 }
 
 ?>
