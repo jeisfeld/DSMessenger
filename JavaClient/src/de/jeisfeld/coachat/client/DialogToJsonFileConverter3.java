@@ -9,16 +9,16 @@ import java.nio.file.Paths;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class DialogToJsonFileConverter2 {
+public class DialogToJsonFileConverter3 {
 
 	public static void main(final String[] args) {
-		String filePath = "D:\\Jörg\\Word\\homodea\\AI\\dialog";
+		String filePath = "D:\\Git\\DSMessenger\\finetuning\\Dominia\\dialog";
 		String inputSuffix = ".txt";
 		String outputSuffix = ".json";
 		String fullSuffix = "s.jsonl";
 
 		try (BufferedWriter fullWriter = new BufferedWriter(new FileWriter(filePath + fullSuffix))) {
-			for (int i = 1; i <= 34; i++) {
+			for (int i = 1; i <= 52; i++) {
 				String[] dialog = readDialogFromFile(filePath + i + inputSuffix);
 				String jsonOutput = convertDialogToJson(dialog);
 				writeJsonToFile(jsonOutput, filePath + i + outputSuffix, fullWriter);
@@ -37,29 +37,47 @@ public class DialogToJsonFileConverter2 {
 	private static String convertDialogToJson(final String[] dialog) {
 		JSONObject root = new JSONObject();
 		JSONArray jsonArray = new JSONArray();
+		StringBuffer newJsonContent = new StringBuffer();
+		JSONObject jsonEntry = null;
 
 		for (String line : dialog) {
 			if (line.trim().isEmpty()) {
 				continue; // Skip empty lines
 			}
 
-			JSONObject jsonEntry = new JSONObject();
 			if (line.startsWith("User:")) {
+				if (jsonEntry != null) {
+					jsonEntry.put("content", newJsonContent);
+					jsonArray.put(jsonEntry);
+				}
+				jsonEntry = new JSONObject();
 				jsonEntry.put("role", "user");
-				jsonEntry.put("content", line.substring(6).trim()); // Remove "User: "
+				newJsonContent = new StringBuffer(line.substring(6)); // Remove "User: "
 			}
 			else if (line.startsWith("AI:")) {
+				if (jsonEntry != null) {
+					jsonEntry.put("content", newJsonContent);
+					jsonArray.put(jsonEntry);
+				}
+				jsonEntry = new JSONObject();
 				jsonEntry.put("role", "assistant");
-				jsonEntry.put("content", line.substring(4).trim()); // Remove "AI: "
+				newJsonContent = new StringBuffer(line.substring(4)); // Remove "AI: "
 			}
 			else if (line.startsWith("System:")) {
+				if (jsonEntry != null) {
+					jsonEntry.put("content", newJsonContent);
+					jsonArray.put(jsonEntry);
+				}
+				jsonEntry = new JSONObject();
 				jsonEntry.put("role", "system");
-				jsonEntry.put("content", line.substring(8).trim()); // Remove "System: "
+				newJsonContent = new StringBuffer(line.substring(8)); // Remove "System: "
 			}
-			else if (!line.isEmpty()) {
-				System.out.println("Unexpected line: " + line);
+			else {
+				newJsonContent.append("\n").append(line);
 			}
-
+		}
+		if (jsonEntry != null) {
+			jsonEntry.put("content", newJsonContent.toString().trim());
 			jsonArray.put(jsonEntry);
 		}
 

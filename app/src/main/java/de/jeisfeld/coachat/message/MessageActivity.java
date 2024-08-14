@@ -222,7 +222,8 @@ public class MessageActivity extends AppCompatActivity {
 				String messageText = message.getMessageText();
 				messageText = messageText.replaceAll("\\r\\n|\\n", "\\\\\n");
 				messageText = messageText.replaceAll("\\\\\\n\\\\\\n", "\n\n");
-				messageText = messageText.replaceAll("\\\\\\n(\\d+)\\.", "\n$1.");
+				messageText = messageText.replaceAll("\\\\\\n(\\d+)\\. ", "\n$1. ");
+				messageText = messageText.replaceAll("\\\\\\n(\\s+)- ", "\n$1- ");
 				markwon.setMarkdown(textViewMessage, messageText);
 
 				if (message.isOwn()) {

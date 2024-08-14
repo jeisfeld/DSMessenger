@@ -203,154 +203,26 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	}
 
-	@SuppressLint("ClickableViewAccessibility")
-	@Override
-	public final View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-		binding = FragmentMessageBinding.inflate(inflater, container, false);
-		markwon = Markwon.create(getContext());
-
-		binding.buttonSend.setOnClickListener(v -> sendMessage(MessagePriority.NORMAL));
-		binding.buttonSendWithPriority.setOnClickListener(v -> sendMessage(MessagePriority.HIGH));
-		binding.buttonAcknowledge.setOnClickListener(v -> {
-			Activity activity = getActivity();
-			if (activity != null) {
-				conversation.updateWithAcknowledgement();
-				setButtonVisibility();
-				Application.getAppDatabase().getMessageDao().acknowledgeMessages(
-						messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
-				refreshMessageList();
-
-				new HttpSender(activity).sendMessage("db/conversation/updatemessagestatus.php",
-						contact, messageList.get(messageList.size() - 1).getMessageId(), null,
-						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_ACKNOWLEDGED.name(),
-						"conversationId", conversation.getConversationId().toString(), "messageIds",
-						messageList.stream().filter(msg -> !msg.isOwn())
-								.map(message -> message.getMessageId().toString()).collect(Collectors.joining(",")));
+	/**
+	 * Remove trailing parameters such as [3ok] from messageText.
+	 *
+	 * @param messageText The message of the text.
+	 * @return The messageText where trailing parameters have been removed if applicable.
+	 */
+	private static String removeTrailingParametersFromMessage(String messageText) {
+		if (messageText.endsWith("]")) {
+			Pattern pattern = Pattern.compile("^(.*)\\s*\\[([a-zA-Z0-9@]+)]$", Pattern.DOTALL);
+			Matcher matcher = pattern.matcher(messageText);
+			if (matcher.find()) {
+				return matcher.group(1);
 			}
-		});
-		binding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditConversationDialog(this, conversation, contact));
-
-		binding.imageViewRefreshMessages.setOnClickListener(
-				v -> new HttpSender(getContext()).sendMessage("db/conversation/querymessages.php", contact, null, (response, responseData) -> {
-					if (responseData.isSuccess()) {
-						List<Message> messages = (List<Message>) responseData.getData().get("messages");
-						if (messages == null) {
-							return;
-						}
-						Application.getAppDatabase().getMessageDao().deleteMessagesByConversationId(conversation.getConversationId().toString());
-						Application.getAppDatabase().getMessageDao().insert(messages);
-						refreshMessageList();
-					}
-					else {
-						Log.e(Application.TAG, "Failed to retrieve message data: " + responseData.getErrorMessage());
-					}
-				}, "conversationId", conversation.getConversationId().toString()));
-
-		binding.imageButtonRefreshPreparedMessage.setOnClickListener(v -> {
-			binding.buttonSend.setEnabled(false);
-			binding.buttonSendWithPriority.setEnabled(false);
-			binding.editTextMessageText.setEnabled(false);
-			new HttpSender(getContext()).sendMessage("db/conversation/recreatepreparedmessage.php", contact, null,
-					(response, responseData) -> getActivity().runOnUiThread(() -> {
-						binding.buttonSend.setEnabled(true);
-						binding.buttonSendWithPriority.setEnabled(true);
-						binding.editTextMessageText.setEnabled(true);
-						if (responseData.isSuccess()) {
-							binding.editTextMessageText.setText((String) responseData.getData().get("preparedMessage"));
-						}
-						else {
-							Log.e(Application.TAG, "Failed to retrieve message data: " + responseData.getErrorMessage());
-						}
-					}), "conversationId", conversation.getConversationId().toString());
-		});
-
-		setRecordVoiceButtonListener();
-
-		assert getArguments() != null;
-		contact = (Contact) getArguments().getSerializable("contact");
-		conversation = (Conversation) getArguments().getSerializable("conversation");
-		binding.textSendMessage.setText(getString(R.string.text_send_message_to, contact.getName()));
-		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
-		if (contact.isSlave()) {
-			binding.editTextMessageText.setText(conversation.getPreparedMessage());
+			else {
+				return messageText;
+			}
 		}
-		binding.imageViewConnectionStatus.setVisibility(MainActivity.isDsUser() ? View.VISIBLE : View.GONE);
-
-		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
-			@NonNull
-			@Override
-			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
-				final View view = super.getView(position, convertView, parent);
-
-				Message message = messageList.get(position);
-				TextView textViewMessage = view.findViewById(R.id.textViewMessage);
-				String messageText = message.getMessageText();
-				messageText = messageText.replaceAll("\\r\\n|\\n", "\\\\\n");
-				messageText = messageText.replaceAll("\\\\\\n\\\\\\n", "\n\n");
-				messageText = messageText.replaceAll("\\\\\\n(\\d+)\\.", "\n$1.");
-				markwon.setMarkdown(textViewMessage, messageText);
-
-				if (message.isOwn()) {
-					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
-					view.findViewById(R.id.spaceLeft).setVisibility(View.VISIBLE);
-					textViewMessage.setBackgroundResource(R.drawable.background_message_own);
-				}
-				else {
-					view.findViewById(R.id.spaceRight).setVisibility(View.VISIBLE);
-					view.findViewById(R.id.spaceLeft).setVisibility(View.GONE);
-					textViewMessage.setBackgroundResource(R.drawable.background_message_contact);
-				}
-
-				((TextView) view.findViewById(R.id.textViewMessageTime)).setText(DateUtil.formatTimestamp(message.getTimestamp(), false));
-
-				ImageView imageViewMessageStatus = view.findViewById(R.id.imageViewMessageStatus);
-				switch (message.getStatus()) {
-				case MESSAGE_SENT:
-					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_sent);
-					break;
-				case MESSAGE_RECEIVED:
-					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_received);
-					break;
-				case MESSAGE_ACKNOWLEDGED:
-					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_acknowledged);
-					break;
-				default:
-					imageViewMessageStatus.setImageResource(0);
-					break;
-				}
-
-				if (position == messageList.size() - 1 && !contact.isSlave() && deleteMessages.isEmpty() &&
-						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)
-						&& messageList.size() >= 2
-						&& !messageList.get(messageList.size() - 1).isOwn() && messageList.get(messageList.size() - 2).isOwn()) {
-					ImageView buttonRefreshMessage = view.findViewById(R.id.imageButtonRefreshMessage);
-					buttonRefreshMessage.setVisibility(View.VISIBLE);
-					buttonRefreshMessage.setOnClickListener(v -> {
-						buttonRefreshMessage.setVisibility(View.GONE);
-						Message lastAiMessage = messageList.get(messageList.size() - 1);
-						Message lastOwnMessage = messageList.get(messageList.size() - 2);
-						messageList.remove(lastAiMessage);
-						messageList.remove(lastOwnMessage);
-						deleteMessages.add(lastAiMessage);
-						deleteMessages.add(lastOwnMessage);
-						arrayAdapter.notifyDataSetChanged();
-						binding.listViewMessages.setSelection(messageList.size() - 1);
-						binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
-						binding.editTextMessageText.setText(lastOwnMessage.getMessageText());
-					});
-				}
-				else {
-					view.findViewById(R.id.imageButtonRefreshMessage).setVisibility(View.GONE);
-				}
-
-				return view;
-			}
-		};
-		binding.listViewMessages.setAdapter(arrayAdapter);
-
-		refreshMessageList();
-
-		return binding.getRoot();
+		else {
+			return messageText;
+		}
 	}
 
 	/**
@@ -574,26 +446,155 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 				"messageType", MessageType.ADMIN.name(), "adminType", AdminType.PING.name());
 	}
 
-	/**
-	 * Remove trailing parameters such as [3ok] from messageText.
-	 *
-	 * @param messageText The message of the text.
-	 * @return The messageText where trailing parameters have been removed if applicable.
-	 */
-	private static String removeTrailingParametersFromMessage(String messageText) {
-		if (messageText.endsWith("]")) {
-			Pattern pattern = Pattern.compile("^(.*)\\s*\\[([a-zA-Z0-9@]+)]$", Pattern.MULTILINE);
-			Matcher matcher = pattern.matcher(messageText);
-			if (matcher.find()) {
-				return matcher.group(1);
+	@SuppressLint("ClickableViewAccessibility")
+	@Override
+	public final View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+		binding = FragmentMessageBinding.inflate(inflater, container, false);
+		markwon = Markwon.create(getContext());
+
+		binding.buttonSend.setOnClickListener(v -> sendMessage(MessagePriority.NORMAL));
+		binding.buttonSendWithPriority.setOnClickListener(v -> sendMessage(MessagePriority.HIGH));
+		binding.buttonAcknowledge.setOnClickListener(v -> {
+			Activity activity = getActivity();
+			if (activity != null) {
+				conversation.updateWithAcknowledgement();
+				setButtonVisibility();
+				Application.getAppDatabase().getMessageDao().acknowledgeMessages(
+						messageList.stream().filter(msg -> !msg.isOwn()).map(msg -> msg.getMessageId().toString()).toArray(String[]::new));
+				refreshMessageList();
+
+				new HttpSender(activity).sendMessage("db/conversation/updatemessagestatus.php",
+						contact, messageList.get(messageList.size() - 1).getMessageId(), null,
+						"messageType", MessageType.ADMIN.name(), "adminType", AdminType.MESSAGE_ACKNOWLEDGED.name(),
+						"conversationId", conversation.getConversationId().toString(), "messageIds",
+						messageList.stream().filter(msg -> !msg.isOwn())
+								.map(message -> message.getMessageId().toString()).collect(Collectors.joining(",")));
 			}
-			else {
-				return messageText;
+		});
+		binding.buttonEdit.setOnClickListener(v -> AccountDialogUtil.displayEditConversationDialog(this, conversation, contact));
+
+		binding.imageViewRefreshMessages.setOnClickListener(
+				v -> new HttpSender(getContext()).sendMessage("db/conversation/querymessages.php", contact, null, (response, responseData) -> {
+					if (responseData.isSuccess()) {
+						List<Message> messages = (List<Message>) responseData.getData().get("messages");
+						if (messages == null) {
+							return;
+						}
+						Application.getAppDatabase().getMessageDao().deleteMessagesByConversationId(conversation.getConversationId().toString());
+						Application.getAppDatabase().getMessageDao().insert(messages);
+						refreshMessageList();
+					}
+					else {
+						Log.e(Application.TAG, "Failed to retrieve message data: " + responseData.getErrorMessage());
+					}
+				}, "conversationId", conversation.getConversationId().toString()));
+
+		binding.imageButtonRefreshPreparedMessage.setOnClickListener(v -> {
+			binding.buttonSend.setEnabled(false);
+			binding.buttonSendWithPriority.setEnabled(false);
+			binding.editTextMessageText.setEnabled(false);
+			new HttpSender(getContext()).sendMessage("db/conversation/recreatepreparedmessage.php", contact, null,
+					(response, responseData) -> getActivity().runOnUiThread(() -> {
+						binding.buttonSend.setEnabled(true);
+						binding.buttonSendWithPriority.setEnabled(true);
+						binding.editTextMessageText.setEnabled(true);
+						if (responseData.isSuccess()) {
+							binding.editTextMessageText.setText((String) responseData.getData().get("preparedMessage"));
+						}
+						else {
+							Log.e(Application.TAG, "Failed to retrieve message data: " + responseData.getErrorMessage());
+						}
+					}), "conversationId", conversation.getConversationId().toString());
+		});
+
+		setRecordVoiceButtonListener();
+
+		assert getArguments() != null;
+		contact = (Contact) getArguments().getSerializable("contact");
+		conversation = (Conversation) getArguments().getSerializable("conversation");
+		binding.textSendMessage.setText(getString(R.string.text_send_message_to, contact.getName()));
+		binding.textSubject.setText(getString(R.string.text_subject, conversation.getSubject()));
+		if (contact.isSlave()) {
+			binding.editTextMessageText.setText(conversation.getPreparedMessage());
+		}
+		binding.imageViewConnectionStatus.setVisibility(MainActivity.isDsUser() ? View.VISIBLE : View.GONE);
+
+		arrayAdapter = new ArrayAdapter<Message>(requireContext(), R.layout.list_view_message, R.id.textViewMessage, messageList) {
+			@NonNull
+			@Override
+			public View getView(final int position, final @Nullable View convertView, final @NonNull ViewGroup parent) {
+				final View view = super.getView(position, convertView, parent);
+
+				Message message = messageList.get(position);
+				TextView textViewMessage = view.findViewById(R.id.textViewMessage);
+				String messageText = message.getMessageText();
+				messageText = messageText.replaceAll("\\r\\n|\\n", "\\\\\n");
+				messageText = messageText.replaceAll("\\\\\\n\\\\\\n", "\n\n");
+				messageText = messageText.replaceAll("\\\\\\n(\\d+)\\. ", "\n$1. ");
+				messageText = messageText.replaceAll("\\\\\\n(\\s+)- ", "\n$1- ");
+				markwon.setMarkdown(textViewMessage, messageText);
+
+				if (message.isOwn()) {
+					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
+					view.findViewById(R.id.spaceLeft).setVisibility(View.VISIBLE);
+					textViewMessage.setBackgroundResource(R.drawable.background_message_own);
+				}
+				else {
+					view.findViewById(R.id.spaceRight).setVisibility(View.VISIBLE);
+					view.findViewById(R.id.spaceLeft).setVisibility(View.GONE);
+					textViewMessage.setBackgroundResource(R.drawable.background_message_contact);
+				}
+
+				((TextView) view.findViewById(R.id.textViewMessageTime)).setText(DateUtil.formatTimestamp(message.getTimestamp(), false));
+
+				ImageView imageViewMessageStatus = view.findViewById(R.id.imageViewMessageStatus);
+				switch (message.getStatus()) {
+				case MESSAGE_SENT:
+					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_sent);
+					break;
+				case MESSAGE_RECEIVED:
+					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_received);
+					break;
+				case MESSAGE_ACKNOWLEDGED:
+					imageViewMessageStatus.setImageResource(R.drawable.ic_icon_message_acknowledged);
+					break;
+				default:
+					imageViewMessageStatus.setImageResource(0);
+					break;
+				}
+
+				if (position == messageList.size() - 1 && !contact.isSlave() && deleteMessages.isEmpty() &&
+						(contact.getAiPolicy() == AiPolicy.AUTOMATIC || contact.getAiPolicy() == AiPolicy.AUTOMATIC_NOMESSAGE)
+						&& messageList.size() >= 2
+						&& !messageList.get(messageList.size() - 1).isOwn() && messageList.get(messageList.size() - 2).isOwn()) {
+					ImageView buttonRefreshMessage = view.findViewById(R.id.imageButtonRefreshMessage);
+					buttonRefreshMessage.setVisibility(View.VISIBLE);
+					buttonRefreshMessage.setOnClickListener(v -> {
+						buttonRefreshMessage.setVisibility(View.GONE);
+						Message lastAiMessage = messageList.get(messageList.size() - 1);
+						Message lastOwnMessage = messageList.get(messageList.size() - 2);
+						messageList.remove(lastAiMessage);
+						messageList.remove(lastOwnMessage);
+						deleteMessages.add(lastAiMessage);
+						deleteMessages.add(lastOwnMessage);
+						arrayAdapter.notifyDataSetChanged();
+						binding.listViewMessages.setSelection(messageList.size() - 1);
+						binding.listViewMessages.smoothScrollToPosition(messageList.size() - 1);
+						binding.editTextMessageText.setText(lastOwnMessage.getMessageText());
+					});
+				}
+				else {
+					view.findViewById(R.id.imageButtonRefreshMessage).setVisibility(View.GONE);
+				}
+
+				return view;
 			}
-		}
-		else {
-			return messageText;
-		}
+		};
+		binding.listViewMessages.setAdapter(arrayAdapter);
+
+		refreshMessageList();
+
+		return binding.getRoot();
 	}
 
 	/**
