@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -99,6 +100,10 @@ public class MessageActivity extends AppCompatActivity {
 	 * Messages to be deleted for retry.
 	 */
 	private final List<Message> deleteMessages = new ArrayList<>();
+	/**
+	 * The TTS engine used for speaking messages.
+	 */
+	private TextToSpeech textToSpeech = null;
 
 	/**
 	 * The local broadcast receiver to do actions sent to this fragment.
@@ -279,6 +284,34 @@ public class MessageActivity extends AppCompatActivity {
 					view.findViewById(R.id.imageButtonRefreshMessage).setVisibility(View.GONE);
 				}
 
+				ImageView buttonSpeak = view.findViewById(R.id.imageButtonSpeak);
+				ImageView buttonStopSpeaking = view.findViewById(R.id.imageButtonStopSpeaking);
+				buttonSpeak.setVisibility(View.VISIBLE);
+				buttonStopSpeaking.setVisibility(View.GONE);
+				buttonSpeak.setOnClickListener(v -> {
+					if (textToSpeech != null) {
+						textToSpeech.stop();
+						textToSpeech.shutdown();
+						textToSpeech = null;
+					}
+					buttonSpeak.setVisibility(View.GONE);
+					buttonStopSpeaking.setVisibility(View.VISIBLE);
+					textToSpeech = new TextToSpeech(MessageActivity.this, status -> {
+						if (status == TextToSpeech.SUCCESS) {
+							textToSpeech.speak(message.getMessageText(), TextToSpeech.QUEUE_FLUSH, null, "utteranceId");
+						}
+					});
+				});
+				buttonStopSpeaking.setOnClickListener(v -> {
+					if (textToSpeech != null) {
+						textToSpeech.stop();
+						textToSpeech.shutdown();
+						textToSpeech = null;
+					}
+					buttonSpeak.setVisibility(View.VISIBLE);
+					buttonStopSpeaking.setVisibility(View.GONE);
+				});
+
 				return view;
 			}
 		};
@@ -332,6 +365,11 @@ public class MessageActivity extends AppCompatActivity {
 	protected final void onDestroy() {
 		super.onDestroy();
 		broadcastManager.unregisterReceiver(localBroadcastReceiver);
+		if (textToSpeech != null) {
+			textToSpeech.stop();
+			textToSpeech.shutdown();
+			textToSpeech = null;
+		}
 	}
 
 	@Override

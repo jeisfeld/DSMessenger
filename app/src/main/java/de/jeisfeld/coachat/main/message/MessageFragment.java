@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,6 +97,11 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	 * Broadcastmanager to update fragment from external.
 	 */
 	private LocalBroadcastManager broadcastManager;
+	/**
+	 * The TTS engine used for speaking messages.
+	 */
+	private TextToSpeech textToSpeech = null;
+
 	/**
 	 * The local broadcast receiver to do actions sent to this fragment.
 	 */
@@ -409,6 +415,11 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	public final void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
+		if (textToSpeech != null) {
+			textToSpeech.stop();
+			textToSpeech.shutdown();
+			textToSpeech = null;
+		}
 	}
 
 	@Override
@@ -586,6 +597,34 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 				else {
 					view.findViewById(R.id.imageButtonRefreshMessage).setVisibility(View.GONE);
 				}
+
+				ImageView buttonSpeak = view.findViewById(R.id.imageButtonSpeak);
+				ImageView buttonStopSpeaking = view.findViewById(R.id.imageButtonStopSpeaking);
+				buttonSpeak.setVisibility(View.VISIBLE);
+				buttonStopSpeaking.setVisibility(View.GONE);
+				buttonSpeak.setOnClickListener(v -> {
+					if (textToSpeech != null) {
+						textToSpeech.stop();
+						textToSpeech.shutdown();
+						textToSpeech = null;
+					}
+					buttonSpeak.setVisibility(View.GONE);
+					buttonStopSpeaking.setVisibility(View.VISIBLE);
+					textToSpeech = new TextToSpeech(getActivity(), status -> {
+						if (status == TextToSpeech.SUCCESS) {
+							textToSpeech.speak(message.getMessageText(), TextToSpeech.QUEUE_FLUSH, null, "utteranceId");
+						}
+					});
+				});
+				buttonStopSpeaking.setOnClickListener(v -> {
+					if (textToSpeech != null) {
+						textToSpeech.stop();
+						textToSpeech.shutdown();
+						textToSpeech = null;
+					}
+					buttonSpeak.setVisibility(View.VISIBLE);
+					buttonStopSpeaking.setVisibility(View.GONE);
+				});
 
 				return view;
 			}
