@@ -43,7 +43,24 @@ function sendFirebaseMessage($token, $data, $ttl = null)
     catch (InvalidMessage $e) {
         error_log($e->getMessage());
         error_log($e->getTraceAsString());
-        muteDeviceByToken($token, 2);
+        if (strpos($e->getMessage(), 'too big') !== false) {
+            if (isset($data['messageType']) && $data['messageType'] === 'TEXT') {
+                $newData = array_merge($data, ['messageText' => 'Please refresh to see the message.']);
+                $message = CloudMessage::withTarget('token', $token)->withData($newData)
+                ->withAndroidConfig($androidConfig)
+                ->withHighestPossiblePriority();
+                try {
+                    $messaging->send($message);
+                }
+                catch (Exception $e) {
+                    error_log($e->getMessage());
+                    error_log($e->getTraceAsString());
+                }
+            }
+        } 
+        else {
+            muteDeviceByToken($token, 2);
+        }
     }
 }
 

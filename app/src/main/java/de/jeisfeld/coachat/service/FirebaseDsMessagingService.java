@@ -12,6 +12,7 @@ import android.util.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import java.util.List;
 import java.util.UUID;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ import de.jeisfeld.coachat.message.MessageDetails;
 import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 import de.jeisfeld.coachat.message.MessageDisplayStrategy.MessageDisplayType;
 import de.jeisfeld.coachat.message.TextMessageDetails;
+import de.jeisfeld.coachat.util.Logger;
 import de.jeisfeld.coachat.util.PreferenceUtil;
 
 /**
@@ -76,18 +78,18 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 	 * Display a notification.
 	 *
 	 * @param textMessageDetails The text message details.
+	 * @param messageText The message text.
 	 */
-	public void displayNotification(final TextMessageDetails textMessageDetails) {
-		String message = textMessageDetails.getMessageText();
+	public void displayNotification(final TextMessageDetails textMessageDetails, final String messageText) {
 		String title = getString(R.string.notification_title, textMessageDetails.getContact().getName());
 
 		Notification.Builder notificationBuilder;
 		notificationBuilder = new Notification.Builder(this, "MessageNotification");
 		notificationBuilder.setSmallIcon(R.drawable.ic_notification)
 				.setContentTitle(title)
-				.setContentText(message)
+				.setContentText(messageText)
 				.setChannelId(Application.NOTIFICATION_CHANNEL_ID)
-				.setStyle(new Notification.BigTextStyle().bigText(message));
+				.setStyle(new Notification.BigTextStyle().bigText(messageText));
 
 		Intent actionIntent = MainActivity.createIntent(this, textMessageDetails);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, textMessageDetails.getContact().getRelationId(), actionIntent,
@@ -104,7 +106,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 
 		Log.d(Application.TAG, "Received message from " + message.getFrom() + " with priority " + message.getPriority());
 
-		if (message.getData().size() > 0) {
+		if (!message.getData().isEmpty()) {
 			Log.i(Application.TAG, "Message data: " + message.getData());
 		}
 
@@ -189,7 +191,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 				break;
 			case MESSAGE_ACKNOWLEDGED:
 				String messageIdsString = adminDetails.getValue("messageIds");
-				if (messageIdsString != null && messageIdsString.length() > 0) {
+				if (messageIdsString != null && !messageIdsString.isEmpty()) {
 					Application.getAppDatabase().getMessageDao().acknowledgeMessages(messageIdsString.split(","));
 					MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_ACKNOWLEDGED, adminDetails.getMessageId(),
 							adminDetails.getContact(),
@@ -232,32 +234,50 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			UUID conversationId = textMessageDetails.getConversationId();
 			Conversation messageConversation = Application.getAppDatabase().getConversationDao().getConversationById(conversationId);
 			if (messageConversation == null && textMessageDetails.getContact() != null
-					&& textMessageDetails.getMessageText() != null && textMessageDetails.getMessageText().length() > 0) {
+					&& textMessageDetails.getMessageText() != null && !textMessageDetails.getMessageText().isEmpty()) {
 				messageConversation = Conversation.createNewConversation(textMessageDetails);
 				messageConversation.insertIfNew(textMessageDetails.getMessageText());
 				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, messageConversation);
 			}
 			messageConversation.setPreparedMessage(textMessageDetails.getPreparedMessage());
 			Message textMessage = new Message(textMessageDetails.getMessageText(), false, textMessageDetails.getMessageId(),
-					conversationId, textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
-			if (textMessage.getMessageText() != null && textMessage.getMessageText().length() > 0) {
+					messageConversation.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_RECEIVED);
+			if (textMessage.getMessageText() != null && !textMessage.getMessageText().isEmpty()) {
 				textMessage.store(messageConversation);
 				messageConversation.updateWithNewMessage();
 				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_EDITED, messageConversation);
 			}
-			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(),
-					textMessageDetails.getContact(), messageConversation, textMessage);
-			Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
-			if (displayType == MessageDisplayType.ACTION) {
-				startActivity(MessageActivity.createIntent(this, textMessageDetails, textMessage));
+
+			String messageText = textMessageDetails.getMessageText();
+
+			// Handle special case where firebase sending failed due to too long message
+			if ("Please refresh to see the message.".equals(messageText)) {
+				final Conversation finalMessageConversation = messageConversation;
+				new HttpSender(this).sendMessage("db/conversation/querymessages.php", textMessageDetails.getContact(), null, (response, responseData) -> {
+					if (responseData.isSuccess()) {
+						List<Message> messages = (List<Message>) responseData.getData().get("messages");
+						if (messages == null || messages.isEmpty()) {
+							handleTextMessage(textMessageDetails, textMessage, finalMessageConversation, displayType);
+							return;
+						}
+						Application.getAppDatabase().getMessageDao().deleteMessagesByConversationId(finalMessageConversation.getConversationId().toString());
+						Application.getAppDatabase().getMessageDao().insert(messages);
+						Logger.log("In special handling");
+						handleTextMessage(textMessageDetails, messages.get(messages.size() - 1), finalMessageConversation, displayType);
+					}
+					else {
+						handleTextMessage(textMessageDetails, textMessage, finalMessageConversation, displayType);
+					}
+				}, "conversationId", conversationId.toString());
 			}
-			displayNotification(textMessageDetails);
-			AlarmReceiver.setAlarm(this, textMessageDetails.getContact());
+			else {
+				handleTextMessage(textMessageDetails, textMessage, messageConversation, displayType);
+			}
 			break;
 		case TEXT_RESPONSE:
 			textMessageDetails = (TextMessageDetails) messageDetails;
 			Conversation conversation = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
-			if (textMessageDetails.getPreparedMessage() != null && textMessageDetails.getPreparedMessage().length() > 0) {
+			if (textMessageDetails.getPreparedMessage() != null && !textMessageDetails.getPreparedMessage().isEmpty()) {
 				conversation.setPreparedMessage(textMessageDetails.getPreparedMessage());
 			}
 			new HttpSender(this).sendMessage("db/conversation/updatemessagestatus.php",
@@ -270,12 +290,12 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 			Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
 			MessageFragment.sendBroadcast(this, MessageFragment.ActionType.TEXT_RESPONSE, messageDetails.getMessageId(),
 					messageDetails.getContact(), conversation, receivedMessage);
-			displayNotification(textMessageDetails);
+			displayNotification(textMessageDetails, textMessageDetails.getMessageText());
 			break;
 		case TEXT_OWN:
 			textMessageDetails = (TextMessageDetails) messageDetails;
 			Conversation conversation2 = Application.getAppDatabase().getConversationDao().getConversationById(textMessageDetails.getConversationId());
-			if (conversation2 == null && textMessageDetails.getMessageText() != null && textMessageDetails.getMessageText().length() > 0) {
+			if (conversation2 == null && textMessageDetails.getMessageText() != null && !textMessageDetails.getMessageText().isEmpty()) {
 				conversation2 = Conversation.createNewConversation(textMessageDetails);
 				conversation2.insertIfNew(textMessageDetails.getMessageText());
 				ConversationsFragment.sendBroadcast(this, ConversationsFragment.ActionType.CONVERSATION_ADDED, conversation2);
@@ -283,7 +303,7 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 
 			Message sentMessage = new Message(textMessageDetails.getMessageText(), true, textMessageDetails.getMessageId(),
 					textMessageDetails.getConversationId(), textMessageDetails.getTimestamp(), MessageStatus.MESSAGE_SENT);
-			if (sentMessage.getMessageText() != null && sentMessage.getMessageText().length() > 0) {
+			if (sentMessage.getMessageText() != null && !sentMessage.getMessageText().isEmpty()) {
 				conversation2.setPreparedMessage(null);
 				sentMessage.store(conversation2);
 				conversation2.updateWithNewMessage();
@@ -321,6 +341,25 @@ public class FirebaseDsMessagingService extends FirebaseMessagingService {
 		default:
 			break;
 		}
+	}
+
+	/**
+	 * Handle an incoming text message.
+	 *
+	 * @param textMessageDetails  The text message details.
+	 * @param textMessage         The text message.
+	 * @param messageConversation The conversation of the message.
+	 * @param displayType         The display type.
+	 */
+	private void handleTextMessage(TextMessageDetails textMessageDetails, Message textMessage, Conversation messageConversation, MessageDisplayType displayType) {
+		MessageFragment.sendBroadcast(this, MessageFragment.ActionType.MESSAGE_RECEIVED, textMessageDetails.getMessageId(),
+				textMessageDetails.getContact(), messageConversation, textMessage);
+		Application.getAppDatabase().getMessageDao().acknowledgeMessages(textMessageDetails.getMessageIds());
+		if (displayType == MessageDisplayType.ACTION) {
+			startActivity(MessageActivity.createIntent(this, textMessageDetails, textMessage));
+		}
+		displayNotification(textMessageDetails, textMessage.getMessageText());
+		AlarmReceiver.setAlarm(this, textMessageDetails.getContact());
 	}
 
 	@Override
