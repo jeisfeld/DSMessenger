@@ -12,13 +12,13 @@ import org.json.JSONObject;
 public class DialogToJsonFileConverter2 {
 
 	public static void main(final String[] args) {
-		String filePath = "D:\\Jörg\\Word\\homodea\\AI\\dialog";
+		String filePath = "D:\\Git\\DSMessenger\\finetuning\\Lasercoaching\\dialog";
 		String inputSuffix = ".txt";
 		String outputSuffix = ".json";
 		String fullSuffix = "s.jsonl";
 
 		try (BufferedWriter fullWriter = new BufferedWriter(new FileWriter(filePath + fullSuffix))) {
-			for (int i = 1; i <= 34; i++) {
+			for (int i = 1; i <= 38; i++) {
 				String[] dialog = readDialogFromFile(filePath + i + inputSuffix);
 				String jsonOutput = convertDialogToJson(dialog);
 				writeJsonToFile(jsonOutput, filePath + i + outputSuffix, fullWriter);
