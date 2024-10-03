@@ -4,6 +4,15 @@ require_once __DIR__ .'/../util/utilityfunctions.php';
 
 function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequencyPenalty = 0, $model = 'gpt-4o-mini-2024-07-18')
 {
+    if (str_starts_with($model, 'o1-')) {
+        foreach ($messages as &$message) {
+            if ($message['role'] === 'system') {
+                $message['role'] = 'user';
+            }
+        }
+        unset($message);
+    }
+    
     $data = [
         'model' => $model,
         'temperature' => $temperature,
