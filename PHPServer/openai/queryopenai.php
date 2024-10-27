@@ -1,9 +1,11 @@
 <?php
 require_once 'apikey.php';
-require_once __DIR__ .'/../util/utilityfunctions.php';
+require_once __DIR__ . '/../util/utilityfunctions.php';
 
 function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequencyPenalty = 0, $model = 'gpt-4o-mini-2024-07-18')
 {
+    $isclaude = str_starts_with($model, 'claude');
+    
     if (str_starts_with($model, 'o1-')) {
         foreach ($messages as &$message) {
             if ($message['role'] === 'system') {
@@ -12,24 +14,67 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
         }
         unset($message);
     }
-    
-    $data = [
-        'model' => $model,
-        'temperature' => $temperature,
-        'presence_penalty' => $presencePenalty,
-        'frequency_penalty' => $frequencyPenalty,
-        'messages' => $messages
-    ];
+
+    if ($isclaude) {
+        $system = "";
+        foreach ($messages as $index => $message) {
+            if (isset($message['role']) && $message['role'] === 'system') {
+                // Extract content of the system message
+                $system = $message['content'];
+                // Remove the system message from $messages
+                unset($messages[$index]);
+                // Break after finding the first "system" entry
+                break;
+            }
+        }
+        // Reindex the array to remove gaps in numeric keys
+        $messages = array_values($messages);
+    }
+
+    if ($isclaude) {
+        $data = [
+            'model' => $model,
+            'temperature' => $temperature,
+            'max_tokens' => 4096,
+            'messages' => $messages
+        ];
+        if ($system) {
+            $data['system'] = $system;
+        }
+    }
+    else {
+        $data = [
+            'model' => $model,
+            'temperature' => $temperature,
+            'presence_penalty' => $presencePenalty,
+            'frequency_penalty' => $frequencyPenalty,
+            'messages' => $messages
+        ];
+    }
 
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . getApiKey()
-    ]);
+    
+    if ($isclaude) {
+        curl_setopt($ch, CURLOPT_URL, 'https://api.anthropic.com/v1/messages');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'x-api-key: ' . getApiKey(1),
+            'anthropic-version: 2023-06-01'
+        ]);
+    }
+    else {
+        curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getApiKey(0)
+        ]);
+    }
 
     $response = curl_exec($ch);
     if (curl_errno($ch)) {
@@ -39,20 +84,39 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
 
     $response_data = json_decode($response, true);
 
-    if (@$response_data['error']) {
-        $error = $response_data['error'];
-        return [
-            'success' => FALSE,
-            'error' => $error
-        ];
+    if ($isclaude) {
+        if (isset($response_data['content'][0]['text'])) {
+            $message = $response_data['content'][0]['text'];
+            return [
+                'success' => TRUE,
+                'message' => ['role' => $response_data['role'], 'content' => $message]
+            ];
+        }
+        if (isset($response_data['error']['message'])) {
+            $message = $response_data['error'];
+            return [
+                'success' => FALSE,
+                'error' => ['code' => $message['type'], 'message' => $message['message']]
+            ];
+        }
     }
-    if (@$response_data['choices'][0]) {
-        $message = $response_data['choices'][0]['message'];
-        return [
-            'success' => TRUE,
-            'message' => $message
-        ];
+    else {
+        if (@$response_data['error']) {
+            $error = $response_data['error'];
+            return [
+                'success' => FALSE,
+                'error' => $error
+            ];
+        }
+        if (@$response_data['choices'][0]) {
+            $message = $response_data['choices'][0]['message'];
+            return [
+                'success' => TRUE,
+                'message' => $message
+            ];
+        }
     }
+    
     return [
         'success' => FALSE
     ];
