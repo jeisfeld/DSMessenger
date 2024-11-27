@@ -35,7 +35,7 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
         $data = [
             'model' => $model,
             'temperature' => $temperature,
-            'max_tokens' => 4096,
+            'max_tokens' => 8192,
             'messages' => $messages
         ];
         if ($system) {

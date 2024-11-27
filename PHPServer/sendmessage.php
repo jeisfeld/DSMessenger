@@ -117,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $responseMessage = $result['message']['content'];
         }
         else {
-            $aiPolicy = 0;
+            $responseMessage = "System error - please retry later - " . $result['error']['message'];
         }
         
         $stmt = $conn->prepare("UPDATE dsm_conversation SET prepared_message = ? where id = ?");

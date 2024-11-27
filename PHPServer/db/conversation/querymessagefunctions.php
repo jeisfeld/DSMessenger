@@ -3,12 +3,12 @@ require_once __DIR__.'/../dbfunctions.php';
 require_once __DIR__ . '/../../openai/queryopenai.php';
 
 $modelMap = [
-    "1" => "o1-preview-2024-09-12",
+    "1" => "claude-3-5-haiku-20241022",
     "2" => "claude-3-5-sonnet-20241022",
     "3" => "gpt-3.5-turbo-0125",
     "4" => "gpt-4o-mini-2024-07-18",
-    "5" => "gpt-4o-2024-08-06",
-    "6" => "gpt-4-turbo-2024-04-09",
+    "5" => "gpt-4o-2024-11-20",
+    "6" => "gpt-4o-2024-05-13",
     "7" => "gpt-4-1106-preview",
     "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
     "9" => "ft:gpt-4o-mini-2024-07-18:personal:vlc:9yc6wVhK"
@@ -176,7 +176,7 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
             if ($letters) {
                 $modified = false;
                 foreach ($letters as $letter) {
-                    $suffix = $messageSuffixJson[$letter];
+                    $suffix = @$messageSuffixJson[$letter];
                     if ($suffix) {
                         $lastMessageContent .= ("\n" . $suffix);
                         $modified = true;

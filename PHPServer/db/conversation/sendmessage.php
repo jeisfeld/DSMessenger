@@ -111,7 +111,7 @@ if (! $isSlave) {
             $responseMessage = $result['message']['content'];
         }
         else {
-            $aiPolicy = 0;
+            $responseMessage = "System error - please retry later - " . $result['error']['message'];
         }
     }
 }

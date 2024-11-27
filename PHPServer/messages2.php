@@ -89,7 +89,7 @@ if ($message && ($aiPolicy == 2 || $aiPolicy == 3)) {
         $responseMessage = $result['message']['content'];
     }
     else {
-        $aiPolicy = 0;
+        $responseMessage = "System error - please retry later - " . $result['error']['message'];
     }
 }
 

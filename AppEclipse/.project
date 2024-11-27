@@ -81,7 +81,7 @@
 		<link>
 			<name>libs-local/R.jar</name>
 			<type>1</type>
-			<locationURI>copy_PARENT/app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/R.jar</locationURI>
+			<locationURI>copy_PARENT/app/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/debug/processDebugResources/R.jar</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>
