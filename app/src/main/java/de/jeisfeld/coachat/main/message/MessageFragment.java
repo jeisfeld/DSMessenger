@@ -56,6 +56,7 @@ import de.jeisfeld.coachat.message.MessageDetails.MessageType;
 import de.jeisfeld.coachat.util.DateUtil;
 import de.jeisfeld.coachat.util.DialogUtil;
 import io.noties.markwon.Markwon;
+import io.noties.markwon.SoftBreakAddsNewLinePlugin;
 
 /**
  * Fragment for sending messages.
@@ -461,7 +462,9 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	@Override
 	public final View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
 		binding = FragmentMessageBinding.inflate(inflater, container, false);
-		markwon = Markwon.create(getContext());
+		markwon = Markwon.builder(getContext())
+				.usePlugin(SoftBreakAddsNewLinePlugin.create())
+				.build();
 
 		binding.buttonSend.setOnClickListener(v -> sendMessage(MessagePriority.NORMAL));
 		binding.buttonSendWithPriority.setOnClickListener(v -> sendMessage(MessagePriority.HIGH));
@@ -538,12 +541,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 
 				Message message = messageList.get(position);
 				TextView textViewMessage = view.findViewById(R.id.textViewMessage);
-				String messageText = message.getMessageText();
-				messageText = messageText.replaceAll("\\r\\n|\\n", "\\\\\n");
-				messageText = messageText.replaceAll("\\\\\\n\\\\\\n", "\n\n");
-				messageText = messageText.replaceAll("\\\\\\n(\\d+)\\. ", "\n$1. ");
-				messageText = messageText.replaceAll("\\\\\\n(\\s+)- ", "\n$1- ");
-				markwon.setMarkdown(textViewMessage, messageText);
+				markwon.setMarkdown(textViewMessage, message.getMessageText());
 
 				if (message.isOwn()) {
 					view.findViewById(R.id.spaceRight).setVisibility(View.GONE);
