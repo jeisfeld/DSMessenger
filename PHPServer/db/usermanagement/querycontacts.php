@@ -112,7 +112,7 @@ function queryPrimings()
     
     $id = null;
     $name = null;
-    $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming");
+    $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming order by name, id");
 
     $stmt->execute();
     $stmt->bind_result($id, $name);
