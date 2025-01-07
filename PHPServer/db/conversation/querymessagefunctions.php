@@ -5,13 +5,15 @@ require_once __DIR__ . '/../../openai/queryopenai.php';
 $modelMap = [
     "1" => "claude-3-5-haiku-20241022",
     "2" => "claude-3-5-sonnet-20241022",
-    "3" => "gpt-4o-mini-2024-07-18",
+    "3" => "llama3.3-70b",
     "4" => "gpt-4o-2024-11-20",
     "5" => "gpt-4o-2024-05-13",
     "6" => "gemini-1.5-flash",
     "7" => "gemini-2.0-flash-exp",
     "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
-    "9" => "ft:gpt-4o-mini-2024-07-18:personal:vlc:9yc6wVhK"
+    "9" => "ft:gpt-4o-mini-2024-07-18:personal:vlc:9yc6wVhK",
+    "+" => "mixtral-8x22b-instruct",
+    "#" => "Nous-Hermes-2-Mixtral-8x7B-DPO"
 ];
 
 $autoQueryTriggerMessage = "[@]";
@@ -124,7 +126,7 @@ function queryMessagesForOpenai($username, $password, $relationId, $conversation
     $lastMessage = end($messages);
     $lastMessageContent = $lastMessage['content'];
     $isAutoQuery = $lastMessageContent == $autoQueryTriggerMessage;
-    $pattern = '/^(.*)\s*\[([a-zA-Z0-9@]+)]$/ms';
+    $pattern = '/^(.*)\s*\[([^\[\]\s\.]+)]$/ms';
     
     if (str_ends_with($lastMessageContent, "]")) {
 

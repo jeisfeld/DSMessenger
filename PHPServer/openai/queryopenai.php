@@ -6,7 +6,8 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
 {
     $isclaude = str_starts_with($model, 'claude');
     $isgemini = str_starts_with($model, 'gemini');
-
+    $isllama = str_starts_with($model, 'llama') || str_starts_with($model, 'mixtral') || str_starts_with($model, 'Qwen') || str_starts_with($model, 'Nous');
+    
     if (str_starts_with($model, 'o1-')) {
         foreach ($messages as &$message) {
             if ($message['role'] === 'system') {
@@ -87,6 +88,15 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
             ];
         }
     }
+    else if ($isllama) {
+        $data = [
+            'model' => $model,
+            'temperature' => $temperature,
+            'frequency_penalty' => $frequencyPenalty,
+            'messages' => $messages,
+            'max_tokens' => 8192
+        ];
+    }
     else {
         $data = [
             'model' => $model,
@@ -119,7 +129,16 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
             'Content-Type: application/json'
         ]);
     }
-    else {
+    else if ($isllama) {
+        curl_setopt($ch, CURLOPT_URL, 'https://api.llama-api.com/chat/completions');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getApiKey(3)
+        ]);
+    } else {
         curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
