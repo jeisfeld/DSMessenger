@@ -27,7 +27,7 @@ $password = $_SESSION['password'];
             <?php
             // Assuming you have a function getContacts() that returns an array of contacts
             $contacts = queryContacts($username, $password, true);
-            $primings = queryPrimings();
+            $primings = queryPrimings($username);
             foreach ($contacts as $contact) {
                 $relationId = $contact['relationId'];
                 $contactName = $contact['contactName'];

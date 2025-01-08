@@ -100,7 +100,7 @@ function queryUsertype($username, $password)
     return $usertype;
 }
 
-function queryPrimings()
+function queryPrimings($username)
 {
     // Create connection
     $conn = getDbConnection();
@@ -110,9 +110,24 @@ function queryPrimings()
         printError(101, "Connection failed: " . $conn->connect_error);
     }
     
+    // get usertype
+    $usertype = 0;
+    $stmt = $conn->prepare("SELECT usertype from dsm_user WHERE username = ?");
+        $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->bind_result($usertype);
+    $stmt->fetch();
+    $stmt->close();
+    
+    // get primings
     $id = null;
     $name = null;
-    $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming order by name, id");
+    if ($usertype === 1) {
+        $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming order by name, id");
+    }
+    else {
+        $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming where name not like 'Domin%' order by name, id");
+    }
 
     $stmt->execute();
     $stmt->bind_result($id, $name);
