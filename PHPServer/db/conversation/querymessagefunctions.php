@@ -13,7 +13,8 @@ $modelMap = [
     "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
     "9" => "ft:gpt-4o-mini-2024-07-18:personal:vlc:9yc6wVhK",
     "+" => "mixtral-8x22b-instruct",
-    "#" => "Nous-Hermes-2-Mixtral-8x7B-DPO"
+    "#" => "o1-mini-2024-09-12",
+    "*" => "o1-2024-12-17"
 ];
 
 $autoQueryTriggerMessage = "[@]";

@@ -7,7 +7,7 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
     $isclaude = str_starts_with($model, 'claude');
     $isgemini = str_starts_with($model, 'gemini');
     $isllama = str_starts_with($model, 'llama') || str_starts_with($model, 'mixtral') || str_starts_with($model, 'Qwen') || str_starts_with($model, 'Nous');
-    
+
     if (str_starts_with($model, 'o1-')) {
         foreach ($messages as &$message) {
             if ($message['role'] === 'system') {
@@ -53,7 +53,7 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                 ],
                 [
                     'category' => "HARM_CATEGORY_HATE_SPEECH",
-                    'threshold' => "BLOCK_ONLY_HIGH"
+                    'threshold' => "BLOCK_NONE"
                 ],
                 [
                     'category' => "HARM_CATEGORY_SEXUALLY_EXPLICIT",
@@ -61,11 +61,11 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                 ],
                 [
                     'category' => "HARM_CATEGORY_DANGEROUS_CONTENT",
-                    'threshold' => "BLOCK_ONLY_HIGH"
+                    'threshold' => "BLOCK_NONE"
                 ],
                 [
                     'category' => "HARM_CATEGORY_CIVIC_INTEGRITY",
-                    'threshold' => "BLOCK_ONLY_HIGH"
+                    'threshold' => "BLOCK_NONE"
                 ]
             ],
             "generationConfig" => [
@@ -78,7 +78,18 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                         'text' => $item['content']
                     ]
                 ];
-            }, $messages)
+            }, $messages),
+            'tools' => [
+                [
+                    'google_search_retrieval' => [
+                        'dynamic_retrieval_config' => [
+                            'mode' => 'MODE_DYNAMIC',
+                            'dynamic_threshold' => 1
+                        ]
+                    ]
+                ]
+            ]
+
         ];
         if ($system) {
             $data['system_instruction'] = [
@@ -138,7 +149,8 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
             'Content-Type: application/json',
             'Authorization: Bearer ' . getApiKey(3)
         ]);
-    } else {
+    }
+    else {
         curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
