@@ -7,16 +7,40 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
     $isclaude = str_starts_with($model, 'claude');
     $isgemini = str_starts_with($model, 'gemini');
     $isllama = str_starts_with($model, 'llama') || str_starts_with($model, 'mixtral') || str_starts_with($model, 'Qwen') || str_starts_with($model, 'Nous');
+    $isdeepseek = str_starts_with($model, 'deepseek');
 
     if (str_starts_with($model, 'o1-')) {
         foreach ($messages as &$message) {
             if ($message['role'] === 'system') {
-                $message['role'] = 'user'; // TODO: use developer when available
+                $message['role'] = 'user'; // TOTO: possibly change if o1 allows system message.
             }
         }
         unset($message);
     }
-
+    if (str_starts_with($model, 'deepseek-reasoner')) { // deepseek-reasoner expects possible system message followed by interleaving user/assistant messages.
+        $newmessages = [];
+        $lastrole = "";
+        foreach ($messages as &$message) {
+            if ($message['role'] === 'system' && $lastrole === "") {
+                $newmessages[] = $message;
+                continue;
+            }
+            if ($lastrole === "" && $message['role'] === 'assistant') {
+                $newmessages[] = createOpenAiMessage('user', 'Please start with first message.');
+                $lastrole = 'user';
+            }
+            if ($message['role'] === $lastrole) {
+                $newmessages[count($newmessages) - 1] .= "\n" . $message['content'];
+            }
+            else {
+                $newmessages[] = $message;
+                $lastrole = $message['role'];
+            }
+        }
+        unset($message);
+        $messages = $newmessages;
+    } 
+    
     if ($isclaude || $isgemini) {
         $system = "";
         foreach ($messages as $index => $message) {
@@ -89,8 +113,10 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                     ]
                 ]
             ]
-
         ];
+        if (str_ends_with($model, 'exp')) {
+            $data["tools"] = []; // Google Search not yet supported with Geminie 2.0-exp
+        }
         if ($system) {
             $data['system_instruction'] = [
                 'parts' => [
@@ -148,6 +174,16 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Authorization: Bearer ' . getApiKey(3)
+        ]);
+    }
+    else if ($isdeepseek) {
+        curl_setopt($ch, CURLOPT_URL, 'https://api.deepseek.com/chat/completions');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getApiKey(4)
         ]);
     }
     else {

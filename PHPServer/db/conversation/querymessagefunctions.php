@@ -12,8 +12,10 @@ $modelMap = [
     "7" => "gemini-2.0-flash-exp",
     "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
     "9" => "ft:gpt-4o-mini-2024-07-18:personal:vlc:9yc6wVhK",
+    "(" => "deepseek-chat",
+    ")" => "deepseek-reasoner",
     "+" => "mixtral-8x22b-instruct",
-    "#" => "o1-mini-2024-09-12",
+    "#" => "o3-mini-2025-01-31",
     "*" => "o1-2024-12-17"
 ];
 
