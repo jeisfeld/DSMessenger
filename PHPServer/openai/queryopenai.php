@@ -39,8 +39,8 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
         }
         unset($message);
         $messages = $newmessages;
-    } 
-    
+    }
+
     if ($isclaude || $isgemini) {
         $system = "";
         foreach ($messages as $index => $message) {
@@ -114,8 +114,25 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                 ]
             ]
         ];
-        if (str_ends_with($model, 'exp')) {
-            $data["tools"] = []; // Google Search not yet supported with Geminie 2.0-exp
+//         if (str_ends_with($model, '001')) {
+//             $data["tools"] = [
+//                 [
+//                     [
+//                         'google_search_retrieval' => [
+//                             'dynamic_retrieval_config' => [
+//                                 'mode' => 'MODE_DYNAMIC',
+//                                 'dynamic_threshold' => 1
+//                             ]
+//                         ]
+//                     ],
+//                     [
+//                         'google_search' => []
+//                     ]
+//                 ]
+//             ];
+//         }
+        if (str_ends_with($model, '001')) {
+            $data["tools"] = [];
         }
         if ($system) {
             $data['system_instruction'] = [
