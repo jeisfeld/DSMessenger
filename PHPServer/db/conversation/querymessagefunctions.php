@@ -14,9 +14,10 @@ $modelMap = [
     "9" => "ft:gpt-4o-mini-2024-07-18:personal:vlc:9yc6wVhK",
     "(" => "deepseek-chat",
     ")" => "deepseek-reasoner",
-    "+" => "mixtral-8x22b-instruct",
-    "#" => "o3-mini-2025-01-31",
-    "*" => "o1-2024-12-17"
+    "#" => "mixtral-8x22b-instruct",
+    "+" => "o3-mini-2025-01-31",
+    "-" => "o1-2024-12-17",
+    "*" => "grok-2-1212"
 ];
 
 $autoQueryTriggerMessage = "[@]";

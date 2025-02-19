@@ -8,6 +8,7 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
     $isgemini = str_starts_with($model, 'gemini');
     $isllama = str_starts_with($model, 'llama') || str_starts_with($model, 'mixtral') || str_starts_with($model, 'Qwen') || str_starts_with($model, 'Nous');
     $isdeepseek = str_starts_with($model, 'deepseek');
+    $isxai = str_starts_with($model, 'grok');
 
     if (str_starts_with($model, 'o1-')) {
         foreach ($messages as &$message) {
@@ -203,7 +204,16 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
             'Authorization: Bearer ' . getApiKey(4)
         ]);
     }
-    else {
+    else if ($isxai) {
+        curl_setopt($ch, CURLOPT_URL, 'https://api.x.ai/v1/chat/completions');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getApiKey(5)
+        ]);
+    }else {
         curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -294,10 +304,26 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
         }
         else if (@$response_data['error']) {
             $error = $response_data['error'];
-            return [
-                'success' => FALSE,
-                'error' => $error
-            ];
+            if (is_array($error)) {
+                // openai
+                return [
+                    'success' => FALSE,
+                    'error' => [
+                        'code' => $error['code'],
+                        'message' => $error['message']
+                    ]
+                ];
+            }
+            else {
+                // x-ai
+                return [
+                    'success' => FALSE,
+                    'error' => [
+                        'code' => $response_data['code'],
+                        'message' => $error
+                    ]
+                ];
+            }
         }
         else { // for analyzing unexpected behavior
             return [
