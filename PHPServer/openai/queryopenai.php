@@ -94,7 +94,8 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                 ]
             ],
             "generationConfig" => [
-                'temperature' => $temperature
+                'temperature' => $temperature,
+                'response_modalities' => 'TEXT'
             ],
             'contents' => array_map(function ($item) {
                 return [
@@ -109,31 +110,18 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                     'google_search_retrieval' => [
                         'dynamic_retrieval_config' => [
                             'mode' => 'MODE_DYNAMIC',
-                            'dynamic_threshold' => 1
+                            'dynamic_threshold' => 0.5
                         ]
                     ]
                 ]
             ]
         ];
-//         if (str_ends_with($model, '001')) {
-//             $data["tools"] = [
-//                 [
-//                     [
-//                         'google_search_retrieval' => [
-//                             'dynamic_retrieval_config' => [
-//                                 'mode' => 'MODE_DYNAMIC',
-//                                 'dynamic_threshold' => 1
-//                             ]
-//                         ]
-//                     ],
-//                     [
-//                         'google_search' => []
-//                     ]
-//                 ]
-//             ];
-//         }
-        if (str_ends_with($model, '001')) {
-            $data["tools"] = [];
+        if (str_starts_with($model, 'gemini-2')) {
+            $data['tools'] = [
+                [
+                    'google_search' => new stdClass()
+                ]
+            ];
         }
         if ($system) {
             $data['system_instruction'] = [
@@ -213,7 +201,8 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
             'Content-Type: application/json',
             'Authorization: Bearer ' . getApiKey(5)
         ]);
-    }else {
+    }
+    else {
         curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
