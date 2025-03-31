@@ -18,7 +18,9 @@ $modelMap = [
     "#" => "mixtral-8x22b-instruct",
     "+" => "o3-mini-2025-01-31",
     "-" => "o1-2024-12-17",
-    "*" => "grok-2-1212"
+    "*" => "grok-2-1212",
+    "?" => "gpt-4.5-preview-2025-02-27",
+    "%" => "gemini-2.5-pro-exp-03-25"
 ];
 
 $autoQueryTriggerMessage = "[@]";
