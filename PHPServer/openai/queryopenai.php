@@ -44,7 +44,7 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
 
     if ($isclaude || $isgemini) {
         $system = "";
-        foreach ($messages as $index => $message) {
+        foreach ($messages as $index => &$message) {
             if (isset($message['role']) && $message['role'] === 'system') {
                 // Extract content of the system message
                 $system = $message['content'];
@@ -70,6 +70,12 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
         }
     }
     else if ($isgemini) {
+        foreach ($messages as &$message) {
+            if (isset($message['role']) && $message['role'] === 'assistant') {
+                $message['role'] = 'model';
+            }
+        }
+        unset($message);
         $data = [
             "safetySettings" => [
                 [

@@ -5,22 +5,24 @@ require_once __DIR__ . '/../../openai/queryopenai.php';
 $modelMap = [
     "1" => "claude-3-5-haiku-20241022",
     "2" => "claude-3-7-sonnet-20250219",
-    "3" => "llama3.3-70b",
-    "4" => "gpt-4o-2024-11-20",
+    "3" => "gpt-4o-2024-05-13",
+    "4" => "gpt-4.1-2025-04-14",
     "5" => "gpt-4o-2024-05-13",
     "6" => "gemini-1.5-flash",
-    "7" => "gemini-2.0-flash-001",
+    "7" => "gemini-2.0-flash",
     "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
     "9" => "ft:gpt-4o-mini-2024-07-18:personal:vlc:9yc6wVhK",
-    "!" => "gpt-4.5-preview-2025-02-27",
+    "!" => "chatgpt-4o-latest",
     "(" => "deepseek-chat",
     ")" => "deepseek-reasoner",
     "#" => "mixtral-8x22b-instruct",
-    "+" => "o3-mini-2025-01-31",
-    "-" => "o1-2024-12-17",
+    "+" => "o4-mini-2025-04-16",
+    "-" => "o3-2025-04-16",
+    "{" => "llama4-scout",
+    "}" => "llama4-maverick",
     "*" => "grok-3-beta",
-    "?" => "gpt-4.5-preview-2025-02-27",
-    "%" => "gemini-2.5-pro-exp-03-25"
+    "<" => "gemini-2.5-flash-preview-04-17",
+    ">" => "gemini-2.5-pro-preview-03-25"
 ];
 
 $autoQueryTriggerMessage = "[@]";
