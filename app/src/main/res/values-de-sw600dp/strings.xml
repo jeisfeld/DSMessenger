@@ -1,0 +1,4 @@
+<resources>
+    <string name="text_send_message_to">Nachricht an %1$s</string>
+    <string name="text_message_from">Nachricht von %1$s</string>
+</resources>

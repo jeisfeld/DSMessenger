@@ -43,9 +43,9 @@
     <string name="button_trigger_lut">Impuls senden</string>
 
     <string name="text_send_message">Nachricht senden</string>
-    <string name="text_send_message_to">Nachricht an %1$s</string>
+    <string name="text_send_message_to">%1$s</string>
     <string name="text_select_conversation">Unterhaltung auswählen</string>
-    <string name="text_message_from">Nachricht von %1$s</string>
+    <string name="text_message_from">%1$s</string>
     <string name="text_subject">%1$s</string>
     <string name="text_display_random_image">Zufallsbild anzeigen</string>
     <string name="text_trigger_lut">Lob &amp; Tadel auslösen</string>

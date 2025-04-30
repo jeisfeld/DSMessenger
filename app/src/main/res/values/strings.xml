@@ -43,9 +43,9 @@
     <string name="button_trigger_lut">Send Pulse</string>
 
     <string name="text_send_message">Send Message</string>
-    <string name="text_send_message_to">Message to %1$s</string>
+    <string name="text_send_message_to">%1$s</string>
     <string name="text_select_conversation">Select Conversation</string>
-    <string name="text_message_from">Message from %1$s</string>
+    <string name="text_message_from">%1$s</string>
     <string name="text_subject">%1$s</string>
     <string name="text_display_random_image">Display RandomImage</string>
     <string name="text_trigger_lut">Trigger Lob &amp; Tadel</string>
