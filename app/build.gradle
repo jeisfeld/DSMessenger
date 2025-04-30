@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "de.jeisfeld.coachat"
         minSdk 26
-        targetSdk 34
+        targetSdk 35
         versionCode 6
         versionName "0.4.2"
 
@@ -41,18 +41,18 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.8.7'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.7'
-    implementation 'androidx.navigation:navigation-fragment:2.8.5'
-    implementation 'androidx.navigation:navigation-ui:2.8.5'
-    implementation 'com.google.firebase:firebase-messaging:24.1.0'
+    implementation 'androidx.navigation:navigation-fragment:2.8.9'
+    implementation 'androidx.navigation:navigation-ui:2.8.9'
+    implementation 'com.google.firebase:firebase-messaging:24.1.1'
     implementation 'androidx.preference:preference:1.2.1'
     implementation 'androidx.test.ext:junit:1.2.1'
     implementation 'io.noties.markwon:core:4.6.2'
     testImplementation 'junit:junit:4.13.2'
 
-    implementation "androidx.room:room-runtime:2.6.1"
+    implementation "androidx.room:room-runtime:2.7.1"
     androidTestImplementation 'org.testng:testng:6.9.6'
-    annotationProcessor "androidx.room:room-compiler:2.6.1"
+    annotationProcessor "androidx.room:room-compiler:2.7.1"
 }
