@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/page_padding"
+    android:paddingHorizontal="@dimen/page_padding"
+    android:paddingTop="@dimen/page_padding"
     tools:context=".main.lut.LutFragment">
 
     <TextView

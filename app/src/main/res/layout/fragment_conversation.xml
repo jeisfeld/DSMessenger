@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/page_padding"
+    android:paddingHorizontal="@dimen/page_padding"
+    android:paddingTop="@dimen/page_padding"
     tools:context=".main.message.MessageFragment">
 
     <TextView
@@ -33,7 +34,7 @@
         android:layout_width="@dimen/input_row_height"
         android:layout_height="@dimen/input_row_height"
         android:contentDescription="@string/text_refresh"
-        android:drawableRight="@drawable/ic_icon_archive"
+        android:drawableEnd="@drawable/ic_icon_archive"
         android:textOff=""
         android:textOn=""
         app:layout_constraintBottom_toBottomOf="@id/textSendMessage"
@@ -45,7 +46,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/margin_medium"
-        android:layout_marginBottom="@dimen/margin_medium"
         android:groupIndicator="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

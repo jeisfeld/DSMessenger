@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/page_padding"
+        android:paddingHorizontal="@dimen/page_padding"
+        android:paddingTop="@dimen/page_padding"
         tools:context=".main.account.AccountFragment">
 
         <TextView
