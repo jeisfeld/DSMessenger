@@ -146,7 +146,13 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
             'max_tokens' => 8192
         ];
     }
-    else {
+    else if ($isxai) {
+        $data = [
+            'model' => $model,
+            'temperature' => $temperature,
+            'messages' => $messages
+        ];
+    }else {
         $data = [
             'model' => $model,
             'temperature' => $temperature,

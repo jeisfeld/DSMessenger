@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../openai/queryopenai.php';
 $modelMap = [
     "1" => "claude-sonnet-4-20250514",
     "2" => "claude-3-7-sonnet-20250219",
-    "3" => "claude-opus-4-20250514",
+    "3" => "claude-opus-4-1-20250805",
     "4" => "gpt-4o-2024-05-13",
     "5" => "gpt-4.1-2025-04-14",
     "6" => "gpt-4o-2024-11-20",
@@ -15,14 +15,18 @@ $modelMap = [
     "!" => "chatgpt-4o-latest",
     "(" => "deepseek-chat",
     ")" => "deepseek-reasoner",
-    "#" => "mixtral-8x22b-instruct",
+    "?" => "mixtral-8x22b-instruct",
     "+" => "o4-mini-2025-04-16",
     "-" => "o3-2025-04-16",
     "{" => "llama4-scout",
     "}" => "llama4-maverick",
     "*" => "grok-3",
+    "#" => "grok-4-0709",
     "<" => "gemini-2.5-flash",
-    ">" => "gemini-2.5-pro"
+    ">" => "gemini-2.5-pro",
+    "%" => "gpt-5-2025-08-07",
+    "$" => "gpt-5-mini-2025-08-07",
+    "&" => "gpt-5-nano-2025-08-07"
 ];
 
 $autoQueryTriggerMessage = "[@]";
