@@ -9,6 +9,7 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
     $isllama = str_starts_with($model, 'llama') || str_starts_with($model, 'mixtral') || str_starts_with($model, 'Qwen') || str_starts_with($model, 'Nous');
     $isdeepseek = str_starts_with($model, 'deepseek');
     $isxai = str_starts_with($model, 'grok');
+    $needsresponsesapi = str_starts_with($model, 'gpt-5-pro');
 
     if (str_starts_with($model, 'o1-')) {
         foreach ($messages as &$message) {
@@ -152,7 +153,17 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
             'temperature' => $temperature,
             'messages' => $messages
         ];
-    }else {
+    }
+    else if ($needsresponsesapi) {
+        $input = mapMessagesToResponsesInput($messages);
+        
+        $data = [
+            'model' => $model,
+            'temperature' => $temperature,
+            'input' => $input,
+        ];
+    }
+    else {
         $data = [
             'model' => $model,
             'temperature' => $temperature,
@@ -214,7 +225,16 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
             'Authorization: Bearer ' . getApiKey(5)
         ]);
     }
-    else {
+    else if ($needsresponsesapi) {
+        curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/responses');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getApiKey(0)
+        ]);
+    }else {
         curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/chat/completions');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -284,6 +304,62 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                     'message' => $message['message']
                 ]
             ];
+        }
+        else { // for analyzing unexpected behavior
+            return [
+                'success' => FALSE,
+                'error' => [
+                    'code' => 'UNEXPECTED',
+                    'message' => $response
+                ]
+            ];
+        }
+    }
+    else if ($needsresponsesapi) {
+        if (!empty($response_data['output']) && is_array($response_data['output'])) {
+            // filter items with status === "completed"
+            $completed = array_values(array_filter(
+                $response_data['output'],
+                fn($item) => ($item['type'] ?? null) === 'message'
+                ));
+            
+            // take the last such item
+            if ($completed) {
+                $last = end($completed);
+                // flatten any text parts
+                $texts = array_map(
+                    fn($c) => $c['text'] ?? '',
+                    array_filter($last['content'] ?? [], fn($c) => ($c['type'] ?? null) === 'output_text')
+                    );
+                $message = trim(implode("\n", $texts));
+                return [
+                    'success' => TRUE,
+                    'message' => $message
+                ];
+            }
+        }
+        if (@$response_data['error']) {
+            $error = $response_data['error'];
+            if (is_array($error)) {
+                // openai
+                return [
+                    'success' => FALSE,
+                    'error' => [
+                        'code' => $error['code'],
+                        'message' => $error['message']
+                    ]
+                ];
+            }
+            else {
+                // x-ai
+                return [
+                    'success' => FALSE,
+                    'error' => [
+                        'code' => $response_data['code'],
+                        'message' => $error
+                    ]
+                ];
+            }
         }
         else { // for analyzing unexpected behavior
             return [
@@ -366,6 +442,56 @@ if ($usermessage) {
     else {
         printError(222, "Failed to query OpenAI");
     }
+}
+
+function mapMessagesToResponsesInput(array $messages): array {
+    $out = [];
+    
+    foreach ($messages as $m) {
+        $role = $m['role'];
+        $content = $m['content'];
+        
+        // Case A: content was a simple string
+        if (is_string($content)) {
+            $out[] = [
+                'role' => $role,
+                'content' => [
+                    [ 'type' => 'input_text', 'text' => $content ]
+                ],
+            ];
+            continue;
+        }
+        
+        // Case B: Chat Completions "vision" style: array of {type:text|image_url,...}
+        if (is_array($content)) {
+            $parts = [];
+            foreach ($content as $part) {
+                if (($part['type'] ?? null) === 'text') {
+                    $parts[] = [ 'type' => 'input_text', 'text' => $part['text'] ?? '' ];
+                } elseif (($part['type'] ?? null) === 'image_url') {
+                    // Accept either ['image_url' => 'https://...'] or ['image_url' => ['url'=>'...']]
+                    $img = $part['image_url'] ?? null;
+                    $url = is_array($img) ? ($img['url'] ?? null) : $img;
+                    if ($url) {
+                        $parts[] = [ 'type' => 'input_image', 'image_url' => $url ];
+                    }
+                }
+                // You can add other part types (files, audio) here if you use them.
+            }
+            $out[] = [ 'role' => $role, 'content' => $parts ];
+            continue;
+        }
+        
+        // Fallback: coerce anything else to text
+        $out[] = [
+            'role' => $role,
+            'content' => [
+                [ 'type' => 'input_text', 'text' => strval($content) ]
+            ],
+        ];
+    }
+    
+    return $out;
 }
 
 ?>
