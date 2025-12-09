@@ -3,13 +3,13 @@ require_once __DIR__.'/../dbfunctions.php';
 require_once __DIR__ . '/../../openai/queryopenai.php';
 
 $modelMap = [
-    "1" => "claude-sonnet-4-20250514",
+    "1" => "claude-sonnet-4-5-20250929",
     "2" => "claude-3-7-sonnet-20250219",
     "3" => "claude-opus-4-1-20250805",
-    "4" => "gpt-4o-2024-05-13",
+    "4" => "claude-haiku-4-5-20251001",
     "5" => "gpt-4.1-2025-04-14",
     "6" => "gpt-4o-2024-11-20",
-    "7" => "gemini-2.0-flash",
+    "7" => "gemini-3-pro-preview",
     "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
     "9" => "ft:gpt-4o-mini-2024-07-18:personal:vlc:9yc6wVhK",
     "!" => "chatgpt-4o-latest",
@@ -21,10 +21,11 @@ $modelMap = [
     "{" => "llama4-scout",
     "}" => "llama4-maverick",
     "*" => "grok-3",
-    "#" => "grok-4-0709",
+    "#" => "grok-4-1-fast-non-reasoning",
     "<" => "gemini-2.5-flash",
     ">" => "gemini-2.5-pro",
-    "%" => "gpt-5-2025-08-07",
+    "%" => "gpt-5.1-2025-11-13",
+    "=" => "gpt-5.2-2025-12-11",
     "/" => "gpt-5-pro-2025-10-06",
     "$" => "gpt-5-mini-2025-08-07",
     "&" => "gpt-5-nano-2025-08-07"

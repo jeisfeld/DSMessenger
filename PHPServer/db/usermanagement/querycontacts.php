@@ -126,7 +126,7 @@ function queryPrimings($username)
         $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming order by name, id");
     }
     else {
-        $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming where name not like 'Domin%' order by name, id");
+        $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming where name not like 'Dominia%' and name not like 'Veit%' order by name, id");
     }
 
     $stmt->execute();

@@ -123,7 +123,7 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                 ]
             ]
         ];
-        if (str_starts_with($model, 'gemini-2')) {
+        if (str_starts_with($model, 'gemini-2') || str_starts_with($model, 'gemini-3')) {
             $data['tools'] = [
                 [
                     'google_search' => new stdClass()
@@ -160,7 +160,7 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
         $data = [
             'model' => $model,
             'temperature' => $temperature,
-            'input' => $input,
+            'input' => $messages
         ];
     }
     else {
