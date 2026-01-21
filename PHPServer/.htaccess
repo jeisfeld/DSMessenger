@@ -1,5 +1,4 @@
 Allow from all
-AddType application/x-httpd-php81 .php
 
 <IfModule mod_headers.c>
 # 1 Jahr (der maximale unterstützte Wert) für Grafik-/Multimediadateien

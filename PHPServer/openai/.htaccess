@@ -1,5 +1,4 @@
 Allow from all
-AddType application/x-httpd-php81 .php
 
 AuthType Basic
 AuthName "Protected Content"
