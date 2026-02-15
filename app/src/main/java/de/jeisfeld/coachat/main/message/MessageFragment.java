@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -261,6 +263,14 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 			 * Flag indicating if recording is happening.
 			 */
 			private boolean isRecording = false;
+			/**
+			 * Handler for scheduling recognition restarts.
+			 */
+			private final Handler recognitionHandler = new Handler(Looper.getMainLooper());
+			/**
+			 * Delay in milliseconds before restarting recognition.
+			 */
+			private static final long RESTART_DELAY_MS = 250L;
 
 			private void updateRecordingUi(final boolean recording) {
 				getActivity().runOnUiThread(() -> {
@@ -278,11 +288,26 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 				try {
 					speechRecognizer.startListening(speechRecognizerIntent);
 				}
-				catch (IllegalStateException e) {
-					Log.w(Application.TAG, "Speech recognizer busy, retry listening", e);
-					speechRecognizer.cancel();
-					speechRecognizer.startListening(speechRecognizerIntent);
+				catch (RuntimeException e) {
+					Log.w(Application.TAG, "Speech recognizer start failed, retry", e);
+					restartListeningWithDelay();
 				}
+			}
+
+			private void restartListeningWithDelay() {
+				recognitionHandler.removeCallbacksAndMessages(null);
+				recognitionHandler.postDelayed(() -> {
+					if (!isRecording) {
+						return;
+					}
+					try {
+						speechRecognizer.cancel();
+					}
+					catch (RuntimeException e) {
+						Log.w(Application.TAG, "Speech recognizer cancel failed", e);
+					}
+					startListening();
+				}, RESTART_DELAY_MS);
 			}
 
 			private void appendRecognizedText(final String recognizedText) {
@@ -307,7 +332,9 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 			public void onClick(View v) {
 				if (isRecording) {
 					isRecording = false;
+					recognitionHandler.removeCallbacksAndMessages(null);
 					speechRecognizer.stopListening();
+					speechRecognizer.cancel();
 					updateRecordingUi(false);
 				}
 				else {
@@ -350,8 +377,9 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 
 							@Override
 							public void onError(int error) {
-								if (isRecording && (error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT || error == SpeechRecognizer.ERROR_NO_MATCH)) {
-									startListening();
+								Log.w(Application.TAG, "Speech recognition error: " + error);
+								if (isRecording && error != SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS) {
+									restartListeningWithDelay();
 								}
 								else {
 									isRecording = false;
@@ -370,7 +398,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 									}
 								}
 								if (isRecording) {
-									startListening();
+									restartListeningWithDelay();
 								}
 							}
 
