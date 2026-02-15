@@ -269,6 +269,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 					binding.imageButtonRecordVoice.setImageResource(recording
 							? R.drawable.ic_icon_microphone_red
 							: R.drawable.ic_icon_microphone);
+					binding.imageButtonRecordVoice.setSelected(recording);
 					binding.editTextMessageText.setEnabled(!recording);
 				});
 			}
@@ -697,6 +698,9 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	 * @param priority The message priority.
 	 */
 	private void sendMessage(final MessagePriority priority) {
+		if (binding.imageButtonRecordVoice.isSelected()) {
+			binding.imageButtonRecordVoice.performClick();
+		}
 		String messageText = binding.editTextMessageText.getText().toString();
 		UUID messageId = UUID.randomUUID();
 		long timestamp = System.currentTimeMillis();
