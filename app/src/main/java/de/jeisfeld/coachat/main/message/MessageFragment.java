@@ -67,6 +67,14 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	 */
 	private static final String BROADCAST_ACTION = "de.jeisfeld.coachat.main.message.MessageFragment";
 	/**
+	 * Silence timeout for voice recognition in milliseconds.
+	 */
+	private static final long VOICE_RECOGNITION_SILENCE_TIMEOUT_MS = 10_000L;
+	/**
+	 * Minimum recording length in milliseconds before the recognizer may stop.
+	 */
+	private static final long VOICE_RECOGNITION_MIN_LENGTH_MS = 30_000L;
+	/**
 	 * An instance for markup handling.
 	 */
 	private Markwon markwon;
@@ -262,6 +270,15 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 
 						Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 						speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+						speechRecognizerIntent.putExtra(
+								RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,
+								VOICE_RECOGNITION_SILENCE_TIMEOUT_MS);
+						speechRecognizerIntent.putExtra(
+								RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS,
+								VOICE_RECOGNITION_SILENCE_TIMEOUT_MS);
+						speechRecognizerIntent.putExtra(
+								RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS,
+								VOICE_RECOGNITION_MIN_LENGTH_MS);
 						//speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "de-DE");
 
 						speechRecognizer.setRecognitionListener(new RecognitionListener() {
