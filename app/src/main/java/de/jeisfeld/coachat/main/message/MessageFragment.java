@@ -254,21 +254,66 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 			 */
 			private String oldText = "";
 			/**
+			 * The voice recognizer intent.
+			 */
+			private Intent speechRecognizerIntent;
+			/**
 			 * Flag indicating if recording is happening.
 			 */
 			private boolean isRecording = false;
+
+			private void updateRecordingUi(final boolean recording) {
+				getActivity().runOnUiThread(() -> {
+					binding.imageButtonRecordVoice.setImageResource(recording
+							? R.drawable.ic_icon_microphone_red
+							: R.drawable.ic_icon_microphone);
+					binding.editTextMessageText.setEnabled(!recording);
+				});
+			}
+
+			private void startListening() {
+				if (!isRecording) {
+					return;
+				}
+				try {
+					speechRecognizer.startListening(speechRecognizerIntent);
+				}
+				catch (IllegalStateException e) {
+					Log.w(Application.TAG, "Speech recognizer busy, retry listening", e);
+					speechRecognizer.cancel();
+					speechRecognizer.startListening(speechRecognizerIntent);
+				}
+			}
+
+			private void appendRecognizedText(final String recognizedText) {
+				getActivity().runOnUiThread(() -> {
+					if ("Löschen".equals(recognizedText)) {
+						oldText = "";
+						binding.editTextMessageText.setText("");
+					}
+					else if (!recognizedText.trim().isEmpty()) {
+						if (oldText.trim().isEmpty()) {
+							oldText = recognizedText;
+						}
+						else {
+							oldText = oldText.trim() + "\n" + recognizedText;
+						}
+						binding.editTextMessageText.setText(oldText);
+					}
+				});
+			}
 
 			@Override
 			public void onClick(View v) {
 				if (isRecording) {
 					isRecording = false;
 					speechRecognizer.stopListening();
+					updateRecordingUi(false);
 				}
 				else {
 					if (ContextCompat.checkSelfPermission(MessageFragment.this.getContext(), permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
 						oldText = binding.editTextMessageText.getText().toString();
-
-						Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+						speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 						speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 						speechRecognizerIntent.putExtra(
 								RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,
@@ -284,10 +329,7 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 						speechRecognizer.setRecognitionListener(new RecognitionListener() {
 							@Override
 							public void onReadyForSpeech(Bundle params) {
-								getActivity().runOnUiThread(() -> {
-									binding.imageButtonRecordVoice.setImageResource(R.drawable.ic_icon_microphone_red);
-									binding.editTextMessageText.setEnabled(false);
-								});
+								updateRecordingUi(true);
 							}
 
 							@Override
@@ -308,40 +350,27 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 
 							@Override
 							public void onError(int error) {
-								getActivity().runOnUiThread(() -> {
-									binding.imageButtonRecordVoice.setImageResource(R.drawable.ic_icon_microphone);
-									binding.editTextMessageText.setEnabled(true);
-								});
+								if (isRecording && (error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT || error == SpeechRecognizer.ERROR_NO_MATCH)) {
+									startListening();
+								}
+								else {
+									isRecording = false;
+									updateRecordingUi(false);
+								}
 							}
 
 							@Override
 							public void onResults(Bundle results) {
-								isRecording = false;
 								ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 								if (matches != null && !matches.isEmpty()) {
 									String foundText = matches.get(0);
-									String recognizedText;
 									if (foundText != null && !foundText.isEmpty()) {
-										recognizedText = foundText.substring(0, 1).toUpperCase() + foundText.substring(1);
+										String recognizedText = foundText.substring(0, 1).toUpperCase() + foundText.substring(1);
+										appendRecognizedText(recognizedText);
 									}
-									else {
-										recognizedText = "";
-									}
-									getActivity().runOnUiThread(() -> {
-										binding.imageButtonRecordVoice.setImageResource(R.drawable.ic_icon_microphone);
-										binding.editTextMessageText.setEnabled(true);
-										if ("Löschen".equals(recognizedText)) {
-											binding.editTextMessageText.setText("");
-										}
-										else {
-											if (oldText.trim().isEmpty()) {
-												binding.editTextMessageText.setText(recognizedText);
-											}
-											else {
-												binding.editTextMessageText.setText(oldText.trim() + "\n" + recognizedText);
-											}
-										}
-									});
+								}
+								if (isRecording) {
+									startListening();
 								}
 							}
 
@@ -354,8 +383,8 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 							}
 						});
 
-						speechRecognizer.startListening(speechRecognizerIntent);
 						isRecording = true;
+						startListening();
 					}
 					else {
 						requestPermissionLauncher.launch(permission.RECORD_AUDIO);
