@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -246,31 +248,99 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 			 */
 			private String oldText = "";
 			/**
+			 * The voice recognizer intent.
+			 */
+			private Intent speechRecognizerIntent;
+			/**
 			 * Flag indicating if recording is happening.
 			 */
 			private boolean isRecording = false;
+			/**
+			 * Handler for scheduling recognition restarts.
+			 */
+			private final Handler recognitionHandler = new Handler(Looper.getMainLooper());
+			/**
+			 * Delay in milliseconds before restarting recognition.
+			 */
+			private static final long RESTART_DELAY_MS = 250L;
+
+			private void updateRecordingUi(final boolean recording) {
+				getActivity().runOnUiThread(() -> {
+					binding.imageButtonRecordVoice.setImageResource(recording
+							? R.drawable.ic_icon_microphone_red
+							: R.drawable.ic_icon_microphone);
+					binding.imageButtonRecordVoice.setSelected(recording);
+					binding.editTextMessageText.setEnabled(!recording);
+				});
+			}
+
+			private void startListening() {
+				if (!isRecording) {
+					return;
+				}
+				try {
+					speechRecognizer.startListening(speechRecognizerIntent);
+				}
+				catch (RuntimeException e) {
+					Log.w(Application.TAG, "Speech recognizer start failed, retry", e);
+					restartListeningWithDelay();
+				}
+			}
+
+			private void restartListeningWithDelay() {
+				recognitionHandler.removeCallbacksAndMessages(null);
+				recognitionHandler.postDelayed(() -> {
+					if (!isRecording) {
+						return;
+					}
+					try {
+						speechRecognizer.cancel();
+					}
+					catch (RuntimeException e) {
+						Log.w(Application.TAG, "Speech recognizer cancel failed", e);
+					}
+					startListening();
+				}, RESTART_DELAY_MS);
+			}
+
+			private void appendRecognizedText(final String recognizedText) {
+				getActivity().runOnUiThread(() -> {
+					if ("Löschen".equals(recognizedText)) {
+						oldText = "";
+						binding.editTextMessageText.setText("");
+					}
+					else if (!recognizedText.trim().isEmpty()) {
+						if (oldText.trim().isEmpty()) {
+							oldText = recognizedText;
+						}
+						else {
+							oldText = oldText.trim() + "\n" + recognizedText;
+						}
+						binding.editTextMessageText.setText(oldText);
+					}
+				});
+			}
 
 			@Override
 			public void onClick(View v) {
 				if (isRecording) {
 					isRecording = false;
+					recognitionHandler.removeCallbacksAndMessages(null);
 					speechRecognizer.stopListening();
+					speechRecognizer.cancel();
+					updateRecordingUi(false);
 				}
 				else {
 					if (ContextCompat.checkSelfPermission(MessageFragment.this.getContext(), permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
 						oldText = binding.editTextMessageText.getText().toString();
-
-						Intent speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+						speechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 						speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 						//speechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "de-DE");
 
 						speechRecognizer.setRecognitionListener(new RecognitionListener() {
 							@Override
 							public void onReadyForSpeech(Bundle params) {
-								getActivity().runOnUiThread(() -> {
-									binding.imageButtonRecordVoice.setImageResource(R.drawable.ic_icon_microphone_red);
-									binding.editTextMessageText.setEnabled(false);
-								});
+								updateRecordingUi(true);
 							}
 
 							@Override
@@ -291,40 +361,28 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 
 							@Override
 							public void onError(int error) {
-								getActivity().runOnUiThread(() -> {
-									binding.imageButtonRecordVoice.setImageResource(R.drawable.ic_icon_microphone);
-									binding.editTextMessageText.setEnabled(true);
-								});
+								Log.w(Application.TAG, "Speech recognition error: " + error);
+								if (isRecording && error != SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS) {
+									restartListeningWithDelay();
+								}
+								else {
+									isRecording = false;
+									updateRecordingUi(false);
+								}
 							}
 
 							@Override
 							public void onResults(Bundle results) {
-								isRecording = false;
 								ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
 								if (matches != null && !matches.isEmpty()) {
 									String foundText = matches.get(0);
-									String recognizedText;
 									if (foundText != null && !foundText.isEmpty()) {
-										recognizedText = foundText.substring(0, 1).toUpperCase() + foundText.substring(1);
+										String recognizedText = foundText.substring(0, 1).toUpperCase() + foundText.substring(1);
+										appendRecognizedText(recognizedText);
 									}
-									else {
-										recognizedText = "";
-									}
-									getActivity().runOnUiThread(() -> {
-										binding.imageButtonRecordVoice.setImageResource(R.drawable.ic_icon_microphone);
-										binding.editTextMessageText.setEnabled(true);
-										if ("Löschen".equals(recognizedText)) {
-											binding.editTextMessageText.setText("");
-										}
-										else {
-											if (oldText.trim().isEmpty()) {
-												binding.editTextMessageText.setText(recognizedText);
-											}
-											else {
-												binding.editTextMessageText.setText(oldText.trim() + "\n" + recognizedText);
-											}
-										}
-									});
+								}
+								if (isRecording) {
+									restartListeningWithDelay();
 								}
 							}
 
@@ -337,8 +395,8 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 							}
 						});
 
-						speechRecognizer.startListening(speechRecognizerIntent);
 						isRecording = true;
+						startListening();
 					}
 					else {
 						requestPermissionLauncher.launch(permission.RECORD_AUDIO);
@@ -640,6 +698,9 @@ public class MessageFragment extends Fragment implements EditConversationParentF
 	 * @param priority The message priority.
 	 */
 	private void sendMessage(final MessagePriority priority) {
+		if (binding.imageButtonRecordVoice.isSelected()) {
+			binding.imageButtonRecordVoice.performClick();
+		}
 		String messageText = binding.editTextMessageText.getText().toString();
 		UUID messageId = UUID.randomUUID();
 		long timestamp = System.currentTimeMillis();
