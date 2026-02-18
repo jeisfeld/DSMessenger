@@ -4,6 +4,11 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
@@ -580,7 +585,7 @@ public final class AccountDialogUtil {
 								dismiss();
 								// TODO: fill slave permissions and AI Policy.
 								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, null,
-										ContactStatus.CONNECTED, null, AiPolicy.NONE, null, null, null, null);
+										ContactStatus.CONNECTED, null, AiPolicy.NONE, null, null, null, null, null);
 								ContactRegistry.getInstance().addOrUpdate(contact);
 
 								AccountFragment.sendBroadcast(getContext(), ActionType.CONTACTS_UPDATED);
@@ -601,6 +606,15 @@ public final class AccountDialogUtil {
 	 * Fragment to edit contact dialog.
 	 */
 	public static class EditContactDialogFragment extends DialogFragment {
+		/**
+		 * Priming ids in dropdown order.
+		 */
+		private final List<Integer> aiPrimingIds = new ArrayList<>();
+		/**
+		 * Priming names in dropdown order.
+		 */
+		private final List<String> aiPrimingNames = new ArrayList<>();
+
 		/**
 		 * The binding of the view.
 		 */
@@ -634,16 +648,19 @@ public final class AccountDialogUtil {
 			assert getArguments() != null;
 			final Contact contact = (Contact) getArguments().getSerializable("contact");
 
-			binding.layoutContactName.setVisibility(contact.getMyPermissions().isEditRelation() ? View.VISIBLE : View.GONE);
+			binding.layoutContactName.setVisibility(View.VISIBLE);
 			binding.layoutSlavePermissions.setVisibility(contact.getMyPermissions().isEditSlavePermissions() ? View.VISIBLE : View.GONE);
 
 			binding.editTextMyName.setText(contact.getMyName());
 			binding.editTextContactName.setText(contact.getName());
+			binding.editTextMyName.setEnabled(contact.getMyPermissions().isEditRelation());
+			binding.editTextContactName.setEnabled(contact.getMyPermissions().isEditRelation());
+			binding.editTextAiUsername.setText(contact.getAiUsername());
 			binding.editTextAiMessageSuffix.setText(contact.getAiMessageSuffix());
 			binding.checkboxAiTimeout.setOnCheckedChangeListener((buttonView, isChecked) ->
 					binding.layoutAiTimeoutValue.setVisibility(isChecked ? View.VISIBLE : View.GONE));
 			binding.checkboxAiTimeout.setChecked(contact.getAiTimeout() != null);
-			binding.layoutAiSettings.setVisibility(contact.getAiPolicy() == AiPolicy.NONE ? View.GONE : View.VISIBLE);
+			binding.layoutAiSettings.setVisibility(contact.getAiRelationId() == null ? View.GONE : View.VISIBLE);
 
 			binding.checkboxEditSlavePermissions.setChecked(contact.getSlavePermissions().isEditSlavePermissions());
 			binding.checkboxEditRelation.setChecked(contact.getSlavePermissions().isEditRelation());
@@ -651,6 +668,10 @@ public final class AccountDialogUtil {
 			final DropdownHandler<String> dropdownHandlerDefaultReplyPolicy = DropdownHandler.fromResource(getContext(),
 					binding.dropdownDefaultReplyPolicy, R.array.array_reply_policies,
 					contact.getSlavePermissions().getDefaultReplyPolicy().ordinal());
+			final DropdownHandler<String> dropdownHandlerAiPolicy = DropdownHandler.fromResource(getContext(),
+					binding.dropdownAiPolicy, R.array.array_ai_policies,
+					contact.getAiPolicy().ordinal());
+			loadAiPrimings(contact.getAiPrimingId());
 			int timerUnitSelection = splitTimerValue(contact);
 			final DropdownHandler<String> dropdownHandlerTimeUnit = DropdownHandler.fromResource(getContext(),
 					binding.dropdownAiTimeoutUnit, R.array.array_timer_unit_names, timerUnitSelection);
@@ -662,18 +683,21 @@ public final class AccountDialogUtil {
 
 			binding.buttonUpdateContact.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
-				if (contact.getStatus() == ContactStatus.CONNECTED
+				if (contact.getMyPermissions().isEditRelation() && contact.getStatus() == ContactStatus.CONNECTED
 						&& (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().length() == 0)) {
 					displayError(R.string.error_missing_ownname);
 					return;
 				}
-				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0) {
+				if (contact.getMyPermissions().isEditRelation()
+						&& (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0)) {
 					displayError(R.string.error_missing_contactname);
 					return;
 				}
 				String myName = binding.editTextMyName.getText().toString().trim();
 				String contactName = binding.editTextContactName.getText().toString().trim();
+				String aiUsername = binding.editTextAiUsername.getText().toString().trim();
 				String messageSuffix = binding.editTextAiMessageSuffix.getText().toString().trim();
+				Integer aiPrimingId = getSelectedAiPrimingId(contact.getAiPrimingId());
 
 				SlavePermissions newSlavePermissions = new SlavePermissions(binding.checkboxEditSlavePermissions.isChecked(),
 						binding.checkboxEditRelation.isChecked(), binding.checkboxManageConversations.isChecked(),
@@ -693,13 +717,71 @@ public final class AccountDialogUtil {
 				}
 
 				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
-						contact.getConnectionCode(), newSlavePermissions, contact.getStatus(), contact.getAiRelationId(), contact.getAiPolicy(),
-						contact.getAiUsername(), contact.getAiAddPrimingText(), messageSuffix, aiTimeout);
+						contact.getConnectionCode(), newSlavePermissions, contact.getStatus(), contact.getAiRelationId(),
+						AiPolicy.fromOrdinal(dropdownHandlerAiPolicy.getSelectedPosition()), aiUsername, contact.getAiAddPrimingText(),
+						aiPrimingId, messageSuffix, aiTimeout);
 				((AccountFragment) requireParentFragment()).handleEditContactDialogResponse(this, newContact);
 
 			});
 
 			return builder.create();
+		}
+
+		/**
+		 * Load AI primings and fill the AI type dropdown.
+		 *
+		 * @param selectedAiPrimingId The selected AI priming id.
+		 */
+		private void loadAiPrimings(final Integer selectedAiPrimingId) {
+			new HttpSender(getContext()).sendMessage("db/usermanagement/queryprimings.php", (response, responseData) -> {
+				if (!responseData.isSuccess() || responseData.getData().get("primings") == null) {
+					return;
+				}
+				@SuppressWarnings("unchecked")
+				Map<Integer, String> primings = (Map<Integer, String>) responseData.getData().get("primings");
+				requireActivity().runOnUiThread(() -> fillAiPrimingDropdown(primings, selectedAiPrimingId));
+			});
+		}
+
+		/**
+		 * Fill the AI priming dropdown.
+		 *
+		 * @param primings           The primings.
+		 * @param selectedAiPrimingId The selected AI priming id.
+		 */
+		private void fillAiPrimingDropdown(final Map<Integer, String> primings, final Integer selectedAiPrimingId) {
+			aiPrimingIds.clear();
+			aiPrimingNames.clear();
+
+			Map<Integer, String> orderedPrimings = new LinkedHashMap<>(primings);
+			for (Map.Entry<Integer, String> entry : orderedPrimings.entrySet()) {
+				aiPrimingIds.add(entry.getKey());
+				aiPrimingNames.add(entry.getValue());
+			}
+
+			DropdownHandler<String> dropdownHandlerAiPriming = new DropdownHandler<>(getContext(), binding.dropdownAiPrimingId,
+					aiPrimingNames.toArray(new String[0]));
+
+			int selectedIndex = 0;
+			if (selectedAiPrimingId != null) {
+				int index = aiPrimingIds.indexOf(selectedAiPrimingId);
+				if (index >= 0) {
+					selectedIndex = index;
+				}
+			}
+			dropdownHandlerAiPriming.selectEntry(selectedIndex);
+		}
+
+		/**
+		 * Get selected AI priming id.
+		 *
+		 * @param fallbackId Fallback id.
+		 * @return The selected AI priming id.
+		 */
+		private Integer getSelectedAiPrimingId(final Integer fallbackId) {
+			String selectedPrimingName = binding.dropdownAiPrimingId.getText() == null ? "" : binding.dropdownAiPrimingId.getText().toString();
+			int selectedIndex = aiPrimingNames.indexOf(selectedPrimingName);
+			return selectedIndex >= 0 ? aiPrimingIds.get(selectedIndex) : fallbackId;
 		}
 
 		private int splitTimerValue(final Contact contact) {

@@ -158,7 +158,7 @@ public class HttpSender {
 	 */
 	public void sendSelfMessage(final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
 		sendMessage("firebase/sendselfmessage.php", new Contact(-1, null, null, 0, false, null,
-						null, null, null, AiPolicy.NONE, null, null, null, null),
+						null, null, null, AiPolicy.NONE, null, null, null, null, null),
 				messageId, listener, parameters);
 	}
 
@@ -309,9 +309,13 @@ public class HttpSender {
 								String aiAddPrimingText = jsonContact.getString("aiAddPrimingText");
 								String aiMessageSuffix = jsonContact.getString("aiMessageSuffix");
 								Contact oldContact = new Contact(relationId);
+								Integer aiPrimingId = jsonContact.optInt("aiPrimingId", -1);
+								if (aiPrimingId == -1) {
+									aiPrimingId = null;
+								}
 								Contact contact = new Contact(relationId, contactName, myName, contactId, isSlave, connectionCode, slavePermissions,
 										isConfirmed ? ContactStatus.CONNECTED : ContactStatus.INVITED, aiRelationId, aiPolicy, aiUsername,
-										aiAddPrimingText, aiMessageSuffix, oldContact.getAiTimeout());
+										aiAddPrimingText, aiPrimingId, aiMessageSuffix, oldContact.getAiTimeout());
 								contacts.put(relationId, contact);
 							}
 							data.put(key, contacts);
@@ -382,6 +386,15 @@ public class HttpSender {
 								devices.add(device);
 							}
 							data.put(key, devices);
+						}
+						else if ("primings".equals(key)) {
+							Map<Integer, String> primings = new HashMap<>();
+							JSONArray jsonArray = jsonObject.getJSONArray(key);
+							for (int i = 0; i < jsonArray.length(); i++) {
+								JSONObject jsonPriming = jsonArray.getJSONObject(i);
+								primings.put(jsonPriming.getInt("id"), jsonPriming.getString("name"));
+							}
+							data.put(key, primings);
 						}
 						else if (jsonObject.get(key) instanceof Integer) {
 							data.put(key, jsonObject.getInt(key));

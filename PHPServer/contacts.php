@@ -53,7 +53,7 @@ $password = $_SESSION['password'];
 				<input type="hidden" name="relationId" id="modalEditRelationId" value="">
 				<input type="hidden" name="isSlave" id="modalEditIsSlave" value="">
 				<input type="hidden" name="aiRelationId" id="modalEditAiRelationId" value="">
-				<div class="form-group modalEditOnlyMaster">
+				<div class="form-group">
     				<label for="modalEditMyName"><?= _("My Name") ?>:</label>
     				<input type="text" name="modalEditMyName" id="modalEditMyName" maxlength="30" value="">
 				</div>
