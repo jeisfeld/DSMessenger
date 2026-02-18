@@ -580,7 +580,7 @@ public final class AccountDialogUtil {
 								dismiss();
 								// TODO: fill slave permissions and AI Policy.
 								Contact contact = new Contact(relationId, contactName, myName, contactId, !amSlave, null, null,
-										ContactStatus.CONNECTED, null, AiPolicy.NONE, null, null, null, null);
+										ContactStatus.CONNECTED, null, AiPolicy.NONE, null, null, null, null, null);
 								ContactRegistry.getInstance().addOrUpdate(contact);
 
 								AccountFragment.sendBroadcast(getContext(), ActionType.CONTACTS_UPDATED);
@@ -634,16 +634,20 @@ public final class AccountDialogUtil {
 			assert getArguments() != null;
 			final Contact contact = (Contact) getArguments().getSerializable("contact");
 
-			binding.layoutContactName.setVisibility(contact.getMyPermissions().isEditRelation() ? View.VISIBLE : View.GONE);
+			binding.layoutContactName.setVisibility(View.VISIBLE);
 			binding.layoutSlavePermissions.setVisibility(contact.getMyPermissions().isEditSlavePermissions() ? View.VISIBLE : View.GONE);
 
 			binding.editTextMyName.setText(contact.getMyName());
 			binding.editTextContactName.setText(contact.getName());
+			binding.editTextMyName.setEnabled(contact.getMyPermissions().isEditRelation());
+			binding.editTextContactName.setEnabled(contact.getMyPermissions().isEditRelation());
+			binding.editTextAiUsername.setText(contact.getAiUsername());
+			binding.editTextAiPrimingId.setText(contact.getAiPrimingId() == null ? "" : Integer.toString(contact.getAiPrimingId()));
 			binding.editTextAiMessageSuffix.setText(contact.getAiMessageSuffix());
 			binding.checkboxAiTimeout.setOnCheckedChangeListener((buttonView, isChecked) ->
 					binding.layoutAiTimeoutValue.setVisibility(isChecked ? View.VISIBLE : View.GONE));
 			binding.checkboxAiTimeout.setChecked(contact.getAiTimeout() != null);
-			binding.layoutAiSettings.setVisibility(contact.getAiPolicy() == AiPolicy.NONE ? View.GONE : View.VISIBLE);
+			binding.layoutAiSettings.setVisibility(contact.getAiRelationId() == null ? View.GONE : View.VISIBLE);
 
 			binding.checkboxEditSlavePermissions.setChecked(contact.getSlavePermissions().isEditSlavePermissions());
 			binding.checkboxEditRelation.setChecked(contact.getSlavePermissions().isEditRelation());
@@ -651,6 +655,9 @@ public final class AccountDialogUtil {
 			final DropdownHandler<String> dropdownHandlerDefaultReplyPolicy = DropdownHandler.fromResource(getContext(),
 					binding.dropdownDefaultReplyPolicy, R.array.array_reply_policies,
 					contact.getSlavePermissions().getDefaultReplyPolicy().ordinal());
+			final DropdownHandler<String> dropdownHandlerAiPolicy = DropdownHandler.fromResource(getContext(),
+					binding.dropdownAiPolicy, R.array.array_ai_policies,
+					contact.getAiPolicy().ordinal());
 			int timerUnitSelection = splitTimerValue(contact);
 			final DropdownHandler<String> dropdownHandlerTimeUnit = DropdownHandler.fromResource(getContext(),
 					binding.dropdownAiTimeoutUnit, R.array.array_timer_unit_names, timerUnitSelection);
@@ -662,18 +669,29 @@ public final class AccountDialogUtil {
 
 			binding.buttonUpdateContact.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
-				if (contact.getStatus() == ContactStatus.CONNECTED
+				if (contact.getMyPermissions().isEditRelation() && contact.getStatus() == ContactStatus.CONNECTED
 						&& (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().length() == 0)) {
 					displayError(R.string.error_missing_ownname);
 					return;
 				}
-				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0) {
+				if (contact.getMyPermissions().isEditRelation()
+						&& (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0)) {
 					displayError(R.string.error_missing_contactname);
 					return;
 				}
 				String myName = binding.editTextMyName.getText().toString().trim();
 				String contactName = binding.editTextContactName.getText().toString().trim();
+				String aiUsername = binding.editTextAiUsername.getText().toString().trim();
 				String messageSuffix = binding.editTextAiMessageSuffix.getText().toString().trim();
+				Integer aiPrimingId = null;
+				if (binding.editTextAiPrimingId.getText() != null && binding.editTextAiPrimingId.getText().toString().trim().length() > 0) {
+					try {
+						aiPrimingId = Integer.parseInt(binding.editTextAiPrimingId.getText().toString().trim());
+					}
+					catch (NumberFormatException e) {
+						aiPrimingId = contact.getAiPrimingId();
+					}
+				}
 
 				SlavePermissions newSlavePermissions = new SlavePermissions(binding.checkboxEditSlavePermissions.isChecked(),
 						binding.checkboxEditRelation.isChecked(), binding.checkboxManageConversations.isChecked(),
@@ -693,8 +711,9 @@ public final class AccountDialogUtil {
 				}
 
 				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
-						contact.getConnectionCode(), newSlavePermissions, contact.getStatus(), contact.getAiRelationId(), contact.getAiPolicy(),
-						contact.getAiUsername(), contact.getAiAddPrimingText(), messageSuffix, aiTimeout);
+						contact.getConnectionCode(), newSlavePermissions, contact.getStatus(), contact.getAiRelationId(),
+						AiPolicy.fromOrdinal(dropdownHandlerAiPolicy.getSelectedPosition()), aiUsername, contact.getAiAddPrimingText(),
+						aiPrimingId, messageSuffix, aiTimeout);
 				((AccountFragment) requireParentFragment()).handleEditContactDialogResponse(this, newContact);
 
 			});

@@ -3,6 +3,7 @@ $(document).ready(function() {
 		var contact = $(this).data('contact');
 		var relationId = contact.relationId;
 		var isSlave = contact.isSlave;
+		var canEditRelation = isSlave || (contact.slavePermissions && contact.slavePermissions.length > 1 && contact.slavePermissions.charAt(1) === '1');
 		var myName = contact.myName;
 		var contactName = contact.contactName;
 		var aiPolicy = contact.aiPolicy;
@@ -17,6 +18,8 @@ $(document).ready(function() {
 		else {
 			$('.modalEditOnlyMaster').hide();					
 		}
+		$('#modalEditMyName').prop('readonly', !canEditRelation);
+		$('#modalEditContactName').prop('readonly', !canEditRelation);
 		if (aiRelationId) {
 			$('#modalEditGroupAi').show();					
 		}
