@@ -67,7 +67,13 @@ $(document).ready(function() {
 		$('#modalEditRelationId').val(relationId);
 		$('#modalEditSubject').val(subject);
 		$('#modalEditArchived').prop('checked', archived);
+		$('#modalMoveToRelationId').val('');
+		$('#modalMoveContainer').hide();
 		$('#modalEdit').show();
+	});
+
+	$('#modalShowMoveButton').click(function() {
+		$('#modalMoveContainer').toggle();
 	});
 
 	$('#modalEdit .close').click(function() {

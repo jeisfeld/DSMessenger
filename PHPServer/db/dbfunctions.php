@@ -109,6 +109,65 @@ SELECT connection_code, slave_name as contact_name, slave_id as contact_id, mast
     ];
 }
 
+function hasManageConversationsPermission($relationData) {
+    if (! $relationData || ! array_key_exists('isSlave', $relationData)) {
+        return false;
+    }
+    if (! $relationData['isSlave']) {
+        return true;
+    }
+    $slavePermissions = @$relationData['slavePermissions'];
+    return strlen($slavePermissions) > 2 && substr($slavePermissions, 2, 1) === '1';
+}
+
+function getManageConversationRelations($userId, $givenConn = null) {
+    if ($givenConn) {
+        $conn = $givenConn;
+    }
+    else {
+        $conn = getDbConnection();
+
+        if ($conn->connect_error) {
+            printError(101, "Connection failed: " . $conn->connect_error);
+        }
+    }
+
+    $relationId = null;
+    $contactName = null;
+    $isSlave = null;
+    $slavePermissions = null;
+    $stmt = $conn->prepare("SELECT id, master_name as contact_name, false as is_slave, slave_permissions FROM dsm_relation WHERE slave_id = ?
+UNION
+SELECT id, slave_name as contact_name, true as is_slave, slave_permissions FROM dsm_relation WHERE master_id = ?");
+    $stmt->bind_param("ii", $userId, $userId);
+    $stmt->execute();
+    $stmt->bind_result($relationId, $contactName, $isSlave, $slavePermissions);
+
+    $relations = array();
+    while ($stmt->fetch()) {
+        $relationData = [
+            'relationId' => $relationId,
+            'contactName' => $contactName,
+            'isSlave' => $isSlave,
+            'slavePermissions' => $slavePermissions
+        ];
+        if (hasManageConversationsPermission($relationData)) {
+            $relations[] = $relationData;
+        }
+    }
+    $stmt->close();
+
+    if (! $givenConn) {
+        $conn->close();
+    }
+
+    usort($relations, function ($relation1, $relation2) {
+        return strcmp($relation1['contactName'], $relation2['contactName']);
+    });
+
+    return $relations;
+}
+
 function getConversationData($userId, $relationId, $conversationId) {
     $conn = getDbConnection();
     

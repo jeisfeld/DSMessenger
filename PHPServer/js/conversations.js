@@ -20,6 +20,8 @@ $(document).ready(function() {
 		$('#modalEditRelationId').val(relationId);
 		$('#modalEditSubject').val(subject);
 		$('#modalEditArchived').prop('checked', archived);
+		$('#modalMoveToRelationId').val('');
+		$('#modalMoveContainer').hide();
 		$('#modalEdit').show();
 	});
 
@@ -27,6 +29,10 @@ $(document).ready(function() {
         $('#button-archive').toggleClass('active');
         $('.conversation-item.archived').toggleClass('hidden');
     });
+
+	$('#modalShowMoveButton').click(function() {
+		$('#modalMoveContainer').toggle();
+	});
 
 	// Close the modal on clicking 'x'
 	$('#modalDelete .close').click(function() {

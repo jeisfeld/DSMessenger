@@ -21,6 +21,8 @@ if ($conn->connect_error) {
 
 $relationData = getRelationData($userId, $relationId);
 $contactName = $relationData['contactName'];
+$showMoveConversationButton = hasManageConversationsPermission($relationData);
+$manageableRelations = $showMoveConversationButton ? getManageConversationRelations($userId) : array();
 
 // Retrieve data for conversations
 
@@ -128,6 +130,7 @@ $conn -> close();
 			<form action="perform_edit_conversation.php" method="post">
 				<input type="hidden" name="conversationId" id="modalEditConversationId" value="">
 				<input type="hidden" name="relationId" id="modalEditRelationId" value="">
+				<input type="hidden" name="fromMessages" value="">
 				<div class="form-group">
     				<label for="modalEditSubject"><?= _("Subject") ?>:</label><input type="text" name="modalEditSubject" id="modalEditSubject" maxlength="100" value="">
 				</div>
@@ -138,6 +141,23 @@ $conn -> close();
 					<span class="left"> <input type="button" name="cancel" class="modal-button" value="<?= _("Cancel") ?>" onclick="$('#modalEdit').hide();"></span>
 					<span class="right"> <input type="submit" name="submit" class="modal-button" value="<?= _("Save Conversation") ?>"></span>
 				</div>
+				<?php if ($showMoveConversationButton) { ?>
+					<div class="form-group">
+						<input type="button" id="modalShowMoveButton" class="modal-button" value="Move conversation">
+					</div>
+					<div class="form-group" id="modalMoveContainer" style="display:none;">
+						<label for="modalMoveToRelationId">Move conversation to:</label>
+						<select name="modalMoveToRelationId" id="modalMoveToRelationId">
+							<option value="">-- Select contact --</option>
+							<?php foreach ($manageableRelations as $manageableRelation) {
+								if ($manageableRelation['relationId'] == $relationId) {
+									continue;
+								}
+								echo '<option value="' . $manageableRelation['relationId'] . '">' . htmlspecialchars($manageableRelation['contactName']) . '</option>';
+							} ?>
+						</select>
+					</div>
+				<?php } ?>
 			</form>
 		</div>
 	</div>
