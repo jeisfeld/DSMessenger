@@ -32,7 +32,11 @@ if ($isSlave) {
     $stmt = $conn->prepare("update dsm_relation set master_name = ?, slave_name = ?, slave_permissions = ? where id = ? and master_id = ?");
 }
 else {
-    $stmt = $conn->prepare("update dsm_relation set slave_name = ?, master_name = ?, slave_permissions = ? where id = ? and slave_id = ? and substring(slave_permissions, 2, 1) = '1'");
+    $stmt = $conn->prepare("update dsm_relation set
+        slave_name = if(substring(slave_permissions, 2, 1) = '1', ?, slave_name),
+        master_name = if(substring(slave_permissions, 2, 1) = '1', ?, master_name),
+        slave_permissions = if(substring(slave_permissions, 1, 1) = '1', ?, slave_permissions)
+        where id = ? and slave_id = ? and (substring(slave_permissions, 1, 1) = '1' or substring(slave_permissions, 2, 1) = '1')");
 }
 
 $stmt->bind_param("sssii", $myName, $contactName, $slavePermissions, $relationId, $userId);
