@@ -4,8 +4,8 @@ require_once __DIR__ . '/../../openai/queryopenai.php';
 
 $modelMap = [
     "1" => "claude-sonnet-4-5-20250929",
-    "2" => "claude-3-7-sonnet-20250219",
-    "3" => "claude-opus-4-1-20250805",
+    "2" => "claude-sonnet-4-6",
+    "3" => "claude-opus-4-6",
     "4" => "claude-haiku-4-5-20251001",
     "5" => "gpt-4.1-2025-04-14",
     "6" => "gpt-4o-2024-11-20",
