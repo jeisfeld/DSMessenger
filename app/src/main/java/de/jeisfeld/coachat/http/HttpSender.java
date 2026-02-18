@@ -387,6 +387,15 @@ public class HttpSender {
 							}
 							data.put(key, devices);
 						}
+						else if ("primings".equals(key)) {
+							Map<Integer, String> primings = new HashMap<>();
+							JSONArray jsonArray = jsonObject.getJSONArray(key);
+							for (int i = 0; i < jsonArray.length(); i++) {
+								JSONObject jsonPriming = jsonArray.getJSONObject(i);
+								primings.put(jsonPriming.getInt("id"), jsonPriming.getString("name"));
+							}
+							data.put(key, primings);
+						}
 						else if (jsonObject.get(key) instanceof Integer) {
 							data.put(key, jsonObject.getInt(key));
 						}

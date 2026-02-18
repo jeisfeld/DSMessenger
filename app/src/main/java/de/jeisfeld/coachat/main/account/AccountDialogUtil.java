@@ -4,6 +4,11 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
@@ -602,6 +607,15 @@ public final class AccountDialogUtil {
 	 */
 	public static class EditContactDialogFragment extends DialogFragment {
 		/**
+		 * Priming ids in dropdown order.
+		 */
+		private final List<Integer> aiPrimingIds = new ArrayList<>();
+		/**
+		 * Priming names in dropdown order.
+		 */
+		private final List<String> aiPrimingNames = new ArrayList<>();
+
+		/**
 		 * The binding of the view.
 		 */
 		private DialogEditContactBinding binding;
@@ -642,7 +656,6 @@ public final class AccountDialogUtil {
 			binding.editTextMyName.setEnabled(contact.getMyPermissions().isEditRelation());
 			binding.editTextContactName.setEnabled(contact.getMyPermissions().isEditRelation());
 			binding.editTextAiUsername.setText(contact.getAiUsername());
-			binding.editTextAiPrimingId.setText(contact.getAiPrimingId() == null ? "" : Integer.toString(contact.getAiPrimingId()));
 			binding.editTextAiMessageSuffix.setText(contact.getAiMessageSuffix());
 			binding.checkboxAiTimeout.setOnCheckedChangeListener((buttonView, isChecked) ->
 					binding.layoutAiTimeoutValue.setVisibility(isChecked ? View.VISIBLE : View.GONE));
@@ -658,6 +671,7 @@ public final class AccountDialogUtil {
 			final DropdownHandler<String> dropdownHandlerAiPolicy = DropdownHandler.fromResource(getContext(),
 					binding.dropdownAiPolicy, R.array.array_ai_policies,
 					contact.getAiPolicy().ordinal());
+			loadAiPrimings(contact.getAiPrimingId());
 			int timerUnitSelection = splitTimerValue(contact);
 			final DropdownHandler<String> dropdownHandlerTimeUnit = DropdownHandler.fromResource(getContext(),
 					binding.dropdownAiTimeoutUnit, R.array.array_timer_unit_names, timerUnitSelection);
@@ -683,15 +697,7 @@ public final class AccountDialogUtil {
 				String contactName = binding.editTextContactName.getText().toString().trim();
 				String aiUsername = binding.editTextAiUsername.getText().toString().trim();
 				String messageSuffix = binding.editTextAiMessageSuffix.getText().toString().trim();
-				Integer aiPrimingId = null;
-				if (binding.editTextAiPrimingId.getText() != null && binding.editTextAiPrimingId.getText().toString().trim().length() > 0) {
-					try {
-						aiPrimingId = Integer.parseInt(binding.editTextAiPrimingId.getText().toString().trim());
-					}
-					catch (NumberFormatException e) {
-						aiPrimingId = contact.getAiPrimingId();
-					}
-				}
+				Integer aiPrimingId = getSelectedAiPrimingId(contact.getAiPrimingId());
 
 				SlavePermissions newSlavePermissions = new SlavePermissions(binding.checkboxEditSlavePermissions.isChecked(),
 						binding.checkboxEditRelation.isChecked(), binding.checkboxManageConversations.isChecked(),
@@ -719,6 +725,63 @@ public final class AccountDialogUtil {
 			});
 
 			return builder.create();
+		}
+
+		/**
+		 * Load AI primings and fill the AI type dropdown.
+		 *
+		 * @param selectedAiPrimingId The selected AI priming id.
+		 */
+		private void loadAiPrimings(final Integer selectedAiPrimingId) {
+			new HttpSender(getContext()).sendMessage("db/usermanagement/queryprimings.php", (response, responseData) -> {
+				if (!responseData.isSuccess() || responseData.getData().get("primings") == null) {
+					return;
+				}
+				@SuppressWarnings("unchecked")
+				Map<Integer, String> primings = (Map<Integer, String>) responseData.getData().get("primings");
+				requireActivity().runOnUiThread(() -> fillAiPrimingDropdown(primings, selectedAiPrimingId));
+			});
+		}
+
+		/**
+		 * Fill the AI priming dropdown.
+		 *
+		 * @param primings           The primings.
+		 * @param selectedAiPrimingId The selected AI priming id.
+		 */
+		private void fillAiPrimingDropdown(final Map<Integer, String> primings, final Integer selectedAiPrimingId) {
+			aiPrimingIds.clear();
+			aiPrimingNames.clear();
+
+			Map<Integer, String> orderedPrimings = new LinkedHashMap<>(primings);
+			for (Map.Entry<Integer, String> entry : orderedPrimings.entrySet()) {
+				aiPrimingIds.add(entry.getKey());
+				aiPrimingNames.add(entry.getValue());
+			}
+
+			DropdownHandler<String> dropdownHandlerAiPriming = new DropdownHandler<>(getContext(), binding.dropdownAiPrimingId,
+					aiPrimingNames.toArray(new String[0]));
+
+			int selectedIndex = 0;
+			if (selectedAiPrimingId != null) {
+				int index = aiPrimingIds.indexOf(selectedAiPrimingId);
+				if (index >= 0) {
+					selectedIndex = index;
+				}
+			}
+			dropdownHandlerAiPriming.selectEntry(selectedIndex);
+		}
+
+		/**
+		 * Get selected AI priming id.
+		 *
+		 * @param fallbackId Fallback id.
+		 * @return The selected AI priming id.
+		 */
+		private Integer getSelectedAiPrimingId(final Integer fallbackId) {
+			String selectedPrimingName = binding.dropdownAiPrimingId.getText() == null ? "" : binding.dropdownAiPrimingId.getText().toString();
+			int selectedIndex = aiPrimingNames.indexOf(selectedPrimingName);
+			return selectedIndex >= 0 ? aiPrimingIds.get(selectedIndex) : fallbackId;
 		}
 
 		private int splitTimerValue(final Contact contact) {

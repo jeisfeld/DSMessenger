@@ -29,7 +29,7 @@ if (isset($_POST['submit'])) {
         $stmt = $conn->prepare("update dsm_relation set slave_name = ?, master_name = ? where id = ? and master_id = ?");
     }
     else {
-        $stmt = $conn->prepare("update dsm_relation set master_name = ?, slave_name = ? where id = ? and slave_id = ?");
+        $stmt = $conn->prepare("update dsm_relation set master_name = ?, slave_name = ? where id = ? and slave_id = ? and substring(slave_permissions, 2, 1) = '1'");
     }
     $stmt->bind_param("ssii", $contactName, $myName, $relationId, $userId);
 

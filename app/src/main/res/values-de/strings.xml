@@ -89,6 +89,9 @@
     <string name="text_my_name_m">Mein Name *</string>
     <string name="text_contact_name">Kontaktname *</string>
     <string name="text_contact">Kontakt</string>
+    <string name="text_my_name_for_ai">Mein Name für KI</string>
+    <string name="text_ai_behavior">KI-Verhalten</string>
+    <string name="text_ai_type">KI-Typ</string>
     <string name="text_ai_message_suffix">Nachrichten-Suffix</string>
     <string name="text_ai_timeout">Nachricht nach Timeout senden</string>
     <string name="text_device_name">Gerätename *</string>
@@ -156,6 +159,14 @@
     <string-array name="array_message_display_types">
         <item>Aktion</item>
         <item>Benachrichtigung</item>
+    </string-array>
+
+    <string-array name="array_ai_policies">
+        <item>keine</item>
+        <item>manuell</item>
+        <item>automatisch live</item>
+        <item>automatisch</item>
+        <item>manuell live</item>
     </string-array>
 
     <string-array name="array_reply_policies">
