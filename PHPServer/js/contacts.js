@@ -11,6 +11,7 @@ $(document).ready(function() {
 		var aiPrimingId = contact.aiPrimingId;
 		var aiAddPrimingText = contact.aiAddPrimingText;
 		var aiMessageSuffix = contact.aiMessageSuffix;
+		var canEditName = contact.canEditName;
 		if (isSlave) {
 			$('.modalEditOnlyMaster').show();					
 		}
@@ -24,6 +25,8 @@ $(document).ready(function() {
 			$('#modalEditGroupAi').hide();					
 		}
 		$('#modalEditContactName').val(contactName);
+		$('#modalEditContactName').prop('readonly', !canEditName);
+		$('#modalEditMyName').prop('readonly', !canEditName);
 		$('#modalEditRelationId').val(relationId);
 		$('#modalEditIsSlave').val(isSlave ? 1 : 0);
 		$('#modalEditAiRelationId').val(aiRelationId);

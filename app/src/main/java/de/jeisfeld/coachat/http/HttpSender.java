@@ -158,7 +158,7 @@ public class HttpSender {
 	 */
 	public void sendSelfMessage(final UUID messageId, final OnHttpResponseListener listener, final String... parameters) {
 		sendMessage("firebase/sendselfmessage.php", new Contact(-1, null, null, 0, false, null,
-						null, null, null, AiPolicy.NONE, null, null, null, null),
+						null, null, null, AiPolicy.NONE, null, null, null, null, null),
 				messageId, listener, parameters);
 	}
 
@@ -307,11 +307,15 @@ public class HttpSender {
 								AiPolicy aiPolicy = AiPolicy.fromOrdinal(jsonContact.getInt("aiPolicy"));
 								String aiUsername = jsonContact.getString("aiUsername");
 								String aiAddPrimingText = jsonContact.getString("aiAddPrimingText");
+								Integer aiPrimingId = jsonContact.optInt("aiPrimingId", -1);
+								if (aiPrimingId == -1) {
+									aiPrimingId = null;
+								}
 								String aiMessageSuffix = jsonContact.getString("aiMessageSuffix");
 								Contact oldContact = new Contact(relationId);
 								Contact contact = new Contact(relationId, contactName, myName, contactId, isSlave, connectionCode, slavePermissions,
 										isConfirmed ? ContactStatus.CONNECTED : ContactStatus.INVITED, aiRelationId, aiPolicy, aiUsername,
-										aiAddPrimingText, aiMessageSuffix, oldContact.getAiTimeout());
+										aiAddPrimingText, aiPrimingId, aiMessageSuffix, oldContact.getAiTimeout());
 								contacts.put(relationId, contact);
 							}
 							data.put(key, contacts);

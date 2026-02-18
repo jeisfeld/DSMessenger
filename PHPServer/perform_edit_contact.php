@@ -31,6 +31,13 @@ if (isset($_POST['submit'])) {
     else {
         $stmt = $conn->prepare("update dsm_relation set master_name = ?, slave_name = ? where id = ? and slave_id = ?");
     }
+    $relationData = getRelationData($userId, $relationId, $conn);
+    $hasEditRelationPermission = $relationData['isSlave'] || substr($relationData['slavePermissions'], 1, 1) === '1';
+    if (! $hasEditRelationPermission) {
+        $contactName = $relationData['contactName'];
+        $myName = $relationData['myName'];
+    }
+
     $stmt->bind_param("ssii", $contactName, $myName, $relationId, $userId);
 
     $stmt->execute();

@@ -33,6 +33,8 @@ $password = $_SESSION['password'];
                 $contactName = $contact['contactName'];
                 $isSlave = $contact['isSlave'];
                 $lasttimestamp = @$contact['lasttimestamp'];
+                $canEditName = $isSlave || substr($contact['slavePermissions'], 1, 1) === '1';
+                $contact['canEditName'] = $canEditName;
                 echo '<li class="contact-item"><a href="conversations.php?relationId=' . $relationId . '">' . 
                     ($isSlave ? '' : '<b>') . $contactName . ($isSlave ? '' : '</b>') . '</a><div class="icons"><span class="time">'.convertTimestamp($lasttimestamp).'</span>
                 <svg class="icon editButton" data-contact="' . htmlspecialchars(json_encode($contact), ENT_QUOTES, 'UTF-8') . '"><use href="images/icons.svg#icon-edit"></use></svg></div></li>';

@@ -62,6 +62,10 @@ public class Contact implements Serializable {
 	 */
 	private final String aiAddPrimingText;
 	/**
+	 * The AI priming id / type.
+	 */
+	private final Integer aiPrimingId;
+	/**
 	 * The AI Message Suffix.
 	 */
 	private final String aiMessageSuffix;
@@ -86,13 +90,14 @@ public class Contact implements Serializable {
 	 * @param aiPolicy         The AI Policy
 	 * @param aiUsername       The AI Username
 	 * @param aiAddPrimingText The AI additional priming text
+	 * @param aiPrimingId      The AI priming id / type
 	 * @param aiMessageSuffix  The AI message suffix
 	 * @param aiTimeout        The AI timeout
 	 */
 	public Contact(final int relationId, final String name, final String myName, final int contactId,
 				   final boolean isSlave, final String connectionCode, final SlavePermissions slavePermissions, final ContactStatus status,
 				   final Integer aiRelationId, final AiPolicy aiPolicy, final String aiUsername, final String aiAddPrimingText,
-				   final String aiMessageSuffix, final Long aiTimeout) {
+				   final Integer aiPrimingId, final String aiMessageSuffix, final Long aiTimeout) {
 		this.relationId = relationId;
 		this.name = name;
 		this.myName = myName;
@@ -105,6 +110,7 @@ public class Contact implements Serializable {
 		this.aiPolicy = aiPolicy;
 		this.aiUsername = aiUsername;
 		this.aiAddPrimingText = aiAddPrimingText;
+		this.aiPrimingId = aiPrimingId;
 		this.aiMessageSuffix = aiMessageSuffix;
 		this.aiTimeout = aiTimeout;
 	}
@@ -130,6 +136,8 @@ public class Contact implements Serializable {
 		aiPolicy = AiPolicy.fromOrdinal(PreferenceUtil.getIndexedSharedPreferenceInt(R.string.key_contact_ai_policy, relationId, 0));
 		aiUsername = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_username, relationId);
 		aiAddPrimingText = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_add_priming_text, relationId);
+		int storedAiPrimingId = PreferenceUtil.getIndexedSharedPreferenceInt(R.string.key_contact_ai_priming_id, relationId, -1);
+		aiPrimingId = storedAiPrimingId == -1 ? null : storedAiPrimingId;
 		aiMessageSuffix = PreferenceUtil.getIndexedSharedPreferenceString(R.string.key_contact_ai_message_suffix, relationId);
 		long storedAiTimeout = PreferenceUtil.getIndexedSharedPreferenceLong(R.string.key_contact_ai_timeout, relationId, -1);
 		aiTimeout = storedAiTimeout == -1 ? null : storedAiTimeout;
@@ -183,6 +191,10 @@ public class Contact implements Serializable {
 		return aiAddPrimingText;
 	}
 
+	public Integer getAiPrimingId() {
+		return aiPrimingId;
+	}
+
 	public String getAiMessageSuffix() {
 		return aiMessageSuffix;
 	}
@@ -229,7 +241,7 @@ public class Contact implements Serializable {
 	public final String toDetailedString() {
 		return "Contact{" + "relationId=" + relationId + ", name='" + name + '\'' + ", myName='" + myName + '\'' + ", contactId='" + contactId + '\''
 				+ ", isSlave=" + isSlave + ", connectionCode='" + connectionCode + "', slavePermissions=" + slavePermissions
-				+ ", status=" + status + ", aiPolicy=" + aiPolicy + ", aiUsername=" + aiUsername + ", aiTimeout=" + aiTimeout + '}';
+				+ ", status=" + status + ", aiPolicy=" + aiPolicy + ", aiUsername=" + aiUsername + ", aiPrimingId=" + aiPrimingId + ", aiTimeout=" + aiTimeout + '}';
 	}
 
 	/**
@@ -257,6 +269,12 @@ public class Contact implements Serializable {
 		}
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_username, getRelationId(), getAiUsername());
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_add_priming_text, getRelationId(), getAiAddPrimingText());
+		if (getAiPrimingId() != null) {
+			PreferenceUtil.setIndexedSharedPreferenceInt(R.string.key_contact_ai_priming_id, getRelationId(), getAiPrimingId());
+		}
+		else {
+			PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_priming_id, getRelationId());
+		}
 		PreferenceUtil.setIndexedSharedPreferenceString(R.string.key_contact_ai_message_suffix, getRelationId(), getAiMessageSuffix());
 		if (getAiTimeout() != null) {
 			PreferenceUtil.setIndexedSharedPreferenceLong(R.string.key_contact_ai_timeout, getRelationId(), getAiTimeout());

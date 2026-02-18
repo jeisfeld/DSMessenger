@@ -89,6 +89,8 @@
     <string name="text_my_name_m">Mein Name *</string>
     <string name="text_contact_name">Kontaktname *</string>
     <string name="text_contact">Kontakt</string>
+    <string name="text_ai_behavior">KI-Verhalten</string>
+    <string name="text_ai_type">KI-Typ</string>
     <string name="text_ai_message_suffix">Nachrichten-Suffix</string>
     <string name="text_ai_timeout">Nachricht nach Timeout senden</string>
     <string name="text_device_name">Gerätename *</string>
@@ -171,5 +173,13 @@
 
     <string-array name="array_widget_names">
         <item>SchnurpSy</item>
+    </string-array>
+
+    <string-array name="array_ai_behaviors">
+        <item>none</item>
+        <item>manual</item>
+        <item>automatic live</item>
+        <item>automatic</item>
+        <item>manual live</item>
     </string-array>
 </resources>

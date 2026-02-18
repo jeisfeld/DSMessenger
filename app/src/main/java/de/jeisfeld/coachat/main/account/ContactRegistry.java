@@ -146,6 +146,7 @@ public final class ContactRegistry {
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_policy, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_username, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_add_priming_text, relationId);
+		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_priming_id, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_message_suffix, relationId);
 		PreferenceUtil.removeIndexedSharedPreference(R.string.key_contact_ai_timeout, relationId);
 
