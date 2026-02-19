@@ -20,7 +20,7 @@ if (isset($_POST['submit'])) {
         printError(101, "Connection failed: " . $conn->connect_error);
     }
     
-    $stmt = $conn->prepare("INSERT INTO dsm_relation (slave_id, master_id, slave_name, master_name) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO dsm_relation (slave_id, master_id, slave_name, master_name, slave_permissions) VALUES (?, ?, ?, ?, '0110')");
     $stmt->bind_param("iiss", $userId, $contactId, $myName, $contactName);
 
     $stmt->execute();
