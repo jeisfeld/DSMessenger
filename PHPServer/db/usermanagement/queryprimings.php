@@ -16,16 +16,38 @@ function queryPrimingsForUser($conn, $username)
     $name = null;
     $primings = array();
 
+    $userprefix = '@@' . $username . '-';
     if ($usertype === 1) {
-        $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming order by name, id");
+        $stmt = $conn->prepare("SELECT id,
+                CASE
+                    WHEN name LIKE ? THEN SUBSTRING(name, LENGTH(?) + 1)
+                    ELSE name
+                END AS name
+         FROM dsm_ai_priming
+         WHERE (name NOT LIKE '@@%' OR name LIKE ?)
+         ORDER BY name, id");
     }
     else {
-        $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming where name not like 'Dominia%' and name not like 'Veit%' order by name, id");
+        $stmt = $conn->prepare("SELECT id,
+                CASE
+                    WHEN name LIKE ? THEN SUBSTRING(name, LENGTH(?) + 1)
+                    ELSE name
+                END AS name
+         FROM dsm_ai_priming
+         WHERE name NOT LIKE 'Dominia%'
+           AND (name NOT LIKE '@@%' OR name LIKE ?)
+         ORDER BY name, id");
     }
-
+    
+    $prefixParam = $userprefix . '%';
+    $stmt->bind_param("sss", $prefixParam, $userprefix, $prefixParam);
+    
     $stmt->execute();
     $stmt->bind_result($id, $name);
-
+    if (str_starts_with($name, $userprefix)) {
+        $name = substr($name, strlen($userprefix));
+    }
+    
     while ($stmt->fetch()) {
         $primings[] = [
             'id' => $id,

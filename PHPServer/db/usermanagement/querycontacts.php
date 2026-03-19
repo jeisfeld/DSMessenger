@@ -1,18 +1,18 @@
 <?php
-require_once __DIR__.'/../dbfunctions.php';
+require_once __DIR__ . '/../dbfunctions.php';
 
 function queryContacts($username, $password, $checkTimestamp = false)
 {
     // Create connection
     $conn = getDbConnection();
-    
+
     // Check connection
     if ($conn->connect_error) {
         printError(101, "Connection failed: " . $conn->connect_error);
     }
-    
+
     $userid = verifyCredentials($conn, $username, $password);
-    
+
     $relationId = null;
     $connectionCode = null;
     $contactName = null;
@@ -30,18 +30,18 @@ function queryContacts($username, $password, $checkTimestamp = false)
 UNION
 SELECT r.id, connection_code, slave_name as contact_name, slave_id as contact_id, master_name as my_name, true as is_slave, slave_permissions, ai_policy, a.id as ai_relation_id, a.user_name as ai_user_name, priming_id, add_priming_text, message_suffix FROM dsm_relation r LEFT JOIN dsm_ai_relation a ON r.id = a.relation_id WHERE master_id = ?
 ORDER BY contact_name");
-    
+
     $stmt->bind_param("ii", $userid, $userid);
     $stmt->execute();
     $stmt->bind_result($relationId, $connectionCode, $contactName, $contactId, $myName, $isSlave, $slavePermissions, $aiPolicy, $aiRelationId, $aiUsername, $aiPrimingId, $aiAddPrimingText, $aiMessageSuffix);
-    
+
     $contacts = array();
     while ($stmt->fetch()) {
         $contacts[] = [
             'relationId' => $relationId,
             'connectionCode' => $connectionCode,
             'contactName' => $contactName,
-            'contactId' => $contactId == null ? -1 : $contactId,
+            'contactId' => $contactId == null ? - 1 : $contactId,
             'myName' => $myName,
             'isSlave' => $isSlave ? true : false,
             'isConfirmed' => $contactId ? true : false,
@@ -55,10 +55,10 @@ ORDER BY contact_name");
         ];
     }
     $stmt->close();
-    
+
     if ($checkTimestamp) {
         $stmt = $conn->prepare("SELECT MAX(lasttimestamp) FROM dsm_conversation WHERE relation_id=?");
-        foreach($contacts as &$contact) {
+        foreach ($contacts as &$contact) {
             $timestamp = null;
             $stmt->bind_param("i", $contact['relationId']);
             $stmt->execute();
@@ -68,11 +68,11 @@ ORDER BY contact_name");
                 $contact['lasttimestamp'] = $timestamp;
             }
         }
-        $stmt -> close();
-    } 
-    
-    $conn -> close();
-    
+        $stmt->close();
+    }
+
+    $conn->close();
+
     return $contacts;
 }
 
@@ -80,23 +80,23 @@ function queryUsertype($username, $password)
 {
     // Create connection
     $conn = getDbConnection();
-    
+
     // Check connection
     if ($conn->connect_error) {
         printError(101, "Connection failed: " . $conn->connect_error);
     }
-    
+
     $userid = verifyCredentials($conn, $username, $password);
-    
+
     $usertype = null;
     $stmt = $conn->prepare("SELECT usertype from dsm_user WHERE id = ?");
-    
+
     $stmt->bind_param("i", $userid);
     $stmt->execute();
     $stmt->bind_result($usertype);
-    $stmt->fetch();    
+    $stmt->fetch();
     $stmt->close();
-    
+
     return $usertype;
 }
 
@@ -104,30 +104,49 @@ function queryPrimings($username)
 {
     // Create connection
     $conn = getDbConnection();
-    
+
     // Check connection
     if ($conn->connect_error) {
         printError(101, "Connection failed: " . $conn->connect_error);
     }
-    
+
     // get usertype
     $usertype = 0;
     $stmt = $conn->prepare("SELECT usertype from dsm_user WHERE username = ?");
-        $stmt->bind_param("s", $username);
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $stmt->bind_result($usertype);
     $stmt->fetch();
     $stmt->close();
-    
+
     // get primings
     $id = null;
     $name = null;
+    $userprefix = '@@' . $username . '-';
     if ($usertype === 1) {
-        $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming order by name, id");
+        $stmt = $conn->prepare("SELECT id, 
+                CASE 
+                    WHEN name LIKE ? THEN SUBSTRING(name, LENGTH(?) + 1)
+                    ELSE name
+                END AS name
+         FROM dsm_ai_priming
+         WHERE (name NOT LIKE '@@%' OR name LIKE ?)
+         ORDER BY name, id");
     }
     else {
-        $stmt = $conn->prepare("SELECT id, name from dsm_ai_priming where name not like 'Dominia%' and name not like 'Veit%' order by name, id");
+        $stmt = $conn->prepare("SELECT id, 
+                CASE 
+                    WHEN name LIKE ? THEN SUBSTRING(name, LENGTH(?) + 1)
+                    ELSE name
+                END AS name
+         FROM dsm_ai_priming
+         WHERE name NOT LIKE 'Dominia%'
+           AND (name NOT LIKE '@@%' OR name LIKE ?)
+         ORDER BY name, id");
     }
+
+    $prefixParam = $userprefix . '%';
+    $stmt->bind_param("sss", $prefixParam, $userprefix, $prefixParam);
 
     $stmt->execute();
     $stmt->bind_result($id, $name);
@@ -138,9 +157,9 @@ function queryPrimings($username)
             'name' => $name
         ];
     }
-    
+
     $stmt->close();
-    
+
     return $primings;
 }
 
@@ -152,7 +171,7 @@ if ($username && $messageTime) {
     header('Content-Type: text/json');
     $contacts = queryContacts($username, $password);
     $usertype = queryUsertype($username, $password);
-    
+
     printSuccess("Contacts of user " . $username . " have been retrieved.", [
         'contacts' => $contacts,
         'usertype' => $usertype
