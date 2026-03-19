@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -753,11 +752,12 @@ public final class AccountDialogUtil {
 			aiPrimingIds.clear();
 			aiPrimingNames.clear();
 
-			Map<Integer, String> orderedPrimings = new LinkedHashMap<>(primings);
-			for (Map.Entry<Integer, String> entry : orderedPrimings.entrySet()) {
-				aiPrimingIds.add(entry.getKey());
-				aiPrimingNames.add(entry.getValue());
-			}
+			primings.entrySet().stream()
+					.sorted(Map.Entry.comparingByValue(String.CASE_INSENSITIVE_ORDER))
+					.forEach(entry -> {
+						aiPrimingIds.add(entry.getKey());
+						aiPrimingNames.add(entry.getValue());
+					});
 
 			DropdownHandler<String> dropdownHandlerAiPriming = new DropdownHandler<>(getContext(), binding.dropdownAiPrimingId,
 					aiPrimingNames.toArray(new String[0]));
