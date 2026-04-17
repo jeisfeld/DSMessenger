@@ -1,6 +1,35 @@
 <?php
 require_once __DIR__ . '/../dbfunctions.php';
 
+function getPrimingPrefixes($conn, $username)
+{
+    if ($username !== 'AI-JE') {
+        return ['@@' . $username . '-'];
+    }
+
+    $prefixes = [];
+    $contactUsername = null;
+    $stmt = $conn->prepare("SELECT DISTINCT u.username
+            FROM dsm_relation r
+            JOIN dsm_user u ON (u.id = r.master_id OR u.id = r.slave_id)
+            JOIN dsm_user me ON me.username = ?
+            WHERE (r.master_id = me.id OR r.slave_id = me.id)
+              AND u.id <> me.id");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->bind_result($contactUsername);
+    while ($stmt->fetch()) {
+        $prefixes[] = '@@' . $contactUsername . '-';
+    }
+    $stmt->close();
+
+    if (count($prefixes) === 0) {
+        $prefixes[] = '@@' . $username . '-';
+    }
+
+    return $prefixes;
+}
+
 function queryContacts($username, $password, $checkTimestamp = false)
 {
     // Create connection
@@ -122,36 +151,35 @@ function queryPrimings($username)
     // get primings
     $id = null;
     $name = null;
-    $userprefix = '@@' . $username . '-';
+    $userprefixes = getPrimingPrefixes($conn, $username);
     if ($usertype === 1) {
-        $stmt = $conn->prepare("SELECT id, 
-                CASE 
-                    WHEN name LIKE ? THEN SUBSTRING(name, LENGTH(?) + 1)
-                    ELSE name
-                END AS name
+        $stmt = $conn->prepare("SELECT id, name
          FROM dsm_ai_priming
-         WHERE (name NOT LIKE '@@%' OR name LIKE ?)
+         WHERE (name NOT LIKE '@@%' OR name LIKE " . implode(" OR name LIKE ", array_fill(0, count($userprefixes), "?")) . ")
          ORDER BY name, id");
     }
     else {
-        $stmt = $conn->prepare("SELECT id, 
-                CASE 
-                    WHEN name LIKE ? THEN SUBSTRING(name, LENGTH(?) + 1)
-                    ELSE name
-                END AS name
+        $stmt = $conn->prepare("SELECT id, name
          FROM dsm_ai_priming
          WHERE name NOT LIKE 'Dominia%'
-           AND (name NOT LIKE '@@%' OR name LIKE ?)
+           AND (name NOT LIKE '@@%' OR name LIKE " . implode(" OR name LIKE ", array_fill(0, count($userprefixes), "?")) . ")
          ORDER BY name, id");
     }
 
-    $prefixParam = $userprefix . '%';
-    $stmt->bind_param("sss", $prefixParam, $userprefix, $prefixParam);
+    $prefixParams = array_map(fn($prefix) => $prefix . '%', $userprefixes);
+    $paramTypes = str_repeat("s", count($prefixParams));
+    $stmt->bind_param($paramTypes, ...$prefixParams);
 
     $stmt->execute();
     $stmt->bind_result($id, $name);
 
     while ($stmt->fetch()) {
+        foreach ($userprefixes as $userprefix) {
+            if (str_starts_with($name, $userprefix)) {
+                $name = substr($name, strlen($userprefix));
+                break;
+            }
+        }
         $primings[] = [
             'id' => $id,
             'name' => $name
