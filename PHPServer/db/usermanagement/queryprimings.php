@@ -17,7 +17,13 @@ function queryPrimingsForUser($conn, $username)
     $primings = array();
 
     $userprefix = '@@' . $username . '-';
-    if ($usertype === 1) {
+    $prefixParam = $userprefix . '%';
+    if ($username === "AI-JE") {
+        $stmt = $conn->prepare("SELECT id, name
+         FROM dsm_ai_priming
+         ORDER BY name, id");
+    }
+    elseif ($usertype === 1) {
         $stmt = $conn->prepare("SELECT id,
                 CASE
                     WHEN name LIKE ? THEN SUBSTRING(name, LENGTH(?) + 1)
@@ -26,6 +32,7 @@ function queryPrimingsForUser($conn, $username)
          FROM dsm_ai_priming
          WHERE (name NOT LIKE '@@%' OR name LIKE ?)
          ORDER BY name, id");
+        $stmt->bind_param("sss", $prefixParam, $userprefix, $prefixParam);
     }
     else {
         $stmt = $conn->prepare("SELECT id,
@@ -37,17 +44,15 @@ function queryPrimingsForUser($conn, $username)
          WHERE name NOT LIKE 'Dominia%'
            AND (name NOT LIKE '@@%' OR name LIKE ?)
          ORDER BY name, id");
+        $stmt->bind_param("sss", $prefixParam, $userprefix, $prefixParam);
     }
-    
-    $prefixParam = $userprefix . '%';
-    $stmt->bind_param("sss", $prefixParam, $userprefix, $prefixParam);
-    
+
     $stmt->execute();
     $stmt->bind_result($id, $name);
     if (str_starts_with($name, $userprefix)) {
         $name = substr($name, strlen($userprefix));
     }
-    
+
     while ($stmt->fetch()) {
         $primings[] = [
             'id' => $id,
@@ -63,7 +68,7 @@ function queryPrimingsForUser($conn, $username)
 $username = @$_POST['username'];
 $password = @$_POST['password'];
 
-if (!$username) {
+if (! $username) {
     printError(111, "Missing username");
 }
 

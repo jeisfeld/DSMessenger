@@ -123,7 +123,13 @@ function queryPrimings($username)
     $id = null;
     $name = null;
     $userprefix = '@@' . $username . '-';
-    if ($usertype === 1) {
+    $prefixParam = $userprefix . '%';
+    if ($username === "AI-JE") {
+        $stmt = $conn->prepare("SELECT id, name
+         FROM dsm_ai_priming
+         ORDER BY name, id");
+    }
+    elseif ($usertype === 1) {
         $stmt = $conn->prepare("SELECT id, 
                 CASE 
                     WHEN name LIKE ? THEN SUBSTRING(name, LENGTH(?) + 1)
@@ -132,6 +138,7 @@ function queryPrimings($username)
          FROM dsm_ai_priming
          WHERE (name NOT LIKE '@@%' OR name LIKE ?)
          ORDER BY name, id");
+        $stmt->bind_param("sss", $prefixParam, $userprefix, $prefixParam);
     }
     else {
         $stmt = $conn->prepare("SELECT id, 
@@ -143,10 +150,8 @@ function queryPrimings($username)
          WHERE name NOT LIKE 'Dominia%'
            AND (name NOT LIKE '@@%' OR name LIKE ?)
          ORDER BY name, id");
+        $stmt->bind_param("sss", $prefixParam, $userprefix, $prefixParam);
     }
-
-    $prefixParam = $userprefix . '%';
-    $stmt->bind_param("sss", $prefixParam, $userprefix, $prefixParam);
 
     $stmt->execute();
     $stmt->bind_result($id, $name);
