@@ -2,6 +2,7 @@ package de.jeisfeld.coachat.entity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -74,6 +75,17 @@ public class Contact implements Serializable {
 	 * A timeout after which AI is triggered.
 	 */
 	private final Long aiTimeout;
+
+	/**
+	 * Marker to identify daily AI timeout configuration values in persistent storage.
+	 */
+	private static final long DAILY_TIMEOUT_MARKER = -1_000_000_000_000L;
+
+	/**
+	 * Milliseconds in one hour.
+	 */
+	private static final long HOUR_MILLIS = 3_600_000L;
+
 
 	/**
 	 * Constructor without id.
@@ -205,13 +217,66 @@ public class Contact implements Serializable {
 	}
 
 	/**
+	 * Determine if the AI timeout is configured as a daily time.
+	 *
+	 * @return {@code true} if timeout is stored as daily time.
+	 */
+	public boolean isAiTimeoutDaily() {
+		return getAiTimeout() != null && getAiTimeout() <= DAILY_TIMEOUT_MARKER;
+	}
+
+	/**
+	 * Retrieve the configured daily alarm hour (0-24).
+	 *
+	 * @return The hour for the daily alarm, or {@code null} if not configured as daily timeout.
+	 */
+	public Integer getAiTimeoutDailyHour() {
+		if (!isAiTimeoutDaily()) {
+			return null;
+		}
+		long encodedMillis = DAILY_TIMEOUT_MARKER - getAiTimeout();
+		return (int) (encodedMillis / HOUR_MILLIS);
+	}
+
+	/**
+	 * Encode a daily alarm hour as timeout value for storage.
+	 *
+	 * @param hour The hour in range 0-24.
+	 * @return Encoded timeout value.
+	 */
+	public static long getAiTimeoutForDailyHour(final int hour) {
+		return DAILY_TIMEOUT_MARKER - hour * HOUR_MILLIS;
+	}
+
+	/**
 	 * Get the time to be used for an alarm.
 	 *
 	 * @return The time to be used for an alarm.
 	 */
 	public Long getAlarmTime() {
-		return getAiTimeout() == null ? null
-				: Application.getAppDatabase().getConversationDao().getLastTimestampForContact(getRelationId()) + getAiTimeout();
+		if (getAiTimeout() == null) {
+			return null;
+		}
+
+		if (isAiTimeoutDaily()) {
+			Integer hour = getAiTimeoutDailyHour();
+			if (hour == null || hour < 0 || hour > 24) {
+				return null;
+			}
+
+			Calendar now = Calendar.getInstance();
+			Calendar nextAlarm = Calendar.getInstance();
+			nextAlarm.set(Calendar.MINUTE, 0);
+			nextAlarm.set(Calendar.SECOND, 0);
+			nextAlarm.set(Calendar.MILLISECOND, 0);
+			nextAlarm.set(Calendar.HOUR_OF_DAY, hour == 24 ? 0 : hour);
+			if (hour == 24 || !nextAlarm.after(now)) {
+				nextAlarm.add(Calendar.DAY_OF_MONTH, 1);
+			}
+			return nextAlarm.getTimeInMillis();
+		}
+
+		return Application.getAppDatabase().getConversationDao().getLastTimestampForContact(getRelationId()) + getAiTimeout();
 	}
 
 	/**

@@ -81,6 +81,7 @@
         <item>day(s)</item>
         <item>week(s)</item>
         <item>month(s)</item>
+        <item>daily</item>
     </string-array>
     <integer-array name="array_timer_unit_values" translatable="false">
         <item>60</item>
@@ -88,5 +89,6 @@
         <item>86400</item>
         <item>604800</item>
         <item>2629746</item>
+        <item>-1</item>
     </integer-array>
 </resources>

@@ -711,8 +711,19 @@ public final class AccountDialogUtil {
 					catch (NumberFormatException e) {
 						aiTimeoutValue = 1;
 					}
-					aiTimeout = 1000 * aiTimeoutValue *
-							(long) (getResources().getIntArray(R.array.array_timer_unit_values))[dropdownHandlerTimeUnit.getSelectedPosition()];
+
+					int[] timerUnitValues = getResources().getIntArray(R.array.array_timer_unit_values);
+					int timerUnitValue = timerUnitValues[dropdownHandlerTimeUnit.getSelectedPosition()];
+					if (timerUnitValue < 0) {
+						if (aiTimeoutValue < 0 || aiTimeoutValue > 24) {
+							displayError(R.string.error_timeout_daily_out_of_range);
+							return;
+						}
+						aiTimeout = Contact.getAiTimeoutForDailyHour(aiTimeoutValue);
+					}
+					else {
+						aiTimeout = 1000L * aiTimeoutValue * timerUnitValue;
+					}
 				}
 
 				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
@@ -790,12 +801,18 @@ public final class AccountDialogUtil {
 				return 2;
 			}
 
+			if (contact.isAiTimeoutDaily()) {
+				Integer dailyHour = contact.getAiTimeoutDailyHour();
+				binding.editTextAiTimeoutValue.setText(dailyHour == null ? "0" : Integer.toString(dailyHour));
+				return getResources().getIntArray(R.array.array_timer_unit_values).length - 1;
+			}
+
 			long timerValueSeconds = contact.getAiTimeout() / 1000;
 			int[] timerUnitValues = getResources().getIntArray(R.array.array_timer_unit_values);
 
 			for (int i = timerUnitValues.length - 1; i >= 0; i--) {
 				int timerUnitValue = timerUnitValues[i];
-				if (timerValueSeconds % timerUnitValue == 0) {
+				if (timerUnitValue > 0 && timerValueSeconds % timerUnitValue == 0) {
 					binding.editTextAiTimeoutValue.setText(Long.toString(timerValueSeconds / timerUnitValue));
 					return i;
 				}

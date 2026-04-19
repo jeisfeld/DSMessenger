@@ -67,7 +67,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 			cancelAlarm(context, contact);
 			return;
 		}
-		if (alarmTime < System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5)) {
+		if (!contact.isAiTimeoutDaily() && alarmTime < System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5)) {
 			cancelAlarm(context, contact);
 			executeAlarm(context, contact);
 			return;
