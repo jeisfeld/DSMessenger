@@ -130,6 +130,7 @@
     <string name="error_wrong_old_password">Wrong old password</string>
     <string name="error_missing_ownname">Missing own name</string>
     <string name="error_missing_contactname">Missing contact name</string>
+    <string name="error_timeout_daily_out_of_range">Daily timeout must be between 0 and 24.</string>
     <string name="error_missing_connectioncode">Missing connection code</string>
     <string name="error_missing_devicename">Missing device name</string>
     <string name="error_missing_subject">Missing subject</string>

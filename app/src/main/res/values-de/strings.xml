@@ -130,6 +130,7 @@
     <string name="error_wrong_old_password">Falsches altes Passwort</string>
     <string name="error_missing_ownname">Eigener Name fehlt</string>
     <string name="error_missing_contactname">Kontaktname fehlt</string>
+    <string name="error_timeout_daily_out_of_range">Der tägliche Timeout muss zwischen 0 und 24 liegen.</string>
     <string name="error_missing_connectioncode">Verbindungscode fehlt</string>
     <string name="error_missing_devicename">Gerätename fehlt</string>
     <string name="error_missing_subject">Betreff fehlt</string>

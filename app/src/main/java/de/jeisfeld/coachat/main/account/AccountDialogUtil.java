@@ -259,7 +259,7 @@ public final class AccountDialogUtil {
 
 			binding.buttonCreateAccount.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
-				if (binding.editTextUsername.getText() == null || binding.editTextUsername.getText().toString().trim().length() == 0) {
+				if (binding.editTextUsername.getText() == null || binding.editTextUsername.getText().toString().trim().isEmpty()) {
 					displayError(R.string.error_missing_username);
 					return;
 				}
@@ -325,7 +325,7 @@ public final class AccountDialogUtil {
 
 			binding.buttonLogin.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
-				if (binding.editTextUsername.getText() == null || binding.editTextUsername.getText().toString().trim().length() == 0) {
+				if (binding.editTextUsername.getText() == null || binding.editTextUsername.getText().toString().trim().isEmpty()) {
 					displayError(R.string.error_missing_username);
 					return;
 				}
@@ -451,7 +451,7 @@ public final class AccountDialogUtil {
 
 			binding.buttonCreateInvitation.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
-				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0) {
+				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().isEmpty()) {
 					displayError(R.string.error_missing_contactname);
 					return;
 				}
@@ -523,7 +523,7 @@ public final class AccountDialogUtil {
 			binding.buttonCancel.setOnClickListener(v -> dismiss());
 
 			binding.buttonReviewInvitation.setOnClickListener(v -> {
-				if (binding.editTextConnectionCode.getText() == null || binding.editTextConnectionCode.getText().toString().trim().length() == 0) {
+				if (binding.editTextConnectionCode.getText() == null || binding.editTextConnectionCode.getText().toString().trim().isEmpty()) {
 					displayError(R.string.error_missing_connectioncode);
 					return;
 				}
@@ -546,7 +546,7 @@ public final class AccountDialogUtil {
 								binding.radioButtonSub.setChecked(true);
 								binding.editTextMyName.setEnabled(false);
 								if (binding.editTextContactName.getText() != null
-										&& binding.editTextContactName.getText().toString().trim().length() > 0) {
+										&& !binding.editTextContactName.getText().toString().trim().isEmpty()) {
 									binding.editTextContactName.setEnabled(false);
 								}
 							}
@@ -566,11 +566,11 @@ public final class AccountDialogUtil {
 
 			binding.buttonAcceptInvitation.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
-				if (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().length() == 0) {
+				if (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().isEmpty()) {
 					displayError(R.string.error_missing_ownname);
 					return;
 				}
-				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0) {
+				if (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().isEmpty()) {
 					displayError(R.string.error_missing_contactname);
 					return;
 				}
@@ -683,12 +683,12 @@ public final class AccountDialogUtil {
 			binding.buttonUpdateContact.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
 				if (contact.getMyPermissions().isEditRelation() && contact.getStatus() == ContactStatus.CONNECTED
-						&& (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().length() == 0)) {
+						&& (binding.editTextMyName.getText() == null || binding.editTextMyName.getText().toString().trim().isEmpty())) {
 					displayError(R.string.error_missing_ownname);
 					return;
 				}
 				if (contact.getMyPermissions().isEditRelation()
-						&& (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().length() == 0)) {
+						&& (binding.editTextContactName.getText() == null || binding.editTextContactName.getText().toString().trim().isEmpty())) {
 					displayError(R.string.error_missing_contactname);
 					return;
 				}
@@ -711,8 +711,19 @@ public final class AccountDialogUtil {
 					catch (NumberFormatException e) {
 						aiTimeoutValue = 1;
 					}
-					aiTimeout = 1000 * aiTimeoutValue *
-							(long) (getResources().getIntArray(R.array.array_timer_unit_values))[dropdownHandlerTimeUnit.getSelectedPosition()];
+
+					int[] timerUnitValues = getResources().getIntArray(R.array.array_timer_unit_values);
+					int timerUnitValue = timerUnitValues[dropdownHandlerTimeUnit.getSelectedPosition()];
+					if (timerUnitValue < 0) {
+						if (aiTimeoutValue < 0 || aiTimeoutValue > 24) {
+							displayError(R.string.error_timeout_daily_out_of_range);
+							return;
+						}
+						aiTimeout = Contact.getAiTimeoutForDailyHour(aiTimeoutValue);
+					}
+					else {
+						aiTimeout = 1000L * aiTimeoutValue * timerUnitValue;
+					}
 				}
 
 				Contact newContact = new Contact(contact.getRelationId(), contactName, myName, contact.getContactId(), contact.isSlave(),
@@ -785,9 +796,15 @@ public final class AccountDialogUtil {
 		}
 
 		private int splitTimerValue(final Contact contact) {
-			if (contact.getAiTimeout() == null || contact.getAiTimeout() <= 0) {
+			if (contact.getAiTimeout() == null || contact.getAiTimeout() <= 0 && !contact.isAiTimeoutDaily()) {
 				binding.editTextAiTimeoutValue.setText("1");
 				return 2;
+			}
+
+			if (contact.isAiTimeoutDaily()) {
+				Integer dailyHour = contact.getAiTimeoutDailyHour();
+				binding.editTextAiTimeoutValue.setText(dailyHour == null ? "0" : Integer.toString(dailyHour));
+				return getResources().getIntArray(R.array.array_timer_unit_values).length - 1;
 			}
 
 			long timerValueSeconds = contact.getAiTimeout() / 1000;
@@ -795,7 +812,7 @@ public final class AccountDialogUtil {
 
 			for (int i = timerUnitValues.length - 1; i >= 0; i--) {
 				int timerUnitValue = timerUnitValues[i];
-				if (timerValueSeconds % timerUnitValue == 0) {
+				if (timerUnitValue > 0 && timerValueSeconds % timerUnitValue == 0) {
 					binding.editTextAiTimeoutValue.setText(Long.toString(timerValueSeconds / timerUnitValue));
 					return i;
 				}
@@ -888,7 +905,7 @@ public final class AccountDialogUtil {
 
 			binding.buttonUpdateDevice.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
-				if (binding.editTextDeviceName.getText() == null || binding.editTextDeviceName.getText().toString().trim().length() == 0) {
+				if (binding.editTextDeviceName.getText() == null || binding.editTextDeviceName.getText().toString().trim().isEmpty()) {
 					displayError(R.string.error_missing_devicename);
 					return;
 				}
@@ -965,7 +982,7 @@ public final class AccountDialogUtil {
 
 			binding.buttonUpdateConversation.setOnClickListener(v -> {
 				binding.textViewErrorMessage.setVisibility(View.INVISIBLE);
-				if (binding.editTextSubject.getText() == null || binding.editTextSubject.getText().toString().trim().length() == 0) {
+				if (binding.editTextSubject.getText() == null || binding.editTextSubject.getText().toString().trim().isEmpty()) {
 					displayError(R.string.error_missing_subject);
 					return;
 				}
