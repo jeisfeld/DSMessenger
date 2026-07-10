@@ -3,32 +3,32 @@ require_once __DIR__.'/../dbfunctions.php';
 require_once __DIR__ . '/../../openai/queryopenai.php';
 
 $modelMap = [
-    "1" => "claude-sonnet-4-5-20250929",
+    "1" => "claude-sonnet-5",
     "2" => "claude-sonnet-4-6",
-    "3" => "claude-opus-4-7",
+    "3" => "claude-opus-4-8",
     "4" => "claude-haiku-4-5-20251001",
     "5" => "gpt-4.1-2025-04-14",
     "6" => "gpt-4o-2024-11-20",
-    "7" => "gemini-3.1-pro-preview",
+    "7" => "gemini-3.7-flash",
     "8" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",
     "9" => "ft:gpt-4o-mini-2024-07-18:personal:vlc:9yc6wVhK",
     "!" => "chatgpt-4o-latest",
-    "(" => "deepseek-chat",
-    ")" => "deepseek-reasoner",
+    "(" => "deepseek-v4-flash",
+    ")" => "deepseek-v4-pro",
     "?" => "mixtral-8x22b-instruct",
     "+" => "o4-mini-2025-04-16",
     "-" => "o3-2025-04-16",
     "{" => "llama4-scout",
     "}" => "llama4-maverick",
     "*" => "grok-4.3",
-    "#" => "grok-4.20-non-reasoning",
-    "<" => "gemini-2.5-flash",
+    "#" => "grok-4.5",
+    "<" => "gemini-3.6-flash",
     ">" => "gemini-2.5-pro",
-    "%" => "gpt-5.4-2026-03-05",
+    "%" => "gpt-5.6-sol",
     "=" => "gpt-5.5-2026-04-23",
     "/" => "gpt-5-pro-2025-10-06",
     "$" => "gpt-5-mini-2025-08-07",
-    "&" => "gpt-5-nano-2025-08-07"
+    "&" => "claude-fable-5"
 ];
 
 $autoQueryTriggerMessage = "[@]";

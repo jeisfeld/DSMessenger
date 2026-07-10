@@ -254,15 +254,22 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
     $response_data = json_decode($response, true);
 
     if ($isclaude) {
-        if (isset($response_data['content'][0]['text'])) {
-            $message = $response_data['content'][0]['text'];
-            return [
-                'success' => TRUE,
-                'message' => [
-                    'role' => $response_data['role'],
-                    'content' => $message
-                ]
-            ];
+        if (isset($response_data['content']) && is_array($response_data['content'])) {
+            foreach ($response_data['content'] as $content) {
+                if (
+                    isset($content['type'], $content['text']) &&
+                    $content['type'] === 'text'
+                    ) {
+                        $message = $content['text'];
+                        return [
+                            'success' => TRUE,
+                            'message' => [
+                                'role' => $response_data['role'],
+                                'content' => $message
+                            ]
+                        ];
+                    }
+            }
         }
         else if (isset($response_data['error']['message'])) {
             $message = $response_data['error'];
