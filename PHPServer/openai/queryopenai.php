@@ -10,7 +10,8 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
     $isdeepseek = str_starts_with($model, 'deepseek');
     $isxai = str_starts_with($model, 'grok');
     $iskimi = str_starts_with($model, 'kimi');
-
+    $isqwen = str_starts_with($model, 'qwen');
+    
     if (str_starts_with($model, 'o1-')) {
         foreach ($messages as &$message) {
             if ($message['role'] === 'system') {
@@ -226,7 +227,16 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
             'Authorization: Bearer ' . getApiKey(6)
         ]);
     }
-    else if ($needsresponsesapi) {
+    else if ($isqwen) {
+        curl_setopt($ch, CURLOPT_URL, 'https://maas.qwencloudapi.com/compatible-mode/v1/chat/completions');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . getApiKey(7)
+        ]);
+    }else if ($needsresponsesapi) {
         curl_setopt($ch, CURLOPT_URL, 'https://api.openai.com/v1/responses');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
