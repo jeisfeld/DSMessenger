@@ -23,7 +23,7 @@ $modelMap = [
     "*" => "grok-4.5",
     "#" => "grok-4.6",
     "<" => "gemini-3.6-flash",
-    ">" => "gemini-2.5-pro",
+    ">" => "gemini-4-argon",
     "%" => "gpt-5.6-sol",
     "=" => "gpt-6-astra",
     "/" => "ft:gpt-3.5-turbo-1106:personal::8ghw8uc0",

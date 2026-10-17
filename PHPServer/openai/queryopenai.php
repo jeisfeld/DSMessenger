@@ -124,7 +124,9 @@ function queryOpenAi($messages, $temperature = 1, $presencePenalty = 0, $frequen
                 ]
             ]
         ];
-        if (str_starts_with($model, 'gemini-2') || str_starts_with($model, 'gemini-3')) {
+        // Gemini 2 and newer use google_search. Keep the legacy retrieval tool
+        // for Gemini 1.x and unversioned legacy model names.
+        if (preg_match('/^gemini-(\d+)(?:\.|-)/', $model, $matches) && (int) $matches[1] >= 2) {
             $data['tools'] = [
                 [
                     'google_search' => new stdClass()
